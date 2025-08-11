@@ -28,6 +28,7 @@ const Auth = () => {
     setLoading(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
+      if (!supabase?.auth) throw new Error("Supabase client is unavailable. Please ensure integration is active.");
       if (mode === "signin") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
