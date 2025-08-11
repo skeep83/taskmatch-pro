@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
+import Auth from "./pages/Auth";
+import Pro from "./pages/Pro";
+import JobNew from "./pages/JobNew";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import { I18nProvider } from "./i18n";
@@ -23,6 +26,10 @@ const App = () => (
           <Header />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/catalog" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/pro" element={<Pro />} />
+            <Route path="/job/new" element={<JobNew />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
