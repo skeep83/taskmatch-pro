@@ -1,6 +1,6 @@
 import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,20 +13,7 @@ const Auth = () => {
   const { toast } = useToast();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
-  const [hasClient, setHasClient] = useState<boolean>(true);
-  const [supabaseUrl, setSupabaseUrl] = useState<string>("");
-  const [supabaseAnon, setSupabaseAnon] = useState<string>("");
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const { supabase } = await import("@/integrations/supabase/client");
-        setHasClient(!!supabase?.auth);
-      } catch {
-        setHasClient(false);
-      }
-    })();
-  }, []);
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -71,25 +58,6 @@ const Auth = () => {
         <header className="mb-6">
           <h1 className="text-2xl font-semibold">{mode === 'signin' ? 'Войти' : 'Создать аккаунт'}</h1>
         </header>
-        {!hasClient && (
-          <aside className="mb-6 p-4 border rounded-md">
-            <p className="text-sm mb-3">Клиент Supabase не найден. Если интеграция подключена, обновите страницу. Либо укажите URL и Public anon key вручную (сохраняется в вашем браузере):</p>
-            <div className="grid gap-3">
-              <div className="space-y-1">
-                <Label htmlFor="sb-url">Supabase URL</Label>
-                <Input id="sb-url" placeholder="https://xyzcompany.supabase.co" value={supabaseUrl} onChange={(e) => setSupabaseUrl(e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="sb-anon">Public anon key</Label>
-                <Input id="sb-anon" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." value={supabaseAnon} onChange={(e) => setSupabaseAnon(e.target.value)} />
-              </div>
-              <div className="flex gap-2">
-                <Button type="button" variant="outline" onClick={() => { localStorage.setItem('supabase.url', supabaseUrl.trim()); localStorage.setItem('supabase.anon', supabaseAnon.trim()); location.reload(); }}>Сохранить и обновить</Button>
-                <Button type="button" variant="ghost" onClick={() => { setSupabaseUrl(''); setSupabaseAnon(''); localStorage.removeItem('supabase.url'); localStorage.removeItem('supabase.anon'); }}>Очистить</Button>
-              </div>
-            </div>
-          </aside>
-        )}
         <form className="space-y-4" onSubmit={onSubmit}>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
