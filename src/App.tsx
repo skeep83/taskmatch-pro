@@ -13,7 +13,7 @@ import JobNew from "./pages/JobNew";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import { I18nProvider } from "./i18n";
-
+import Diagnostics from "./components/Diagnostics";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -22,6 +22,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <Diagnostics />
         <BrowserRouter>
           <Header />
           <Routes>
