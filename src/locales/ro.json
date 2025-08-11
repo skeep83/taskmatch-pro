@@ -1,0 +1,18 @@
+{
+  "app.name": "ServiceHub",
+  "nav.find_pro": "Găsește specialist",
+  "nav.become_pro": "Devino specialist",
+  "nav.catalog": "Catalog",
+  "nav.sign_in": "Autentificare",
+  "hero.title": "Conectăm clienții cu specialiști verificați în câteva clipe",
+  "hero.subtitle": "Plăți escrow, licitații, chat, evaluare video și plăți instant.",
+  "hero.cta_primary": "Comandă serviciu",
+  "hero.cta_secondary": "Înregistrează-te ca prestator",
+  "section.categories": "Categorii populare",
+  "section.testimonials": "Testimoniale",
+  "footer.rights": "© ServiceHub. Toate drepturile rezervate.",
+  "lang.ru": "Rus",
+  "lang.ro": "Rom",
+  "seo.home.title": "ServiceHub — piață de servicii",
+  "seo.home.desc": "Găsește rapid specialiști verificați. Escrow, licitații, chat, evaluare video, plăți instant."
+}

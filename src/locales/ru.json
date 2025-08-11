@@ -1,0 +1,18 @@
+{
+  "app.name": "ServiceHub",
+  "nav.find_pro": "Найти специалиста",
+  "nav.become_pro": "Стать специалистом",
+  "nav.catalog": "Каталог",
+  "nav.sign_in": "Войти",
+  "hero.title": "Моментально соединяем клиентов с проверенными специалистами",
+  "hero.subtitle": "Эскроу‑платежи, тендеры, чаты, видео‑оценка и мгновенные выплаты.",
+  "hero.cta_primary": "Заказать услугу",
+  "hero.cta_secondary": "Стать исполнителем",
+  "section.categories": "Популярные категории",
+  "section.testimonials": "Отзывы клиентов",
+  "footer.rights": "© ServiceHub. Все права защищены.",
+  "lang.ru": "Рус",
+  "lang.ro": "Rom",
+  "seo.home.title": "ServiceHub — маркетплейс услуг",
+  "seo.home.desc": "Быстрый подбор проверенных специалистов. Эскроу, тендеры, чаты, видео‑оценка, мгновенные выплаты."
+}
