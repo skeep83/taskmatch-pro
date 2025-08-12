@@ -203,12 +203,12 @@ const DashboardPro = () => {
             <span>Рейтинг: {ratingAvg ? ratingAvg.toFixed(1) : '—'}{ratingCount ? ` (${ratingCount})` : ''}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button className="btn-ghost" onClick={()=>navigate('/pro/profile')}>Профиль</button>
-            <button className="btn-ghost" onClick={()=>navigate('/pro/schedule')}>Расписание</button>
-            <button className="btn-ghost" onClick={()=>navigate('/portfolio')}>Портфолио</button>
-            <button className="btn-ghost" onClick={()=>navigate('/tenders')}>Тендеры</button>
-            <button className="btn-ghost" onClick={requestPayout}>Запросить выплату</button>
-            <button className="btn-ghost" onClick={()=>navigate('/kyc')}>KYC</button>
+            <button className="btn-ghost text-sm" onClick={()=>navigate('/pro/profile')}>Профиль</button>
+            <button className="btn-ghost text-sm" onClick={()=>navigate('/pro/schedule')}>Расписание</button>
+            <button className="btn-ghost text-sm" onClick={()=>navigate('/portfolio')}>Портфолио</button>
+            <button className="btn-ghost text-sm" onClick={()=>navigate('/tenders')}>Тендеры</button>
+            <button className="btn-ghost text-sm" onClick={requestPayout}>Запросить выплату</button>
+            <button className="btn-ghost text-sm" onClick={()=>navigate('/kyc')}>KYC</button>
           </div>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
