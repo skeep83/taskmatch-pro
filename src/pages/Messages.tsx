@@ -14,6 +14,9 @@ const Messages = () => {
   const [chats, setChats] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState("");
+  const [presence, setPresence] = useState<Record<string, any>>({});
+  const [otherOnline, setOtherOnline] = useState(false);
+
 
   useEffect(() => {
     (async () => {
@@ -59,6 +62,36 @@ const Messages = () => {
     })();
   }, [id]);
 
+  // Presence: track participants in this chat
+  useEffect(() => {
+    (async () => {
+      if (!id || !userId) return;
+      const { supabase } = await import("@/integrations/supabase/client");
+      const room = (supabase as any).channel(`presence:chat:${id}`, { config: { presence: { key: userId } } });
+
+      const updateState = () => {
+        const state = room.presenceState() as Record<string, any[]>;
+        setPresence(state);
+        const chat = chats.find((c) => String(c.id) === String(id));
+        const otherId = chat ? (chat.client_id === userId ? chat.professional_id : chat.client_id) : null;
+        const flat = Object.values(state).flat() as any[];
+        setOtherOnline(Boolean(flat.find((p: any) => p.user_id === otherId)));
+      };
+
+      room
+        .on('presence', { event: 'sync' }, updateState)
+        .on('presence', { event: 'join' }, updateState)
+        .on('presence', { event: 'leave' }, updateState)
+        .subscribe(async (status: string) => {
+          if (status === 'SUBSCRIBED') {
+            await room.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString() });
+          }
+        });
+
+      return () => { (supabase as any).removeChannel(room); };
+    })();
+  }, [id, userId, chats]);
+
   const send = async () => {
     if (!text.trim() || !userId || !id) return;
     try {
@@ -101,7 +134,10 @@ const Messages = () => {
               <div className="p-6 text-sm text-muted-foreground">Выберите чат слева</div>
             ) : (
               <>
-                <div className="p-3 border-b text-sm">{selectedChat ? `Чат #${String(selectedChat.id).slice(0,8)}` : 'Чат'}</div>
+                <div className="p-3 border-b text-sm flex items-center justify-between">
+                  <span>{selectedChat ? `Чат #${String(selectedChat.id).slice(0,8)}` : 'Чат'}</span>
+                  <span className="text-xs text-muted-foreground">{otherOnline ? 'Онлайн' : 'Не в сети'}</span>
+                </div>
                 <div className="flex-1 p-3 space-y-2 overflow-y-auto">
                   {messages.map((m) => (
                     <div key={m.id} className={`max-w-[80%] p-2 rounded-md ${m.sender_id===userId? 'ml-auto bg-primary/10' : 'bg-muted'}`}>
