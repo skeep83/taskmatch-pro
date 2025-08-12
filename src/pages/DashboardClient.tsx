@@ -92,17 +92,17 @@ const DashboardClient = () => {
           <button className="btn-hero" onClick={() => navigate('/job/new')}>Новый заказ</button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="p-4 border rounded-md">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="p-4 border rounded-md min-w-0">
             <h3 className="font-medium mb-2">HomeCare Подписка</h3>
-            <div className="flex gap-2">
-              <button className="btn-ghost" disabled={subLoading} onClick={() => startSubscribe(990)}>
+            <div className="flex flex-wrap items-center gap-2">
+              <button className="btn-ghost whitespace-nowrap text-sm px-3 py-2" disabled={subLoading} onClick={() => startSubscribe(990)}>
                 Basic $9.90
               </button>
-              <button className="btn-ghost" disabled={subLoading} onClick={() => startSubscribe(1990)}>
+              <button className="btn-ghost whitespace-nowrap text-sm px-3 py-2" disabled={subLoading} onClick={() => startSubscribe(1990)}>
                 Plus $19.90
               </button>
-              <button className="btn-ghost" disabled={subLoading} onClick={() => startSubscribe(3990)}>
+              <button className="btn-ghost whitespace-nowrap text-sm px-3 py-2" disabled={subLoading} onClick={() => startSubscribe(3990)}>
                 Max $39.90
               </button>
             </div>
