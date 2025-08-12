@@ -3,6 +3,7 @@ import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { ShieldCheck, Zap, Crown } from "lucide-react";
 
 const DashboardClient = () => {
   const { t } = useI18n();
@@ -93,17 +94,20 @@ const DashboardClient = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="p-4 border rounded-md min-w-0">
+          <div className="p-4 border rounded-md min-w-0 animate-fade-in">
             <h3 className="font-medium mb-2">HomeCare Подписка</h3>
             <div className="flex flex-wrap items-center gap-2">
-              <button className="btn-ghost whitespace-nowrap text-sm px-3 py-2" disabled={subLoading} onClick={() => startSubscribe(990)}>
-                Basic $9.90
+              <button className="btn-ghost hover-scale whitespace-nowrap text-sm px-3 py-2 flex items-center gap-2" disabled={subLoading} onClick={() => startSubscribe(990)}>
+                <ShieldCheck className="h-4 w-4" aria-hidden />
+                <span>Basic $9.90</span>
               </button>
-              <button className="btn-ghost whitespace-nowrap text-sm px-3 py-2" disabled={subLoading} onClick={() => startSubscribe(1990)}>
-                Plus $19.90
+              <button className="btn-ghost hover-scale whitespace-nowrap text-sm px-3 py-2 flex items-center gap-2" disabled={subLoading} onClick={() => startSubscribe(1990)}>
+                <Zap className="h-4 w-4" aria-hidden />
+                <span>Plus $19.90</span>
               </button>
-              <button className="btn-ghost whitespace-nowrap text-sm px-3 py-2" disabled={subLoading} onClick={() => startSubscribe(3990)}>
-                Max $39.90
+              <button className="btn-ghost hover-scale whitespace-nowrap text-sm px-3 py-2 flex items-center gap-2" disabled={subLoading} onClick={() => startSubscribe(3990)}>
+                <Crown className="h-4 w-4" aria-hidden />
+                <span>Max $39.90</span>
               </button>
             </div>
             <div className="mt-2">
