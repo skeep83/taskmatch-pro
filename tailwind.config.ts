@@ -19,8 +19,8 @@ export default {
 		},
 				extend: {
 				fontFamily: {
-					sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'],
-					display: ['"Playfair Display"', 'serif']
+					sans: ['-apple-system','BlinkMacSystemFont','SF Pro Text','SF Pro Display','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial','Noto Sans','Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','sans-serif'],
+					display: ['SF Pro Display','-apple-system','BlinkMacSystemFont','SF Pro Text','system-ui','Helvetica Neue','Arial','sans-serif']
 				},
 				colors: {
 				border: 'hsl(var(--border))',
