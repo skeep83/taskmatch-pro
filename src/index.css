@@ -105,7 +105,7 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground antialiased font-sans text-[19px] md:text-[20px] leading-relaxed;
+    @apply bg-background text-foreground antialiased font-sans text-[25px] leading-relaxed;
   }
 
   h1, h2, h3 {
