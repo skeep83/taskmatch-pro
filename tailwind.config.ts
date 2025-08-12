@@ -75,18 +75,14 @@ export default {
 			keyframes: {
 				'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
 				'accordion-up': { from: { height: 'var(--radix-accordion-content-height)' }, to: { height: '0' } },
-				'fade-in': {
-					'0%': { opacity: '0', transform: 'translateY(10px)' },
-					'100%': { opacity: '1', transform: 'translateY(0)' }
-				},
-				'fade-out': {
-					'0%': { opacity: '1', transform: 'translateY(0)' },
-					'100%': { opacity: '0', transform: 'translateY(10px)' }
-				},
+				'fade-in': { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+				'fade-out': { '0%': { opacity: '1', transform: 'translateY(0)' }, '100%': { opacity: '0', transform: 'translateY(10px)' } },
 				'scale-in': { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
 				'scale-out': { from: { transform: 'scale(1)', opacity: '1' }, to: { transform: 'scale(0.95)', opacity: '0' } },
 				'slide-in-right': { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(0)' } },
 				'slide-out-right': { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(100%)' } },
+				'float': { '0%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-6px)' }, '100%': { transform: 'translateY(0)' } },
+				'glow': { '0%': { filter: 'drop-shadow(0 0 0 hsl(var(--primary)/0))' }, '50%': { filter: 'drop-shadow(0 0 12px hsl(var(--primary)/0.45))' }, '100%': { filter: 'drop-shadow(0 0 0 hsl(var(--primary)/0))' } },
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -98,7 +94,9 @@ export default {
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
 				'slide-out-right': 'slide-out-right 0.3s ease-out',
 				'enter': 'fade-in 0.3s ease-out, scale-in 0.2s ease-out',
-				'exit': 'fade-out 0.3s ease-out, scale-out 0.2s ease-out'
+				'exit': 'fade-out 0.3s ease-out, scale-out 0.2s ease-out',
+				'float-slow': 'float 3s ease-in-out infinite',
+				'glow-soft': 'glow 2.5s ease-in-out infinite',
 			}
 		}
 	},

@@ -2,6 +2,8 @@ import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { useI18n } from "@/i18n";
 import { Link } from "react-router-dom";
+import { Wrench, Zap, Sparkles, Paintbrush, Package, Cog, ShieldCheck, Crown } from "lucide-react";
+import AnimatedIcon from "@/components/ui/animated-icon";
 
 const categories = [
   { key: "plumbing", label: "Сантехника" },
@@ -37,17 +39,34 @@ const Index = () => {
             <Link to="/job/new" className="btn-hero">{t("hero.cta_primary")}</Link>
             <Link to="/pro" className="btn-ghost">{t("hero.cta_secondary")}</Link>
           </div>
+          <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground">
+            <AnimatedIcon icon={ShieldCheck} delayMs={0} />
+            <AnimatedIcon icon={Zap} delayMs={150} />
+            <AnimatedIcon icon={Crown} delayMs={300} />
+          </div>
         </div>
       </section>
 
       <section className="container mx-auto py-12">
         <h2 className="text-2xl md:text-3xl font-semibold mb-6">{t("section.categories")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((c) => (
-            <div key={c.key} className="card-surface text-center hover:shadow-lg transition-shadow hover-scale">
-              <div className="text-sm font-medium">{c.label}</div>
-            </div>
-          ))}
+          {categories.map((c) => {
+            const iconsByKey: Record<string, any> = {
+              plumbing: Wrench,
+              electric: Zap,
+              cleaning: Sparkles,
+              appliance: Cog,
+              painting: Paintbrush,
+              moving: Package,
+            };
+            const IconCmp = iconsByKey[c.key] || Sparkles;
+            return (
+              <div key={c.key} className="card-surface text-center hover:shadow-lg transition-shadow hover-scale">
+                <IconCmp className="mx-auto h-7 w-7 text-primary animate-float-slow" aria-hidden />
+                <div className="text-sm font-medium mt-2">{c.label}</div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
