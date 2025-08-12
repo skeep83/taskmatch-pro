@@ -3,7 +3,7 @@ import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Zap, Crown } from "lucide-react";
+import { ShieldCheck, Zap, Crown, PlusCircle, Gift, ClipboardList, MessageSquare, CreditCard } from "lucide-react";
 
 const DashboardClient = () => {
   const { t } = useI18n();
@@ -126,7 +126,7 @@ const DashboardClient = () => {
       <section className="max-w-5xl mx-auto card-surface">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-semibold">Личный кабинет</h1>
-          <button className="btn-hero" onClick={() => navigate('/job/new')}>Новый заказ</button>
+          <button className="btn-hero inline-flex items-center" onClick={() => navigate('/job/new')}><PlusCircle className="h-5 w-5 mr-2" aria-hidden />Новый заказ</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -151,13 +151,13 @@ const DashboardClient = () => {
             </div>
           </div>
           <div className="p-4 border rounded-md">
-            <h3 className="font-medium mb-2">Реферальный код</h3>
+            <h3 className="font-medium mb-2 inline-flex items-center"><Gift className="h-4 w-4 mr-2" aria-hidden />Реферальный код</h3>
             <p className="text-sm break-all">{userId}</p>
             <button className="mt-2 text-xs underline" onClick={() => { navigator.clipboard.writeText(String(userId)); toast({ title: 'Скопировано' }); }}>Копировать</button>
           </div>
         </div>
 
-        <h2 className="text-lg font-medium mb-2">Мои заказы</h2>
+        <h2 className="text-lg font-medium mb-2 inline-flex items-center"><ClipboardList className="h-5 w-5 mr-2" aria-hidden />Мои заказы</h2>
         <ul className="space-y-3">
           {myJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока нет заказов</li>}
           {myJobs.map((j) => (
@@ -167,8 +167,8 @@ const DashboardClient = () => {
                 <p className="text-xs text-muted-foreground">Статус: {j.status} • {j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'}</p>
               </div>
               <div className="flex gap-2">
-                {j.status === 'new' && <button className="btn-ghost" onClick={() => payEscrow(j)}>Оплатить эскроу</button>}
-                {j.pro_id && <button className="btn-ghost" onClick={() => openChatForJob(j)}>Чат</button>}
+                {j.status === 'new' && <button className="btn-ghost inline-flex items-center" onClick={() => payEscrow(j)}><CreditCard className="h-4 w-4 mr-1" aria-hidden />Оплатить эскроу</button>}
+                {j.pro_id && <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>}
               </div>
             </li>
           ))}

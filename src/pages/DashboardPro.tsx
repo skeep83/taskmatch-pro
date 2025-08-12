@@ -3,6 +3,7 @@ import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, CreditCard, Briefcase, Clock, ShieldCheck } from "lucide-react";
 
 const DashboardPro = () => {
   const { t } = useI18n();
@@ -313,22 +314,22 @@ const DashboardPro = () => {
       <section className="max-w-5xl mx-auto card-surface">
         <h1 className="text-2xl font-semibold mb-4">Кабинет исполнителя</h1>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-6">
-          <div className="text-sm flex flex-wrap items-center gap-3">
-            <span className="text-success text-lg font-semibold">Баланс: ${(walletBalance/100).toFixed(2)} $</span>
-            <span className="text-success text-lg font-semibold">Рейтинг: {ratingAvg ? ratingAvg.toFixed(1) : '—'}{ratingCount ? ` (${ratingCount})` : ''}</span>
+          <div className="text-sm flex flex-wrap items-center gap-4">
+            <span className="text-success text-lg font-semibold inline-flex items-center"><Wallet className="h-4 w-4 mr-1" aria-hidden />Баланс: ${(walletBalance/100).toFixed(2)} $</span>
+            <span className="text-success text-lg font-semibold inline-flex items-center"><Star className="h-4 w-4 mr-1" aria-hidden />Рейтинг: {ratingAvg ? ratingAvg.toFixed(1) : '—'}{ratingCount ? ` (${ratingCount})` : ''}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button className="btn-ghost text-sm" onClick={()=>navigate('/pro/profile')}>Профиль</button>
-            <button className="btn-ghost text-sm" onClick={()=>navigate('/pro/schedule')}>Расписание</button>
-            <button className="btn-ghost text-sm" onClick={()=>navigate('/portfolio')}>Портфолио</button>
-            <button className="btn-ghost text-sm" onClick={()=>navigate('/tenders')}>Тендеры</button>
-            <button className="btn-ghost text-sm" onClick={requestPayout}>Запросить выплату</button>
-            <button className="btn-ghost text-sm" onClick={()=>navigate('/kyc')}>KYC</button>
+            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/pro/profile')}><UserCog className="h-4 w-4 mr-1" aria-hidden />Профиль</button>
+            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/pro/schedule')}><Calendar className="h-4 w-4 mr-1" aria-hidden />Расписание</button>
+            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/portfolio')}><ImageIcon className="h-4 w-4 mr-1" aria-hidden />Портфолио</button>
+            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/tenders')}><Briefcase className="h-4 w-4 mr-1" aria-hidden />Тендеры</button>
+            <button className="btn-ghost text-sm inline-flex items-center" onClick={requestPayout}><CreditCard className="h-4 w-4 mr-1" aria-hidden />Запросить выплату</button>
+            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/kyc')}><ShieldCheck className="h-4 w-4 mr-1" aria-hidden />KYC</button>
           </div>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <h2 className="text-lg font-medium mb-2">Доступные заказы</h2>
+            <h2 className="text-lg font-medium mb-2 inline-flex items-center"><Briefcase className="h-4 w-4 mr-2" aria-hidden />Доступные заказы</h2>
             <ul className="space-y-3">
               {nearbyJobs.length === 0 && <li className="text-sm text-muted-foreground">Нет доступных заказов</li>}
               {nearbyJobs.map((j) => {
@@ -349,9 +350,9 @@ const DashboardPro = () => {
                     <div className="md:col-span-3 flex flex-col gap-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-medium">{categoriesMap[j.category_id] || 'Без категории'}</p>
+                          <p className="text-sm font-medium"><Briefcase className="inline h-4 w-4 mr-1" aria-hidden />{categoriesMap[j.category_id] || 'Без категории'}</p>
                           <p className="text-sm mt-1">{j.description}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'} • Бюджет: {j.budget_min_cents ? `$${(j.budget_min_cents/100).toFixed(0)}` : '—'}{j.budget_max_cents ? `–$${(j.budget_max_cents/100).toFixed(0)}` : ''}</p>
+                          <p className="text-xs text-muted-foreground mt-1"><Calendar className="inline h-3 w-3 mr-1" aria-hidden />{j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'} • <CreditCard className="inline h-3 w-3 mx-1" aria-hidden />Бюджет: {j.budget_min_cents ? `$${(j.budget_min_cents/100).toFixed(0)}` : '—'}{j.budget_max_cents ? `–$${(j.budget_max_cents/100).toFixed(0)}` : ''}</p>
                           {existingApps[j.id] && (
                             <p className="text-xs text-success mt-1">Ваш оффер: ${(existingApps[j.id].price_cents/100).toFixed(2)} $</p>
                           )}
@@ -403,7 +404,7 @@ const DashboardPro = () => {
             </ul>
           </div>
           <div>
-            <h2 className="text-lg font-medium mb-2">Мои активные</h2>
+            <h2 className="text-lg font-medium mb-2 inline-flex items-center"><Clock className="h-4 w-4 mr-2" aria-hidden />Мои активные</h2>
             <ul className="space-y-3">
               {myActiveJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока пусто</li>}
               {myActiveJobs.map((j) => (
@@ -413,7 +414,7 @@ const DashboardPro = () => {
                     <p className="text-xs text-muted-foreground">Статус: {j.status}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button className="btn-ghost" onClick={() => openChatForJob(j.id)}>Чат</button>
+                    <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j.id)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>
                     {j.status === 'accepted' && <button className="btn-ghost" onClick={() => startJob(j.id)}>Старт</button>}
                     {j.status === 'in_progress' && <button className="btn-ghost" onClick={() => finishJob(j.id)}>Завершить</button>}
                   </div>
