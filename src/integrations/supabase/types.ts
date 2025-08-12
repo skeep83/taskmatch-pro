@@ -14,6 +14,378 @@ export type Database = {
   }
   public: {
     Tables: {
+      bids: {
+        Row: {
+          created_at: string
+          eta_slot: string | null
+          id: string
+          is_final: boolean
+          note: string | null
+          price_cents: number
+          pro_id: string
+          tender_id: string
+          warranty_days: number | null
+        }
+        Insert: {
+          created_at?: string
+          eta_slot?: string | null
+          id?: string
+          is_final?: boolean
+          note?: string | null
+          price_cents: number
+          pro_id: string
+          tender_id: string
+          warranty_days?: number | null
+        }
+        Update: {
+          created_at?: string
+          eta_slot?: string | null
+          id?: string
+          is_final?: boolean
+          note?: string | null
+          price_cents?: number
+          pro_id?: string
+          tender_id?: string
+          warranty_days?: number | null
+        }
+        Relationships: []
+      }
+      business_accounts: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          idno: string | null
+          legal_address: string | null
+          owner_id: string
+          updated_at: string
+          vat_number: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          idno?: string | null
+          legal_address?: string | null
+          owner_id: string
+          updated_at?: string
+          vat_number?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          idno?: string | null
+          legal_address?: string | null
+          owner_id?: string
+          updated_at?: string
+          vat_number?: string | null
+        }
+        Relationships: []
+      }
+      business_members: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          limits: Json | null
+          role: Database["public"]["Enums"]["biz_role"]
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          limits?: Json | null
+          role?: Database["public"]["Enums"]["biz_role"]
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          limits?: Json | null
+          role?: Database["public"]["Enums"]["biz_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          label_ro: string | null
+          label_ru: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          label_ro?: string | null
+          label_ru?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          label_ro?: string | null
+          label_ru?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          chat_id: string
+          content: string | null
+          created_at: string
+          file_url: string | null
+          id: string
+          is_read: boolean
+          message_type: string
+          sender_id: string
+        }
+        Insert: {
+          chat_id: string
+          content?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_read?: boolean
+          message_type?: string
+          sender_id: string
+        }
+        Update: {
+          chat_id?: string
+          content?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_read?: boolean
+          message_type?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      chats: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          job_id: string | null
+          last_message_at: string | null
+          professional_id: string
+          status: Database["public"]["Enums"]["chat_status"]
+          tender_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          last_message_at?: string | null
+          professional_id: string
+          status?: Database["public"]["Enums"]["chat_status"]
+          tender_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          last_message_at?: string | null
+          professional_id?: string
+          status?: Database["public"]["Enums"]["chat_status"]
+          tender_id?: string | null
+        }
+        Relationships: []
+      }
+      escrows: {
+        Row: {
+          amount_cents: number
+          client_id: string
+          created_at: string
+          currency: string
+          id: string
+          job_id: string
+          pro_id: string | null
+          status: Database["public"]["Enums"]["escrow_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          client_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          job_id: string
+          pro_id?: string | null
+          status?: Database["public"]["Enums"]["escrow_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          client_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          job_id?: string
+          pro_id?: string | null
+          status?: Database["public"]["Enums"]["escrow_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      job_photos: {
+        Row: {
+          created_at: string
+          file_url: string
+          id: string
+          job_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_url: string
+          id?: string
+          job_id: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string
+          id?: string
+          job_id?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          budget_max_cents: number | null
+          budget_min_cents: number | null
+          category_id: string
+          client_id: string
+          created_at: string
+          description: string | null
+          end_confirmed: boolean
+          id: string
+          pro_id: string | null
+          scheduled_at: string | null
+          start_confirmed: boolean
+          status: Database["public"]["Enums"]["job_status"]
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          budget_max_cents?: number | null
+          budget_min_cents?: number | null
+          category_id: string
+          client_id: string
+          created_at?: string
+          description?: string | null
+          end_confirmed?: boolean
+          id?: string
+          pro_id?: string | null
+          scheduled_at?: string | null
+          start_confirmed?: boolean
+          status?: Database["public"]["Enums"]["job_status"]
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          budget_max_cents?: number | null
+          budget_min_cents?: number | null
+          category_id?: string
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          end_confirmed?: boolean
+          id?: string
+          pro_id?: string | null
+          scheduled_at?: string | null
+          start_confirmed?: boolean
+          status?: Database["public"]["Enums"]["job_status"]
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      kyc_documents: {
+        Row: {
+          created_at: string
+          doc_type: string
+          file_url: string
+          id: string
+          reviewed_at: string | null
+          reviewer_id: string | null
+          status: Database["public"]["Enums"]["kyc_status"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doc_type: string
+          file_url: string
+          id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          file_url?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pricing_templates: {
+        Row: {
+          active: boolean
+          category_id: string
+          created_at: string
+          currency: string
+          id: string
+          price_cents: number
+          same_day_fee_cents: number | null
+          title_ro: string | null
+          title_ru: string | null
+          updated_at: string
+          urgent_multiplier: number | null
+        }
+        Insert: {
+          active?: boolean
+          category_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          price_cents: number
+          same_day_fee_cents?: number | null
+          title_ro?: string | null
+          title_ru?: string | null
+          updated_at?: string
+          urgent_multiplier?: number | null
+        }
+        Update: {
+          active?: boolean
+          category_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          price_cents?: number
+          same_day_fee_cents?: number | null
+          title_ro?: string | null
+          title_ru?: string | null
+          updated_at?: string
+          urgent_multiplier?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -41,6 +413,171 @@ export type Database = {
         }
         Relationships: []
       }
+      ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          from_user_id: string
+          id: string
+          job_id: string
+          score: number
+          to_user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          from_user_id: string
+          id?: string
+          job_id: string
+          score: number
+          to_user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          job_id?: string
+          score?: number
+          to_user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          bonus_cents: number | null
+          created_at: string
+          id: string
+          referred_id: string | null
+          referrer_id: string
+          status: Database["public"]["Enums"]["referral_status"]
+        }
+        Insert: {
+          bonus_cents?: number | null
+          created_at?: string
+          id?: string
+          referred_id?: string | null
+          referrer_id: string
+          status?: Database["public"]["Enums"]["referral_status"]
+        }
+        Update: {
+          bonus_cents?: number | null
+          created_at?: string
+          id?: string
+          referred_id?: string | null
+          referrer_id?: string
+          status?: Database["public"]["Enums"]["referral_status"]
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          renews_at: string | null
+          tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          renews_at?: string | null
+          tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          renews_at?: string | null
+          tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tenders: {
+        Row: {
+          budget_hint_cents: number | null
+          category_id: string
+          client_id: string
+          created_at: string
+          description: string | null
+          id: string
+          status: Database["public"]["Enums"]["tender_status"]
+          title: string | null
+          updated_at: string
+          window_from: string | null
+          window_to: string | null
+        }
+        Insert: {
+          budget_hint_cents?: number | null
+          category_id: string
+          client_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["tender_status"]
+          title?: string | null
+          updated_at?: string
+          window_from?: string | null
+          window_to?: string | null
+        }
+        Update: {
+          budget_hint_cents?: number | null
+          category_id?: string
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["tender_status"]
+          title?: string | null
+          updated_at?: string
+          window_from?: string | null
+          window_to?: string | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          direction: Database["public"]["Enums"]["txn_direction"]
+          id: string
+          job_id: string | null
+          meta: Json | null
+          pro_id: string | null
+          subject: string
+          subject_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          direction: Database["public"]["Enums"]["txn_direction"]
+          id?: string
+          job_id?: string | null
+          meta?: Json | null
+          pro_id?: string | null
+          subject: string
+          subject_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          direction?: Database["public"]["Enums"]["txn_direction"]
+          id?: string
+          job_id?: string | null
+          meta?: Json | null
+          pro_id?: string | null
+          subject?: string
+          subject_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -62,6 +599,27 @@ export type Database = {
         }
         Relationships: []
       }
+      wallets: {
+        Row: {
+          balance_cents: number
+          created_at: string
+          pro_id: string
+          updated_at: string
+        }
+        Insert: {
+          balance_cents?: number
+          created_at?: string
+          pro_id: string
+          updated_at?: string
+        }
+        Update: {
+          balance_cents?: number
+          created_at?: string
+          pro_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -77,6 +635,20 @@ export type Database = {
     }
     Enums: {
       app_role: "client" | "pro" | "business" | "admin"
+      biz_role: "owner" | "manager" | "member"
+      chat_status: "active" | "closed"
+      escrow_status: "held" | "released" | "refunded"
+      job_status:
+        | "new"
+        | "accepted"
+        | "in_progress"
+        | "done"
+        | "disputed"
+        | "canceled"
+      kyc_status: "pending" | "approved" | "rejected"
+      referral_status: "pending" | "granted" | "revoked"
+      tender_status: "open" | "closed" | "awarded" | "canceled"
+      txn_direction: "credit" | "debit"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -205,6 +777,21 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["client", "pro", "business", "admin"],
+      biz_role: ["owner", "manager", "member"],
+      chat_status: ["active", "closed"],
+      escrow_status: ["held", "released", "refunded"],
+      job_status: [
+        "new",
+        "accepted",
+        "in_progress",
+        "done",
+        "disputed",
+        "canceled",
+      ],
+      kyc_status: ["pending", "approved", "rejected"],
+      referral_status: ["pending", "granted", "revoked"],
+      tender_status: ["open", "closed", "awarded", "canceled"],
+      txn_direction: ["credit", "debit"],
     },
   },
 } as const
