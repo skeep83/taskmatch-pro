@@ -65,10 +65,34 @@ const JobNew = () => {
         scheduled_at,
       };
       if (presetProId) insertPayload.pro_id = presetProId;
-      const { error } = await (supabase as any)
+      const { data: created, error } = await (supabase as any)
         .from("jobs")
-        .insert(insertPayload);
+        .insert(insertPayload)
+        .select('id')
+        .single();
       if (error) throw error;
+
+      // Upload photos to private bucket and link to job
+      const files = fd.getAll('photos').filter((f) => f instanceof File) as File[];
+      if (created?.id && files.length) {
+        const bucket = (supabase as any).storage.from('evidence');
+        for (let i = 0; i < Math.min(files.length, 8); i++) {
+          const file = files[i];
+          try {
+            const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+            const path = `job/${created.id}/${Date.now()}-${i}.${ext}`;
+            const { error: upErr } = await bucket.upload(path, file, { upsert: true, contentType: file.type || 'image/jpeg' });
+            if (upErr) throw upErr;
+            const { error: insErr } = await (supabase as any)
+              .from('job_photos')
+              .insert({ job_id: created.id, file_url: path });
+            if (insErr) throw insErr;
+          } catch (e) {
+            console.warn('photo upload failed', e);
+          }
+        }
+      }
+
       toast({ title: "Заказ создан", description: "Мы уведомим специалистов" });
       navigate("/dashboard", { replace: true });
     } catch (err: any) {
@@ -119,6 +143,11 @@ const JobNew = () => {
               <label className="block text-sm mb-1">Время</label>
               <input name="time" type="time" className="w-full border rounded-md px-3 py-2 bg-background" />
             </div>
+          </div>
+          <div>
+            <label className="block text-sm mb-1">Фото задачи</label>
+            <input name="photos" type="file" accept="image/*" multiple className="w-full border rounded-md px-3 py-2 bg-background" />
+            <p className="text-xs text-muted-foreground mt-1">Добавьте фотографии (до 8 файлов) для точной оценки</p>
           </div>
           <div className="flex justify-end gap-3 mt-2">
             <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>Отмена</button>

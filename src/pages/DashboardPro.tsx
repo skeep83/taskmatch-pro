@@ -19,6 +19,8 @@ const DashboardPro = () => {
   const [showOfferFor, setShowOfferFor] = useState<Record<string, boolean>>({});
   const [offerDrafts, setOfferDrafts] = useState<Record<string, { price: string; eta: string; warranty: string; note: string }>>({});
   const [existingApps, setExistingApps] = useState<Record<string, any>>({});
+  const [jobPhotos, setJobPhotos] = useState<Record<string, string[]>>({});
+  const [categoriesMap, setCategoriesMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     (async () => {
@@ -77,8 +79,44 @@ const DashboardPro = () => {
         const map: Record<string, any> = {};
         (apps || []).forEach((a: any) => { map[a.job_id] = a; });
         setExistingApps(map);
+
+        // Фотографии заказов (приватное хранилище, подпишем ссылки)
+        const { data: photos } = await (supabase as any)
+          .from('job_photos')
+          .select('job_id, file_url')
+          .in('job_id', jobIds)
+          .limit(120);
+        if (photos && photos.length) {
+          const paths = photos.map((p:any)=>p.file_url);
+          const { data: signed } = await (supabase as any)
+            .storage.from('evidence')
+            .createSignedUrls(paths, 3600);
+          const byPath: Record<string,string> = {};
+          (signed || []).forEach((s:any)=>{ if (s?.path && s?.signedUrl) byPath[s.path] = s.signedUrl; });
+          const grouped: Record<string,string[]> = {};
+          photos.forEach((p:any)=>{ const url = byPath[p.file_url]; if (url) { (grouped[p.job_id] ||= []).push(url); } });
+          setJobPhotos(grouped);
+        } else {
+          setJobPhotos({});
+        }
+
+        // Названия категорий
+        const uniqueCatIds = Array.from(new Set(openJobs.map((j:any)=>j.category_id).filter(Boolean)));
+        if (uniqueCatIds.length) {
+          const { data: cats } = await (supabase as any)
+            .from('categories')
+            .select('id,label_ru,key')
+            .in('id', uniqueCatIds);
+          const cmap: Record<string,string> = {};
+          (cats || []).forEach((c:any)=>{ cmap[c.id] = c.label_ru || c.key; });
+          setCategoriesMap(cmap);
+        } else {
+          setCategoriesMap({});
+        }
       } else {
         setExistingApps({});
+        setJobPhotos({});
+        setCategoriesMap({});
       }
 
       // Load my active jobs
@@ -293,58 +331,75 @@ const DashboardPro = () => {
             <h2 className="text-lg font-medium mb-2">Доступные заказы</h2>
             <ul className="space-y-3">
               {nearbyJobs.length === 0 && <li className="text-sm text-muted-foreground">Нет доступных заказов</li>}
-              {nearbyJobs.map((j) => (
-                <li key={j.id} className="p-3 rounded-md border">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm">{j.description}</p>
-                      <p className="text-xs text-muted-foreground">{j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'}</p>
-                      {existingApps[j.id] && (
-                        <p className="text-xs text-success mt-1">Ваш оффер: ${(existingApps[j.id].price_cents/100).toFixed(2)} $</p>
+              {nearbyJobs.map((j) => {
+                const photos = jobPhotos[j.id] || [];
+                return (
+                  <li key={j.id} className="p-4 rounded-md border grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div className="md:col-span-2">
+                      {photos.length > 0 ? (
+                        <div className="grid grid-cols-3 gap-2">
+                          {photos.slice(0,3).map((url, idx) => (
+                            <img key={idx} src={url} alt={`Фото заказа ${String(j.id).slice(0,8)} #${idx+1}`} className="w-full h-24 object-cover rounded-md" loading="lazy" />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="aspect-[3/2] rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">Нет фото</div>
                       )}
                     </div>
-                    <div className="flex gap-2">
-                      <button className="btn-ghost" onClick={() => toggleOffer(j.id)}>{showOfferFor[j.id] ? 'Скрыть' : 'Офер'}</button>
-                      <button className="btn-ghost" onClick={() => acceptJob(j.id)}>Принять</button>
-                    </div>
-                  </div>
-                  {showOfferFor[j.id] && (
-                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-5 gap-2">
-                      <input
-                        type="number"
-                        placeholder="Цена, $"
-                        className="input"
-                        value={offerDrafts[j.id]?.price || ''}
-                        onChange={(e)=>updateDraft(j.id,'price',e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Когда (ETA)"
-                        className="input"
-                        value={offerDrafts[j.id]?.eta || ''}
-                        onChange={(e)=>updateDraft(j.id,'eta',e.target.value)}
-                      />
-                      <input
-                        type="number"
-                        placeholder="Гарантия, дни"
-                        className="input"
-                        value={offerDrafts[j.id]?.warranty || ''}
-                        onChange={(e)=>updateDraft(j.id,'warranty',e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Комментарий"
-                        className="input sm:col-span-2"
-                        value={offerDrafts[j.id]?.note || ''}
-                        onChange={(e)=>updateDraft(j.id,'note',e.target.value)}
-                      />
-                      <div className="sm:col-span-5">
-                        <button className="btn-hero" onClick={()=>sendOffer(j.id)}>Отправить оффер</button>
+                    <div className="md:col-span-3 flex flex-col gap-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium">{categoriesMap[j.category_id] || 'Без категории'}</p>
+                          <p className="text-sm mt-1">{j.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'} • Бюджет: {j.budget_min_cents ? `$${(j.budget_min_cents/100).toFixed(0)}` : '—'}{j.budget_max_cents ? `–$${(j.budget_max_cents/100).toFixed(0)}` : ''}</p>
+                          {existingApps[j.id] && (
+                            <p className="text-xs text-success mt-1">Ваш оффер: ${(existingApps[j.id].price_cents/100).toFixed(2)} $</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <button className="btn-ghost" onClick={() => toggleOffer(j.id)}>{showOfferFor[j.id] ? 'Скрыть' : 'Офер'}</button>
+                          <button className="btn-ghost" onClick={() => acceptJob(j.id)}>Принять</button>
+                        </div>
                       </div>
+                      {showOfferFor[j.id] && (
+                        <div className="mt-1 grid grid-cols-1 sm:grid-cols-5 gap-2">
+                          <input
+                            type="number"
+                            placeholder="Цена, $"
+                            className="w-full border rounded-md px-2 py-2 bg-background"
+                            value={offerDrafts[j.id]?.price || ''}
+                            onChange={(e)=>updateDraft(j.id,'price',e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Когда (ETA)"
+                            className="w-full border rounded-md px-2 py-2 bg-background"
+                            value={offerDrafts[j.id]?.eta || ''}
+                            onChange={(e)=>updateDraft(j.id,'eta',e.target.value)}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Гарантия, дни"
+                            className="w-full border rounded-md px-2 py-2 bg-background"
+                            value={offerDrafts[j.id]?.warranty || ''}
+                            onChange={(e)=>updateDraft(j.id,'warranty',e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Комментарий"
+                            className="w-full border rounded-md px-2 py-2 bg-background sm:col-span-2"
+                            value={offerDrafts[j.id]?.note || ''}
+                            onChange={(e)=>updateDraft(j.id,'note',e.target.value)}
+                          />
+                          <div className="sm:col-span-5">
+                            <button className="btn-hero" onClick={()=>sendOffer(j.id)}>Отправить оффер</button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <div>
