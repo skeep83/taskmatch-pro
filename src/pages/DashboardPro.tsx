@@ -12,6 +12,7 @@ const DashboardPro = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [nearbyJobs, setNearbyJobs] = useState<any[]>([]);
   const [myActiveJobs, setMyActiveJobs] = useState<any[]>([]);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
@@ -55,6 +56,14 @@ const DashboardPro = () => {
         .order("created_at", { ascending: false })
         .limit(20);
       setMyActiveJobs(active || []);
+
+      // Wallet balance
+      const { data: wallet } = await (supabase as any)
+        .from('wallets')
+        .select('balance_cents')
+        .eq('pro_id', uid)
+        .maybeSingle();
+      setWalletBalance(wallet?.balance_cents || 0);
       setLoading(false);
     })();
   }, [navigate, toast]);
@@ -119,11 +128,51 @@ const DashboardPro = () => {
     }
   };
 
+  const startJob = async (jobId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await (supabase as any)
+        .from('jobs')
+        .update({ status: 'in_progress', start_confirmed: true })
+        .eq('id', jobId)
+        .eq('status', 'accepted');
+      if (error) throw error;
+      toast({ title: 'Старт подтвержден' });
+      setMyActiveJobs((prev) => prev.map(j => j.id===jobId ? { ...j, status: 'in_progress' } : j));
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
+    }
+  };
+
+  const finishJob = async (jobId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await (supabase as any)
+        .from('jobs')
+        .update({ status: 'done', end_confirmed: true })
+        .eq('id', jobId)
+        .eq('status', 'in_progress');
+      if (error) throw error;
+      toast({ title: 'Завершение подтверждено' });
+      setMyActiveJobs((prev) => prev.map(j => j.id===jobId ? { ...j, status: 'done' } : j));
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
+    }
+  };
+
   return (
     <main className="container mx-auto py-12">
       <Seo title={`${t('app.name')} — Кабинет исполнителя`} description="Pro dashboard" canonical="/pro/dashboard" />
       <section className="max-w-5xl mx-auto card-surface">
         <h1 className="text-2xl font-semibold mb-4">Кабинет исполнителя</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="text-sm text-muted-foreground">Баланс кошелька: ${(walletBalance/100).toFixed(2)} $</div>
+          <div className="flex gap-2">
+            <button className="btn-ghost" onClick={()=>navigate('/kyc')}>Загрузить KYC</button>
+          </div>
+        </div>
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <h2 className="text-lg font-medium mb-2">Доступные заказы</h2>
@@ -145,13 +194,15 @@ const DashboardPro = () => {
             <ul className="space-y-3">
               {myActiveJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока пусто</li>}
               {myActiveJobs.map((j) => (
-                <li key={j.id} className="p-3 rounded-md border flex items-center justify_between gap-3">
+                <li key={j.id} className="p-3 rounded-md border flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm">{j.description}</p>
                     <p className="text-xs text-muted-foreground">Статус: {j.status}</p>
                   </div>
                   <div className="flex gap-2">
                     <button className="btn-ghost" onClick={() => openChatForJob(j.id)}>Чат</button>
+                    {j.status === 'accepted' && <button className="btn-ghost" onClick={() => startJob(j.id)}>Старт</button>}
+                    {j.status === 'in_progress' && <button className="btn-ghost" onClick={() => finishJob(j.id)}>Завершить</button>}
                   </div>
                 </li>
               ))}
