@@ -198,9 +198,9 @@ const DashboardPro = () => {
       <section className="max-w-5xl mx-auto card-surface">
         <h1 className="text-2xl font-semibold mb-4">Кабинет исполнителя</h1>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-6">
-          <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-3">
-            <span>Баланс: ${(walletBalance/100).toFixed(2)} $</span>
-            <span>Рейтинг: {ratingAvg ? ratingAvg.toFixed(1) : '—'}{ratingCount ? ` (${ratingCount})` : ''}</span>
+          <div className="text-sm flex flex-wrap items-center gap-3">
+            <span className="text-success text-lg font-semibold">Баланс: ${(walletBalance/100).toFixed(2)} $</span>
+            <span className="text-success text-lg font-semibold">Рейтинг: {ratingAvg ? ratingAvg.toFixed(1) : '—'}{ratingCount ? ` (${ratingCount})` : ''}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button className="btn-ghost text-sm" onClick={()=>navigate('/pro/profile')}>Профиль</button>
