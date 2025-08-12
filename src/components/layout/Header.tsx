@@ -14,6 +14,7 @@ export const Header = () => {
           <Link to="/catalog" className="text-sm hover:opacity-80 transition-opacity">{t("nav.catalog")}</Link>
           <Link to="/job/new" className="text-sm hover:opacity-80 transition-opacity">{t("nav.find_pro")}</Link>
           <Link to="/pro" className="text-sm hover:opacity-80 transition-opacity">{t("nav.become_pro")}</Link>
+          <Link to="/messages" className="text-sm hover:opacity-80 transition-opacity">Сообщения</Link>
         </div>
         <div className="flex items-center gap-3">
           <button aria-label="RU" className={`text-sm px-2 py-1 rounded-md border ${locale==='ru' ? 'opacity-100' : 'opacity-60'}`} onClick={() => setLocale('ru')}>

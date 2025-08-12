@@ -17,6 +17,7 @@ import Diagnostics from "./components/Diagnostics";
 import DashboardClient from "./pages/DashboardClient";
 import DashboardPro from "./pages/DashboardPro";
 import DashboardBusiness from "./pages/DashboardBusiness";
+import Messages from "./pages/Messages";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +38,8 @@ const App = () => (
             <Route path="/dashboard" element={<DashboardClient />} />
             <Route path="/pro/dashboard" element={<DashboardPro />} />
             <Route path="/business/dashboard" element={<DashboardBusiness />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/messages/:id" element={<Messages />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

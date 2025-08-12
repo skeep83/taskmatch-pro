@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -36,7 +36,7 @@ const DashboardPro = () => {
         navigate("/pro");
         return;
       }
-      // Load jobs available (no pro assigned)
+      // Load jobs available (no pro assigned) — allowed by RLS policy jobs_select_open_for_auth
       const { data: openJobs } = await (supabase as any)
         .from("jobs")
         .select("id, description, budget_min_cents, budget_max_cents, scheduled_at, created_at")
@@ -51,7 +51,7 @@ const DashboardPro = () => {
         .from("jobs")
         .select("id, description, status, scheduled_at, created_at")
         .eq("pro_id", uid)
-        .in("status", ["accepted", "in_progress"])
+        .in("status", ["accepted", "in_progress"]) // @ts-ignore
         .order("created_at", { ascending: false })
         .limit(20);
       setMyActiveJobs(active || []);
@@ -60,6 +60,34 @@ const DashboardPro = () => {
   }, [navigate, toast]);
 
   if (loading) return <main className="container mx-auto py-12"><section className="max-w-5xl mx-auto card-surface"><h1 className="text-xl">Загрузка…</h1></section></main>;
+
+  const openChatForJob = async (jobId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      if (!userId) return;
+      const { data: job, error: jerr } = await (supabase as any)
+        .from("jobs").select("id, client_id").eq("id", jobId).maybeSingle();
+      if (jerr) throw jerr;
+      const clientId = job?.client_id;
+      if (!clientId) throw new Error("Клиент не найден");
+      const { data: existing } = await (supabase as any)
+        .from("chats")
+        .select("id").eq("job_id", jobId).eq("professional_id", userId).eq("client_id", clientId).maybeSingle();
+      let chatId = existing?.id;
+      if (!chatId) {
+        const { data: created, error: cerr } = await (supabase as any)
+          .from("chats")
+          .insert({ job_id: jobId, client_id: clientId, professional_id: userId })
+          .select("id").single();
+        if (cerr) throw cerr;
+        chatId = created.id;
+      }
+      window.location.href = `/messages/${chatId}`;
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: "Не удалось открыть чат", description: e?.message, variant: "destructive" });
+    }
+  };
 
   const acceptJob = async (jobId: string) => {
     try {
@@ -117,9 +145,14 @@ const DashboardPro = () => {
             <ul className="space-y-3">
               {myActiveJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока пусто</li>}
               {myActiveJobs.map((j) => (
-                <li key={j.id} className="p-3 rounded-md border">
-                  <p className="text-sm">{j.description}</p>
-                  <p className="text-xs text-muted-foreground">Статус: {j.status}</p>
+                <li key={j.id} className="p-3 rounded-md border flex items-center justify_between gap-3">
+                  <div>
+                    <p className="text-sm">{j.description}</p>
+                    <p className="text-xs text-muted-foreground">Статус: {j.status}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="btn-ghost" onClick={() => openChatForJob(j.id)}>Чат</button>
+                  </div>
                 </li>
               ))}
             </ul>
