@@ -9,17 +9,21 @@ const DashboardPro = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [nearbyJobs, setNearbyJobs] = useState<any[]>([]);
+  const [myActiveJobs, setMyActiveJobs] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
-      const userId = s.session?.user?.id;
-      if (!userId) {
+      const uid = s.session?.user?.id || null;
+      if (!uid) {
         toast({ title: "Требуется вход", description: "Пожалуйста, войдите" });
         navigate("/auth");
         return;
       }
+      setUserId(uid);
       const { data: roles, error } = await supabase.from("user_roles").select("role");
       if (error) {
         toast({ title: "Ошибка", description: error.message, variant: "destructive" });
@@ -32,6 +36,25 @@ const DashboardPro = () => {
         navigate("/pro");
         return;
       }
+      // Load jobs available (no pro assigned)
+      const { data: openJobs } = await (supabase as any)
+        .from("jobs")
+        .select("id, description, budget_min_cents, budget_max_cents, scheduled_at, created_at")
+        .eq("status", "new")
+        .is("pro_id", null)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      setNearbyJobs(openJobs || []);
+
+      // Load my active jobs
+      const { data: active } = await (supabase as any)
+        .from("jobs")
+        .select("id, description, status, scheduled_at, created_at")
+        .eq("pro_id", uid)
+        .in("status", ["accepted", "in_progress"])
+        .order("created_at", { ascending: false })
+        .limit(20);
+      setMyActiveJobs(active || []);
       setLoading(false);
     })();
   }, [navigate, toast]);
