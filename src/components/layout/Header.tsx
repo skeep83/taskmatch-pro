@@ -4,7 +4,7 @@ import { useI18n } from "@/i18n";
 export const Header = () => {
   const { t, locale, setLocale } = useI18n();
   return (
-    <header className="w-full border-b bg-background sticky top-0 z-20">
+    <header className="w-full glass-nav sticky top-0 z-20">
       <nav className="container mx-auto flex items-center justify-between py-4">
         <Link to="/" className="flex items-center gap-2" aria-label={t("app.name")}> 
           <div className="h-8 w-8 rounded-md" style={{background: "var(--gradient-primary)"}} />

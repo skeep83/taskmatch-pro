@@ -27,10 +27,10 @@ const Index = () => {
       <section className="relative overflow-hidden">
         <div className="container mx-auto py-20 md:py-28 text-center">
           <SignatureGradient />
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-balance">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-balance animate-fade-in">
             <span className="text-gradient">{t("hero.title")}</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in">
             {t("hero.subtitle")}
           </p>
           <div className="flex items-center justify-center gap-4">
@@ -44,7 +44,7 @@ const Index = () => {
         <h2 className="text-2xl md:text-3xl font-semibold mb-6">{t("section.categories")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((c) => (
-            <div key={c.key} className="card-surface text-center hover:shadow-lg transition-shadow">
+            <div key={c.key} className="card-surface text-center hover:shadow-lg transition-shadow hover-scale">
               <div className="text-sm font-medium">{c.label}</div>
             </div>
           ))}

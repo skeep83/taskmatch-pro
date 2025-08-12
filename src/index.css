@@ -133,6 +133,21 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-soft);
     background: hsl(var(--card));
   }
+  .glass-surface {
+    @apply rounded-xl border p-6 backdrop-blur-xl;
+    background: linear-gradient(180deg, hsl(var(--background) / 0.65), hsl(var(--background) / 0.45));
+    box-shadow: var(--shadow-soft);
+  }
+  .acrylic-surface {
+    @apply rounded-xl border p-6 backdrop-blur-2xl;
+    background: linear-gradient(135deg, hsl(var(--brand-1) / 0.10), hsl(var(--brand-2) / 0.08))
+      , linear-gradient(0deg, hsl(var(--background) / 0.55), hsl(var(--background) / 0.55));
+    box-shadow: var(--shadow-strong);
+  }
+  .glass-nav {
+    @apply border-b backdrop-blur-xl;
+    background: linear-gradient(180deg, hsl(var(--background) / 0.8), hsl(var(--background) / 0.6));
+  }
   .text-gradient {
     background-image: var(--gradient-primary);
     -webkit-background-clip: text;
@@ -140,3 +155,11 @@ All colors MUST be HSL.
     color: transparent;
   }
 }
+
+@layer utilities {
+  .hover-scale { @apply transition-transform duration-200 hover:scale-105; }
+  .story-link { position: relative; display: inline-block; }
+  .story-link::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right; transition: transform 300ms ease; }
+  .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+}
+
