@@ -1,8 +1,29 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n";
 
 export const Header = () => {
   const { t, locale, setLocale } = useI18n();
+  const navigate = useNavigate();
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setAuthed(!!session?.user);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthed(!!session?.user);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setAuthed(false);
+    navigate("/");
+  };
+
   return (
     <header className="w-full glass-nav sticky top-0 z-20">
       <nav className="container mx-auto flex items-center justify-between py-4">
@@ -24,7 +45,11 @@ export const Header = () => {
           <button aria-label="RO" className={`text-sm px-2 py-1 rounded-md border ${locale==='ro' ? 'opacity-100' : 'opacity-60'}`} onClick={() => setLocale('ro')}>
             {t("lang.ro")}
           </button>
-          <Link to="/auth" className="btn-ghost">{t("nav.sign_in")}</Link>
+          {authed ? (
+            <button onClick={signOut} className="btn-ghost">{t("nav.sign_out")}</button>
+          ) : (
+            <Link to="/auth" className="btn-ghost">{t("nav.sign_in")}</Link>
+          )}
         </div>
       </nav>
     </header>
