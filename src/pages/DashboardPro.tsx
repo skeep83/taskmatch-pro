@@ -22,6 +22,8 @@ const DashboardPro = () => {
   const [existingApps, setExistingApps] = useState<Record<string, any>>({});
   const [jobPhotos, setJobPhotos] = useState<Record<string, string[]>>({});
   const [categoriesMap, setCategoriesMap] = useState<Record<string, string>>({});
+  const [ratedByMeJobs, setRatedByMeJobs] = useState<Record<string, boolean>>({});
+  const [ratingDraftsPro, setRatingDraftsPro] = useState<Record<string, { score: string; comment: string }>>({});
 
   useEffect(() => {
     (async () => {
@@ -120,15 +122,30 @@ const DashboardPro = () => {
         setCategoriesMap({});
       }
 
-      // Load my active jobs
+      // Load my jobs (accepted, in_progress, done)
       const { data: active } = await (supabase as any)
         .from("jobs")
-        .select("id, description, status, scheduled_at, created_at")
+        .select("id, description, status, scheduled_at, created_at, client_id")
         .eq("pro_id", uid)
-        .in("status", ["accepted", "in_progress"]) // @ts-ignore
+        .in("status", ["accepted", "in_progress", "done"]) // @ts-ignore
         .order("created_at", { ascending: false })
         .limit(20);
       setMyActiveJobs(active || []);
+
+      // Какие завершённые я уже оценил
+      const doneIds = (active || []).filter((j:any)=>j.status==='done').map((j:any)=>j.id);
+      if (doneIds.length) {
+        const { data: myR } = await (supabase as any)
+          .from('ratings')
+          .select('job_id')
+          .eq('from_user_id', uid)
+          .in('job_id', doneIds);
+        const mapRated: Record<string, boolean> = {};
+        (myR || []).forEach((r:any)=>{ mapRated[r.job_id] = true; });
+        setRatedByMeJobs(mapRated);
+      } else {
+        setRatedByMeJobs({});
+      }
 
       // Wallet balance
       const { data: wallet } = await (supabase as any)
@@ -292,6 +309,32 @@ const DashboardPro = () => {
     }
   };
 
+  const updateProRatingDraft = (jobId: string, field: 'score'|'comment', value: string) => {
+    setRatingDraftsPro((prev)=>({ ...prev, [jobId]: { score: '', comment: '', ...(prev[jobId]||{}), [field]: value } }));
+  };
+
+  const submitProRating = async (jobId: string, toUserId: string) => {
+    try {
+      if (!userId) return;
+      const draft = ratingDraftsPro[jobId] || { score: '', comment: '' };
+      const score = Number(draft.score);
+      if (!score || score < 1 || score > 5) {
+        toast({ title: 'Укажите оценку 1-5', variant: 'destructive' });
+        return;
+      }
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { error } = await (supabase as any)
+        .from('ratings')
+        .insert({ job_id: jobId, from_user_id: userId, to_user_id: toUserId, score, comment: draft.comment || null });
+      if (error) throw error;
+      setRatedByMeJobs((prev)=>({ ...prev, [jobId]: true }));
+      toast({ title: 'Спасибо за отзыв!' });
+    } catch (e:any) {
+      console.error(e);
+      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
+    }
+  };
+
   const requestPayout = async () => {
     try {
       if (!userId) return;
@@ -408,16 +451,38 @@ const DashboardPro = () => {
             <ul className="space-y-3">
               {myActiveJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока пусто</li>}
               {myActiveJobs.map((j) => (
-                <li key={j.id} className="p-3 rounded-md border flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm">{j.description}</p>
-                    <p className="text-xs text-muted-foreground">Статус: {j.status}</p>
+                <li key={j.id} className="p-3 rounded-md border animate-fade-in">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm">{j.description}</p>
+                      <p className="text-xs text-muted-foreground">Статус: {j.status}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j.id)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>
+                      {j.status === 'accepted' && <button className="btn-ghost" onClick={() => startJob(j.id)}>Старт</button>}
+                      {j.status === 'in_progress' && <button className="btn-ghost" onClick={() => finishJob(j.id)}>Завершить</button>}
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j.id)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>
-                    {j.status === 'accepted' && <button className="btn-ghost" onClick={() => startJob(j.id)}>Старт</button>}
-                    {j.status === 'in_progress' && <button className="btn-ghost" onClick={() => finishJob(j.id)}>Завершить</button>}
-                  </div>
+                  {j.status === 'done' && (
+                    <div className="mt-3 border-t pt-3">
+                      {ratedByMeJobs[j.id] ? (
+                        <p className="text-xs text-success">Ваш отзыв отправлен</p>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-6 gap-2">
+                          <select className="w-full border rounded-md px-2 py-2 bg-background" value={ratingDraftsPro[j.id]?.score || ''} onChange={(e)=>updateProRatingDraft(j.id,'score',e.target.value)}>
+                            <option value="">Оценка 1-5</option>
+                            <option value="5">5 — Отлично</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1 — Плохо</option>
+                          </select>
+                          <input type="text" placeholder="Комментарий (необязательно)" className="w-full border rounded-md px-2 py-2 bg-background sm:col-span-4" value={ratingDraftsPro[j.id]?.comment || ''} onChange={(e)=>updateProRatingDraft(j.id,'comment',e.target.value)} />
+                          <button className="btn-hero" onClick={()=>submitProRating(j.id, j.client_id)}>Оценить клиента</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

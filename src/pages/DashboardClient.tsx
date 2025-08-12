@@ -16,6 +16,8 @@ const DashboardClient = () => {
   const [offersByJob, setOffersByJob] = useState<Record<string, any[]>>({});
   const [ratingsByPro, setRatingsByPro] = useState<Record<string, { avg: number; count: number }>>({});
   const [portfolioByPro, setPortfolioByPro] = useState<Record<string, any[]>>({});
+  const [ratedByMe, setRatedByMe] = useState<Record<string, boolean>>({});
+  const [ratingDrafts, setRatingDrafts] = useState<Record<string, { score: string; comment: string }>>({});
 
   useEffect(() => {
     (async () => {
@@ -66,6 +68,21 @@ const DashboardClient = () => {
         setOffersByJob({});
         setRatingsByPro({});
         setPortfolioByPro({});
+      }
+
+      // Отметим, что уже оценено клиентом (по завершённым заказам)
+      const doneIds = (data || []).filter((j:any)=>j.status==='done').map((j:any)=>j.id);
+      if (doneIds.length) {
+        const { data: myRatings } = await (supabase as any)
+          .from('ratings')
+          .select('job_id')
+          .eq('from_user_id', uid)
+          .in('job_id', doneIds);
+        const ratedMap: Record<string, boolean> = {};
+        (myRatings || []).forEach((r:any)=>{ ratedMap[r.job_id] = true; });
+        setRatedByMe(ratedMap);
+      } else {
+        setRatedByMe({});
       }
 
       setLoading(false);
@@ -120,6 +137,32 @@ const DashboardClient = () => {
     }
   };
 
+  const updateRatingDraft = (jobId: string, field: 'score'|'comment', value: string) => {
+    setRatingDrafts((prev) => ({ ...prev, [jobId]: { score: '', comment: '', ...(prev[jobId]||{}), [field]: value } }));
+  };
+
+  const submitRating = async (jobId: string, toUserId: string) => {
+    try {
+      if (!userId) return navigate('/auth');
+      const draft = ratingDrafts[jobId] || { score: '', comment: '' };
+      const score = Number(draft.score);
+      if (!score || score < 1 || score > 5) {
+        toast({ title: 'Укажите оценку 1-5', variant: 'destructive' });
+        return;
+      }
+      const { supabase } = await import('@\/integrations\/supabase\/client');
+      const { error } = await (supabase as any)
+        .from('ratings')
+        .insert({ job_id: jobId, from_user_id: userId, to_user_id: toUserId, score, comment: draft.comment || null });
+      if (error) throw error;
+      setRatedByMe((prev)=>({ ...prev, [jobId]: true }));
+      toast({ title: 'Спасибо за отзыв!' });
+    } catch (e:any) {
+      console.error(e);
+      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
+    }
+  };
+
   return (
     <main className="container mx-auto py-12">
       <Seo title={`${t('app.name')} — Личный кабинет`} description="Client dashboard" canonical="/dashboard" />
@@ -161,15 +204,37 @@ const DashboardClient = () => {
         <ul className="space-y-3">
           {myJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока нет заказов</li>}
           {myJobs.map((j) => (
-            <li key={j.id} className="p-3 rounded-md border flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm">{j.description}</p>
-                <p className="text-xs text-muted-foreground">Статус: {j.status} • {j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'}</p>
+            <li key={j.id} className="p-3 rounded-md border animate-fade-in">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm">{j.description}</p>
+                  <p className="text-xs text-muted-foreground">Статус: {j.status} • {j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'}</p>
+                </div>
+                <div className="flex gap-2">
+                  {j.status === 'new' && <button className="btn-ghost inline-flex items-center" onClick={() => payEscrow(j)}><CreditCard className="h-4 w-4 mr-1" aria-hidden />Оплатить эскроу</button>}
+                  {j.pro_id && <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>}
+                </div>
               </div>
-              <div className="flex gap-2">
-                {j.status === 'new' && <button className="btn-ghost inline-flex items-center" onClick={() => payEscrow(j)}><CreditCard className="h-4 w-4 mr-1" aria-hidden />Оплатить эскроу</button>}
-                {j.pro_id && <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>}
-              </div>
+              {j.status === 'done' && j.pro_id && (
+                <div className="mt-3 border-t pt-3 animate-fade-in">
+                  {ratedByMe[j.id] ? (
+                    <p className="text-xs text-success">Ваш отзыв отправлен</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-6 gap-2">
+                      <select className="w-full border rounded-md px-2 py-2 bg-background" value={ratingDrafts[j.id]?.score || ''} onChange={(e)=>updateRatingDraft(j.id,'score',e.target.value)}>
+                        <option value="">Оценка 1-5</option>
+                        <option value="5">5 — Отлично</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1 — Плохо</option>
+                      </select>
+                      <input type="text" placeholder="Комментарий (необязательно)" className="w-full border rounded-md px-2 py-2 bg-background sm:col-span-4" value={ratingDrafts[j.id]?.comment || ''} onChange={(e)=>updateRatingDraft(j.id,'comment',e.target.value)} />
+                      <button className="btn-hero" onClick={()=>submitRating(j.id, j.pro_id)}>Оценить</button>
+                    </div>
+                  )}
+                </div>
+              )}
             </li>
           ))}
         </ul>
