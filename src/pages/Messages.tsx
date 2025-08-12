@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
@@ -17,6 +17,9 @@ const Messages = () => {
   const [presence, setPresence] = useState<Record<string, any>>({});
   const [otherOnline, setOtherOnline] = useState(false);
 
+  const [otherTyping, setOtherTyping] = useState(false);
+  const roomRef = useRef<any>(null);
+  const typingTimerRef = useRef<any>(null);
 
   useEffect(() => {
     (async () => {
@@ -68,6 +71,7 @@ const Messages = () => {
       if (!id || !userId) return;
       const { supabase } = await import("@/integrations/supabase/client");
       const room = (supabase as any).channel(`presence:chat:${id}`, { config: { presence: { key: userId } } });
+      roomRef.current = room;
 
       const updateState = () => {
         const state = room.presenceState() as Record<string, any[]>;
@@ -76,6 +80,8 @@ const Messages = () => {
         const otherId = chat ? (chat.client_id === userId ? chat.professional_id : chat.client_id) : null;
         const flat = Object.values(state).flat() as any[];
         setOtherOnline(Boolean(flat.find((p: any) => p.user_id === otherId)));
+        const otherPresence = flat.find((p: any) => p.user_id === otherId);
+        setOtherTyping(Boolean(otherPresence?.typing));
       };
 
       room
@@ -84,11 +90,11 @@ const Messages = () => {
         .on('presence', { event: 'leave' }, updateState)
         .subscribe(async (status: string) => {
           if (status === 'SUBSCRIBED') {
-            await room.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString() });
+            await room.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString(), typing: false });
           }
         });
 
-      return () => { (supabase as any).removeChannel(room); };
+      return () => { (supabase as any).removeChannel(room); roomRef.current = null; };
     })();
   }, [id, userId, chats]);
 
@@ -136,7 +142,7 @@ const Messages = () => {
               <>
                 <div className="p-3 border-b text-sm flex items-center justify-between">
                   <span>{selectedChat ? `Чат #${String(selectedChat.id).slice(0,8)}` : 'Чат'}</span>
-                  <span className="text-xs text-muted-foreground">{otherOnline ? 'Онлайн' : 'Не в сети'}</span>
+                  <span className="text-xs text-muted-foreground">{otherTyping ? 'Печатает…' : (otherOnline ? 'Онлайн' : 'Не в сети')}</span>
                 </div>
                 <div className="flex-1 p-3 space-y-2 overflow-y-auto">
                   {messages.map((m) => (
