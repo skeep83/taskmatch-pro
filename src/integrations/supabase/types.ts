@@ -50,36 +50,99 @@ export type Database = {
         }
         Relationships: []
       }
+      biz_invoices: {
+        Row: {
+          amount_cents: number
+          business_id: string
+          created_at: string
+          currency: string
+          due_date: string | null
+          id: string
+          pdf_url: string | null
+          status: Database["public"]["Enums"]["invoice_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          business_id: string
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          pdf_url?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          business_id?: string
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          pdf_url?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       business_accounts: {
         Row: {
           company_name: string
+          contract_url: string | null
           created_at: string
           id: string
           idno: string | null
           legal_address: string | null
           owner_id: string
+          rate_multiplier: number
           updated_at: string
           vat_number: string | null
         }
         Insert: {
           company_name: string
+          contract_url?: string | null
           created_at?: string
           id?: string
           idno?: string | null
           legal_address?: string | null
           owner_id: string
+          rate_multiplier?: number
           updated_at?: string
           vat_number?: string | null
         }
         Update: {
           company_name?: string
+          contract_url?: string | null
           created_at?: string
           id?: string
           idno?: string | null
           legal_address?: string | null
           owner_id?: string
+          rate_multiplier?: number
           updated_at?: string
           vat_number?: string | null
+        }
+        Relationships: []
+      }
+      business_jobs: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          job_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          job_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          job_id?: string
         }
         Relationships: []
       }
@@ -773,6 +836,7 @@ export type Database = {
       biz_role: "owner" | "manager" | "member"
       chat_status: "active" | "closed"
       escrow_status: "held" | "released" | "refunded"
+      invoice_status: "draft" | "sent" | "paid" | "canceled"
       job_status:
         | "new"
         | "accepted"
@@ -916,6 +980,7 @@ export const Constants = {
       biz_role: ["owner", "manager", "member"],
       chat_status: ["active", "closed"],
       escrow_status: ["held", "released", "refunded"],
+      invoice_status: ["draft", "sent", "paid", "canceled"],
       job_status: [
         "new",
         "accepted",
