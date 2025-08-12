@@ -344,6 +344,60 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_requests: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          pro_id: string
+          status: Database["public"]["Enums"]["payout_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          pro_id: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          pro_id?: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      portfolio_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          pro_id: string
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          pro_id: string
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          pro_id?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
       pricing_templates: {
         Row: {
           active: boolean
@@ -383,6 +437,87 @@ export type Database = {
           title_ru?: string | null
           updated_at?: string
           urgent_multiplier?: number | null
+        }
+        Relationships: []
+      }
+      pro_availability: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          start_time: string
+          user_id: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          start_time: string
+          user_id: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          user_id?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
+      pro_categories: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pro_profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          fixed_price_cents: number | null
+          hourly_rate_cents: number | null
+          id: string
+          radius_km: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          fixed_price_cents?: number | null
+          hourly_rate_cents?: number | null
+          id?: string
+          radius_km?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          fixed_price_cents?: number | null
+          hourly_rate_cents?: number | null
+          id?: string
+          radius_km?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -646,6 +781,7 @@ export type Database = {
         | "disputed"
         | "canceled"
       kyc_status: "pending" | "approved" | "rejected"
+      payout_status: "pending" | "approved" | "rejected" | "paid"
       referral_status: "pending" | "granted" | "revoked"
       tender_status: "open" | "closed" | "awarded" | "canceled"
       txn_direction: "credit" | "debit"
@@ -789,6 +925,7 @@ export const Constants = {
         "canceled",
       ],
       kyc_status: ["pending", "approved", "rejected"],
+      payout_status: ["pending", "approved", "rejected", "paid"],
       referral_status: ["pending", "granted", "revoked"],
       tender_status: ["open", "closed", "awarded", "canceled"],
       txn_direction: ["credit", "debit"],

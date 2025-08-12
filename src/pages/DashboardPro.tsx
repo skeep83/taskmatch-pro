@@ -13,6 +13,8 @@ const DashboardPro = () => {
   const [nearbyJobs, setNearbyJobs] = useState<any[]>([]);
   const [myActiveJobs, setMyActiveJobs] = useState<any[]>([]);
   const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [ratingAvg, setRatingAvg] = useState<number | null>(null);
+  const [ratingCount, setRatingCount] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
@@ -64,6 +66,17 @@ const DashboardPro = () => {
         .eq('pro_id', uid)
         .maybeSingle();
       setWalletBalance(wallet?.balance_cents || 0);
+
+      // Ratings
+      const { data: ratings } = await (supabase as any)
+        .from('ratings')
+        .select('score')
+        .eq('to_user_id', uid)
+        .limit(200);
+      const scores = (ratings || []).map((r: any) => r.score as number);
+      const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
+      setRatingAvg(avg);
+      setRatingCount(scores.length);
       setLoading(false);
     })();
   }, [navigate, toast]);
@@ -145,6 +158,7 @@ const DashboardPro = () => {
     }
   };
 
+  // 
   const finishJob = async (jobId: string) => {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
@@ -162,15 +176,39 @@ const DashboardPro = () => {
     }
   };
 
+  const requestPayout = async () => {
+    try {
+      if (!userId) return;
+      const amountStr = prompt('Сумма к выплате, $') || '';
+      const amount = Math.round(Number(amountStr) * 100);
+      if (!amount || amount <= 0) return;
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await (supabase as any).from('payout_requests').insert({ pro_id: userId, amount_cents: amount });
+      if (error) throw error;
+      toast({ title: 'Запрос на выплату создан' });
+    } catch (e:any) {
+      console.error(e);
+      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
+    }
+  };
+
   return (
     <main className="container mx-auto py-12">
       <Seo title={`${t('app.name')} — Кабинет исполнителя`} description="Pro dashboard" canonical="/pro/dashboard" />
       <section className="max-w-5xl mx-auto card-surface">
         <h1 className="text-2xl font-semibold mb-4">Кабинет исполнителя</h1>
-        <div className="flex items-center justify-between mb-6">
-          <div className="text-sm text-muted-foreground">Баланс кошелька: ${(walletBalance/100).toFixed(2)} $</div>
-          <div className="flex gap-2">
-            <button className="btn-ghost" onClick={()=>navigate('/kyc')}>Загрузить KYC</button>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-6">
+          <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-3">
+            <span>Баланс: ${(walletBalance/100).toFixed(2)} $</span>
+            <span>Рейтинг: {ratingAvg ? ratingAvg.toFixed(1) : '—'}{ratingCount ? ` (${ratingCount})` : ''}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button className="btn-ghost" onClick={()=>navigate('/pro/profile')}>Профиль</button>
+            <button className="btn-ghost" onClick={()=>navigate('/pro/schedule')}>Расписание</button>
+            <button className="btn-ghost" onClick={()=>navigate('/portfolio')}>Портфолио</button>
+            <button className="btn-ghost" onClick={()=>navigate('/tenders')}>Тендеры</button>
+            <button className="btn-ghost" onClick={requestPayout}>Запросить выплату</button>
+            <button className="btn-ghost" onClick={()=>navigate('/kyc')}>KYC</button>
           </div>
         </div>
         <div className="grid md:grid-cols-2 gap-6">

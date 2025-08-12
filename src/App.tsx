@@ -19,6 +19,11 @@ import DashboardPro from "./pages/DashboardPro";
 import DashboardBusiness from "./pages/DashboardBusiness";
 import Messages from "./pages/Messages";
 import Kyc from "./pages/Kyc";
+import ProProfile from "./pages/ProProfile";
+import ProSchedule from "./pages/ProSchedule";
+import ProPortfolio from "./pages/ProPortfolio";
+import TendersList from "./pages/TendersList";
+import TenderDetail from "./pages/TenderDetail";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -42,6 +47,11 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/messages/:id" element={<Messages />} />
             <Route path="/kyc" element={<Kyc />} />
+            <Route path="/pro/profile" element={<ProProfile />} />
+            <Route path="/pro/schedule" element={<ProSchedule />} />
+            <Route path="/portfolio" element={<ProPortfolio />} />
+            <Route path="/tenders" element={<TendersList />} />
+            <Route path="/tenders/:id" element={<TenderDetail />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
