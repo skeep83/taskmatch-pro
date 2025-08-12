@@ -2,7 +2,7 @@ import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const JobNew = () => {
   const { t } = useI18n();
@@ -24,6 +24,11 @@ const JobNew = () => {
       }
     })();
   }, []);
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const presetCategory = params.get("category_id") || "";
+  const presetProId = params.get("pro_id") || "";
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -50,17 +55,19 @@ const JobNew = () => {
         return;
       }
       const scheduled_at = date && time ? new Date(`${date}T${time}:00Z`).toISOString() : null;
+      const insertPayload: any = {
+        client_id: userId,
+        category_id,
+        title: null,
+        description,
+        budget_min_cents: isFinite(budget_min) ? Math.round(budget_min * 100) : null,
+        budget_max_cents: isFinite(budget_max) ? Math.round(budget_max * 100) : null,
+        scheduled_at,
+      };
+      if (presetProId) insertPayload.pro_id = presetProId;
       const { error } = await (supabase as any)
         .from("jobs")
-        .insert({
-          client_id: userId,
-          category_id,
-          title: null,
-          description,
-          budget_min_cents: isFinite(budget_min) ? Math.round(budget_min * 100) : null,
-          budget_max_cents: isFinite(budget_max) ? Math.round(budget_max * 100) : null,
-          scheduled_at,
-        });
+        .insert(insertPayload);
       if (error) throw error;
       toast({ title: "Заказ создан", description: "Мы уведомим специалистов" });
       navigate("/dashboard", { replace: true });
@@ -84,8 +91,8 @@ const JobNew = () => {
         <form className="grid gap-4" onSubmit={onSubmit}>
           <div>
             <label className="block text-sm mb-1">Категория</label>
-            <select name="category_id" className="w-full border rounded-md px-3 py-2 bg-background" required>
-              <option value="" disabled selected>Выберите категорию</option>
+            <select name="category_id" defaultValue={presetCategory} className="w-full border rounded-md px-3 py-2 bg-background" required>
+              <option value="" disabled>Выберите категорию</option>
               {categoryOptions}
             </select>
           </div>

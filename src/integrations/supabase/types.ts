@@ -584,6 +584,27 @@ export type Database = {
         }
         Relationships: []
       }
+      pro_rating_stats: {
+        Row: {
+          avg_score: number
+          pro_id: string
+          rating_count: number
+          updated_at: string
+        }
+        Insert: {
+          avg_score?: number
+          pro_id: string
+          rating_count?: number
+          updated_at?: string
+        }
+        Update: {
+          avg_score?: number
+          pro_id?: string
+          rating_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -829,6 +850,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      refresh_pro_rating_stats: {
+        Args: { _pro_id: string }
+        Returns: undefined
       }
     }
     Enums: {

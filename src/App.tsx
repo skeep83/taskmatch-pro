@@ -24,6 +24,8 @@ import ProSchedule from "./pages/ProSchedule";
 import ProPortfolio from "./pages/ProPortfolio";
 import TendersList from "./pages/TendersList";
 import TenderDetail from "./pages/TenderDetail";
+import Catalog from "./pages/Catalog";
+import ProPublic from "./pages/ProPublic";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,7 +39,7 @@ const App = () => (
           <Header />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/catalog" element={<Index />} />
+            <Route path="/catalog" element={<Catalog />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/pro" element={<Pro />} />
             <Route path="/job/new" element={<JobNew />} />
@@ -52,6 +54,7 @@ const App = () => (
             <Route path="/portfolio" element={<ProPortfolio />} />
             <Route path="/tenders" element={<TendersList />} />
             <Route path="/tenders/:id" element={<TenderDetail />} />
+            <Route path="/pro/:id" element={<ProPublic />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
