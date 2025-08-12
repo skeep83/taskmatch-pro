@@ -19,6 +19,7 @@ const Auth = () => {
     const fd = new FormData(e.currentTarget);
     const email = String(fd.get("email") || "").trim();
     const password = String(fd.get("password") || "");
+    const desiredRole = (String(fd.get("role") || "client") as "client" | "pro" | "business");
 
     if (!email || !password) {
       toast({ title: "Проверьте поля", description: "Введите email и пароль", variant: "destructive" });
@@ -33,15 +34,51 @@ const Auth = () => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (data?.user) {
+          // If a role was saved during signup confirmation, try to attach it now
+          const pendingRole = (localStorage.getItem("desired_role") as "client" | "pro" | "business" | null);
+          if (pendingRole) {
+            try {
+              // Ensure role exists
+              const { data: roles } = await supabase.from("user_roles").select("role");
+              const hasRole = (roles || []).some((r: any) => r.role === pendingRole);
+              if (!hasRole) {
+                await supabase.from("user_roles").insert({ user_id: data.user.id, role: pendingRole });
+              }
+            } catch {
+              /* ignore attach errors */
+            } finally {
+              localStorage.removeItem("desired_role");
+            }
+          }
+          // Redirect by role priority: pro -> business -> client
+          const { data: roles2 } = await supabase.from("user_roles").select("role");
+          const roleList = (roles2 || []).map((r: any) => r.role);
           toast({ title: "Успешный вход", description: `Добро пожаловать, ${email}` });
-          navigate("/", { replace: true });
+          if (roleList.includes("pro")) navigate("/pro/dashboard", { replace: true });
+          else if (roleList.includes("business")) navigate("/business/dashboard", { replace: true });
+          else navigate("/dashboard", { replace: true });
         }
       } else {
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        const redirectUrl = `${window.location.origin}/`;
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: redirectUrl },
+        });
         if (error) throw error;
-        // В большинстве проектов включено подтверждение email
-        toast({ title: "Аккаунт создан", description: "Проверьте почту для подтверждения" });
-        navigate("/", { replace: true });
+        if (data.session?.user?.id) {
+          // Email confirmation disabled: attach role immediately
+          await supabase.from("user_roles").insert({ user_id: data.session.user.id, role: desiredRole });
+          toast({ title: "Аккаунт создан", description: "Роль назначена. Добро пожаловать!" });
+          if (desiredRole === "pro") navigate("/pro/dashboard", { replace: true });
+          else if (desiredRole === "business") navigate("/business/dashboard", { replace: true });
+          else navigate("/dashboard", { replace: true });
+        } else {
+          // Most setups require email confirmation
+          localStorage.setItem("desired_role", desiredRole);
+          toast({ title: "Аккаунт создан", description: "Проверьте почту для подтверждения" });
+          navigate("/", { replace: true });
+        }
       }
     } catch (err: any) {
       console.error(err);
@@ -67,6 +104,16 @@ const Auth = () => {
             <Label htmlFor="password">Пароль</Label>
             <Input id="password" name="password" type="password" placeholder="••••••••" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} required />
           </div>
+          {mode === 'signup' && (
+            <div className="space-y-2">
+              <Label htmlFor="role">Роль аккаунта</Label>
+              <select id="role" name="role" defaultValue="client" className="w-full h-10 rounded-md border bg-background px-3">
+                <option value="client">Клиент</option>
+                <option value="pro">Специалист</option>
+                <option value="business">Бизнес</option>
+              </select>
+            </div>
+          )}
           <div className="flex items-center justify-between gap-3 pt-2">
             <Button type="submit" disabled={loading}>
               {loading ? 'Подождите…' : mode === 'signin' ? 'Войти' : 'Создать аккаунт'}
