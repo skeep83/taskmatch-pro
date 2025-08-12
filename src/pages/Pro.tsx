@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +8,21 @@ const Pro = () => {
   const { t } = useI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data: s } = await supabase.auth.getSession();
+        const uid = s.session?.user?.id;
+        if (!uid) return;
+        const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', uid);
+        const hasPro = (roles || []).some((r: any) => r.role === 'pro');
+        if (hasPro) navigate('/pro/dashboard');
+      } catch {}
+    })();
+  }, [navigate]);
+
 
   const handleBecomePro = async () => {
     try {
