@@ -15,6 +15,10 @@ const DashboardPro = () => {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [ratingAvg, setRatingAvg] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number>(0);
+  const [proCatIds, setProCatIds] = useState<string[]>([]);
+  const [showOfferFor, setShowOfferFor] = useState<Record<string, boolean>>({});
+  const [offerDrafts, setOfferDrafts] = useState<Record<string, { price: string; eta: string; warranty: string; note: string }>>({});
+  const [existingApps, setExistingApps] = useState<Record<string, any>>({});
 
   useEffect(() => {
     (async () => {
@@ -39,15 +43,43 @@ const DashboardPro = () => {
         navigate("/pro");
         return;
       }
-      // Load jobs available (no pro assigned) — allowed by RLS policy jobs_select_open_for_auth
-      const { data: openJobs } = await (supabase as any)
-        .from("jobs")
-        .select("id, description, budget_min_cents, budget_max_cents, scheduled_at, created_at")
-        .eq("status", "new")
-        .is("pro_id", null)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      setNearbyJobs(openJobs || []);
+      // Загрузить категории специалиста
+      const { data: proCats } = await (supabase as any)
+        .from('pro_categories')
+        .select('category_id')
+        .eq('user_id', uid);
+      const catIds = (proCats || []).map((c: any) => c.category_id);
+      setProCatIds(catIds);
+
+      // Заказы по подходящим категориям (без назначенного исполнителя)
+      let openJobs: any[] = [];
+      if (catIds.length > 0) {
+        const { data } = await (supabase as any)
+          .from("jobs")
+          .select("id, description, budget_min_cents, budget_max_cents, scheduled_at, created_at, category_id")
+          .eq("status", "new")
+          .is("pro_id", null)
+          .in('category_id', catIds)
+          .order("created_at", { ascending: false })
+          .limit(30);
+        openJobs = data || [];
+      }
+      setNearbyJobs(openJobs);
+
+      // Оферты, уже отправленные этим исполнителем по видимым заказам
+      const jobIds = openJobs.map(j => j.id);
+      if (jobIds.length) {
+        const { data: apps } = await (supabase as any)
+          .from('job_applications')
+          .select('id, job_id, price_cents, eta_slot, warranty_days, note, created_at')
+          .eq('pro_id', uid)
+          .in('job_id', jobIds);
+        const map: Record<string, any> = {};
+        (apps || []).forEach((a: any) => { map[a.job_id] = a; });
+        setExistingApps(map);
+      } else {
+        setExistingApps({});
+      }
 
       // Load my active jobs
       const { data: active } = await (supabase as any)
@@ -141,6 +173,51 @@ const DashboardPro = () => {
     }
   };
 
+
+  const toggleOffer = (jobId: string) => {
+    setShowOfferFor((prev) => ({ ...prev, [jobId]: !prev[jobId] }));
+  };
+
+  const sendOffer = async (jobId: string) => {
+    try {
+      if (!userId) return;
+      const draft = offerDrafts[jobId] || { price: '', eta: '', warranty: '', note: '' };
+      const priceNum = Math.round(Number(draft.price) * 100);
+      if (!priceNum || priceNum <= 0) {
+        toast({ title: 'Укажите цену', variant: 'destructive' });
+        return;
+      }
+      const { supabase } = await import('@/integrations/supabase/client');
+      const payload: any = {
+        job_id: jobId,
+        pro_id: userId,
+        price_cents: priceNum,
+      };
+      if (draft.eta) payload.eta_slot = draft.eta;
+      if (draft.warranty) payload.warranty_days = Number(draft.warranty) || null;
+      if (draft.note) payload.note = draft.note;
+      const { data, error } = await (supabase as any)
+        .from('job_applications')
+        .upsert(payload, { onConflict: 'job_id,pro_id' })
+        .select('id, job_id, price_cents, eta_slot, warranty_days, note, created_at')
+        .maybeSingle();
+      if (error) throw error;
+      setExistingApps((prev) => ({ ...prev, [jobId]: data }));
+      setShowOfferFor((p) => ({ ...p, [jobId]: false }));
+      toast({ title: 'Оффер отправлен' });
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
+    }
+  };
+
+  const updateDraft = (jobId: string, field: 'price'|'eta'|'warranty'|'note', value: string) => {
+    setOfferDrafts((prev) => ({
+      ...prev,
+      [jobId]: { price: '', eta: '', warranty: '', note: '', ...(prev[jobId] || {}), [field]: value }
+    }));
+  };
+
   const startJob = async (jobId: string) => {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
@@ -217,12 +294,55 @@ const DashboardPro = () => {
             <ul className="space-y-3">
               {nearbyJobs.length === 0 && <li className="text-sm text-muted-foreground">Нет доступных заказов</li>}
               {nearbyJobs.map((j) => (
-                <li key={j.id} className="p-3 rounded-md border flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm">{j.description}</p>
-                    <p className="text-xs text-muted-foreground">{j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'}</p>
+                <li key={j.id} className="p-3 rounded-md border">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm">{j.description}</p>
+                      <p className="text-xs text-muted-foreground">{j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'}</p>
+                      {existingApps[j.id] && (
+                        <p className="text-xs text-success mt-1">Ваш оффер: ${(existingApps[j.id].price_cents/100).toFixed(2)} $</p>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="btn-ghost" onClick={() => toggleOffer(j.id)}>{showOfferFor[j.id] ? 'Скрыть' : 'Офер'}</button>
+                      <button className="btn-ghost" onClick={() => acceptJob(j.id)}>Принять</button>
+                    </div>
                   </div>
-                  <button className="btn-ghost" onClick={() => acceptJob(j.id)}>Принять</button>
+                  {showOfferFor[j.id] && (
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-5 gap-2">
+                      <input
+                        type="number"
+                        placeholder="Цена, $"
+                        className="input"
+                        value={offerDrafts[j.id]?.price || ''}
+                        onChange={(e)=>updateDraft(j.id,'price',e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Когда (ETA)"
+                        className="input"
+                        value={offerDrafts[j.id]?.eta || ''}
+                        onChange={(e)=>updateDraft(j.id,'eta',e.target.value)}
+                      />
+                      <input
+                        type="number"
+                        placeholder="Гарантия, дни"
+                        className="input"
+                        value={offerDrafts[j.id]?.warranty || ''}
+                        onChange={(e)=>updateDraft(j.id,'warranty',e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Комментарий"
+                        className="input sm:col-span-2"
+                        value={offerDrafts[j.id]?.note || ''}
+                        onChange={(e)=>updateDraft(j.id,'note',e.target.value)}
+                      />
+                      <div className="sm:col-span-5">
+                        <button className="btn-hero" onClick={()=>sendOffer(j.id)}>Отправить оффер</button>
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

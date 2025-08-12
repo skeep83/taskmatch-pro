@@ -13,6 +13,9 @@ const DashboardClient = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [myJobs, setMyJobs] = useState<any[]>([]);
   const [subLoading, setSubLoading] = useState(false);
+  const [offersByJob, setOffersByJob] = useState<Record<string, any[]>>({});
+  const [ratingsByPro, setRatingsByPro] = useState<Record<string, { avg: number; count: number }>>({});
+  const [portfolioByPro, setPortfolioByPro] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     (async () => {
@@ -32,6 +35,39 @@ const DashboardClient = () => {
         .order("created_at", { ascending: false })
         .limit(50);
       setMyJobs(data || []);
+
+      // Загрузить офферы по активным новым заказам
+      const jobIds = (data || []).filter((j:any)=>j.status==='new').map((j:any)=>j.id);
+      if (jobIds.length) {
+        const { data: apps } = await (supabase as any)
+          .from('job_applications')
+          .select('id, job_id, pro_id, price_cents, eta_slot, warranty_days, note, created_at')
+          .in('job_id', jobIds)
+          .order('created_at', { ascending: false });
+        const grouped: Record<string, any[]> = {};
+        const proIdsSet = new Set<string>();
+        (apps || []).forEach((a:any)=>{ (grouped[a.job_id] ||= []).push(a); proIdsSet.add(a.pro_id); });
+        setOffersByJob(grouped);
+
+        const proIds = Array.from(proIdsSet);
+        if (proIds.length) {
+          const [{ data: stats }, { data: items }] = await Promise.all([
+            (supabase as any).from('pro_rating_stats').select('pro_id, avg_score, rating_count').in('pro_id', proIds),
+            (supabase as any).from('portfolio_items').select('id, pro_id, image_url, title, created_at').in('pro_id', proIds).order('created_at', { ascending: false }).limit(60)
+          ]);
+          const ratingsMap: Record<string, { avg: number; count: number }> = {};
+          (stats || []).forEach((s:any)=>{ ratingsMap[s.pro_id] = { avg: Number(s.avg_score||0), count: s.rating_count||0 }; });
+          setRatingsByPro(ratingsMap);
+          const portfolioMap: Record<string, any[]> = {};
+          (items || []).forEach((it:any)=>{ (portfolioMap[it.pro_id] ||= []).length < 3 && portfolioMap[it.pro_id].push(it); });
+          setPortfolioByPro(portfolioMap);
+        }
+      } else {
+        setOffersByJob({});
+        setRatingsByPro({});
+        setPortfolioByPro({});
+      }
+
       setLoading(false);
     })();
   }, [navigate, toast]);

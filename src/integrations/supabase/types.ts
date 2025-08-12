@@ -302,6 +302,42 @@ export type Database = {
         }
         Relationships: []
       }
+      job_applications: {
+        Row: {
+          created_at: string
+          eta_slot: string | null
+          id: string
+          is_final: boolean
+          job_id: string
+          note: string | null
+          price_cents: number
+          pro_id: string
+          warranty_days: number | null
+        }
+        Insert: {
+          created_at?: string
+          eta_slot?: string | null
+          id?: string
+          is_final?: boolean
+          job_id: string
+          note?: string | null
+          price_cents: number
+          pro_id: string
+          warranty_days?: number | null
+        }
+        Update: {
+          created_at?: string
+          eta_slot?: string | null
+          id?: string
+          is_final?: boolean
+          job_id?: string
+          note?: string | null
+          price_cents?: number
+          pro_id?: string
+          warranty_days?: number | null
+        }
+        Relationships: []
+      }
       job_photos: {
         Row: {
           created_at: string
