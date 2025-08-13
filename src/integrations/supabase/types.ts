@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string
+          after: Json | null
+          before: Json | null
+          created_at: string | null
+          entity: string
+          entity_id: string
+          id: number
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          after?: Json | null
+          before?: Json | null
+          created_at?: string | null
+          entity: string
+          entity_id: string
+          id?: number
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          after?: Json | null
+          before?: Json | null
+          created_at?: string | null
+          entity?: string
+          entity_id?: string
+          id?: number
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           active: boolean
@@ -323,6 +356,87 @@ export type Database = {
         }
         Relationships: []
       }
+      commission_rules: {
+        Row: {
+          active: boolean
+          category_id: string | null
+          city: string | null
+          created_at: string | null
+          id: string
+          min_fee_cents: number
+          night_coef: number
+          pct: number
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean
+          category_id?: string | null
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          min_fee_cents?: number
+          night_coef?: number
+          pct?: number
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean
+          category_id?: string | null
+          city?: string | null
+          created_at?: string | null
+          id?: string
+          min_fee_cents?: number
+          night_coef?: number
+          pct?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      dispute_cases: {
+        Row: {
+          assigned_to: string | null
+          claimant: string
+          created_at: string | null
+          evidence: Json | null
+          id: string
+          job_id: string
+          penalty_cents: number | null
+          refund_cents: number | null
+          resolution: string | null
+          sla_due_at: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          claimant: string
+          created_at?: string | null
+          evidence?: Json | null
+          id?: string
+          job_id: string
+          penalty_cents?: number | null
+          refund_cents?: number | null
+          resolution?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          claimant?: string
+          created_at?: string | null
+          evidence?: Json | null
+          id?: string
+          job_id?: string
+          penalty_cents?: number | null
+          refund_cents?: number | null
+          resolution?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       endorsements: {
         Row: {
           created_at: string
@@ -575,6 +689,36 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_queue: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          id: number
+          reason: string | null
+          status: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          id?: number
+          reason?: string | null
+          status?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: number
+          reason?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       payout_requests: {
         Row: {
           amount_cents: number
@@ -599,6 +743,36 @@ export type Database = {
           pro_id?: string
           status?: Database["public"]["Enums"]["payout_status"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      payouts: {
+        Row: {
+          amount_cents: number
+          id: string
+          initiated_at: string | null
+          method: string | null
+          pro_id: string
+          settled_at: string | null
+          status: string | null
+        }
+        Insert: {
+          amount_cents: number
+          id?: string
+          initiated_at?: string | null
+          method?: string | null
+          pro_id: string
+          settled_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          id?: string
+          initiated_at?: string | null
+          method?: string | null
+          pro_id?: string
+          settled_at?: string | null
+          status?: string | null
         }
         Relationships: []
       }
@@ -986,6 +1160,60 @@ export type Database = {
           tier?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      tender_evaluations: {
+        Row: {
+          bid_id: string
+          created_at: string | null
+          id: string
+          judge_id: string
+          note: string | null
+          rubric_id: string
+          score: number
+        }
+        Insert: {
+          bid_id: string
+          created_at?: string | null
+          id?: string
+          judge_id: string
+          note?: string | null
+          rubric_id: string
+          score: number
+        }
+        Update: {
+          bid_id?: string
+          created_at?: string | null
+          id?: string
+          judge_id?: string
+          note?: string | null
+          rubric_id?: string
+          score?: number
+        }
+        Relationships: []
+      }
+      tender_rubrics: {
+        Row: {
+          created_at: string | null
+          criterion: string
+          id: string
+          tender_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string | null
+          criterion: string
+          id?: string
+          tender_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string | null
+          criterion?: string
+          id?: string
+          tender_id?: string
+          weight?: number
         }
         Relationships: []
       }

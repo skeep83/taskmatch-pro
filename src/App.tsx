@@ -27,6 +27,16 @@ import TenderDetail from "./pages/TenderDetail";
 import Catalog from "./pages/Catalog";
 import ProPublic from "./pages/ProPublic";
 import Feed from "./pages/Feed";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminUsers from "./pages/admin/Users";
+import AdminJobs from "./pages/admin/Jobs";
+import AdminTenders from "./pages/admin/Tenders";
+import AdminDisputes from "./pages/admin/Disputes";
+import AdminFinance from "./pages/admin/Finance";
+import AdminRisk from "./pages/admin/Risk";
+import AdminContent from "./pages/admin/Content";
+import AdminSettings from "./pages/admin/Settings";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -60,6 +70,17 @@ const App = () => (
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="/feed" element={<Feed />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="jobs" element={<AdminJobs />} />
+              <Route path="tenders" element={<AdminTenders />} />
+              <Route path="disputes" element={<AdminDisputes />} />
+              <Route path="finance" element={<AdminFinance />} />
+              <Route path="risk" element={<AdminRisk />} />
+              <Route path="content" element={<AdminContent />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
