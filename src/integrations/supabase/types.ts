@@ -887,6 +887,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_business_member: {
+        Args: { _biz: string; _user: string }
+        Returns: boolean
+      }
+      is_business_owner: {
+        Args: { _biz: string; _user: string }
+        Returns: boolean
+      }
       refresh_pro_rating_stats: {
         Args: { _pro_id: string }
         Returns: undefined
