@@ -353,9 +353,9 @@ const DashboardPro = () => {
 
   return (
     <main className="container mx-auto py-12">
-      <Seo title={`${t('app.name')} — Кабинет исполнителя`} description="Pro dashboard" canonical="/pro/dashboard" />
+      <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
       <section className="max-w-5xl mx-auto card-surface">
-        <h1 className="text-2xl font-semibold mb-4">Кабинет исполнителя</h1>
+        <h1 className="text-2xl font-semibold mb-4">Кабинет специалиста</h1>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-6">
           <div className="text-sm flex flex-wrap items-center gap-4">
             <span className="text-success text-lg font-semibold inline-flex items-center"><Wallet className="h-4 w-4 mr-1" aria-hidden />Баланс: ${(walletBalance/100).toFixed(2)} $</span>

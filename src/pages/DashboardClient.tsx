@@ -117,7 +117,7 @@ const DashboardClient = () => {
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id || null;
       if (!uid) return navigate('/auth');
-      if (!job.pro_id) return toast({ title: 'Чат недоступен', description: 'Исполнитель ещё не назначен' });
+      if (!job.pro_id) return toast({ title: 'Чат недоступен', description: 'Специалист ещё не назначен' });
       const { data: existing } = await (supabase as any)
         .from("chats")
         .select("id").eq("job_id", job.id).eq("client_id", job.client_id).eq("professional_id", job.pro_id).maybeSingle();
