@@ -34,6 +34,7 @@ export const Header = () => {
         <div className="hidden md:flex items-center gap-6">
           <Link to="/catalog" className="text-sm hover:opacity-80 transition-opacity">{t("nav.catalog")}</Link>
           <Link to="/job/new" className="text-sm hover:opacity-80 transition-opacity">{t("nav.find_pro")}</Link>
+          <Link to="/feed" className="text-sm hover:opacity-80 transition-opacity">Лента</Link>
           <Link to="/dashboard" className="text-sm hover:opacity-80 transition-opacity">Кабинет</Link>
           <Link to="/pro/dashboard" className="text-sm hover:opacity-80 transition-opacity">PRO</Link>
           <Link to="/messages" className="text-sm hover:opacity-80 transition-opacity">Сообщения</Link>

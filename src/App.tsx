@@ -26,6 +26,7 @@ import TendersList from "./pages/TendersList";
 import TenderDetail from "./pages/TenderDetail";
 import Catalog from "./pages/Catalog";
 import ProPublic from "./pages/ProPublic";
+import Feed from "./pages/Feed";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/feed" element={<Feed />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />

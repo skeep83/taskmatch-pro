@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          active: boolean
+          created_at: string
+          criteria: Json | null
+          id: string
+          key: string
+          title_ro: string | null
+          title_ru: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          criteria?: Json | null
+          id?: string
+          key: string
+          title_ro?: string | null
+          title_ru?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          criteria?: Json | null
+          id?: string
+          key?: string
+          title_ro?: string | null
+          title_ru?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bids: {
         Row: {
           created_at: string
@@ -266,6 +299,60 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: []
+      }
+      endorsements: {
+        Row: {
+          created_at: string
+          from_id: string
+          id: string
+          note: string | null
+          skill: string
+          to_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          from_id: string
+          id?: string
+          note?: string | null
+          skill: string
+          to_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          from_id?: string
+          id?: string
+          note?: string | null
+          skill?: string
+          to_id?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       escrows: {
         Row: {
           amount_cents: number
@@ -299,6 +386,30 @@ export type Database = {
           pro_id?: string | null
           status?: Database["public"]["Enums"]["escrow_status"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      follows: {
+        Row: {
+          created_at: string
+          id: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -443,6 +554,27 @@ export type Database = {
         }
         Relationships: []
       }
+      likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payout_requests: {
         Row: {
           amount_cents: number
@@ -494,6 +626,72 @@ export type Database = {
           image_url?: string
           pro_id?: string
           title?: string | null
+        }
+        Relationships: []
+      }
+      post_photos: {
+        Row: {
+          created_at: string
+          file_url: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_url: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          author_id: string
+          category_id: string | null
+          city: string | null
+          content: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          org_id: string | null
+          title: string | null
+          type: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          author_id: string
+          category_id?: string | null
+          city?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          org_id?: string | null
+          title?: string | null
+          type?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          author_id?: string
+          category_id?: string | null
+          city?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          org_id?: string | null
+          title?: string | null
+          type?: string
+          updated_at?: string
+          visibility?: string
         }
         Relationships: []
       }
@@ -725,6 +923,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scores: {
+        Row: {
+          entity_id: string
+          entity_type: string
+          id: string
+          price_fairness: number
+          quality: number
+          reliability: number
+          social_trust: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          entity_id: string
+          entity_type: string
+          id?: string
+          price_fairness?: number
+          quality?: number
+          reliability?: number
+          social_trust?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          price_fairness?: number
+          quality?: number
+          reliability?: number
+          social_trust?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           active: boolean
@@ -830,6 +1064,30 @@ export type Database = {
           pro_id?: string | null
           subject?: string
           subject_id?: string | null
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          created_at: string
+          granted_by: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }

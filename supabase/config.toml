@@ -1,1 +1,7 @@
 project_id = "adstlhdgegtkvtgklkyx"
+
+[functions.feed-get]
+verify_jwt = false
+
+[functions.scores-refresh-user]
+verify_jwt = true
