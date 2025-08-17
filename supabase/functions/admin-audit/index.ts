@@ -201,34 +201,34 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-}
 
-function groupByHour(data: any[]) {
-  const hourlyGroups: Record<string, number> = {};
-  
-  data.forEach(item => {
-    const hour = new Date(item.created_at).getHours();
-    const key = `${hour}:00`;
-    hourlyGroups[key] = (hourlyGroups[key] || 0) + 1;
-  });
-  
-  return hourlyGroups;
-}
+  function groupByHour(data: any[]) {
+    const hourlyGroups: Record<string, number> = {};
+    
+    data.forEach(item => {
+      const hour = new Date(item.created_at).getHours();
+      const key = `${hour}:00`;
+      hourlyGroups[key] = (hourlyGroups[key] || 0) + 1;
+    });
+    
+    return hourlyGroups;
+  }
 
-function convertToCSV(data: any[]): string {
-  if (data.length === 0) return '';
-  
-  const headers = Object.keys(data[0]);
-  const csvHeaders = headers.join(',');
-  
-  const csvRows = data.map(row => 
-    headers.map(header => {
-      const cell = row[header];
-      if (cell === null || cell === undefined) return '';
-      if (typeof cell === 'object') return JSON.stringify(cell).replace(/"/g, '""');
-      return String(cell).replace(/"/g, '""');
-    }).join(',')
-  );
-  
-  return [csvHeaders, ...csvRows].join('\n');
+  function convertToCSV(data: any[]): string {
+    if (data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const csvHeaders = headers.join(',');
+    
+    const csvRows = data.map(row => 
+      headers.map(header => {
+        const cell = row[header];
+        if (cell === null || cell === undefined) return '';
+        if (typeof cell === 'object') return JSON.stringify(cell).replace(/"/g, '""');
+        return String(cell).replace(/"/g, '""');
+      }).join(',')
+    );
+    
+    return [csvHeaders, ...csvRows].join('\n');
+  }
 }
