@@ -131,6 +131,60 @@ const DashboardPro = () => {
     setTenders(data || []);
   };
 
+  const handleAcceptJob = async (jobId: string) => {
+    if (!userId) return;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('jobs')
+        .update({ 
+          status: 'accepted', 
+          pro_id: userId 
+        })
+        .eq('id', jobId)
+        .eq('status', 'new');
+
+      if (error) throw error;
+
+      toast({ 
+        title: "Заказ принят", 
+        description: "Заказ успешно принят в работу" 
+      });
+
+      // Refresh data
+      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
+      await Promise.all([
+        loadNearbyJobs(userId, refreshSupabase),
+        loadActiveJobs(userId, refreshSupabase)
+      ]);
+    } catch (error: any) {
+      toast({ 
+        title: "Ошибка", 
+        description: error.message || "Не удалось принять заказ", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const handleOfferPrice = (jobId: string) => {
+    navigate(`/job/${jobId}/application`);
+  };
+
+  const handleVideoEvaluation = (jobId: string) => {
+    // Generate video room URL (in real app, this would be handled by backend)
+    const roomId = `job-${jobId}-${Date.now()}`;
+    const videoUrl = `https://meet.jit.si/${roomId}`;
+    
+    toast({ 
+      title: "Видео-оценка", 
+      description: "Открываем комнату для видео-оценки..." 
+    });
+    
+    // Open video in new tab
+    window.open(videoUrl, '_blank');
+  };
+
   if (loading) return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div 
@@ -325,13 +379,22 @@ const DashboardPro = () => {
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <button className="btn-hero text-sm animate-pulse-glow">
+                        <button 
+                          onClick={() => handleAcceptJob(j.id)}
+                          className="btn-hero text-sm animate-pulse-glow"
+                        >
                           Принять
                         </button>
-                        <button className="btn-ghost text-sm">
+                        <button 
+                          onClick={() => handleOfferPrice(j.id)}
+                          className="btn-ghost text-sm"
+                        >
                           Предложить цену
                         </button>
-                        <button className="btn-ghost text-sm flex items-center gap-1">
+                        <button 
+                          onClick={() => handleVideoEvaluation(j.id)}
+                          className="btn-ghost text-sm flex items-center gap-1"
+                        >
                           <AnimatedIcon icon={Video} size={14} />
                           Видео-оценка
                         </button>
