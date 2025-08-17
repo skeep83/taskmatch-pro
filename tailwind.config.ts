@@ -83,7 +83,7 @@ export default {
 				'scale-out': { from: { transform: 'scale(1)', opacity: '1' }, to: { transform: 'scale(0.98)', opacity: '0' } },
 				'slide-in-right': { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(0)' } },
 				'slide-out-right': { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(100%)' } },
-				'float': { '0%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-3px)' }, '100%': { transform: 'translateY(0)' } },
+				'float': { '0%': { transform: 'translateY(0) scale(1)' }, '50%': { transform: 'translateY(-3px) scale(1)' }, '100%': { transform: 'translateY(0) scale(1)' } },
 				'glow': { '0%': { filter: 'drop-shadow(0 0 0 hsl(var(--primary)/0))' }, '50%': { filter: 'drop-shadow(0 0 8px hsl(var(--primary)/0.25))' }, '100%': { filter: 'drop-shadow(0 0 0 hsl(var(--primary)/0))' } },
 				'shimmer': { '0%': { transform: 'translateX(-100%) rotate(12deg)' }, '100%': { transform: 'translateX(200%) rotate(12deg)' } },
 				'pulse-glow': { '0%, 100%': { boxShadow: '0 0 15px hsl(var(--primary)/0.2)' }, '50%': { boxShadow: '0 0 25px hsl(var(--primary)/0.4), 0 0 35px hsl(var(--accent)/0.2)' } },

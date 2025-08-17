@@ -27,18 +27,18 @@ export const FloatingCard = React.forwardRef<HTMLDivElement, FloatingCardProps>(
           "before:bg-gradient-to-br before:from-primary/30 before:via-transparent before:to-accent/30",
           "before:mask-composite-subtract before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]",
           isVisible && "animate-fade-in",
-          hover && "hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl hover:animate-float-slow",
-          glow && "shadow-[0_0_30px_hsl(var(--primary)/0.2)] hover:animate-glow-soft",
+          hover && "hover:scale-[1.01] hover:shadow-xl group",
+          glow && "shadow-[0_0_30px_hsl(var(--primary)/0.2)]",
           className
         )}
         style={{ animationDelay: `${delay}ms` }}
         {...props}
       >
         {/* Glass reflection effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none group-hover:animate-glow-soft" />
         
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 group-hover:animate-float-slow transition-transform duration-700 ease-out">
           {children}
         </div>
       </div>
