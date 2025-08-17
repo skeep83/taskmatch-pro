@@ -202,6 +202,9 @@ All colors MUST be HSL.
 
 @layer utilities {
   .hover-scale { @apply transition-transform duration-200 hover:scale-105; }
+  .hover-float { @apply transition-transform duration-300 hover:animate-float-slow; }
+  .hover-glow { @apply transition-all duration-300 hover:animate-glow-soft; }
+  .hover-bounce { @apply transition-transform duration-300 hover:animate-bounce-gentle; }
   .story-link { position: relative; display: inline-block; }
   .story-link::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right; transition: transform 300ms ease; }
   .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }

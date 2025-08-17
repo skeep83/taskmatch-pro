@@ -102,13 +102,18 @@ export default {
 				'slide-out-right': 'slide-out-right 0.3s ease-out',
 				'enter': 'fade-in 0.3s ease-out, scale-in 0.2s ease-out',
 				'exit': 'fade-out 0.3s ease-out, scale-out 0.2s ease-out',
-				'float-slow': 'float 3s ease-in-out infinite',
-				'glow-soft': 'glow 2.5s ease-in-out infinite',
-				'shimmer': 'shimmer 3s ease-in-out infinite',
-				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-				'bounce-gentle': 'bounce-gentle 2s ease-in-out infinite',
-				'rotate-slow': 'rotate-slow 20s linear infinite',
-				'gradient-shift': 'gradient-shift 6s ease-in-out infinite'
+				// Hover-only animations (no infinite by default)
+				'float-slow': 'float 3s ease-in-out',
+				'glow-soft': 'glow 2.5s ease-in-out',
+				'shimmer': 'shimmer 3s ease-in-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out',
+				'bounce-gentle': 'bounce-gentle 2s ease-in-out',
+				'rotate-slow': 'rotate-slow 20s linear',
+				'gradient-shift': 'gradient-shift 6s ease-in-out',
+				// Infinite versions for special cases
+				'float-infinite': 'float 3s ease-in-out infinite',
+				'glow-infinite': 'glow 2.5s ease-in-out infinite',
+				'pulse-infinite': 'pulse-glow 2s ease-in-out infinite'
 			}
 		}
 	},
