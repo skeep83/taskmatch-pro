@@ -14,8 +14,8 @@ export const AnimatedIcon: React.FC<AnimatedIconProps> = ({ icon: Icon, size = 2
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center text-primary transition-all duration-300",
-        "hover:scale-110 hover:animate-float-slow",
+        "inline-flex items-center justify-center text-primary transition-all duration-500 ease-out",
+        "hover:scale-105 hover:animate-float-slow",
         glow && "hover:animate-glow-soft",
         className
       )}

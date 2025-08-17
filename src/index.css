@@ -127,16 +127,16 @@ All colors MUST be HSL.
 
 @layer components {
   .btn-hero {
-    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold shadow-lg transition-all duration-300 transform;
+    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold shadow-lg transition-all duration-500 ease-out transform;
     background-image: var(--gradient-primary);
     color: hsl(var(--primary-foreground));
   }
   .btn-hero:hover {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-1px) scale(1.01);
     box-shadow: var(--shadow-glow), var(--shadow-strong);
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold border-2 transition-all duration-300;
+    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold border-2 transition-all duration-500 ease-out;
     border-color: hsl(var(--border));
     color: hsl(var(--foreground));
     background: var(--gradient-glass);
@@ -145,7 +145,7 @@ All colors MUST be HSL.
   .btn-ghost:hover {
     border-color: hsl(var(--primary));
     background: hsl(var(--primary)/0.1);
-    transform: translateY(-1px);
+    transform: translateY(-0.5px);
     box-shadow: var(--shadow-soft);
   }
   .card-surface {
@@ -201,12 +201,12 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  .hover-scale { @apply transition-transform duration-200 hover:scale-105; }
-  .hover-float { @apply transition-transform duration-300 hover:animate-float-slow; }
-  .hover-glow { @apply transition-all duration-300 hover:animate-glow-soft; }
-  .hover-bounce { @apply transition-transform duration-300 hover:animate-bounce-gentle; }
+  .hover-scale { @apply transition-transform duration-400 ease-out hover:scale-[1.02]; }
+  .hover-float { @apply transition-transform duration-500 ease-out hover:animate-float-slow; }
+  .hover-glow { @apply transition-all duration-500 ease-out hover:animate-glow-soft; }
+  .hover-bounce { @apply transition-transform duration-500 ease-out hover:animate-bounce-gentle; }
   .story-link { position: relative; display: inline-block; }
-  .story-link::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right; transition: transform 300ms ease; }
+  .story-link::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right; transition: transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94); }
   .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
 }
 

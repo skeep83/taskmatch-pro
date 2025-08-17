@@ -21,14 +21,14 @@ export const FloatingCard = React.forwardRef<HTMLDivElement, FloatingCardProps>(
       <div
         ref={ref}
         className={cn(
-          "relative overflow-hidden rounded-2xl border backdrop-blur-xl transition-all duration-500",
+          "relative overflow-hidden rounded-2xl border backdrop-blur-xl transition-all duration-700 ease-out",
           "bg-gradient-to-br from-card/80 via-card/60 to-card/80",
           "before:absolute before:inset-0 before:rounded-2xl before:padding-[1px]",
           "before:bg-gradient-to-br before:from-primary/30 before:via-transparent before:to-accent/30",
           "before:mask-composite-subtract before:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]",
           isVisible && "animate-fade-in",
-          hover && "hover:scale-[1.02] hover:-translate-y-1 hover:shadow-2xl hover:animate-float-slow",
-          glow && "shadow-[0_0_40px_hsl(var(--primary)/0.3)] hover:animate-glow-soft",
+          hover && "hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl hover:animate-float-slow",
+          glow && "shadow-[0_0_30px_hsl(var(--primary)/0.2)] hover:animate-glow-soft",
           className
         )}
         style={{ animationDelay: `${delay}ms` }}
