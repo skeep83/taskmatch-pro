@@ -50,7 +50,7 @@ const JobNew = () => {
     const time = String(fd.get("time") || "");
 
     if (!category_id || !description) {
-      toast({ title: "Проверьте поля", description: "Категория и описание обязательны", variant: "destructive" });
+      toast({ title: t("auth.error.fields"), description: t("job.new.error.required"), variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -156,10 +156,10 @@ const JobNew = () => {
         <div className="relative container mx-auto px-4 py-24">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-              Инстант‑бронирование
+              {t("job.new.title")}
             </h1>
             <p className="text-xl text-white/90 mb-8">
-              Создайте заказ за 3 минуты и получите предложения от проверенных специалистов
+              {t("job.new.subtitle")}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">

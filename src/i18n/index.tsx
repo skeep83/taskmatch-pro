@@ -80,7 +80,7 @@ export const I18nProvider: React.FC<{ initialLocale?: Locale; children: React.Re
             <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-primary/40 animate-spin mx-auto" style={{animationDuration: '1.5s'}}></div>
           </div>
           <h2 className="text-xl font-semibold text-foreground mb-2">ServiceHub</h2>
-          <p className="text-muted-foreground animate-pulse">Загрузка переводов...</p>
+          <p className="text-muted-foreground animate-pulse">{dict["loading.translations"] || "Загрузка переводов..."}</p>
         </div>
       </div>
     );

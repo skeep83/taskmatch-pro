@@ -34,7 +34,7 @@ const Messages = () => {
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id || null;
       if (!uid) {
-        toast({ title: "Требуется вход", description: "Пожалуйста, войдите" });
+        toast({ title: t("messages.login_required"), description: t("messages.please_login") });
         navigate("/auth");
         return;
       }
@@ -136,10 +136,10 @@ const Messages = () => {
         <div className="relative container mx-auto px-4 py-16">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 animate-fade-in">
-              Безопасные чаты
+              {t("messages.title")}
             </h1>
             <p className="text-xl text-white/90 mb-6">
-              Общайтесь с клиентами и специалистами в защищенной среде
+              {t("messages.subtitle")}
             </p>
             <div className="flex gap-4">
               <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
