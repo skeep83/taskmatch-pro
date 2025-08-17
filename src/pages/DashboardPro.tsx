@@ -185,6 +185,76 @@ const DashboardPro = () => {
     window.open(videoUrl, '_blank');
   };
 
+  const handleOpenChat = (jobId: string) => {
+    navigate(`/messages?job=${jobId}`);
+  };
+
+  const handleStartWork = async (jobId: string) => {
+    if (!userId) return;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('jobs')
+        .update({ 
+          status: 'in_progress',
+          start_confirmed: true
+        })
+        .eq('id', jobId)
+        .eq('pro_id', userId);
+
+      if (error) throw error;
+
+      toast({ 
+        title: "Работа начата", 
+        description: "Статус заказа изменен на 'В работе'" 
+      });
+
+      // Refresh active jobs
+      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
+      await loadActiveJobs(userId, refreshSupabase);
+    } catch (error: any) {
+      toast({ 
+        title: "Ошибка", 
+        description: error.message || "Не удалось начать работу", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const handleCompleteWork = async (jobId: string) => {
+    if (!userId) return;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('jobs')
+        .update({ 
+          status: 'done',
+          end_confirmed: true
+        })
+        .eq('id', jobId)
+        .eq('pro_id', userId);
+
+      if (error) throw error;
+
+      toast({ 
+        title: "Работа завершена", 
+        description: "Заказ успешно завершен" 
+      });
+
+      // Refresh active jobs
+      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
+      await loadActiveJobs(userId, refreshSupabase);
+    } catch (error: any) {
+      toast({ 
+        title: "Ошибка", 
+        description: error.message || "Не удалось завершить работу", 
+        variant: "destructive" 
+      });
+    }
+  };
+
   if (loading) return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div 
@@ -457,15 +527,28 @@ const DashboardPro = () => {
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <button className="btn-ghost text-sm flex items-center gap-2">
+                        <button 
+                          onClick={() => handleOpenChat(j.id)}
+                          className="btn-ghost text-sm flex items-center gap-2"
+                        >
                           <AnimatedIcon icon={MessageSquare} size={16} />
                           Чат
                         </button>
                         {j.status === 'accepted' && (
-                          <button className="btn-hero text-sm">Начать работу</button>
+                          <button 
+                            onClick={() => handleStartWork(j.id)}
+                            className="btn-hero text-sm"
+                          >
+                            Начать работу
+                          </button>
                         )}
                         {j.status === 'in_progress' && (
-                          <button className="btn-hero text-sm">Завершить</button>
+                          <button 
+                            onClick={() => handleCompleteWork(j.id)}
+                            className="btn-hero text-sm"
+                          >
+                            Завершить
+                          </button>
                         )}
                       </div>
                     </div>
