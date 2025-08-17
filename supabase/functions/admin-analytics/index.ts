@@ -42,10 +42,26 @@ serve(async (req) => {
       });
     }
 
-    const { data: adminCheck } = await supabaseService
-      .rpc('verify_admin_access', { required_role: 'admin' });
+    // Check user roles directly with authenticated user context
+    const { data: userRoles, error: rolesError } = await supabaseService
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
 
-    if (!adminCheck) {
+    if (rolesError) {
+      console.error('Error checking user roles:', rolesError);
+      return new Response(JSON.stringify({ error: "Failed to verify permissions" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const roles = userRoles?.map(r => r.role) || [];
+    const hasAdminAccess = roles.includes('admin') || roles.includes('superadmin');
+
+    if (!hasAdminAccess) {
+
+    
       return new Response(JSON.stringify({ error: "Insufficient permissions" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
