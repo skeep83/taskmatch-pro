@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import clientDashboard from "@/assets/client-dashboard.jpg";
 import subscriptionPlans from "@/assets/subscription-plans.jpg";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const DashboardClient = () => {
   const { t } = useI18n();
@@ -101,21 +102,44 @@ const DashboardClient = () => {
     })();
   }, [navigate, toast]);
 
-  if (loading) return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${clientDashboard})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
-      <FloatingCard className="p-8 text-center animate-pulse-glow">
-        <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем ваш кабинет...</h1>
-        <div className="flex items-center justify-center gap-2">
-          <AnimatedIcon icon={Clock} className="animate-spin" />
+  // Show loading skeleton on first load
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Seo title="Личный кабинет" description="Управляйте заказами и отслеживайте прогресс" />
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Header skeleton */}
+          <div className="text-center space-y-4">
+            <Skeleton className="h-12 w-80 mx-auto" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+          
+          {/* Stats skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1,2,3].map(i => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
+          
+          {/* Content skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-48" />
+              <div className="space-y-3">
+                {[1,2,3].map(i => (
+                  <Skeleton key={i} className="h-24 w-full" />
+                ))}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          </div>
         </div>
-      </FloatingCard>
-    </main>
-  );
+      </div>
+    );
+  }
 
   const payEscrow = async (job: any) => {
     try {
