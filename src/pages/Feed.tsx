@@ -30,28 +30,40 @@ const Feed = () => {
         else if (roles?.[0]?.role === "business") setUserRole("business");
       }
       
-      // Load available jobs
+      // Load available jobs first
       let query = (supabase as any)
         .from("jobs")
-        .select(`
-          *,
-          categories(label_ru, key),
-          pro_profiles(hourly_rate_cents, fixed_price_cents),
-          users(email)
-        `)
+        .select("*")
         .eq("status", "new")
         .order("created_at", { ascending: false })
         .limit(20);
         
       if (selectedCategory) query = query.eq("category_id", selectedCategory);
       
-      const { data, error } = await query;
-      if (error) throw error;
-      setJobs(data || []);
+      const { data: jobsData, error: jobsError } = await query;
+      if (jobsError) throw jobsError;
       
-      // Load categories
-      const { data: cats } = await (supabase as any).from("categories").select("*").order("label_ru");
-      setCategories(cats || []);
+      // Load categories separately
+      const { data: categoriesData, error: categoriesError } = await (supabase as any)
+        .from("categories")
+        .select("*")
+        .order("label_ru");
+      
+      if (categoriesError) {
+        console.warn("Categories loading error:", categoriesError);
+      }
+      
+      // Merge category info with jobs
+      const jobsWithCategories = (jobsData || []).map((job: any) => {
+        const category = (categoriesData || []).find((cat: any) => cat.id === job.category_id);
+        return {
+          ...job,
+          category: category
+        };
+      });
+      
+      setJobs(jobsWithCategories);
+      setCategories(categoriesData || []);
     } catch (error: any) {
       console.error(error);
       toast({ title: "Ошибка загрузки", variant: "destructive" });
@@ -87,7 +99,7 @@ const Feed = () => {
   const filteredJobs = jobs.filter(job => 
     searchQuery === "" || 
     job.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    job.categories?.label_ru?.toLowerCase().includes(searchQuery.toLowerCase())
+    job.category?.label_ru?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -163,7 +175,7 @@ const Feed = () => {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <Badge variant="secondary" className="mb-2">
-                    {job.categories?.label_ru || "Услуга"}
+                    {job.category?.label_ru || "Услуга"}
                   </Badge>
                   {job.scheduled_at && (
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">

@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -37,7 +38,56 @@ import AdminFinance from "./pages/admin/Finance";
 import AdminRisk from "./pages/admin/Risk";
 import AdminContent from "./pages/admin/Content";
 import AdminSettings from "./pages/admin/Settings";
+import PageTransition from "./components/PageTransition";
+
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const location = useLocation();
+  
+  return (
+    <>
+      <Header />
+      <PageTransition>
+        <Routes location={location}>
+          <Route path="/" element={<Index />} />
+          <Route path="/catalog" element={<Catalog />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/pro" element={<Pro />} />
+          <Route path="/job/new" element={<JobNew />} />
+          <Route path="/dashboard" element={<DashboardClient />} />
+          <Route path="/pro/dashboard" element={<DashboardPro />} />
+          <Route path="/business/dashboard" element={<DashboardBusiness />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:id" element={<Messages />} />
+          <Route path="/kyc" element={<Kyc />} />
+          <Route path="/pro/profile" element={<ProProfile />} />
+          <Route path="/pro/schedule" element={<ProSchedule />} />
+          <Route path="/portfolio" element={<ProPortfolio />} />
+          <Route path="/tenders" element={<TendersList />} />
+          <Route path="/tenders/:id" element={<TenderDetail />} />
+          <Route path="/pro/:id" element={<ProPublic />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-canceled" element={<PaymentCanceled />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="jobs" element={<AdminJobs />} />
+            <Route path="tenders" element={<AdminTenders />} />
+            <Route path="disputes" element={<AdminDisputes />} />
+            <Route path="finance" element={<AdminFinance />} />
+            <Route path="risk" element={<AdminRisk />} />
+            <Route path="content" element={<AdminContent />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </PageTransition>
+      <Footer />
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -47,43 +97,7 @@ const App = () => (
         <Sonner />
         <Diagnostics />
         <BrowserRouter>
-          <Header />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/pro" element={<Pro />} />
-            <Route path="/job/new" element={<JobNew />} />
-            <Route path="/dashboard" element={<DashboardClient />} />
-            <Route path="/pro/dashboard" element={<DashboardPro />} />
-            <Route path="/business/dashboard" element={<DashboardBusiness />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/messages/:id" element={<Messages />} />
-            <Route path="/kyc" element={<Kyc />} />
-            <Route path="/pro/profile" element={<ProProfile />} />
-            <Route path="/pro/schedule" element={<ProSchedule />} />
-            <Route path="/portfolio" element={<ProPortfolio />} />
-            <Route path="/tenders" element={<TendersList />} />
-            <Route path="/tenders/:id" element={<TenderDetail />} />
-            <Route path="/pro/:id" element={<ProPublic />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-            <Route path="/payment-canceled" element={<PaymentCanceled />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="jobs" element={<AdminJobs />} />
-              <Route path="tenders" element={<AdminTenders />} />
-              <Route path="disputes" element={<AdminDisputes />} />
-              <Route path="finance" element={<AdminFinance />} />
-              <Route path="risk" element={<AdminRisk />} />
-              <Route path="content" element={<AdminContent />} />
-              <Route path="settings" element={<AdminSettings />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Footer />
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </I18nProvider>
