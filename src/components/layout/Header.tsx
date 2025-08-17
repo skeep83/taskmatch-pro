@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n";
+import serviceHubLogo from "@/assets/servicehub-logo.png";
 
 export const Header = () => {
   const { t, locale, setLocale } = useI18n();
@@ -28,9 +29,10 @@ export const Header = () => {
     <header className="w-full glass-nav sticky top-0 z-50">
       <nav className="container mx-auto flex items-center justify-between py-4 px-6">
         <Link to="/" className="flex items-center gap-3 group" aria-label={t("app.name")}> 
-          <div 
-            className="h-10 w-10 rounded-xl shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
-            style={{background: "var(--gradient-primary)"}} 
+          <img 
+            src={serviceHubLogo}
+            alt="ServiceHub Logo"
+            className="h-10 w-10 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
           />
           <span className="text-xl font-display font-bold text-gradient">{t("app.name")}</span>
         </Link>
