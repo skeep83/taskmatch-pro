@@ -5,6 +5,7 @@ import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { 
   ShieldCheck, Zap, Crown, PlusCircle, Gift, ClipboardList, MessageSquare, 
   CreditCard, Star, Clock, MapPin, Video, Wallet, TrendingUp, Award,
@@ -19,6 +20,7 @@ const DashboardClient = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [myJobs, setMyJobs] = useState<any[]>([]);
   const [subLoading, setSubLoading] = useState(false);
@@ -99,6 +101,11 @@ const DashboardClient = () => {
       }
 
       setLoading(false);
+      
+      // Add delay for smooth content appearance  
+      setTimeout(() => {
+        setContentLoaded(true);
+      }, 100);
     })();
   }, [navigate, toast]);
 
@@ -224,19 +231,38 @@ const DashboardClient = () => {
       
       <Seo title={`${t('app.name')} — Личный кабинет`} description="Client dashboard" canonical="/dashboard" />
       
-      <div className="container mx-auto py-8 px-6 relative z-10">
+      <motion.div 
+        className="container mx-auto py-8 px-6 relative z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: contentLoaded ? 1 : 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
-          <div className="animate-fade-in">
+        <motion.div 
+          className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: contentLoaded ? 1 : 0, y: contentLoaded ? 0 : 20 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: contentLoaded ? 1 : 0, x: contentLoaded ? 0 : -20 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
             <h1 className="text-4xl lg:text-5xl font-display font-bold text-gradient mb-2">
               Добро пожаловать!
             </h1>
             <p className="text-xl text-muted-foreground">
               Управляйте своими заказами и подпиской
             </p>
-          </div>
+          </motion.div>
           
-          <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <motion.div 
+            className="flex items-center gap-4" 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: contentLoaded ? 1 : 0, x: contentLoaded ? 0 : 20 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
             <Link to="/job/new" className="btn-hero flex items-center gap-2 animate-pulse-glow">
               <AnimatedIcon icon={PlusCircle} size={20} />
               Новый заказ
@@ -245,11 +271,16 @@ const DashboardClient = () => {
               <AnimatedIcon icon={Bell} size={20} />
               Уведомления
             </button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: contentLoaded ? 1 : 0, y: contentLoaded ? 0 : 30 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <FloatingCard className="p-6 text-center" delay={100} hover glow>
             <AnimatedIcon icon={ClipboardList} size={32} className="text-primary mb-4" />
             <div className="text-2xl font-bold text-primary mb-1">{myJobs.length}</div>
@@ -277,9 +308,14 @@ const DashboardClient = () => {
             <div className="text-2xl font-bold text-amber-500 mb-1">{subscriptionStatus}</div>
             <div className="text-sm text-muted-foreground">Подписка</div>
           </FloatingCard>
-        </div>
+        </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <motion.div 
+          className="grid lg:grid-cols-3 gap-8"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: contentLoaded ? 1 : 0, y: contentLoaded ? 0 : 40 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* HomeCare Subscription */}
@@ -545,8 +581,8 @@ const DashboardClient = () => {
               </div>
             </FloatingCard>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </main>
   );
 };
