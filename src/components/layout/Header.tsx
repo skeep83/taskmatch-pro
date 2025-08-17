@@ -43,19 +43,19 @@ export const Header = () => {
             {t("nav.find_pro")}
           </Link>
           <Link to="/feed" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            Лента
+            {t("nav.feed")}
           </Link>
           <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            Кабинет
+            {t("nav.dashboard")}
           </Link>
           <Link to="/pro/dashboard" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            PRO
+            {t("nav.pro")}
           </Link>
           <Link to="/messages" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            Сообщения
+            {t("nav.messages")}
           </Link>
           <Link to="/admin" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            Admin
+            {t("nav.admin")}
           </Link>
         </div>
         

@@ -5,10 +5,12 @@ import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "@/i18n";
 import { MapPin, Clock, Euro, Filter, Search, Video, Star, Shield, Zap } from "lucide-react";
 import feedImage from "@/assets/feed-jobs.jpg";
 
-const Feed = () => {
+export default function Feed() {
+  const { t } = useI18n();
   const { toast } = useToast();
   const [jobs, setJobs] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -66,7 +68,7 @@ const Feed = () => {
       setCategories(categoriesData || []);
     } catch (error: any) {
       console.error(error);
-      toast({ title: "Ошибка загрузки", variant: "destructive" });
+      toast({ title: t("notifications.error"), variant: "destructive" });
     }
   };
 
@@ -86,11 +88,11 @@ const Feed = () => {
         .eq("id", jobId);
         
       if (error) throw error;
-      toast({ title: "Заказ принят!" });
+      toast({ title: t("notifications.job_accepted") });
       loadJobs();
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Ошибка", description: e?.message, variant: "destructive" });
+      toast({ title: t("notifications.error"), description: e?.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -115,10 +117,10 @@ const Feed = () => {
         <div className="relative container mx-auto px-4 py-24">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-              {userRole === "pro" ? "Заказы рядом с вами" : "Лента активности"}
+              {userRole === "pro" ? t("feed.title") : t("feed.title")}
             </h1>
             <p className="text-xl text-white/90 mb-8">
-              {userRole === "pro" ? "Принимайте заказы и зарабатывайте мгновенно" : "Следите за активностью платформы"}
+              {userRole === "pro" ? t("feed.search") : t("dashboard.welcome")}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
@@ -146,7 +148,7 @@ const Feed = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <input
                 type="text"
-                placeholder="Поиск заказов..."
+                placeholder={t("feed.search")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-white/50 border border-white/20 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
@@ -159,7 +161,7 @@ const Feed = () => {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50"
               >
-                <option value="">Все категории</option>
+                <option value="">{t("feed.category.all")}</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>{cat.label_ru || cat.key}</option>
                 ))}
@@ -213,7 +215,7 @@ const Feed = () => {
                       disabled={loading}
                       className="btn-hero flex-1 group-hover:shadow-lg transition-all"
                     >
-                      Принять заказ
+                      {loading ? t("common.loading") : t("feed.accept_job")}
                     </button>
                     <button className="btn-ghost p-3">
                       <Video className="w-4 h-4" />
@@ -232,13 +234,11 @@ const Feed = () => {
         {filteredJobs.length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
-            <h2 className="text-xl font-semibold mb-2">Нет доступных заказов</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("feed.no_jobs")}</h2>
             <p className="text-muted-foreground">Попробуйте изменить фильтры или создать новый заказ</p>
           </div>
         )}
       </section>
     </main>
   );
-};
-
-export default Feed;
+}
