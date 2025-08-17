@@ -1,58 +1,81 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useToast } from "@/hooks/use-toast";
+import { FloatingCard } from "@/components/ui/floating-card";
+import { GlassMorphism } from "@/components/ui/glass-morphism";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Clock, Euro, Filter, Search, Video, Star, Shield, Zap } from "lucide-react";
+import feedImage from "@/assets/feed-jobs.jpg";
 
 const Feed = () => {
   const { toast } = useToast();
-  const [items, setItems] = useState<any[]>([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState("client");
 
-  const loadFeed = async () => {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data, error } = await (supabase as any).functions.invoke("feed-get", { body: { page: 1, limit: 20 } });
-    if (error) {
+  const loadJobs = async () => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data: s } = await supabase.auth.getSession();
+      const uid = s.session?.user?.id;
+      
+      // Load user role
+      if (uid) {
+        const { data: roles } = await (supabase as any).from("user_roles").select("role").eq("user_id", uid);
+        if (roles?.[0]?.role === "pro") setUserRole("pro");
+        else if (roles?.[0]?.role === "business") setUserRole("business");
+      }
+      
+      // Load available jobs
+      let query = (supabase as any)
+        .from("jobs")
+        .select(`
+          *,
+          categories(label_ru, key),
+          pro_profiles(hourly_rate_cents, fixed_price_cents),
+          users(email)
+        `)
+        .eq("status", "new")
+        .order("created_at", { ascending: false })
+        .limit(20);
+        
+      if (selectedCategory) query = query.eq("category_id", selectedCategory);
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      setJobs(data || []);
+      
+      // Load categories
+      const { data: cats } = await (supabase as any).from("categories").select("*").order("label_ru");
+      setCategories(cats || []);
+    } catch (error: any) {
       console.error(error);
-      toast({ title: "Ошибка загрузки ленты", variant: "destructive" });
-      return;
+      toast({ title: "Ошибка загрузки", variant: "destructive" });
     }
-    setItems(data?.items || []);
   };
 
-  useEffect(() => { loadFeed(); }, []);
+  useEffect(() => { loadJobs(); }, [selectedCategory]);
 
-  const createPost = async () => {
+  const acceptJob = async (jobId: string) => {
     try {
       setLoading(true);
       const { supabase } = await import("@/integrations/supabase/client");
-      const { data: s } = await (supabase as any).auth.getSession();
+      const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id;
       if (!uid) { window.location.href = "/auth"; return; }
-      if (!title && !content) { toast({ title: "Добавьте текст поста", variant: "destructive" }); return; }
-
-      const { data: post, error: insErr } = await (supabase as any)
-        .from("posts").insert({ author_id: uid, title, content, visibility: "public", is_published: true }).select("id").maybeSingle();
-      if (insErr) throw insErr;
-
-      if (files && files.length > 0 && post?.id) {
-        const uploads = Array.from(files).slice(0, 6);
-        for (const f of uploads) {
-          const path = `${uid}/${post.id}/${Date.now()}-${f.name}`;
-          const { error: upErr } = await (supabase as any).storage.from("posts").upload(path, f);
-          if (upErr) throw upErr;
-          const { data: pub } = (supabase as any).storage.from("posts").getPublicUrl(path);
-          const url = pub?.publicUrl;
-          if (url) {
-            await (supabase as any).from("post_photos").insert({ post_id: post.id, file_url: url });
-          }
-        }
-      }
-
-      setTitle(""); setContent(""); (document.getElementById("files") as HTMLInputElement | null)?.value && ((document.getElementById("files") as HTMLInputElement).value = "");
-      toast({ title: "Пост опубликован" });
-      await loadFeed();
+      
+      const { error } = await (supabase as any)
+        .from("jobs")
+        .update({ pro_id: uid, status: "accepted" })
+        .eq("id", jobId);
+        
+      if (error) throw error;
+      toast({ title: "Заказ принят!" });
+      loadJobs();
     } catch (e: any) {
       console.error(e);
       toast({ title: "Ошибка", description: e?.message, variant: "destructive" });
@@ -61,39 +84,146 @@ const Feed = () => {
     }
   };
 
-  return (
-    <main className="container mx-auto py-10">
-      <Seo title="ServiceHub — Лента" description="Лента кейсов и объявлений" canonical="/feed" />
-      <section className="max-w-3xl mx-auto card-surface">
-        <h1 className="text-2xl font-semibold mb-4">Лента</h1>
+  const filteredJobs = jobs.filter(job => 
+    searchQuery === "" || 
+    job.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    job.categories?.label_ru?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-        <div className="p-4 border rounded-md mb-6">
-          <h2 className="text-lg font-medium mb-2">Новый пост</h2>
-          <div className="grid gap-3">
-            <input className="border rounded-md px-3 py-2 bg-background" placeholder="Заголовок (опц.)" value={title} onChange={e=>setTitle(e.target.value)} />
-            <textarea className="border rounded-md px-3 py-2 bg-background min-h-24" placeholder="Текст поста" value={content} onChange={e=>setContent(e.target.value)} />
-            <input id="files" type="file" multiple accept="image/*" onChange={(e)=>setFiles(e.target.files)} />
-            <button className="btn-hero" onClick={createPost} disabled={loading}>{loading?"Публикация…":"Опубликовать"}</button>
+  return (
+    <main className="min-h-screen">
+      <Seo title="ServiceHub — Лента заказов" description="Доступные заказы для специалистов" canonical="/feed" />
+      
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={feedImage} alt="Jobs Feed" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-purple-600/80" />
+        </div>
+        <div className="relative container mx-auto px-4 py-24">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
+              {userRole === "pro" ? "Заказы рядом с вами" : "Лента активности"}
+            </h1>
+            <p className="text-xl text-white/90 mb-8">
+              {userRole === "pro" ? "Принимайте заказы и зарабатывайте мгновенно" : "Следите за активностью платформы"}
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
+                <div className="flex items-center gap-2 text-white">
+                  <AnimatedIcon icon={Zap} className="text-yellow-300" />
+                  <span>Мгновенные выплаты</span>
+                </div>
+              </FloatingCard>
+              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
+                <div className="flex items-center gap-2 text-white">
+                  <AnimatedIcon icon={Shield} className="text-green-300" />
+                  <span>Защита эскроу</span>
+                </div>
+              </FloatingCard>
+            </div>
           </div>
         </div>
+      </section>
 
-        <ul className="space-y-4">
-          {items.map((it:any)=> (
-            <li key={it.id} className="p-4 border rounded-md">
-              {it.title && <h3 className="text-base font-medium mb-1">{it.title}</h3>}
-              {it.content && <p className="text-sm mb-2 whitespace-pre-wrap">{it.content}</p>}
-              {it.photos?.length>0 && (
-                <div className="grid sm:grid-cols-2 gap-2">
-                  {it.photos.map((ph:any)=> (
-                    <img key={ph.id} src={ph.file_url} alt="Фото поста" className="w-full h-48 object-cover rounded-md" loading="lazy" />
-                  ))}
+      {/* Filters */}
+      <section className="container mx-auto px-4 py-8">
+        <GlassMorphism className="p-6 mb-8">
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex-1 min-w-[300px] relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Поиск заказов..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-white/50 border border-white/20 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50"
+              >
+                <option value="">Все категории</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.label_ru || cat.key}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </GlassMorphism>
+
+        {/* Jobs Grid */}
+        <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredJobs.map((job) => (
+            <FloatingCard key={job.id} className="job-card group hover:scale-[1.02] transition-all duration-300">
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <Badge variant="secondary" className="mb-2">
+                    {job.categories?.label_ru || "Услуга"}
+                  </Badge>
+                  {job.scheduled_at && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" />
+                      {new Date(job.scheduled_at).toLocaleDateString()}
+                    </div>
+                  )}
                 </div>
-              )}
-              <div className="text-xs text-muted-foreground mt-2">{new Date(it.created_at).toLocaleString()}</div>
-            </li>
+                
+                <h3 className="font-semibold text-lg mb-3 line-clamp-2">{job.description}</h3>
+                
+                <div className="space-y-3 mb-4">
+                  {job.budget_min_cents && (
+                    <div className="flex items-center gap-2">
+                      <Euro className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">
+                        {(job.budget_min_cents / 100).toFixed(0)}-{(job.budget_max_cents / 100).toFixed(0)} ₽
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-blue-500" />
+                    <span className="text-sm text-muted-foreground">В радиусе 5км</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span className="text-sm text-muted-foreground">Срочность: обычная</span>
+                  </div>
+                </div>
+
+                {userRole === "pro" && (
+                  <div className="flex gap-2 pt-4 border-t">
+                    <button
+                      onClick={() => acceptJob(job.id)}
+                      disabled={loading}
+                      className="btn-hero flex-1 group-hover:shadow-lg transition-all"
+                    >
+                      Принять заказ
+                    </button>
+                    <button className="btn-ghost p-3">
+                      <Video className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+                
+                <div className="text-xs text-muted-foreground mt-3 pt-3 border-t">
+                  Создан {new Date(job.created_at).toLocaleString()}
+                </div>
+              </div>
+            </FloatingCard>
           ))}
-          {items.length===0 && <li className="text-sm text-muted-foreground">Пока нет публикаций</li>}
-        </ul>
+        </div>
+
+        {filteredJobs.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <h2 className="text-xl font-semibold mb-2">Нет доступных заказов</h2>
+            <p className="text-muted-foreground">Попробуйте изменить фильтры или создать новый заказ</p>
+          </div>
+        )}
       </section>
     </main>
   );

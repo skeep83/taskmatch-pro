@@ -3,6 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
+import { FloatingCard } from "@/components/ui/floating-card";
+import { GlassMorphism } from "@/components/ui/glass-morphism";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield } from "lucide-react";
+import messagesImage from "@/assets/messages-chat.jpg";
 
 const Messages = () => {
   const { t } = useI18n();
@@ -117,48 +124,171 @@ const Messages = () => {
   const selectedChat = useMemo(() => chats.find((c) => String(c.id) === String(id)) || null, [chats, id]);
 
   return (
-    <main className="container mx-auto py-12">
+    <main className="min-h-screen">
       <Seo title={`${t('app.name')} — Сообщения`} description="Чаты и сообщения" canonical="/messages" />
-      <section className="max-w-5xl mx-auto card-surface">
-        <h1 className="text-2xl font-semibold mb-4">Сообщения</h1>
-        <div className="grid md:grid-cols-3 gap-4">
-          <aside className="md:col-span-1 border rounded-md overflow-hidden">
-            <ul className="divide-y">
-              {chats.length === 0 && <li className="p-3 text-sm text-muted-foreground">Нет чатов</li>}
-              {chats.map((c) => (
-                <li key={c.id}>
-                  <button className={`w-full text-left p-3 hover:bg-muted ${String(c.id)===String(id)?'bg-muted':''}`} onClick={() => navigate(`/messages/${c.id}`)}>
-                    <div className="text-sm">Чат #{String(c.id).slice(0,8)}</div>
-                    <div className="text-xs text-muted-foreground">{c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}</div>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </aside>
-          <article className="md:col-span-2 border rounded-md flex flex-col min-h-[420px]">
-            {!id ? (
-              <div className="p-6 text-sm text-muted-foreground">Выберите чат слева</div>
-            ) : (
-              <>
-                <div className="p-3 border-b text-sm flex items-center justify-between">
-                  <span>{selectedChat ? `Чат #${String(selectedChat.id).slice(0,8)}` : 'Чат'}</span>
-                  <span className="text-xs text-muted-foreground">{otherTyping ? 'Печатает…' : (otherOnline ? 'Онлайн' : 'Не в сети')}</span>
+      
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={messagesImage} alt="Messages" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-purple-600/80" />
+        </div>
+        <div className="relative container mx-auto px-4 py-16">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 animate-fade-in">
+              Безопасные чаты
+            </h1>
+            <p className="text-xl text-white/90 mb-6">
+              Общайтесь с клиентами и специалистами в защищенной среде
+            </p>
+            <div className="flex gap-4">
+              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
+                <div className="flex items-center gap-2 text-white">
+                  <Shield className="w-5 h-5 text-green-300" />
+                  <span>Защищенные чаты</span>
                 </div>
-                <div className="flex-1 p-3 space-y-2 overflow-y-auto">
-                  {messages.map((m) => (
-                    <div key={m.id} className={`max-w-[80%] p-2 rounded-md ${m.sender_id===userId? 'ml-auto bg-primary/10' : 'bg-muted'}`}>
-                      <div className="text-sm whitespace-pre-wrap">{m.content}</div>
-                      <div className="text-[10px] opacity-60 mt-1">{new Date(m.created_at).toLocaleString()}</div>
+              </FloatingCard>
+              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
+                <div className="flex items-center gap-2 text-white">
+                  <Video className="w-5 h-5 text-blue-300" />
+                  <span>Видео-оценка</span>
+                </div>
+              </FloatingCard>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Chat Interface */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-4 gap-6 h-[600px]">
+            
+            {/* Chat List */}
+            <GlassMorphism className="lg:col-span-1 p-4">
+              <h2 className="font-semibold mb-4 flex items-center gap-2">
+                <Circle className="w-4 h-4 text-green-500 fill-current" />
+                Активные чаты
+              </h2>
+              <div className="space-y-2 overflow-y-auto max-h-[500px]">
+                {chats.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <div className="text-4xl mb-2">💬</div>
+                    <p className="text-sm">Нет активных чатов</p>
+                  </div>
+                )}
+                {chats.map((c) => (
+                  <FloatingCard 
+                    key={c.id} 
+                    className={`p-3 cursor-pointer transition-all hover:scale-[1.02] ${
+                      String(c.id) === String(id) ? 'ring-2 ring-primary bg-primary/5' : ''
+                    }`}
+                    onClick={() => navigate(`/messages/${c.id}`)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                        {String(c.id).slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">
+                          Заказ #{String(c.job_id || c.tender_id || c.id).slice(0, 8)}
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}
+                        </div>
+                      </div>
                     </div>
-                  ))}
+                  </FloatingCard>
+                ))}
+              </div>
+            </GlassMorphism>
+
+            {/* Chat Messages */}
+            <GlassMorphism className="lg:col-span-3 flex flex-col">
+              {!id ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">💬</div>
+                    <h3 className="text-xl font-semibold mb-2">Выберите чат</h3>
+                    <p className="text-muted-foreground">Выберите чат из списка слева для начала общения</p>
+                  </div>
                 </div>
-                <div className="p-3 border-t flex gap-2">
-                  <input value={text} onChange={(e)=>setText(e.target.value)} className="flex-1 border rounded-md px-3 py-2 bg-background" placeholder="Напишите сообщение…" />
-                  <button className="btn-hero" onClick={send}>Отправить</button>
-                </div>
-              </>
-            )}
-          </article>
+              ) : (
+                <>
+                  {/* Chat Header */}
+                  <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                        {String(selectedChat?.id || id).slice(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-medium">
+                          {selectedChat ? `Заказ #${String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}` : 'Чат'}
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
+                          {otherTyping ? 'Печатает…' : (otherOnline ? 'В сети' : 'Не в сети')}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm">
+                        <Video className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Phone className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Messages */}
+                  <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+                    {messages.map((m) => (
+                      <div key={m.id} className={`flex ${m.sender_id === userId ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[70%] p-3 rounded-2xl ${
+                          m.sender_id === userId 
+                            ? 'bg-primary text-primary-foreground rounded-br-md' 
+                            : 'bg-muted rounded-bl-md'
+                        }`}>
+                          <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                          <div className={`text-xs mt-1 flex items-center gap-1 ${
+                            m.sender_id === userId ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                          }`}>
+                            <span>{new Date(m.created_at).toLocaleTimeString()}</span>
+                            {m.sender_id === userId && m.is_read && (
+                              <CheckCircle2 className="w-3 h-3" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Message Input */}
+                  <div className="p-4 border-t border-white/10">
+                    <div className="flex gap-3 items-end">
+                      <Button variant="ghost" size="sm" className="flex-shrink-0">
+                        <Paperclip className="w-4 h-4" />
+                      </Button>
+                      <div className="flex-1 relative">
+                        <input
+                          value={text}
+                          onChange={(e) => setText(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && send()}
+                          className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 pr-12 focus:ring-2 focus:ring-primary/50 transition-all resize-none"
+                          placeholder="Напишите сообщение..."
+                        />
+                      </div>
+                      <Button onClick={send} className="flex-shrink-0">
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </GlassMorphism>
+          </div>
         </div>
       </section>
     </main>
