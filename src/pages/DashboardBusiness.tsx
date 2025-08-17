@@ -1,7 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
+import { FloatingCard } from "@/components/ui/floating-card";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+import {
+  Building2, Users, TrendingUp, FileText, Settings, Bell,
+  DollarSign, Calendar, BarChart3, Shield, Clock, Award,
+  Target, Briefcase, CheckCircle, AlertTriangle, Plus, Star
+} from "lucide-react";
+import businessDashboard from "@/assets/business-dashboard.jpg";
 
 const DashboardBusiness = () => {
   const { t } = useI18n();
@@ -11,6 +20,12 @@ const DashboardBusiness = () => {
   const [biz, setBiz] = useState<any | null>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [totalSpent, setTotalSpent] = useState<number>(0);
+  const [activeJobs, setActiveJobs] = useState<number>(0);
+  const [completedJobs, setCompletedJobs] = useState<number>(0);
+  const [avgSla, setAvgSla] = useState<string>('99.2%');
+  const [monthlyBudget, setMonthlyBudget] = useState<number>(50000);
+  const [budgetUsed, setBudgetUsed] = useState<number>(32450);
 
   // form states
   const [companyName, setCompanyName] = useState("");
@@ -18,7 +33,6 @@ const DashboardBusiness = () => {
   const [idno, setIdno] = useState("");
   const [addr, setAddr] = useState("");
   const [mult, setMult] = useState<number>(1.0);
-
   const [memberUserId, setMemberUserId] = useState("");
 
   type OrderRow = { category_id: string | null; description: string; min?: number; max?: number; when?: string };
@@ -35,11 +49,11 @@ const DashboardBusiness = () => {
       setUserId(uid);
 
       // load categories
-      const { data: cats } = await (supabase as any).from('categories').select('id, key, label_ru, label_ro').order('key');
+      const { data: cats } = await supabase.from('categories').select('id, key, label_ru, label_ro').order('key');
       setCategories(cats || []);
 
       // find owned business account
-      const { data: owned } = await (supabase as any)
+      const { data: owned } = await supabase
         .from('business_accounts')
         .select('*')
         .eq('owner_id', uid)
@@ -52,264 +66,471 @@ const DashboardBusiness = () => {
         setIdno(owned.idno || '');
         setAddr(owned.legal_address || '');
         setMult(Number(owned.rate_multiplier || 1));
-        const { data: mems } = await (supabase as any)
+        
+        const { data: mems } = await supabase
           .from('business_members')
           .select('id, user_id, role, created_at')
           .eq('business_id', owned.id)
           .order('created_at', { ascending: false });
         setMembers(mems || []);
+
+        // Load business analytics
+        await loadBusinessAnalytics(owned.id, supabase);
       }
 
       setLoading(false);
     })();
   }, []);
 
-  const createBusiness = async () => {
-    try {
-      if (!userId) return;
-      if (!companyName.trim()) return toast({ title: 'Укажите название', variant: 'destructive' });
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data, error } = await (supabase as any)
-        .from('business_accounts')
-        .insert({ owner_id: userId, company_name: companyName, vat_number: vat || null, idno: idno || null, legal_address: addr || null, rate_multiplier: mult || 1 })
-        .select('*')
-        .single();
-      if (error) throw error;
-      setBiz(data);
-      toast({ title: 'Компания создана' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
+  const loadBusinessAnalytics = async (businessId: string, supabase: any) => {
+    // Load business jobs and calculate metrics
+    const { data: businessJobs } = await supabase
+      .from('business_jobs')
+      .select(`
+        job_id,
+        jobs (
+          id, status, budget_max_cents, created_at
+        )
+      `)
+      .eq('business_id', businessId);
+
+    if (businessJobs) {
+      const jobs = businessJobs.map((bj: any) => bj.jobs).filter(Boolean);
+      setActiveJobs(jobs.filter((j: any) => ['new', 'accepted', 'in_progress'].includes(j.status)).length);
+      setCompletedJobs(jobs.filter((j: any) => j.status === 'done').length);
+      
+      const spent = jobs
+        .filter((j: any) => j.status === 'done')
+        .reduce((sum: number, j: any) => sum + (j.budget_max_cents || 0), 0);
+      setTotalSpent(spent);
     }
   };
 
-  const saveCompany = async () => {
-    try {
-      if (!businessId) return;
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any)
-        .from('business_accounts')
-        .update({ company_name: companyName, vat_number: vat || null, idno: idno || null, legal_address: addr || null, rate_multiplier: mult || 1 })
-        .eq('id', businessId);
-      if (error) throw error;
-      toast({ title: 'Сохранено' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
+  // add row
+  const addRow = () => {
+    setRows([...rows, { category_id: null, description: "", min: undefined, max: undefined }]);
   };
 
-  const addMember = async () => {
-    try {
-      if (!businessId || !memberUserId) return;
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any).from('business_members').insert({ business_id: businessId, user_id: memberUserId, role: 'member' });
-      if (error) throw error;
-      const { data: mems } = await (supabase as any).from('business_members').select('id, user_id, role, created_at').eq('business_id', businessId).order('created_at', { ascending: false });
-      setMembers(mems || []);
-      setMemberUserId('');
-      toast({ title: 'Добавлен' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
+  // remove row
+  const removeRow = (index: number) => {
+    const newRows = [...rows];
+    newRows.splice(index, 1);
+    setRows(newRows);
   };
 
-  const addRow = () => setRows((prev)=> [...prev, { category_id: null, description: '' }]);
-  const updateRow = (idx:number, patch: Partial<OrderRow>) => setRows((prev)=> prev.map((r,i)=> i===idx ? { ...r, ...patch } : r));
-  const removeRow = (idx:number) => setRows((prev)=> prev.filter((_,i)=>i!==idx));
-
-  const createMassOrders = async () => {
-    try {
-      if (!userId || !businessId) return;
-      const { supabase } = await import("@/integrations/supabase/client");
-      const valid = rows.filter(r=> r.category_id && r.description.trim());
-      if (valid.length === 0) return toast({ title: 'Заполните задания', variant: 'destructive' });
-      // insert jobs one by one to keep RLS simple
-      for (const r of valid) {
-        const payload: any = {
-          client_id: userId,
-          category_id: r.category_id,
-          description: r.description,
-          budget_min_cents: r.min || null,
-          budget_max_cents: r.max || null,
-          scheduled_at: r.when || null,
-          status: 'new'
-        };
-        const { data: job, error: jerr } = await (supabase as any).from('jobs').insert(payload).select('id').single();
-        if (jerr) throw jerr;
-        const { error: berr } = await (supabase as any).from('business_jobs').insert({ business_id: businessId, job_id: job.id });
-        if (berr) throw berr;
-      }
-      toast({ title: 'Заказы созданы' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
+  // update row
+  const updateRow = (index: number, field: string, value: any) => {
+    const newRows = [...rows];
+    newRows[index][field] = value;
+    setRows(newRows);
   };
 
-  const uploadContract = async (file: File) => {
-    try {
-      if (!businessId) return;
-      const { supabase } = await import("@/integrations/supabase/client");
-      const ext = file.name.split('.').pop();
-      const path = `${businessId}/${crypto.randomUUID()}.${ext}`;
-      const { error: uerr } = await supabase.storage.from('biz_docs').upload(path, file, { upsert: false, contentType: file.type });
-      if (uerr) throw uerr;
-      const { data: signed } = await supabase.storage.from('biz_docs').createSignedUrl(path, 60*60);
-      const url = signed?.signedUrl || path;
-      const { error: aerr } = await (supabase as any).from('business_accounts').update({ contract_url: url }).eq('id', businessId);
-      if (aerr) throw aerr;
-      setBiz((prev:any)=> ({ ...prev, contract_url: url }));
-      toast({ title: 'Договор загружен' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
-  };
-
-  const createInvoice = async () => {
-    try {
-      if (!businessId) return;
-      const amountStr = prompt('Сумма счёта, $') || '';
-      const amount = Math.round(Number(amountStr) * 100);
-      if (!amount || amount <= 0) return;
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any).from('biz_invoices').insert({ business_id: businessId, amount_cents: amount, status: 'sent' });
-      if (error) throw error;
-      toast({ title: 'Счёт создан' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
-  };
-
-  if (loading) return <main className="container mx-auto py-12"><section className="max-w-6xl mx-auto card-surface"><h1 className="text-xl">Загрузка…</h1></section></main>;
-
-  return (
-    <main className="container mx-auto py-12">
-      <Seo title={`${t('app.name')} — Бизнес-кабинет`} description="Business dashboard" canonical="/business/dashboard" />
-      <section className="max-w-6xl mx-auto card-surface">
-        <h1 className="text-2xl font-semibold mb-4">Бизнес-кабинет</h1>
-
-        {!biz ? (
-          <div className="p-4 border rounded-md">
-            <h3 className="font-medium mb-3">Создать компанию</h3>
-            <div className="grid md:grid-cols-2 gap-3">
-              <input className="border rounded-md px-3 py-2 bg-background" placeholder="Название компании" value={companyName} onChange={(e)=>setCompanyName(e.target.value)} />
-              <input className="border rounded-md px-3 py-2 bg-background" placeholder="VAT/NDS" value={vat} onChange={(e)=>setVat(e.target.value)} />
-              <input className="border rounded-md px-3 py-2 bg-background" placeholder="IDNO/рег. номер" value={idno} onChange={(e)=>setIdno(e.target.value)} />
-              <input className="border rounded-md px-3 py-2 bg-background md:col-span-2" placeholder="Юридический адрес" value={addr} onChange={(e)=>setAddr(e.target.value)} />
-            </div>
-            <div className="mt-3 flex items-center gap-3">
-              <label className="text-sm">Мультипликатор тарифа</label>
-              <input className="border rounded-md px-3 py-2 bg-background w-32" type="number" min={0.1} step={0.1} value={mult} onChange={(e)=>setMult(Number(e.target.value))} />
-              <button className="btn-hero" onClick={createBusiness}>Создать</button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            <div className="p-4 border rounded-md">
-              <h3 className="font-medium mb-3">Профиль компании</h3>
-              <div className="grid md:grid-cols-2 gap-3">
-                <input className="border rounded-md px-3 py-2 bg-background" placeholder="Название компании" value={companyName} onChange={(e)=>setCompanyName(e.target.value)} />
-                <input className="border rounded-md px-3 py-2 bg-background" placeholder="VAT/NDS" value={vat} onChange={(e)=>setVat(e.target.value)} />
-                <input className="border rounded-md px-3 py-2 bg-background" placeholder="IDNO/рег. номер" value={idno} onChange={(e)=>setIdno(e.target.value)} />
-                <input className="border rounded-md px-3 py-2 bg-background md:col-span-2" placeholder="Юридический адрес" value={addr} onChange={(e)=>setAddr(e.target.value)} />
-                <div className="flex items-center gap-3 md:col-span-2">
-                  <label className="text-sm">Мультипликатор тарифа</label>
-                  <input className="border rounded-md px-3 py-2 bg-background w-32" type="number" min={0.1} step={0.1} value={mult} onChange={(e)=>setMult(Number(e.target.value))} />
-                  <button className="btn-ghost" onClick={saveCompany}>Сохранить</button>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="text-sm block mb-1">Договор</label>
-                  <input type="file" onChange={(e)=>{ const f=e.target.files?.[0]; if (f) uploadContract(f); }} />
-                  {biz.contract_url && <div className="text-xs mt-1"><a className="underline" href={biz.contract_url} target="_blank" rel="noreferrer">Открыть текущий договор</a></div>}
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 border rounded-md">
-              <h3 className="font-medium mb-3">Сотрудники</h3>
-              <div className="flex flex-wrap items-end gap-2 mb-3">
-                <input className="border rounded-md px-3 py-2 bg-background" placeholder="user_id" value={memberUserId} onChange={(e)=>setMemberUserId(e.target.value)} />
-                <button className="btn-ghost" onClick={addMember}>Добавить</button>
-              </div>
-              <ul className="space-y-2">
-                {members.length===0 && <li className="text-sm text-muted-foreground">Сотрудников пока нет</li>}
-                {members.map((m)=> (
-                  <li key={m.id} className="p-3 border rounded-md text-sm">{m.user_id} • {m.role}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="p-4 border rounded-md">
-              <h3 className="font-medium mb-3">Массовые заказы</h3>
-              <div className="space-y-3">
-                {rows.map((r,idx)=> (
-                  <div key={idx} className="grid md:grid-cols-5 gap-2">
-                    <select className="border rounded-md px-3 py-2 bg-background" value={r.category_id || ''} onChange={(e)=>updateRow(idx,{ category_id: e.target.value || null })}>
-                      <option value="">Категория</option>
-                      {categories.map((c:any)=> (<option key={c.id} value={c.id}>{c.label_ru || c.key}</option>))}
-                    </select>
-                    <input className="border rounded-md px-3 py-2 bg-background md:col-span-2" placeholder="Описание" value={r.description} onChange={(e)=>updateRow(idx,{ description: e.target.value })} />
-                    <input className="border rounded-md px-3 py-2 bg-background" type="number" min={0} placeholder="Мин, ¢" value={r.min ?? ''} onChange={(e)=>updateRow(idx,{ min: e.target.value===''? undefined : Number(e.target.value) })} />
-                    <input className="border rounded-md px-3 py-2 bg-background" type="number" min={0} placeholder="Макс, ¢" value={r.max ?? ''} onChange={(e)=>updateRow(idx,{ max: e.target.value===''? undefined : Number(e.target.value) })} />
-                    <input className="border rounded-md px-3 py-2 bg-background md:col-span-2" type="datetime-local" value={r.when || ''} onChange={(e)=>updateRow(idx,{ when: e.target.value })} />
-                    <div className="flex items-center"><button className="text-xs underline" onClick={()=>removeRow(idx)}>Удалить</button></div>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2">
-                  <button className="btn-ghost" onClick={addRow}>Добавить строку</button>
-                  <button className="btn-hero" onClick={createMassOrders}>Создать заказы</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 border rounded-md">
-              <h3 className="font-medium mb-3">Счета (e‑инвойсы)</h3>
-              <button className="btn-ghost mb-3" onClick={createInvoice}>Создать счёт</button>
-              {/* Для простоты: показать последние 20 */}
-              <BizInvoices businessId={businessId!} />
-            </div>
-          </div>
-        )}
-      </section>
+  if (loading) return (
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${businessDashboard})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+      <FloatingCard className="p-8 text-center animate-pulse-glow">
+        <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем бизнес-кабинет...</h1>
+        <div className="flex items-center justify-center gap-2">
+          <AnimatedIcon icon={Clock} className="animate-spin" />
+        </div>
+      </FloatingCard>
     </main>
   );
-};
-
-const BizInvoices: React.FC<{ businessId: string }> = ({ businessId }) => {
-  const { toast } = useToast();
-  const [items, setItems] = useState<any[]>([]);
-  useEffect(() => { (async () => {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data } = await (supabase as any).from('biz_invoices').select('*').eq('business_id', businessId).order('created_at', { ascending: false }).limit(20);
-    setItems(data || []);
-  })(); }, [businessId]);
-
-  const markPaid = async (id: string) => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any).from('biz_invoices').update({ status: 'paid' }).eq('id', id);
-      if (error) throw error;
-      setItems((prev)=> prev.map((x)=> x.id===id ? { ...x, status: 'paid' } : x));
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
-  };
 
   return (
-    <ul className="space-y-2">
-      {items.length===0 && <li className="text-sm text-muted-foreground">Пока нет счетов</li>}
-      {items.map((it)=> (
-        <li key={it.id} className="p-3 border rounded-md flex items-center justify-between">
-          <div className="text-sm">#{String(it.id).slice(0,8)} • {(it.amount_cents/100).toFixed(2)} {it.currency.toUpperCase()} • {it.status}</div>
-          {it.status !== 'paid' && <button className="text-xs underline" onClick={()=>markPaid(it.id)}>Отметить оплаченным</button>}
-        </li>
-      ))}
-    </ul>
+    <main className="relative min-h-screen overflow-hidden">
+      {/* Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${businessDashboard})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+      
+      <Seo title={`${t('app.name')} — Бизнес-кабинет`} description="Business dashboard" canonical="/business/dashboard" />
+      
+      <div className="container mx-auto py-8 px-6 relative z-10">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
+          <div className="animate-fade-in">
+            <h1 className="text-4xl lg:text-5xl font-display font-bold text-gradient mb-2">
+              {biz?.company_name || 'Бизнес-кабинет'}
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Управление корпоративными заказами и командой
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <button className="btn-hero flex items-center gap-2 animate-pulse-glow">
+              <AnimatedIcon icon={Plus} size={20} />
+              Массовый заказ
+            </button>
+            <button className="btn-ghost flex items-center gap-2">
+              <AnimatedIcon icon={Bell} size={20} />
+              Уведомления
+            </button>
+          </div>
+        </div>
+
+        {!biz ? (
+          <div className="max-w-4xl mx-auto">
+            <FloatingCard className="p-8" delay={100} hover>
+              <div className="text-center mb-8">
+                <AnimatedIcon icon={Building2} size={48} className="text-primary mb-4" />
+                <h2 className="text-2xl font-display font-bold mb-2">Создайте бизнес-аккаунт</h2>
+                <p className="text-muted-foreground">
+                  Получите доступ к корпоративным функциям и централизованному управлению
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Название компании *</label>
+                  <input 
+                    className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                    placeholder="ООО Рога и Копыта" 
+                    value={companyName} 
+                    onChange={(e)=>setCompanyName(e.target.value)} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">VAT/НДС номер</label>
+                  <input 
+                    className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                    placeholder="1234567890" 
+                    value={vat} 
+                    onChange={(e)=>setVat(e.target.value)} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">IDNO/Регистрационный номер</label>
+                  <input 
+                    className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                    placeholder="0987654321" 
+                    value={idno} 
+                    onChange={(e)=>setIdno(e.target.value)} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Мультипликатор тарифа</label>
+                  <input 
+                    className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                    type="number" 
+                    min={0.1} 
+                    step={0.1} 
+                    value={mult} 
+                    onChange={(e)=>setMult(Number(e.target.value))} 
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium mb-2">Юридический адрес</label>
+                  <input 
+                    className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                    placeholder="г. Москва, ул. Примерная, д. 123" 
+                    value={addr} 
+                    onChange={(e)=>setAddr(e.target.value)} 
+                  />
+                </div>
+              </div>
+
+              <div className="mt-8 text-center">
+                <button className="btn-hero text-lg px-8 py-4 animate-pulse-glow">
+                  Создать бизнес-аккаунт
+                </button>
+              </div>
+            </FloatingCard>
+          </div>
+        ) : (
+          <>
+            {/* Business Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
+              <FloatingCard className="p-6 text-center" delay={100} hover glow>
+                <AnimatedIcon icon={DollarSign} size={32} className="text-success mb-4" />
+                <div className="text-2xl font-bold text-success mb-1">
+                  ${(totalSpent/100).toFixed(0)}
+                </div>
+                <div className="text-sm text-muted-foreground">Потрачено всего</div>
+              </FloatingCard>
+              
+              <FloatingCard className="p-6 text-center" delay={200} hover glow>
+                <AnimatedIcon icon={Briefcase} size={32} className="text-primary mb-4" />
+                <div className="text-2xl font-bold text-primary mb-1">{activeJobs}</div>
+                <div className="text-sm text-muted-foreground">Активных заказов</div>
+              </FloatingCard>
+              
+              <FloatingCard className="p-6 text-center" delay={300} hover glow>
+                <AnimatedIcon icon={CheckCircle} size={32} className="text-accent mb-4" />
+                <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
+                <div className="text-sm text-muted-foreground">Завершено</div>
+              </FloatingCard>
+              
+              <FloatingCard className="p-6 text-center" delay={400} hover glow>
+                <AnimatedIcon icon={Users} size={32} className="text-purple-500 mb-4" />
+                <div className="text-2xl font-bold text-purple-500 mb-1">{members.length}</div>
+                <div className="text-sm text-muted-foreground">Сотрудников</div>
+              </FloatingCard>
+              
+              <FloatingCard className="p-6 text-center" delay={500} hover glow>
+                <AnimatedIcon icon={Target} size={32} className="text-amber-500 mb-4" />
+                <div className="text-2xl font-bold text-amber-500 mb-1">{avgSla}</div>
+                <div className="text-sm text-muted-foreground">SLA</div>
+              </FloatingCard>
+            </div>
+
+            {/* Budget Overview */}
+            <FloatingCard className="p-8 mb-8" delay={100} hover>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <AnimatedIcon icon={BarChart3} size={28} className="text-primary" />
+                  <h2 className="text-2xl font-display font-bold">Бюджет и расходы</h2>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Текущий месяц
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    ${(monthlyBudget/100).toFixed(0)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Месячный бюджет</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-accent mb-2">
+                    ${(budgetUsed/100).toFixed(0)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Использовано</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-success mb-2">
+                    ${((monthlyBudget - budgetUsed)/100).toFixed(0)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Остается</div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span>Использование бюджета</span>
+                  <span>{((budgetUsed / monthlyBudget) * 100).toFixed(1)}%</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-3">
+                  <div 
+                    className="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-1000"
+                    style={{ width: `${(budgetUsed / monthlyBudget) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </FloatingCard>
+
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* Company Profile */}
+                <FloatingCard className="p-8" delay={200} hover>
+                  <div className="flex items-center gap-3 mb-6">
+                    <AnimatedIcon icon={Building2} size={28} className="text-primary" />
+                    <h2 className="text-2xl font-display font-bold">Профиль компании</h2>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Название компании</label>
+                      <input 
+                        className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                        value={companyName} 
+                        onChange={(e)=>setCompanyName(e.target.value)} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">VAT/НДС номер</label>
+                      <input 
+                        className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                        value={vat} 
+                        onChange={(e)=>setVat(e.target.value)} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">IDNO/Рег. номер</label>
+                      <input 
+                        className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                        value={idno} 
+                        onChange={(e)=>setIdno(e.target.value)} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Мультипликатор тарифа</label>
+                      <input 
+                        className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                        type="number" 
+                        min={0.1} 
+                        step={0.1} 
+                        value={mult} 
+                        onChange={(e)=>setMult(Number(e.target.value))} 
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium mb-2">Юридический адрес</label>
+                      <input 
+                        className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                        value={addr} 
+                        onChange={(e)=>setAddr(e.target.value)} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex gap-4">
+                    <button className="btn-hero">Сохранить изменения</button>
+                    <button className="btn-ghost">Загрузить договор</button>
+                  </div>
+                </FloatingCard>
+
+                {/* Team Management */}
+                <FloatingCard className="p-8" delay={300} hover>
+                  <div className="flex items-center gap-3 mb-6">
+                    <AnimatedIcon icon={Users} size={28} className="text-primary" />
+                    <h2 className="text-2xl font-display font-bold">Управление командой</h2>
+                  </div>
+
+                  <div className="flex gap-4 mb-6">
+                    <input 
+                      className="flex-1 border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                      placeholder="ID пользователя" 
+                      value={memberUserId} 
+                      onChange={(e)=>setMemberUserId(e.target.value)} 
+                    />
+                    <button className="btn-hero px-6">Добавить сотрудника</button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {members.length === 0 && (
+                      <div className="text-center py-8">
+                        <AnimatedIcon icon={Users} size={32} className="text-muted-foreground mb-3" />
+                        <p className="text-muted-foreground">Пока нет сотрудников</p>
+                      </div>
+                    )}
+
+                    {members.map((m, index) => (
+                      <FloatingCard key={m.id} className="p-4" delay={index * 50} hover>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <AnimatedIcon icon={Users} size={20} className="text-primary" />
+                            </div>
+                            <div>
+                              <div className="font-medium">{String(m.user_id).slice(0, 8)}...</div>
+                              <div className="text-sm text-muted-foreground capitalize">{m.role}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button className="btn-ghost text-sm">Лимиты</button>
+                            <button className="btn-ghost text-sm text-destructive">Удалить</button>
+                          </div>
+                        </div>
+                      </FloatingCard>
+                    ))}
+                  </div>
+                </FloatingCard>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                {/* Quick Actions */}
+                <FloatingCard className="p-6" delay={400} hover>
+                  <h3 className="font-semibold mb-4">Быстрые действия</h3>
+                  <div className="space-y-3">
+                    <button className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors w-full text-left">
+                      <AnimatedIcon icon={Plus} size={20} className="text-primary" />
+                      <span className="text-sm">Массовый заказ</span>
+                    </button>
+                    <button className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors w-full text-left">
+                      <AnimatedIcon icon={FileText} size={20} className="text-primary" />
+                      <span className="text-sm">Создать счет</span>
+                    </button>
+                    <button className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors w-full text-left">
+                      <AnimatedIcon icon={BarChart3} size={20} className="text-primary" />
+                      <span className="text-sm">Отчеты</span>
+                    </button>
+                    <button className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors w-full text-left">
+                      <AnimatedIcon icon={Settings} size={20} className="text-primary" />
+                      <span className="text-sm">Настройки</span>
+                    </button>
+                  </div>
+                </FloatingCard>
+
+                {/* SLA Dashboard */}
+                <FloatingCard className="p-6" delay={500} hover>
+                  <div className="flex items-center gap-3 mb-4">
+                    <AnimatedIcon icon={Target} size={24} className="text-primary" />
+                    <h3 className="font-semibold">SLA Мониторинг</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Время ответа</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                        <span className="text-sm font-medium">&lt; 2 часа</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Качество выполнения</span>
+                      <div className="flex items-center gap-1">
+                        <AnimatedIcon icon={Star} size={14} className="text-amber-500" />
+                        <span className="text-sm font-medium">4.8/5.0</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Соблюдение сроков</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                        <span className="text-sm font-medium">98.5%</span>
+                      </div>
+                    </div>
+                  </div>
+                </FloatingCard>
+
+                {/* Recent Invoices */}
+                <FloatingCard className="p-6" delay={600} hover>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Последние счета</h3>
+                    <button className="text-sm text-primary hover:underline">Все счета</button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div>
+                        <div className="font-medium text-sm">#INV-001</div>
+                        <div className="text-xs text-muted-foreground">15 января</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium text-sm">$1,250.00</div>
+                        <div className="text-xs text-success">Оплачен</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div>
+                        <div className="font-medium text-sm">#INV-002</div>
+                        <div className="text-xs text-muted-foreground">10 января</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium text-sm">$850.00</div>
+                        <div className="text-xs text-amber-500">Ожидает</div>
+                      </div>
+                    </div>
+                  </div>
+                </FloatingCard>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </main>
   );
 };
 

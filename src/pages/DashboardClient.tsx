@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
+import { FloatingCard } from "@/components/ui/floating-card";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Zap, Crown, PlusCircle, Gift, ClipboardList, MessageSquare, CreditCard } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { 
+  ShieldCheck, Zap, Crown, PlusCircle, Gift, ClipboardList, MessageSquare, 
+  CreditCard, Star, Clock, MapPin, Video, Wallet, TrendingUp, Award,
+  Home, Calendar, Settings, Bell
+} from "lucide-react";
+import clientDashboard from "@/assets/client-dashboard.jpg";
+import subscriptionPlans from "@/assets/subscription-plans.jpg";
 
 const DashboardClient = () => {
   const { t } = useI18n();
@@ -18,6 +26,8 @@ const DashboardClient = () => {
   const [portfolioByPro, setPortfolioByPro] = useState<Record<string, any[]>>({});
   const [ratedByMe, setRatedByMe] = useState<Record<string, boolean>>({});
   const [ratingDrafts, setRatingDrafts] = useState<Record<string, { score: string; comment: string }>>({});
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>('none');
 
   useEffect(() => {
     (async () => {
@@ -30,6 +40,8 @@ const DashboardClient = () => {
         return;
       }
       setUserId(uid);
+      
+      // Load jobs, offers, ratings, and portfolio data
       const { data } = await (supabase as any)
         .from("jobs")
         .select("id, description, status, scheduled_at, created_at, budget_min_cents, budget_max_cents, pro_id, client_id")
@@ -89,7 +101,21 @@ const DashboardClient = () => {
     })();
   }, [navigate, toast]);
 
-  if (loading) return <main className="container mx-auto py-12"><section className="max-w-5xl mx-auto card-surface"><h1 className="text-xl">Загрузка…</h1></section></main>;
+  if (loading) return (
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${clientDashboard})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+      <FloatingCard className="p-8 text-center animate-pulse-glow">
+        <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем ваш кабинет...</h1>
+        <div className="flex items-center justify-center gap-2">
+          <AnimatedIcon icon={Clock} className="animate-spin" />
+        </div>
+      </FloatingCard>
+    </main>
+  );
 
   const payEscrow = async (job: any) => {
     try {
@@ -164,81 +190,339 @@ const DashboardClient = () => {
   };
 
   return (
-    <main className="container mx-auto py-12">
+    <main className="relative min-h-screen overflow-hidden">
+      {/* Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${clientDashboard})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+      
       <Seo title={`${t('app.name')} — Личный кабинет`} description="Client dashboard" canonical="/dashboard" />
-      <section className="max-w-5xl mx-auto card-surface">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold">Личный кабинет</h1>
-          <button className="btn-hero inline-flex items-center" onClick={() => navigate('/job/new')}><PlusCircle className="h-5 w-5 mr-2" aria-hidden />Новый заказ</button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="p-4 border rounded-md min-w-0 animate-fade-in">
-            <h3 className="font-medium mb-2">HomeCare Подписка</h3>
-            <div className="flex flex-wrap items-center gap-2">
-              <button className="btn-ghost hover-scale whitespace-nowrap text-sm px-3 py-2 flex items-center gap-2" disabled={subLoading} onClick={() => startSubscribe(990)}>
-                <ShieldCheck className="h-4 w-4" aria-hidden />
-                <span>Basic $9.90</span>
-              </button>
-              <button className="btn-ghost hover-scale whitespace-nowrap text-sm px-3 py-2 flex items-center gap-2" disabled={subLoading} onClick={() => startSubscribe(1990)}>
-                <Zap className="h-4 w-4" aria-hidden />
-                <span>Plus $19.90</span>
-              </button>
-              <button className="btn-ghost hover-scale whitespace-nowrap text-sm px-3 py-2 flex items-center gap-2" disabled={subLoading} onClick={() => startSubscribe(3990)}>
-                <Crown className="h-4 w-4" aria-hidden />
-                <span>Max $39.90</span>
-              </button>
-            </div>
-            <div className="mt-2">
-              <button className="text-xs underline" onClick={async ()=>{ const { paymentProvider } = await import("@/payments/PaymentProvider"); paymentProvider.openCustomerPortal(); }}>Управлять подпиской</button>
-            </div>
+      
+      <div className="container mx-auto py-8 px-6 relative z-10">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
+          <div className="animate-fade-in">
+            <h1 className="text-4xl lg:text-5xl font-display font-bold text-gradient mb-2">
+              Добро пожаловать!
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Управляйте своими заказами и подпиской
+            </p>
           </div>
-          <div className="p-4 border rounded-md">
-            <h3 className="font-medium mb-2 inline-flex items-center"><Gift className="h-4 w-4 mr-2" aria-hidden />Реферальный код</h3>
-            <p className="text-sm break-all">{userId}</p>
-            <button className="mt-2 text-xs underline" onClick={() => { navigator.clipboard.writeText(String(userId)); toast({ title: 'Скопировано' }); }}>Копировать</button>
+          
+          <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <Link to="/job/new" className="btn-hero flex items-center gap-2 animate-pulse-glow">
+              <AnimatedIcon icon={PlusCircle} size={20} />
+              Новый заказ
+            </Link>
+            <button className="btn-ghost flex items-center gap-2">
+              <AnimatedIcon icon={Bell} size={20} />
+              Уведомления
+            </button>
           </div>
         </div>
 
-        <h2 className="text-lg font-medium mb-2 inline-flex items-center"><ClipboardList className="h-5 w-5 mr-2" aria-hidden />Мои заказы</h2>
-        <ul className="space-y-3">
-          {myJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока нет заказов</li>}
-          {myJobs.map((j) => (
-            <li key={j.id} className="p-3 rounded-md border animate-fade-in">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm">{j.description}</p>
-                  <p className="text-xs text-muted-foreground">Статус: {j.status} • {j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'}</p>
-                </div>
-                <div className="flex gap-2">
-                  {j.status === 'new' && <button className="btn-ghost inline-flex items-center" onClick={() => payEscrow(j)}><CreditCard className="h-4 w-4 mr-1" aria-hidden />Оплатить эскроу</button>}
-                  {j.pro_id && <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>}
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <FloatingCard className="p-6 text-center" delay={100} hover glow>
+            <AnimatedIcon icon={ClipboardList} size={32} className="text-primary mb-4" />
+            <div className="text-2xl font-bold text-primary mb-1">{myJobs.length}</div>
+            <div className="text-sm text-muted-foreground">Всего заказов</div>
+          </FloatingCard>
+          
+          <FloatingCard className="p-6 text-center" delay={200} hover glow>
+            <AnimatedIcon icon={Clock} size={32} className="text-accent mb-4" />
+            <div className="text-2xl font-bold text-accent mb-1">
+              {myJobs.filter(j => j.status === 'in_progress').length}
+            </div>
+            <div className="text-sm text-muted-foreground">В работе</div>
+          </FloatingCard>
+          
+          <FloatingCard className="p-6 text-center" delay={300} hover glow>
+            <AnimatedIcon icon={Award} size={32} className="text-success mb-4" />
+            <div className="text-2xl font-bold text-success mb-1">
+              {myJobs.filter(j => j.status === 'done').length}
+            </div>
+            <div className="text-sm text-muted-foreground">Завершено</div>
+          </FloatingCard>
+          
+          <FloatingCard className="p-6 text-center" delay={400} hover glow>
+            <AnimatedIcon icon={Crown} size={32} className="text-amber-500 mb-4" />
+            <div className="text-2xl font-bold text-amber-500 mb-1">{subscriptionStatus}</div>
+            <div className="text-sm text-muted-foreground">Подписка</div>
+          </FloatingCard>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* HomeCare Subscription */}
+            <FloatingCard className="p-8" delay={100} hover>
+              <div className="flex items-center gap-3 mb-6">
+                <AnimatedIcon icon={Crown} size={28} className="text-primary" />
+                <h2 className="text-2xl font-display font-bold">HomeCare Подписка</h2>
+              </div>
+              
+              <div 
+                className="relative rounded-2xl p-6 mb-6 overflow-hidden"
+                style={{ backgroundImage: `url(${subscriptionPlans})`, backgroundSize: 'cover' }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-accent/90" />
+                <div className="relative text-white">
+                  <h3 className="text-xl font-bold mb-2">Выберите план</h3>
+                  <p className="opacity-90">Получите приоритетное обслуживание и гарантии</p>
                 </div>
               </div>
-              {j.status === 'done' && j.pro_id && (
-                <div className="mt-3 border-t pt-3 animate-fade-in">
-                  {ratedByMe[j.id] ? (
-                    <p className="text-xs text-success">Ваш отзыв отправлен</p>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-6 gap-2">
-                      <select className="w-full border rounded-md px-2 py-2 bg-background" value={ratingDrafts[j.id]?.score || ''} onChange={(e)=>updateRatingDraft(j.id,'score',e.target.value)}>
-                        <option value="">Оценка 1-5</option>
-                        <option value="5">5 — Отлично</option>
-                        <option value="4">4</option>
-                        <option value="3">3</option>
-                        <option value="2">2</option>
-                        <option value="1">1 — Плохо</option>
-                      </select>
-                      <input type="text" placeholder="Комментарий (необязательно)" className="w-full border rounded-md px-2 py-2 bg-background sm:col-span-4" value={ratingDrafts[j.id]?.comment || ''} onChange={(e)=>updateRatingDraft(j.id,'comment',e.target.value)} />
-                      <button className="btn-hero" onClick={()=>submitRating(j.id, j.pro_id)}>Оценить</button>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <FloatingCard className="p-6 text-center hover:scale-105 transition-all" delay={200}>
+                  <AnimatedIcon icon={ShieldCheck} size={24} className="text-primary mb-3" />
+                  <h4 className="font-semibold mb-2">Basic</h4>
+                  <div className="text-2xl font-bold text-primary mb-2">$9.90</div>
+                  <div className="text-sm text-muted-foreground mb-4">в месяц</div>
+                  <button 
+                    className="btn-ghost w-full text-sm" 
+                    disabled={subLoading} 
+                    onClick={() => startSubscribe(990)}
+                  >
+                    Выбрать
+                  </button>
+                </FloatingCard>
+
+                <FloatingCard className="p-6 text-center hover:scale-105 transition-all border-primary" delay={300}>
+                  <AnimatedIcon icon={Zap} size={24} className="text-accent mb-3" />
+                  <h4 className="font-semibold mb-2">Plus</h4>
+                  <div className="text-2xl font-bold text-accent mb-2">$19.90</div>
+                  <div className="text-sm text-muted-foreground mb-4">в месяц</div>
+                  <button 
+                    className="btn-hero w-full text-sm animate-pulse-glow" 
+                    disabled={subLoading} 
+                    onClick={() => startSubscribe(1990)}
+                  >
+                    Выбрать
+                  </button>
+                </FloatingCard>
+
+                <FloatingCard className="p-6 text-center hover:scale-105 transition-all" delay={400}>
+                  <AnimatedIcon icon={Crown} size={24} className="text-amber-500 mb-3" />
+                  <h4 className="font-semibold mb-2">Max</h4>
+                  <div className="text-2xl font-bold text-amber-500 mb-2">$39.90</div>
+                  <div className="text-sm text-muted-foreground mb-4">в месяц</div>
+                  <button 
+                    className="btn-ghost w-full text-sm" 
+                    disabled={subLoading} 
+                    onClick={() => startSubscribe(3990)}
+                  >
+                    Выбрать
+                  </button>
+                </FloatingCard>
+              </div>
+
+              <div className="mt-6 text-center">
+                <button 
+                  className="text-sm underline hover:text-primary transition-colors" 
+                  onClick={async ()=>{ 
+                    const { paymentProvider } = await import("@/payments/PaymentProvider"); 
+                    paymentProvider.openCustomerPortal(); 
+                  }}
+                >
+                  Управлять подпиской
+                </button>
+              </div>
+            </FloatingCard>
+
+            {/* My Jobs */}
+            <FloatingCard className="p-8" delay={200} hover>
+              <div className="flex items-center gap-3 mb-6">
+                <AnimatedIcon icon={ClipboardList} size={28} className="text-primary" />
+                <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
+              </div>
+
+              <div className="space-y-4">
+                {myJobs.length === 0 && (
+                  <div className="text-center py-12">
+                    <AnimatedIcon icon={ClipboardList} size={48} className="text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Пока нет заказов</h3>
+                    <p className="text-muted-foreground mb-6">Создайте свой первый заказ прямо сейчас</p>
+                    <Link to="/job/new" className="btn-hero animate-pulse-glow">
+                      Создать заказ
+                    </Link>
+                  </div>
+                )}
+
+                {myJobs.map((j, index) => (
+                  <FloatingCard key={j.id} className="p-6" delay={index * 50} hover>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h4 className="font-semibold mb-2">{j.description}</h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                          <div className="flex items-center gap-1">
+                            <AnimatedIcon icon={Clock} size={14} />
+                            {j.status}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <AnimatedIcon icon={Calendar} size={14} />
+                            {j.scheduled_at ? new Date(j.scheduled_at).toLocaleDateString() : 'Без срока'}
+                          </div>
+                          {j.budget_max_cents && (
+                            <div className="flex items-center gap-1">
+                              <AnimatedIcon icon={Wallet} size={14} />
+                              ${(j.budget_max_cents/100).toFixed(2)}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Status indicator */}
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+                          j.status === 'new' ? 'bg-blue-100 text-blue-800' :
+                          j.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
+                          j.status === 'in_progress' ? 'bg-purple-100 text-purple-800' :
+                          j.status === 'done' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          <div className={`w-2 h-2 rounded-full ${
+                            j.status === 'new' ? 'bg-blue-500' :
+                            j.status === 'accepted' ? 'bg-amber-500' :
+                            j.status === 'in_progress' ? 'bg-purple-500' :
+                            j.status === 'done' ? 'bg-green-500' :
+                            'bg-gray-500'
+                          }`} />
+                          {j.status === 'new' ? 'Новый' :
+                           j.status === 'accepted' ? 'Принят' :
+                           j.status === 'in_progress' ? 'В работе' :
+                           j.status === 'done' ? 'Завершен' : j.status}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        {j.status === 'new' && (
+                          <button 
+                            className="btn-hero text-sm flex items-center gap-2" 
+                            onClick={() => payEscrow(j)}
+                          >
+                            <AnimatedIcon icon={CreditCard} size={16} />
+                            Оплатить
+                          </button>
+                        )}
+                        {j.pro_id && (
+                          <>
+                            <button 
+                              className="btn-ghost text-sm flex items-center gap-2" 
+                              onClick={() => openChatForJob(j)}
+                            >
+                              <AnimatedIcon icon={MessageSquare} size={16} />
+                              Чат
+                            </button>
+                            <button className="btn-ghost text-sm flex items-center gap-2">
+                              <AnimatedIcon icon={Video} size={16} />
+                              Видео
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
+
+                    {/* Rating section for completed jobs */}
+                    {j.status === 'done' && j.pro_id && (
+                      <div className="mt-6 pt-6 border-t">
+                        {ratedByMe[j.id] ? (
+                          <div className="flex items-center gap-2 text-success">
+                            <AnimatedIcon icon={Star} size={16} />
+                            <span className="text-sm font-medium">Спасибо за ваш отзыв!</span>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <h5 className="font-medium">Оцените работу специалиста</h5>
+                            <div className="grid grid-cols-1 sm:grid-cols-6 gap-3">
+                              <select 
+                                className="w-full border rounded-xl px-3 py-2 bg-background/80" 
+                                value={ratingDrafts[j.id]?.score || ''} 
+                                onChange={(e)=>updateRatingDraft(j.id,'score',e.target.value)}
+                              >
+                                <option value="">Оценка 1-5</option>
+                                <option value="5">5 ⭐ Отлично</option>
+                                <option value="4">4 ⭐ Хорошо</option>
+                                <option value="3">3 ⭐ Средне</option>
+                                <option value="2">2 ⭐ Плохо</option>
+                                <option value="1">1 ⭐ Ужасно</option>
+                              </select>
+                              <input 
+                                type="text" 
+                                placeholder="Ваш комментарий" 
+                                className="w-full border rounded-xl px-3 py-2 bg-background/80 sm:col-span-4" 
+                                value={ratingDrafts[j.id]?.comment || ''} 
+                                onChange={(e)=>updateRatingDraft(j.id,'comment',e.target.value)} 
+                              />
+                              <button 
+                                className="btn-hero" 
+                                onClick={()=>submitRating(j.id, j.pro_id)}
+                              >
+                                Отправить
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </FloatingCard>
+                ))}
+              </div>
+            </FloatingCard>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Referral Program */}
+            <FloatingCard className="p-6" delay={300} hover>
+              <div className="flex items-center gap-3 mb-4">
+                <AnimatedIcon icon={Gift} size={24} className="text-primary" />
+                <h3 className="font-semibold">Реферальная программа</h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Приглашайте друзей и получайте бонусы
+              </p>
+              <div className="p-3 bg-muted/50 rounded-lg mb-4">
+                <p className="text-xs text-muted-foreground mb-1">Ваш код:</p>
+                <p className="font-mono text-sm break-all">{String(userId).slice(0, 8)}</p>
+              </div>
+              <button 
+                className="btn-ghost w-full text-sm" 
+                onClick={() => { 
+                  navigator.clipboard.writeText(String(userId)); 
+                  toast({ title: 'Код скопирован!' }); 
+                }}
+              >
+                Копировать код
+              </button>
+            </FloatingCard>
+
+            {/* Quick Actions */}
+            <FloatingCard className="p-6" delay={400} hover>
+              <h3 className="font-semibold mb-4">Быстрые действия</h3>
+              <div className="space-y-3">
+                <Link to="/catalog" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                  <AnimatedIcon icon={Home} size={20} className="text-primary" />
+                  <span className="text-sm">Найти специалиста</span>
+                </Link>
+                <Link to="/messages" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                  <AnimatedIcon icon={MessageSquare} size={20} className="text-primary" />
+                  <span className="text-sm">Сообщения</span>
+                </Link>
+                <Link to="/tenders" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                  <AnimatedIcon icon={TrendingUp} size={20} className="text-primary" />
+                  <span className="text-sm">Тендеры</span>
+                </Link>
+                <button className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors w-full text-left">
+                  <AnimatedIcon icon={Settings} size={20} className="text-primary" />
+                  <span className="text-sm">Настройки</span>
+                </button>
+              </div>
+            </FloatingCard>
+          </div>
+        </div>
+      </div>
     </main>
   );
 };

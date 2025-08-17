@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
+import { FloatingCard } from "@/components/ui/floating-card";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useI18n } from "@/i18n";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import { Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, CreditCard, Briefcase, Clock, ShieldCheck } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { 
+  Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, 
+  CreditCard, Briefcase, Clock, ShieldCheck, TrendingUp, Award,
+  Settings, Bell, Zap, Video, MapPin, CheckCircle, AlertCircle,
+  BarChart3, DollarSign
+} from "lucide-react";
+import dashboardPro from "@/assets/dashboard-pro.jpg";
 
 const DashboardPro = () => {
   const { t } = useI18n();
@@ -16,14 +24,11 @@ const DashboardPro = () => {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [ratingAvg, setRatingAvg] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number>(0);
-  const [proCatIds, setProCatIds] = useState<string[]>([]);
-  const [showOfferFor, setShowOfferFor] = useState<Record<string, boolean>>({});
-  const [offerDrafts, setOfferDrafts] = useState<Record<string, { price: string; eta: string; warranty: string; note: string }>>({});
-  const [existingApps, setExistingApps] = useState<Record<string, any>>({});
-  const [jobPhotos, setJobPhotos] = useState<Record<string, string[]>>({});
-  const [categoriesMap, setCategoriesMap] = useState<Record<string, string>>({});
-  const [ratedByMeJobs, setRatedByMeJobs] = useState<Record<string, boolean>>({});
-  const [ratingDraftsPro, setRatingDraftsPro] = useState<Record<string, { score: string; comment: string }>>({});
+  const [kycStatus, setKycStatus] = useState<string>('pending');
+  const [monthlyEarnings, setMonthlyEarnings] = useState<number>(0);
+  const [completedJobs, setCompletedJobs] = useState<number>(0);
+  const [responseTime, setResponseTime] = useState<string>('< 1 час');
+  const [tenders, setTenders] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -36,6 +41,7 @@ const DashboardPro = () => {
         return;
       }
       setUserId(uid);
+      
       const { data: roles, error } = await supabase.from("user_roles").select("role");
       if (error) {
         toast({ title: "Ошибка", description: error.message, variant: "destructive" });
@@ -48,447 +54,472 @@ const DashboardPro = () => {
         navigate("/pro");
         return;
       }
-      // Загрузить категории специалиста
-      const { data: proCats } = await (supabase as any)
-        .from('pro_categories')
-        .select('category_id')
-        .eq('user_id', uid);
-      const catIds = (proCats || []).map((c: any) => c.category_id);
-      setProCatIds(catIds);
 
-      // Заказы по подходящим категориям (без назначенного исполнителя)
-      let openJobs: any[] = [];
-      if (catIds.length > 0) {
-        const { data } = await (supabase as any)
-          .from("jobs")
-          .select("id, description, budget_min_cents, budget_max_cents, scheduled_at, created_at, category_id")
-          .eq("status", "new")
-          .is("pro_id", null)
-          .in('category_id', catIds)
-          .order("created_at", { ascending: false })
-          .limit(30);
-        openJobs = data || [];
-      }
-      setNearbyJobs(openJobs);
+      // Load all necessary data
+      await Promise.all([
+        loadNearbyJobs(uid, supabase),
+        loadActiveJobs(uid, supabase),
+        loadWalletBalance(uid, supabase),
+        loadRatings(uid, supabase),
+        loadKycStatus(uid, supabase),
+        loadTenders(uid, supabase)
+      ]);
 
-      // Оферты, уже отправленные этим исполнителем по видимым заказам
-      const jobIds = openJobs.map(j => j.id);
-      if (jobIds.length) {
-        const { data: apps } = await (supabase as any)
-          .from('job_applications')
-          .select('id, job_id, price_cents, eta_slot, warranty_days, note, created_at')
-          .eq('pro_id', uid)
-          .in('job_id', jobIds);
-        const map: Record<string, any> = {};
-        (apps || []).forEach((a: any) => { map[a.job_id] = a; });
-        setExistingApps(map);
-
-        // Фотографии заказов (приватное хранилище, подпишем ссылки)
-        const { data: photos } = await (supabase as any)
-          .from('job_photos')
-          .select('job_id, file_url')
-          .in('job_id', jobIds)
-          .limit(120);
-        if (photos && photos.length) {
-          const paths = photos.map((p:any)=>p.file_url);
-          const { data: signed } = await (supabase as any)
-            .storage.from('evidence')
-            .createSignedUrls(paths, 3600);
-          const byPath: Record<string,string> = {};
-          (signed || []).forEach((s:any)=>{ if (s?.path && s?.signedUrl) byPath[s.path] = s.signedUrl; });
-          const grouped: Record<string,string[]> = {};
-          photos.forEach((p:any)=>{ const url = byPath[p.file_url]; if (url) { (grouped[p.job_id] ||= []).push(url); } });
-          setJobPhotos(grouped);
-        } else {
-          setJobPhotos({});
-        }
-
-        // Названия категорий
-        const uniqueCatIds = Array.from(new Set(openJobs.map((j:any)=>j.category_id).filter(Boolean)));
-        if (uniqueCatIds.length) {
-          const { data: cats } = await (supabase as any)
-            .from('categories')
-            .select('id,label_ru,key')
-            .in('id', uniqueCatIds);
-          const cmap: Record<string,string> = {};
-          (cats || []).forEach((c:any)=>{ cmap[c.id] = c.label_ru || c.key; });
-          setCategoriesMap(cmap);
-        } else {
-          setCategoriesMap({});
-        }
-      } else {
-        setExistingApps({});
-        setJobPhotos({});
-        setCategoriesMap({});
-      }
-
-      // Load my jobs (accepted, in_progress, done)
-      const { data: active } = await (supabase as any)
-        .from("jobs")
-        .select("id, description, status, scheduled_at, created_at, client_id")
-        .eq("pro_id", uid)
-        .in("status", ["accepted", "in_progress", "done"]) // @ts-ignore
-        .order("created_at", { ascending: false })
-        .limit(20);
-      setMyActiveJobs(active || []);
-
-      // Какие завершённые я уже оценил
-      const doneIds = (active || []).filter((j:any)=>j.status==='done').map((j:any)=>j.id);
-      if (doneIds.length) {
-        const { data: myR } = await (supabase as any)
-          .from('ratings')
-          .select('job_id')
-          .eq('from_user_id', uid)
-          .in('job_id', doneIds);
-        const mapRated: Record<string, boolean> = {};
-        (myR || []).forEach((r:any)=>{ mapRated[r.job_id] = true; });
-        setRatedByMeJobs(mapRated);
-      } else {
-        setRatedByMeJobs({});
-      }
-
-      // Wallet balance
-      const { data: wallet } = await (supabase as any)
-        .from('wallets')
-        .select('balance_cents')
-        .eq('pro_id', uid)
-        .maybeSingle();
-      setWalletBalance(wallet?.balance_cents || 0);
-
-      // Ratings
-      const { data: ratings } = await (supabase as any)
-        .from('ratings')
-        .select('score')
-        .eq('to_user_id', uid)
-        .limit(200);
-      const scores = (ratings || []).map((r: any) => r.score as number);
-      const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
-      setRatingAvg(avg);
-      setRatingCount(scores.length);
       setLoading(false);
     })();
   }, [navigate, toast]);
 
-  if (loading) return <main className="container mx-auto py-12"><section className="max-w-5xl mx-auto card-surface"><h1 className="text-xl">Загрузка…</h1></section></main>;
-
-  const openChatForJob = async (jobId: string) => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      if (!userId) return;
-      const { data: job, error: jerr } = await (supabase as any)
-        .from("jobs").select("id, client_id").eq("id", jobId).maybeSingle();
-      if (jerr) throw jerr;
-      const clientId = job?.client_id;
-      if (!clientId) throw new Error("Клиент не найден");
-      const { data: existing } = await (supabase as any)
-        .from("chats")
-        .select("id").eq("job_id", jobId).eq("professional_id", userId).eq("client_id", clientId).maybeSingle();
-      let chatId = existing?.id;
-      if (!chatId) {
-        const { data: created, error: cerr } = await (supabase as any)
-          .from("chats")
-          .insert({ job_id: jobId, client_id: clientId, professional_id: userId })
-          .select("id").single();
-        if (cerr) throw cerr;
-        chatId = created.id;
-      }
-      window.location.href = `/messages/${chatId}`;
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: "Не удалось открыть чат", description: e?.message, variant: "destructive" });
-    }
+  const loadNearbyJobs = async (uid: string, supabase: any) => {
+    const { data } = await supabase
+      .from('jobs')
+      .select('id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
+      .eq('status', 'new')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    setNearbyJobs(data || []);
   };
 
-  const acceptJob = async (jobId: string) => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      if (!userId) return;
-      const { error } = await (supabase as any)
-        .from("jobs")
-        .update({ pro_id: userId, status: "accepted" })
-        .eq("id", jobId)
-        .eq("status", "new")
-        .is("pro_id", null);
-      if (error) throw error;
-      toast({ title: "Заказ принят" });
-      // Refresh lists
-      const { data: openJobs } = await (supabase as any)
-        .from("jobs")
-        .select("id, description, budget_min_cents, budget_max_cents, scheduled_at, created_at")
-        .eq("status", "new").is("pro_id", null).order("created_at", { ascending: false }).limit(20);
-      setNearbyJobs(openJobs || []);
-      const { data: active } = await (supabase as any)
-        .from("jobs")
-        .select("id, description, status, scheduled_at, created_at")
-        .eq("pro_id", userId)
-        .in("status", ["accepted", "in_progress"]).order("created_at", { ascending: false }).limit(20);
-      setMyActiveJobs(active || []);
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: "Не удалось принять", description: e?.message, variant: "destructive" });
-    }
+  const loadActiveJobs = async (uid: string, supabase: any) => {
+    const { data } = await supabase
+      .from('jobs')
+      .select('id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
+      .eq('pro_id', uid)
+      .in('status', ['accepted', 'in_progress', 'done'])
+      .order('created_at', { ascending: false })
+      .limit(20);
+    setMyActiveJobs(data || []);
   };
 
-
-  const toggleOffer = (jobId: string) => {
-    setShowOfferFor((prev) => ({ ...prev, [jobId]: !prev[jobId] }));
+  const loadWalletBalance = async (uid: string, supabase: any) => {
+    const { data: wallet } = await supabase
+      .from('wallets')
+      .select('balance_cents')
+      .eq('pro_id', uid)
+      .maybeSingle();
+    setWalletBalance(wallet?.balance_cents || 0);
   };
 
-  const sendOffer = async (jobId: string) => {
-    try {
-      if (!userId) return;
-      const draft = offerDrafts[jobId] || { price: '', eta: '', warranty: '', note: '' };
-      const priceNum = Math.round(Number(draft.price) * 100);
-      if (!priceNum || priceNum <= 0) {
-        toast({ title: 'Укажите цену', variant: 'destructive' });
-        return;
-      }
-      const { supabase } = await import('@/integrations/supabase/client');
-      const payload: any = {
-        job_id: jobId,
-        pro_id: userId,
-        price_cents: priceNum,
-      };
-      if (draft.eta) payload.eta_slot = draft.eta;
-      if (draft.warranty) payload.warranty_days = Number(draft.warranty) || null;
-      if (draft.note) payload.note = draft.note;
-      const { data, error } = await (supabase as any)
-        .from('job_applications')
-        .upsert(payload, { onConflict: 'job_id,pro_id' })
-        .select('id, job_id, price_cents, eta_slot, warranty_days, note, created_at')
-        .maybeSingle();
-      if (error) throw error;
-      setExistingApps((prev) => ({ ...prev, [jobId]: data }));
-      setShowOfferFor((p) => ({ ...p, [jobId]: false }));
-      toast({ title: 'Оффер отправлен' });
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
+  const loadRatings = async (uid: string, supabase: any) => {
+    const { data: ratings } = await supabase
+      .from('ratings')
+      .select('score')
+      .eq('to_user_id', uid)
+      .limit(200);
+    const scores = (ratings || []).map((r: any) => r.score as number);
+    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
+    setRatingAvg(avg);
+    setRatingCount(scores.length);
   };
 
-  const updateDraft = (jobId: string, field: 'price'|'eta'|'warranty'|'note', value: string) => {
-    setOfferDrafts((prev) => ({
-      ...prev,
-      [jobId]: { price: '', eta: '', warranty: '', note: '', ...(prev[jobId] || {}), [field]: value }
-    }));
+  const loadKycStatus = async (uid: string, supabase: any) => {
+    const { data: docs } = await supabase
+      .from('kyc_documents')
+      .select('status')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    setKycStatus(docs?.[0]?.status || 'pending');
   };
 
-  const startJob = async (jobId: string) => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any)
-        .from('jobs')
-        .update({ status: 'in_progress', start_confirmed: true })
-        .eq('id', jobId)
-        .eq('status', 'accepted');
-      if (error) throw error;
-      toast({ title: 'Старт подтвержден' });
-      setMyActiveJobs((prev) => prev.map(j => j.id===jobId ? { ...j, status: 'in_progress' } : j));
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
+  const loadTenders = async (uid: string, supabase: any) => {
+    const { data } = await supabase
+      .from('tenders')
+      .select('*')
+      .eq('status', 'open')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    setTenders(data || []);
   };
 
-  // 
-  const finishJob = async (jobId: string) => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any)
-        .from('jobs')
-        .update({ status: 'done', end_confirmed: true })
-        .eq('id', jobId)
-        .eq('status', 'in_progress');
-      if (error) throw error;
-      toast({ title: 'Завершение подтверждено' });
-      setMyActiveJobs((prev) => prev.map(j => j.id===jobId ? { ...j, status: 'done' } : j));
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
-  };
-
-  const updateProRatingDraft = (jobId: string, field: 'score'|'comment', value: string) => {
-    setRatingDraftsPro((prev)=>({ ...prev, [jobId]: { score: '', comment: '', ...(prev[jobId]||{}), [field]: value } }));
-  };
-
-  const submitProRating = async (jobId: string, toUserId: string) => {
-    try {
-      if (!userId) return;
-      const draft = ratingDraftsPro[jobId] || { score: '', comment: '' };
-      const score = Number(draft.score);
-      if (!score || score < 1 || score > 5) {
-        toast({ title: 'Укажите оценку 1-5', variant: 'destructive' });
-        return;
-      }
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { error } = await (supabase as any)
-        .from('ratings')
-        .insert({ job_id: jobId, from_user_id: userId, to_user_id: toUserId, score, comment: draft.comment || null });
-      if (error) throw error;
-      setRatedByMeJobs((prev)=>({ ...prev, [jobId]: true }));
-      toast({ title: 'Спасибо за отзыв!' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
-  };
-
-  const requestPayout = async () => {
-    try {
-      if (!userId) return;
-      const amountStr = prompt('Сумма к выплате, $') || '';
-      const amount = Math.round(Number(amountStr) * 100);
-      if (!amount || amount <= 0) return;
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any).from('payout_requests').insert({ pro_id: userId, amount_cents: amount });
-      if (error) throw error;
-      toast({ title: 'Запрос на выплату создан' });
-    } catch (e:any) {
-      console.error(e);
-      toast({ title: 'Ошибка', description: e?.message, variant: 'destructive' });
-    }
-  };
+  if (loading) return (
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${dashboardPro})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+      <FloatingCard className="p-8 text-center animate-pulse-glow">
+        <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем кабинет специалиста...</h1>
+        <div className="flex items-center justify-center gap-2">
+          <AnimatedIcon icon={Clock} className="animate-spin" />
+        </div>
+      </FloatingCard>
+    </main>
+  );
 
   return (
-    <main className="container mx-auto py-12">
+    <main className="relative min-h-screen overflow-hidden">
+      {/* Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${dashboardPro})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+      
       <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
-      <section className="max-w-5xl mx-auto card-surface">
-        <h1 className="text-2xl font-semibold mb-4">Кабинет специалиста</h1>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-6">
-          <div className="text-sm flex flex-wrap items-center gap-4">
-            <span className="text-success text-lg font-semibold inline-flex items-center"><Wallet className="h-4 w-4 mr-1" aria-hidden />Баланс: ${(walletBalance/100).toFixed(2)} $</span>
-            <span className="text-success text-lg font-semibold inline-flex items-center"><Star className="h-4 w-4 mr-1" aria-hidden />Рейтинг: {ratingAvg ? ratingAvg.toFixed(1) : '—'}{ratingCount ? ` (${ratingCount})` : ''}</span>
+      
+      <div className="container mx-auto py-8 px-6 relative z-10">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
+          <div className="animate-fade-in">
+            <h1 className="text-4xl lg:text-5xl font-display font-bold text-gradient mb-2">
+              Кабинет специалиста
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Управляйте заказами и развивайте бизнес
+            </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/pro/profile')}><UserCog className="h-4 w-4 mr-1" aria-hidden />Профиль</button>
-            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/pro/schedule')}><Calendar className="h-4 w-4 mr-1" aria-hidden />Расписание</button>
-            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/portfolio')}><ImageIcon className="h-4 w-4 mr-1" aria-hidden />Портфолио</button>
-            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/tenders')}><Briefcase className="h-4 w-4 mr-1" aria-hidden />Тендеры</button>
-            <button className="btn-ghost text-sm inline-flex items-center" onClick={requestPayout}><CreditCard className="h-4 w-4 mr-1" aria-hidden />Запросить выплату</button>
-            <button className="btn-ghost text-sm inline-flex items-center" onClick={()=>navigate('/kyc')}><ShieldCheck className="h-4 w-4 mr-1" aria-hidden />KYC</button>
+          
+          <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <AnimatedIcon icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
+                size={20} 
+                className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
+              />
+              <span className="text-sm font-medium">
+                KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
+              </span>
+            </div>
+            <button className="btn-ghost flex items-center gap-2">
+              <AnimatedIcon icon={Bell} size={20} />
+              Уведомления
+            </button>
           </div>
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h2 className="text-lg font-medium mb-2 inline-flex items-center"><Briefcase className="h-4 w-4 mr-2" aria-hidden />Доступные заказы</h2>
-            <ul className="space-y-3">
-              {nearbyJobs.length === 0 && <li className="text-sm text-muted-foreground">Нет доступных заказов</li>}
-              {nearbyJobs.map((j) => {
-                const photos = jobPhotos[j.id] || [];
-                return (
-                  <li key={j.id} className="p-4 rounded-md border grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div className="md:col-span-2">
-                      {photos.length > 0 ? (
-                        <div className="grid grid-cols-3 gap-2">
-                          {photos.slice(0,3).map((url, idx) => (
-                            <img key={idx} src={url} alt={`Фото заказа ${String(j.id).slice(0,8)} #${idx+1}`} className="w-full h-24 object-cover rounded-md" loading="lazy" />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="aspect-[3/2] rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">Нет фото</div>
-                      )}
-                    </div>
-                    <div className="md:col-span-3 flex flex-col gap-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium"><Briefcase className="inline h-4 w-4 mr-1" aria-hidden />{categoriesMap[j.category_id] || 'Без категории'}</p>
-                          <p className="text-sm mt-1">{j.description}</p>
-                          <p className="text-xs text-muted-foreground mt-1"><Calendar className="inline h-3 w-3 mr-1" aria-hidden />{j.scheduled_at ? new Date(j.scheduled_at).toLocaleString() : 'Без срока'} • <CreditCard className="inline h-3 w-3 mx-1" aria-hidden />Бюджет: {j.budget_min_cents ? `$${(j.budget_min_cents/100).toFixed(0)}` : '—'}{j.budget_max_cents ? `–$${(j.budget_max_cents/100).toFixed(0)}` : ''}</p>
-                          {existingApps[j.id] && (
-                            <p className="text-xs text-success mt-1">Ваш оффер: ${(existingApps[j.id].price_cents/100).toFixed(2)} $</p>
-                          )}
-                        </div>
-                        <div className="flex gap-2 shrink-0">
-                          <button className="btn-ghost" onClick={() => toggleOffer(j.id)}>{showOfferFor[j.id] ? 'Скрыть' : 'Офер'}</button>
-                          <button className="btn-ghost" onClick={() => acceptJob(j.id)}>Принять</button>
-                        </div>
-                      </div>
-                      {showOfferFor[j.id] && (
-                        <div className="mt-1 grid grid-cols-1 sm:grid-cols-5 gap-2">
-                          <input
-                            type="number"
-                            placeholder="Цена, $"
-                            className="w-full border rounded-md px-2 py-2 bg-background"
-                            value={offerDrafts[j.id]?.price || ''}
-                            onChange={(e)=>updateDraft(j.id,'price',e.target.value)}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Когда (ETA)"
-                            className="w-full border rounded-md px-2 py-2 bg-background"
-                            value={offerDrafts[j.id]?.eta || ''}
-                            onChange={(e)=>updateDraft(j.id,'eta',e.target.value)}
-                          />
-                          <input
-                            type="number"
-                            placeholder="Гарантия, дни"
-                            className="w-full border rounded-md px-2 py-2 bg-background"
-                            value={offerDrafts[j.id]?.warranty || ''}
-                            onChange={(e)=>updateDraft(j.id,'warranty',e.target.value)}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Комментарий"
-                            className="w-full border rounded-md px-2 py-2 bg-background sm:col-span-2"
-                            value={offerDrafts[j.id]?.note || ''}
-                            onChange={(e)=>updateDraft(j.id,'note',e.target.value)}
-                          />
-                          <div className="sm:col-span-5">
-                            <button className="btn-hero" onClick={()=>sendOffer(j.id)}>Отправить оффер</button>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
+          <FloatingCard className="p-6 text-center" delay={100} hover glow>
+            <AnimatedIcon icon={Wallet} size={32} className="text-success mb-4" />
+            <div className="text-2xl font-bold text-success mb-1">
+              ${(walletBalance/100).toFixed(2)}
+            </div>
+            <div className="text-sm text-muted-foreground">Баланс</div>
+          </FloatingCard>
+          
+          <FloatingCard className="p-6 text-center" delay={200} hover glow>
+            <AnimatedIcon icon={Star} size={32} className="text-amber-500 mb-4" />
+            <div className="text-2xl font-bold text-amber-500 mb-1">
+              {ratingAvg ? ratingAvg.toFixed(1) : '—'}
+            </div>
+            <div className="text-sm text-muted-foreground">Рейтинг ({ratingCount})</div>
+          </FloatingCard>
+          
+          <FloatingCard className="p-6 text-center" delay={300} hover glow>
+            <AnimatedIcon icon={DollarSign} size={32} className="text-primary mb-4" />
+            <div className="text-2xl font-bold text-primary mb-1">
+              ${(monthlyEarnings/100).toFixed(0)}
+            </div>
+            <div className="text-sm text-muted-foreground">Этот месяц</div>
+          </FloatingCard>
+          
+          <FloatingCard className="p-6 text-center" delay={400} hover glow>
+            <AnimatedIcon icon={Award} size={32} className="text-accent mb-4" />
+            <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
+            <div className="text-sm text-muted-foreground">Выполнено</div>
+          </FloatingCard>
+          
+          <FloatingCard className="p-6 text-center" delay={500} hover glow>
+            <AnimatedIcon icon={Clock} size={32} className="text-purple-500 mb-4" />
+            <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
+            <div className="text-sm text-muted-foreground">Время ответа</div>
+          </FloatingCard>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
+          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={100}>
+            <Link to="/pro/profile" className="flex flex-col items-center gap-2">
+              <AnimatedIcon icon={UserCog} size={24} className="text-primary" />
+              <span className="text-sm font-medium">Профиль</span>
+            </Link>
+          </FloatingCard>
+          
+          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={200}>
+            <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
+              <AnimatedIcon icon={Calendar} size={24} className="text-primary" />
+              <span className="text-sm font-medium">Расписание</span>
+            </Link>
+          </FloatingCard>
+          
+          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={300}>
+            <Link to="/portfolio" className="flex flex-col items-center gap-2">
+              <AnimatedIcon icon={ImageIcon} size={24} className="text-primary" />
+              <span className="text-sm font-medium">Портфолио</span>
+            </Link>
+          </FloatingCard>
+          
+          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={400}>
+            <Link to="/tenders" className="flex flex-col items-center gap-2">
+              <AnimatedIcon icon={Briefcase} size={24} className="text-primary" />
+              <span className="text-sm font-medium">Тендеры</span>
+            </Link>
+          </FloatingCard>
+          
+          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={500}>
+            <button className="flex flex-col items-center gap-2 w-full">
+              <AnimatedIcon icon={CreditCard} size={24} className="text-primary" />
+              <span className="text-sm font-medium">Выплата</span>
+            </button>
+          </FloatingCard>
+          
+          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={600}>
+            <Link to="/kyc" className="flex flex-col items-center gap-2">
+              <AnimatedIcon icon={ShieldCheck} size={24} className="text-primary" />
+              <span className="text-sm font-medium">KYC</span>
+            </Link>
+          </FloatingCard>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Available Jobs */}
+            <FloatingCard className="p-8" delay={200} hover>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <AnimatedIcon icon={Briefcase} size={28} className="text-primary" />
+                  <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {nearbyJobs.length} заказов поблизости
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {nearbyJobs.length === 0 && (
+                  <div className="text-center py-12">
+                    <AnimatedIcon icon={Briefcase} size={48} className="text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
+                    <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
+                    <Link to="/pro/profile" className="btn-hero">
+                      Настроить профиль
+                    </Link>
+                  </div>
+                )}
+
+                {nearbyJobs.map((j, index) => (
+                  <FloatingCard key={j.id} className="p-6" delay={index * 50} hover>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h4 className="font-semibold mb-2">{j.description}</h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                          <div className="flex items-center gap-1">
+                            <AnimatedIcon icon={DollarSign} size={14} />
+                            ${(j.budget_min_cents/100).toFixed(0)} - ${(j.budget_max_cents/100).toFixed(0)}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <AnimatedIcon icon={Calendar} size={14} />
+                            {j.scheduled_at ? new Date(j.scheduled_at).toLocaleDateString() : 'Гибкий график'}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <AnimatedIcon icon={MapPin} size={14} />
+                            Рядом
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <div>
-            <h2 className="text-lg font-medium mb-2 inline-flex items-center"><Clock className="h-4 w-4 mr-2" aria-hidden />Мои активные</h2>
-            <ul className="space-y-3">
-              {myActiveJobs.length === 0 && <li className="text-sm text-muted-foreground">Пока пусто</li>}
-              {myActiveJobs.map((j) => (
-                <li key={j.id} className="p-3 rounded-md border animate-fade-in">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm">{j.description}</p>
-                      <p className="text-xs text-muted-foreground">Статус: {j.status}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="btn-ghost inline-flex items-center" onClick={() => openChatForJob(j.id)}><MessageSquare className="h-4 w-4 mr-1" aria-hidden />Чат</button>
-                      {j.status === 'accepted' && <button className="btn-ghost" onClick={() => startJob(j.id)}>Старт</button>}
-                      {j.status === 'in_progress' && <button className="btn-ghost" onClick={() => finishJob(j.id)}>Завершить</button>}
-                    </div>
-                  </div>
-                  {j.status === 'done' && (
-                    <div className="mt-3 border-t pt-3">
-                      {ratedByMeJobs[j.id] ? (
-                        <p className="text-xs text-success">Ваш отзыв отправлен</p>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-6 gap-2">
-                          <select className="w-full border rounded-md px-2 py-2 bg-background" value={ratingDraftsPro[j.id]?.score || ''} onChange={(e)=>updateProRatingDraft(j.id,'score',e.target.value)}>
-                            <option value="">Оценка 1-5</option>
-                            <option value="5">5 — Отлично</option>
-                            <option value="4">4</option>
-                            <option value="3">3</option>
-                            <option value="2">2</option>
-                            <option value="1">1 — Плохо</option>
-                          </select>
-                          <input type="text" placeholder="Комментарий (необязательно)" className="w-full border rounded-md px-2 py-2 bg-background sm:col-span-4" value={ratingDraftsPro[j.id]?.comment || ''} onChange={(e)=>updateProRatingDraft(j.id,'comment',e.target.value)} />
-                          <button className="btn-hero" onClick={()=>submitProRating(j.id, j.client_id)}>Оценить клиента</button>
+                        
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
+                          <div className="w-2 h-2 rounded-full bg-blue-500" />
+                          Новый заказ
                         </div>
-                      )}
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <button className="btn-hero text-sm animate-pulse-glow">
+                          Принять
+                        </button>
+                        <button className="btn-ghost text-sm">
+                          Предложить цену
+                        </button>
+                        <button className="btn-ghost text-sm flex items-center gap-1">
+                          <AnimatedIcon icon={Video} size={14} />
+                          Видео-оценка
+                        </button>
+                      </div>
                     </div>
-                  )}
-                </li>
-              ))}
-            </ul>
+                  </FloatingCard>
+                ))}
+              </div>
+            </FloatingCard>
+
+            {/* Active Jobs */}
+            <FloatingCard className="p-8" delay={300} hover>
+              <div className="flex items-center gap-3 mb-6">
+                <AnimatedIcon icon={Clock} size={28} className="text-primary" />
+                <h2 className="text-2xl font-display font-bold">Мои активные заказы</h2>
+              </div>
+
+              <div className="space-y-4">
+                {myActiveJobs.length === 0 && (
+                  <div className="text-center py-8">
+                    <AnimatedIcon icon={Clock} size={32} className="text-muted-foreground mb-3" />
+                    <p className="text-muted-foreground">Пока нет активных заказов</p>
+                  </div>
+                )}
+
+                {myActiveJobs.map((j, index) => (
+                  <FloatingCard key={j.id} className="p-6" delay={index * 50} hover>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h4 className="font-semibold mb-2">{j.description}</h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                          <div className="flex items-center gap-1">
+                            <AnimatedIcon icon={Clock} size={14} />
+                            {j.status === 'accepted' ? 'Принят' : 
+                             j.status === 'in_progress' ? 'В работе' : 
+                             j.status === 'done' ? 'Завершен' : j.status}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <AnimatedIcon icon={Calendar} size={14} />
+                            {j.scheduled_at ? new Date(j.scheduled_at).toLocaleDateString() : 'Без срока'}
+                          </div>
+                        </div>
+                        
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+                          j.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
+                          j.status === 'in_progress' ? 'bg-purple-100 text-purple-800' :
+                          j.status === 'done' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          <div className={`w-2 h-2 rounded-full ${
+                            j.status === 'accepted' ? 'bg-amber-500' :
+                            j.status === 'in_progress' ? 'bg-purple-500' :
+                            j.status === 'done' ? 'bg-green-500' :
+                            'bg-gray-500'
+                          }`} />
+                          {j.status === 'accepted' ? 'Принят к работе' :
+                           j.status === 'in_progress' ? 'В процессе' :
+                           j.status === 'done' ? 'Завершен' : j.status}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <button className="btn-ghost text-sm flex items-center gap-2">
+                          <AnimatedIcon icon={MessageSquare} size={16} />
+                          Чат
+                        </button>
+                        {j.status === 'accepted' && (
+                          <button className="btn-hero text-sm">Начать работу</button>
+                        )}
+                        {j.status === 'in_progress' && (
+                          <button className="btn-hero text-sm">Завершить</button>
+                        )}
+                      </div>
+                    </div>
+                  </FloatingCard>
+                ))}
+              </div>
+            </FloatingCard>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Earnings Analytics */}
+            <FloatingCard className="p-6" delay={400} hover>
+              <div className="flex items-center gap-3 mb-4">
+                <AnimatedIcon icon={TrendingUp} size={24} className="text-primary" />
+                <h3 className="font-semibold">Аналитика доходов</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Сегодня</span>
+                  <span className="font-semibold">$125.00</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Эта неделя</span>
+                  <span className="font-semibold">$850.00</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Этот месяц</span>
+                  <span className="font-semibold text-primary">$2,340.00</span>
+                </div>
+              </div>
+              
+              <button className="btn-ghost w-full text-sm mt-4 flex items-center justify-center gap-2">
+                <AnimatedIcon icon={BarChart3} size={16} />
+                Подробная аналитика
+              </button>
+            </FloatingCard>
+
+            {/* Instant Payout */}
+            <FloatingCard className="p-6" delay={500} hover>
+              <div className="flex items-center gap-3 mb-4">
+                <AnimatedIcon icon={Zap} size={24} className="text-accent" />
+                <h3 className="font-semibold">Мгновенные выплаты</h3>
+              </div>
+              
+              <p className="text-sm text-muted-foreground mb-4">
+                Доступно для вывода: <span className="font-semibold text-success">${(walletBalance/100).toFixed(2)}</span>
+              </p>
+              
+              <button className="btn-hero w-full text-sm animate-pulse-glow flex items-center justify-center gap-2">
+                <AnimatedIcon icon={CreditCard} size={16} />
+                Запросить выплату
+              </button>
+              
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Средства поступят в течение 15 минут
+              </p>
+            </FloatingCard>
+
+            {/* Tenders */}
+            <FloatingCard className="p-6" delay={600} hover>
+              <div className="flex items-center gap-3 mb-4">
+                <AnimatedIcon icon={Briefcase} size={24} className="text-primary" />
+                <h3 className="font-semibold">Активные тендеры</h3>
+              </div>
+              
+              <div className="space-y-3">
+                {tenders.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
+                ) : (
+                  tenders.map((t, index) => (
+                    <div key={t.id} className="p-3 rounded-lg border hover:bg-muted/30 transition-colors">
+                      <h5 className="font-medium text-sm mb-1">{t.title}</h5>
+                      <p className="text-xs text-muted-foreground">
+                        До {new Date(t.deadline_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              <Link to="/tenders" className="btn-ghost w-full text-sm mt-4">
+                Посмотреть все тендеры
+              </Link>
+            </FloatingCard>
+
+            {/* Performance Metrics */}
+            <FloatingCard className="p-6" delay={700} hover>
+              <h3 className="font-semibold mb-4">Показатели</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Время ответа</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <span className="text-sm font-medium">Отлично</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Качество работ</span>
+                  <div className="flex items-center gap-1">
+                    <AnimatedIcon icon={Star} size={14} className="text-amber-500" />
+                    <span className="text-sm font-medium">4.9</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Надежность</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <span className="text-sm font-medium">98%</span>
+                  </div>
+                </div>
+              </div>
+            </FloatingCard>
           </div>
         </div>
-      </section>
+      </div>
     </main>
   );
 };
