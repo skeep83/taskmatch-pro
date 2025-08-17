@@ -54,10 +54,15 @@ All colors MUST be HSL.
     --brand-1: 258 80% 50%;
     --brand-2: 199 89% 48%;
     --brand-3: 280 72% 60%;
+    --brand-glow: 258 80% 65%;
     --gradient-primary: linear-gradient(135deg, hsl(var(--brand-1)) 0%, hsl(var(--brand-2)) 50%, hsl(var(--brand-3)) 100%);
+    --gradient-surface: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--card)/0.8) 100%);
+    --gradient-glass: linear-gradient(145deg, hsl(var(--background)/0.6) 0%, hsl(var(--background)/0.3) 100%);
     --shadow-soft: 0 8px 30px hsl(var(--brand-1) / 0.15);
     --shadow-strong: 0 12px 40px hsl(var(--brand-1) / 0.25);
+    --shadow-glow: 0 0 80px hsl(var(--brand-glow) / 0.3);
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
@@ -102,6 +107,7 @@ All colors MUST be HSL.
 
     --shadow-soft: 0 8px 30px hsl(var(--brand-1) / 0.25);
     --shadow-strong: 0 12px 40px hsl(var(--brand-1) / 0.35);
+    --shadow-glow: 0 0 80px hsl(var(--brand-glow) / 0.4);
   }
 }
 
@@ -121,44 +127,76 @@ All colors MUST be HSL.
 
 @layer components {
   .btn-hero {
-    @apply inline-flex items-center justify-center rounded-lg px-6 py-3 font-medium shadow-md transition-transform duration-200;
+    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold shadow-lg transition-all duration-300 transform;
     background-image: var(--gradient-primary);
     color: hsl(var(--primary-foreground));
   }
   .btn-hero:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-strong);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-glow), var(--shadow-strong);
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg px-6 py-3 font-medium border;
+    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold border-2 transition-all duration-300;
     border-color: hsl(var(--border));
     color: hsl(var(--foreground));
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+  }
+  .btn-ghost:hover {
+    border-color: hsl(var(--primary));
+    background: hsl(var(--primary)/0.1);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-soft);
   }
   .card-surface {
-    @apply rounded-xl border p-6 backdrop-blur;
+    @apply rounded-2xl border p-8 backdrop-blur-sm relative overflow-hidden;
+    background: var(--gradient-surface);
     box-shadow: var(--shadow-soft);
-    background: hsl(var(--card));
+    border-color: hsl(var(--border)/0.5);
+  }
+  .card-surface::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary)/0.3), transparent);
   }
   .glass-surface {
-    @apply rounded-xl border p-6 backdrop-blur-xl;
-    background: linear-gradient(180deg, hsl(var(--background) / 0.65), hsl(var(--background) / 0.45));
+    @apply rounded-2xl border p-8 backdrop-blur-xl relative;
+    background: var(--gradient-glass);
     box-shadow: var(--shadow-soft);
+    border-color: hsl(var(--border)/0.3);
   }
   .acrylic-surface {
-    @apply rounded-xl border p-6 backdrop-blur-2xl;
-    background: linear-gradient(135deg, hsl(var(--brand-1) / 0.10), hsl(var(--brand-2) / 0.08))
-      , linear-gradient(0deg, hsl(var(--background) / 0.55), hsl(var(--background) / 0.55));
+    @apply rounded-2xl border p-8 backdrop-blur-2xl relative;
+    background: linear-gradient(135deg, hsl(var(--brand-1) / 0.08), hsl(var(--brand-2) / 0.06))
+      , var(--gradient-glass);
     box-shadow: var(--shadow-strong);
+    border-color: hsl(var(--primary)/0.2);
+  }
+  .acrylic-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(var(--primary)/0.4), transparent, hsl(var(--accent)/0.4));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
   }
   .glass-nav {
-    @apply border-b backdrop-blur-xl;
-    background: linear-gradient(180deg, hsl(var(--background) / 0.8), hsl(var(--background) / 0.6));
+    @apply border-b backdrop-blur-xl sticky top-0 z-50;
+    background: var(--gradient-glass);
+    border-color: hsl(var(--border)/0.3);
   }
   .text-gradient {
     background-image: var(--gradient-primary);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    filter: drop-shadow(0 2px 4px hsl(var(--primary)/0.3));
   }
 }
 
