@@ -25,32 +25,74 @@ export const Header = () => {
   };
 
   return (
-    <header className="w-full glass-nav sticky top-0 z-20">
-      <nav className="container mx-auto flex items-center justify-between py-4">
-        <Link to="/" className="flex items-center gap-2" aria-label={t("app.name")}> 
-          <div className="h-8 w-8 rounded-md" style={{background: "var(--gradient-primary)"}} />
-          <span className="font-semibold">{t("app.name")}</span>
+    <header className="w-full glass-nav sticky top-0 z-50">
+      <nav className="container mx-auto flex items-center justify-between py-4 px-6">
+        <Link to="/" className="flex items-center gap-3 group" aria-label={t("app.name")}> 
+          <div 
+            className="h-10 w-10 rounded-xl shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
+            style={{background: "var(--gradient-primary)"}} 
+          />
+          <span className="text-xl font-display font-bold text-gradient">{t("app.name")}</span>
         </Link>
-        <div className="hidden md:flex items-center gap-6">
-          <Link to="/catalog" className="text-sm hover:opacity-80 transition-opacity">{t("nav.catalog")}</Link>
-          <Link to="/job/new" className="text-sm hover:opacity-80 transition-opacity">{t("nav.find_pro")}</Link>
-          <Link to="/feed" className="text-sm hover:opacity-80 transition-opacity">Лента</Link>
-          <Link to="/dashboard" className="text-sm hover:opacity-80 transition-opacity">Кабинет</Link>
-          <Link to="/pro/dashboard" className="text-sm hover:opacity-80 transition-opacity">PRO</Link>
-          <Link to="/messages" className="text-sm hover:opacity-80 transition-opacity">Сообщения</Link>
-          <Link to="/admin" className="text-sm hover:opacity-80 transition-opacity">Admin</Link>
+        
+        <div className="hidden md:flex items-center gap-8">
+          <Link to="/catalog" className="text-sm font-medium hover:text-primary transition-colors story-link">
+            {t("nav.catalog")}
+          </Link>
+          <Link to="/job/new" className="text-sm font-medium hover:text-primary transition-colors story-link">
+            {t("nav.find_pro")}
+          </Link>
+          <Link to="/feed" className="text-sm font-medium hover:text-primary transition-colors story-link">
+            Лента
+          </Link>
+          <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors story-link">
+            Кабинет
+          </Link>
+          <Link to="/pro/dashboard" className="text-sm font-medium hover:text-primary transition-colors story-link">
+            PRO
+          </Link>
+          <Link to="/messages" className="text-sm font-medium hover:text-primary transition-colors story-link">
+            Сообщения
+          </Link>
+          <Link to="/admin" className="text-sm font-medium hover:text-primary transition-colors story-link">
+            Admin
+          </Link>
         </div>
-        <div className="flex items-center gap-3">
-          <button aria-label="RU" className={`text-sm px-2 py-1 rounded-md border ${locale==='ru' ? 'opacity-100' : 'opacity-60'}`} onClick={() => setLocale('ru')}>
-            {t("lang.ru")}
-          </button>
-          <button aria-label="RO" className={`text-sm px-2 py-1 rounded-md border ${locale==='ro' ? 'opacity-100' : 'opacity-60'}`} onClick={() => setLocale('ro')}>
-            {t("lang.ro")}
-          </button>
+        
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
+            <button 
+              aria-label="RU" 
+              className={`text-sm px-3 py-1.5 rounded-md font-medium transition-all ${
+                locale==='ru' 
+                  ? 'bg-primary text-primary-foreground shadow-sm' 
+                  : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+              }`} 
+              onClick={() => setLocale('ru')}
+            >
+              {t("lang.ru")}
+            </button>
+            <button 
+              aria-label="RO" 
+              className={`text-sm px-3 py-1.5 rounded-md font-medium transition-all ${
+                locale==='ro' 
+                  ? 'bg-primary text-primary-foreground shadow-sm' 
+                  : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+              }`} 
+              onClick={() => setLocale('ro')}
+            >
+              {t("lang.ro")}
+            </button>
+          </div>
+          
           {authed ? (
-            <button onClick={signOut} className="btn-ghost">{t("nav.sign_out")}</button>
+            <button onClick={signOut} className="btn-ghost">
+              {t("nav.sign_out")}
+            </button>
           ) : (
-            <Link to="/auth" className="btn-ghost">{t("nav.sign_in")}</Link>
+            <Link to="/auth" className="btn-hero">
+              {t("nav.sign_in")}
+            </Link>
           )}
         </div>
       </nav>

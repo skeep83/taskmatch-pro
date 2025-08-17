@@ -1,4 +1,6 @@
 import { Seo } from "@/components/Seo";
+import { GlassMorphism } from "@/components/ui/glass-morphism";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useI18n } from "@/i18n";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
@@ -6,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Lock, Mail, User, Shield, Eye, EyeOff } from "lucide-react";
+import authBg from "@/assets/auth-bg.jpg";
 
 const Auth = () => {
   const { t } = useI18n();
@@ -88,47 +92,146 @@ const Auth = () => {
     }
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
-    <main className="container mx-auto py-12">
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${authBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
+      
       <Seo title={`${t('app.name')} — Auth`} description="Sign in or create an account" canonical="/auth" />
-      <section className="max-w-xl mx-auto card-surface">
-        <header className="mb-6">
-          <h1 className="text-2xl font-semibold">{mode === 'signin' ? 'Войти' : 'Создать аккаунт'}</h1>
-        </header>
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="you@example.com" autoComplete="email" required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Пароль</Label>
-            <Input id="password" name="password" type="password" placeholder="••••••••" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} required />
-          </div>
-          {mode === 'signup' && (
-            <div className="space-y-2">
-              <Label htmlFor="role">Роль аккаунта</Label>
-              <select id="role" name="role" defaultValue="client" className="w-full h-10 rounded-md border bg-background px-3">
-                <option value="client">Клиент</option>
-                <option value="pro">Специалист</option>
-                <option value="business">Бизнес</option>
-              </select>
+      
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="max-w-lg mx-auto">
+          <GlassMorphism intensity="strong" variant="bordered" className="p-8 animate-fade-in">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="mb-6">
+                <AnimatedIcon 
+                  icon={mode === 'signin' ? Lock : Shield} 
+                  size={48} 
+                  className="text-primary animate-pulse-glow"
+                />
+              </div>
+              <h1 className="text-3xl font-display font-bold mb-2 text-gradient">
+                {mode === 'signin' ? 'Добро пожаловать!' : 'Создать аккаунт'}
+              </h1>
+              <p className="text-muted-foreground">
+                {mode === 'signin' 
+                  ? 'Войдите в свой аккаунт ServiceHub' 
+                  : 'Присоединяйтесь к ServiceHub сегодня'
+                }
+              </p>
             </div>
-          )}
-          <div className="flex items-center justify-between gap-3 pt-2">
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Подождите…' : mode === 'signin' ? 'Войти' : 'Создать аккаунт'}
-            </Button>
-            <Button type="button" variant="ghost" onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}>
-              {mode === 'signin' ? 'Создать аккаунт' : 'У меня уже есть аккаунт'}
-            </Button>
-          </div>
-        </form>
-        <aside className="mt-4 text-sm text-muted-foreground">
-          <p>
-            Отправляя форму, вы соглашаетесь с условиями сервиса. 2FA будет доступна после входа в настройках аккаунта.
-          </p>
-        </aside>
-      </section>
+
+            <form className="space-y-6" onSubmit={onSubmit}>
+              {/* Email Field */}
+              <div className="space-y-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
+                <Label htmlFor="email" className="flex items-center gap-2 font-medium">
+                  <AnimatedIcon icon={Mail} size={16} />
+                  Email адрес
+                </Label>
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  placeholder="your@email.com" 
+                  autoComplete="email" 
+                  required 
+                  className="h-12 px-4 text-lg border-2 border-border/50 focus:border-primary/50 transition-all"
+                />
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                <Label htmlFor="password" className="flex items-center gap-2 font-medium">
+                  <AnimatedIcon icon={Lock} size={16} />
+                  Пароль
+                </Label>
+                <div className="relative">
+                  <Input 
+                    id="password" 
+                    name="password" 
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••" 
+                    autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} 
+                    required 
+                    className="h-12 px-4 pr-12 text-lg border-2 border-border/50 focus:border-primary/50 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <AnimatedIcon icon={showPassword ? EyeOff : Eye} size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Role Selection for Signup */}
+              {mode === 'signup' && (
+                <div className="space-y-2 animate-fade-in" style={{ animationDelay: '300ms' }}>
+                  <Label htmlFor="role" className="flex items-center gap-2 font-medium">
+                    <AnimatedIcon icon={User} size={16} />
+                    Тип аккаунта
+                  </Label>
+                  <select 
+                    id="role" 
+                    name="role" 
+                    defaultValue="client" 
+                    className="w-full h-12 rounded-xl border-2 border-border/50 bg-background/80 px-4 text-lg focus:border-primary/50 transition-all"
+                  >
+                    <option value="client">Клиент — заказываю услуги</option>
+                    <option value="pro">Специалист — выполняю заказы</option>
+                    <option value="business">Бизнес — корпоративный аккаунт</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Submit Buttons */}
+              <div className="flex flex-col gap-4 pt-4 animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <Button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="h-12 text-lg btn-hero w-full"
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Подождите…
+                    </div>
+                  ) : (
+                    mode === 'signin' ? 'Войти в аккаунт' : 'Создать аккаунт'
+                  )}
+                </Button>
+                
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+                  className="h-12 text-lg"
+                >
+                  {mode === 'signin' ? 'Нет аккаунта? Создать' : 'Уже есть аккаунт? Войти'}
+                </Button>
+              </div>
+            </form>
+
+            {/* Footer */}
+            <div className="mt-8 pt-6 border-t border-border/30 text-center animate-fade-in" style={{ animationDelay: '500ms' }}>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Продолжая, вы соглашаетесь с нашими{' '}
+                <span className="text-primary hover:underline cursor-pointer">условиями использования</span>
+                {' '}и{' '}
+                <span className="text-primary hover:underline cursor-pointer">политикой конфиденциальности</span>
+              </p>
+            </div>
+          </GlassMorphism>
+        </div>
+      </div>
     </main>
   );
 };
