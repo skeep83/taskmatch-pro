@@ -1438,6 +1438,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_admin_role: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1463,6 +1467,10 @@ export type Database = {
           p_resource_type: string
           p_user_agent?: string
         }
+        Returns: undefined
+      }
+      make_user_admin: {
+        Args: { _email: string }
         Returns: undefined
       }
       refresh_pro_rating_stats: {
