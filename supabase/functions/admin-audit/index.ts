@@ -231,4 +231,4 @@ serve(async (req) => {
     
     return [csvHeaders, ...csvRows].join('\n');
   }
-}
+});
