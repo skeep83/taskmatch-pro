@@ -201,7 +201,7 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  .hover-scale { @apply transition-transform duration-400 ease-out hover:scale-[1.02]; }
+  .hover-scale { @apply transition-transform duration-300 ease-out hover:scale-[1.02]; }
   .hover-float { @apply transition-transform duration-500 ease-out hover:animate-float-slow; }
   .hover-glow { @apply transition-all duration-500 ease-out hover:animate-glow-soft; }
   .hover-bounce { @apply transition-transform duration-500 ease-out hover:animate-bounce-gentle; }
