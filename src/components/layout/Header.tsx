@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n";
-import serviceHubLogo from "@/assets/servicehub-logo.png";
+import serviceHubLogo from "@/assets/servicehub-logo-v2.png";
 
 export const Header = () => {
   const { t, locale, setLocale } = useI18n();
