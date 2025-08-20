@@ -1641,6 +1641,30 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      find_nearby_pros: {
+        Args: {
+          job_category_id: string
+          job_lat: number
+          job_lng: number
+          limit_results?: number
+          max_distance_km?: number
+        }
+        Returns: {
+          avatar_url: string
+          avg_rating: number
+          base_price_cents: number
+          city: string
+          coverage_radius_km: number
+          distance_km: number
+          first_name: string
+          hourly_rate_cents: number
+          last_name: string
+          match_score: number
+          pro_id: string
+          rating_count: number
+          response_time_minutes: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
