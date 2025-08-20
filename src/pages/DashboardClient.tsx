@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -16,7 +16,7 @@ import subscriptionPlans from "@/assets/subscription-plans.jpg";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const DashboardClient = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
