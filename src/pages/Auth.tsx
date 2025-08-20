@@ -1,7 +1,7 @@
 import { Seo } from "@/components/Seo";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import { Lock, Mail, User, Shield, Eye, EyeOff } from "lucide-react";
 import authBg from "@/assets/auth-bg.jpg";
 
 const Auth = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
