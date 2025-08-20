@@ -38,6 +38,7 @@ import AdminFinance from "./pages/admin/Finance";
 import AdminRisk from "./pages/admin/Risk";
 import AdminContent from "./pages/admin/Content";
 import AdminSettings from "./pages/admin/Settings";
+import HowItWorks from "./pages/HowItWorks";
 import PageTransition from "./components/PageTransition";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const AppContent = () => {
       <PageTransition>
         <Routes location={location}>
           <Route path="/" element={<Index />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pro" element={<Pro />} />

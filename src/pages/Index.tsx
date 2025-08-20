@@ -50,11 +50,14 @@ const Index = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
-                <Link to="/job/new" className="btn-hero text-lg px-8 py-4 animate-pulse-glow">
-                  {t("hero.cta_primary")}
+                <Link to="/catalog" className="btn-hero text-lg px-8 py-4 animate-pulse-glow">
+                  🔍 Найти специалиста
                 </Link>
-                <Link to="/pro" className="btn-ghost text-lg px-8 py-4 hover-scale">
-                  {t("hero.cta_secondary")}
+                <Link to="/auth" className="btn-ghost text-lg px-8 py-4 hover-scale">
+                  💼 Стать исполнителем
+                </Link>
+                <Link to="/tenders" className="btn-ghost text-lg px-8 py-4 hover-scale">
+                  🏢 Корпоративные тендеры
                 </Link>
               </div>
 
@@ -87,24 +90,35 @@ const Index = () => {
                 
                 {/* Floating Stats Cards */}
                 <FloatingCard 
-                  className="absolute -top-6 -left-6 p-4 w-48"
+                  className="absolute -top-6 -left-6 p-4 w-56"
                   delay={600}
                   glow
                 >
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-primary mb-1">15K+</div>
+                    <div className="text-3xl font-bold text-primary mb-1">25K+</div>
                     <div className="text-sm text-muted-foreground">Выполненных заказов</div>
                   </div>
                 </FloatingCard>
 
                 <FloatingCard 
-                  className="absolute -bottom-6 -right-6 p-4 w-48"
+                  className="absolute -bottom-6 -right-6 p-4 w-56"
                   delay={800}
                   glow
                 >
                   <div className="text-center">
                     <div className="text-3xl font-bold text-accent mb-1">4.9★</div>
                     <div className="text-sm text-muted-foreground">Средний рейтинг</div>
+                  </div>
+                </FloatingCard>
+
+                <FloatingCard 
+                  className="absolute -top-6 -right-6 p-4 w-48"
+                  delay={700}
+                  glow
+                >
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-500 mb-1">98%</div>
+                    <div className="text-sm text-muted-foreground">Довольных клиентов</div>
                   </div>
                 </FloatingCard>
               </div>
