@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, Link } from "react-router-dom";
 import { 
@@ -14,7 +14,7 @@ import {
 import dashboardPro from "@/assets/dashboard-pro.jpg";
 
 const DashboardPro = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
