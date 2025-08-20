@@ -1,7 +1,7 @@
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 const Footer = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   return (
     <footer className="w-full border-t bg-background">
       <div className="container mx-auto py-8 flex items-center justify-between text-sm">
