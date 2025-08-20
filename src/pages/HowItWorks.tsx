@@ -2,12 +2,12 @@ import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
 import { Search, MessageSquare, CreditCard, Star, Users, Shield, Zap, CheckCircle } from "lucide-react";
 
 const HowItWorks = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
 
   const steps = [
     {
