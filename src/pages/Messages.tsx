@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Seo } from "@/components/Seo";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
@@ -12,7 +12,7 @@ import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield } fr
 import messagesImage from "@/assets/messages-chat.jpg";
 
 const Messages = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { id } = useParams();
