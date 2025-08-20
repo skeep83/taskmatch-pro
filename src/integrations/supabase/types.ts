@@ -666,6 +666,9 @@ export type Database = {
           description: string | null
           end_confirmed: boolean
           id: string
+          location_address: string | null
+          location_lat: number | null
+          location_lng: number | null
           pro_id: string | null
           scheduled_at: string | null
           start_confirmed: boolean
@@ -682,6 +685,9 @@ export type Database = {
           description?: string | null
           end_confirmed?: boolean
           id?: string
+          location_address?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           pro_id?: string | null
           scheduled_at?: string | null
           start_confirmed?: boolean
@@ -698,6 +704,9 @@ export type Database = {
           description?: string | null
           end_confirmed?: boolean
           id?: string
+          location_address?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           pro_id?: string | null
           scheduled_at?: string | null
           start_confirmed?: boolean
@@ -788,6 +797,54 @@ export type Database = {
           id?: number
           reason?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          email_sent: boolean | null
+          id: string
+          is_read: boolean | null
+          message: string
+          message_ro: string | null
+          push_sent: boolean | null
+          sms_sent: boolean | null
+          title: string
+          title_ro: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          email_sent?: boolean | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          message_ro?: string | null
+          push_sent?: boolean | null
+          sms_sent?: boolean | null
+          title: string
+          title_ro?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          email_sent?: boolean | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          message_ro?: string | null
+          push_sent?: boolean | null
+          sms_sent?: boolean | null
+          title?: string
+          title_ro?: string | null
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1085,28 +1142,93 @@ export type Database = {
         }
         Relationships: []
       }
+      pro_services: {
+        Row: {
+          base_price_cents: number | null
+          category_id: string
+          coverage_radius_km: number | null
+          created_at: string
+          hourly_rate_cents: number | null
+          id: string
+          is_active: boolean | null
+          location_lat: number | null
+          location_lng: number | null
+          pro_id: string
+          response_time_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          base_price_cents?: number | null
+          category_id: string
+          coverage_radius_km?: number | null
+          created_at?: string
+          hourly_rate_cents?: number | null
+          id?: string
+          is_active?: boolean | null
+          location_lat?: number | null
+          location_lng?: number | null
+          pro_id: string
+          response_time_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          base_price_cents?: number | null
+          category_id?: string
+          coverage_radius_km?: number | null
+          created_at?: string
+          hourly_rate_cents?: number | null
+          id?: string
+          is_active?: boolean | null
+          location_lat?: number | null
+          location_lng?: number | null
+          pro_id?: string
+          response_time_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          city: string | null
+          country: string | null
           created_at: string
           full_name: string | null
           id: string
+          latitude: number | null
           locale: string | null
+          longitude: number | null
           phone: string | null
           updated_at: string
         }
         Insert: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          latitude?: number | null
           locale?: string | null
+          longitude?: number | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
+          city?: string | null
+          country?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          latitude?: number | null
           locale?: string | null
+          longitude?: number | null
           phone?: string | null
           updated_at?: string
         }
@@ -1204,6 +1326,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      service_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          description_ro: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_ro: string
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          description_ro?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_ro: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          description_ro?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_ro?: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -1387,6 +1556,36 @@ export type Database = {
           created_at?: string
           granted_by?: string | null
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_devices: {
+        Row: {
+          created_at: string
+          device_token: string
+          id: string
+          is_active: boolean | null
+          last_used: string | null
+          platform: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_token: string
+          id?: string
+          is_active?: boolean | null
+          last_used?: string | null
+          platform?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_token?: string
+          id?: string
+          is_active?: boolean | null
+          last_used?: string | null
+          platform?: string | null
           user_id?: string
         }
         Relationships: []

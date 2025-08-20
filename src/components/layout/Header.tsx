@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedI18n } from "@/i18n/enhanced";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 export const Header = () => {
   const { t, changeLanguage, language } = useEnhancedI18n();
@@ -87,6 +88,8 @@ export const Header = () => {
               {t("lang.ro")}
             </button>
           </div>
+          
+          {authed && <NotificationCenter />}
           
           {authed ? (
             <button onClick={signOut} className="btn-ghost">
