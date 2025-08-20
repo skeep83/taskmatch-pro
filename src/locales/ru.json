@@ -220,5 +220,7 @@
   "notifications.error": "Ошибка",
   "notifications.job_accepted": "Заказ принят",
   
-  "dashboard.welcome": "Добро пожаловать в ServiceHub"
+  "dashboard.welcome": "Добро пожаловать в ServiceHub",
+  
+  "nav.how_it_works": "Как это работает"
 }

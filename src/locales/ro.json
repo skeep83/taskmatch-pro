@@ -220,5 +220,7 @@
   "notifications.error": "Eroare",
   "notifications.job_accepted": "Comandă acceptată",
   
-  "dashboard.welcome": "Bun venit la ServiceHub"
+  "dashboard.welcome": "Bun venit la ServiceHub",
+  
+  "nav.how_it_works": "Cum funcționează"
 }

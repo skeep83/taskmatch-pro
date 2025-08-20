@@ -13,7 +13,7 @@ import Pro from "./pages/Pro";
 import JobNew from "./pages/JobNew";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
-import { I18nProvider } from "./i18n";
+import { EnhancedI18nProvider } from "./i18n/enhanced";
 import Diagnostics from "./components/Diagnostics";
 import DashboardClient from "./pages/DashboardClient";
 import DashboardPro from "./pages/DashboardPro";
@@ -93,7 +93,7 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <I18nProvider>
+    <EnhancedI18nProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -102,7 +102,7 @@ const App = () => (
           <AppContent />
         </BrowserRouter>
       </TooltipProvider>
-    </I18nProvider>
+    </EnhancedI18nProvider>
   </QueryClientProvider>
 );
 

@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 export const Header = () => {
-  const { t, locale, setLocale } = useI18n();
+  const { t, changeLanguage, language } = useEnhancedI18n();
   const navigate = useNavigate();
   const [authed, setAuthed] = useState(false);
 
@@ -37,7 +37,7 @@ export const Header = () => {
         
         <div className="hidden md:flex items-center gap-8">
           <Link to="/how-it-works" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            Как это работает
+            {t("nav.how_it_works")}
           </Link>
           <Link to="/catalog" className="text-sm font-medium hover:text-primary transition-colors story-link">
             {t("nav.catalog")}
@@ -65,24 +65,24 @@ export const Header = () => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
             <button 
-              aria-label="RU" 
+              aria-label="Русский" 
               className={`text-sm px-3 py-1.5 rounded-md font-medium transition-all ${
-                locale==='ru' 
+                language==='ru' 
                   ? 'bg-primary text-primary-foreground shadow-sm' 
                   : 'hover:bg-muted text-muted-foreground hover:text-foreground'
               }`} 
-              onClick={() => setLocale('ru')}
+              onClick={() => changeLanguage('ru')}
             >
               {t("lang.ru")}
             </button>
             <button 
-              aria-label="RO" 
+              aria-label="Română" 
               className={`text-sm px-3 py-1.5 rounded-md font-medium transition-all ${
-                locale==='ro' 
+                language==='ro' 
                   ? 'bg-primary text-primary-foreground shadow-sm' 
                   : 'hover:bg-muted text-muted-foreground hover:text-foreground'
               }`} 
-              onClick={() => setLocale('ro')}
+              onClick={() => changeLanguage('ro')}
             >
               {t("lang.ro")}
             </button>

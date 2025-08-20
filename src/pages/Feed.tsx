@@ -5,12 +5,12 @@ import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Badge } from "@/components/ui/badge";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { MapPin, Clock, Euro, Filter, Search, Video, Star, Shield, Zap } from "lucide-react";
 import feedImage from "@/assets/feed-jobs.jpg";
 
 export default function Feed() {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const [jobs, setJobs] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
