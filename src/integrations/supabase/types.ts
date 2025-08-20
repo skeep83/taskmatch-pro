@@ -464,6 +464,51 @@ export type Database = {
         }
         Relationships: []
       }
+      currencies: {
+        Row: {
+          code: string
+          created_at: string
+          decimal_places: number
+          exchange_rate: number
+          id: string
+          is_active: boolean
+          is_base: boolean
+          name_en: string
+          name_ro: string | null
+          name_ru: string | null
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          decimal_places?: number
+          exchange_rate?: number
+          id?: string
+          is_active?: boolean
+          is_base?: boolean
+          name_en: string
+          name_ro?: string | null
+          name_ru?: string | null
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          decimal_places?: number
+          exchange_rate?: number
+          id?: string
+          is_active?: boolean
+          is_base?: boolean
+          name_en?: string
+          name_ro?: string | null
+          name_ru?: string | null
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dispute_cases: {
         Row: {
           assigned_to: string | null
@@ -574,6 +619,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      exchange_rate_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          currency_id: string
+          id: string
+          new_rate: number
+          old_rate: number
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          currency_id: string
+          id?: string
+          new_rate: number
+          old_rate: number
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          currency_id?: string
+          id?: string
+          new_rate?: number
+          old_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exchange_rate_history_currency_id_fkey"
+            columns: ["currency_id"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       follows: {
         Row: {
@@ -902,6 +982,36 @@ export type Database = {
           pro_id?: string
           settled_at?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }

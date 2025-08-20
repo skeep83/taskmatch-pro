@@ -185,6 +185,9 @@ export default function AdminLayout() {
             <NavLink to="/admin/content" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
               Content
             </NavLink>
+            <NavLink to="/admin/currencies" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
+              Currencies
+            </NavLink>
             <NavLink to="/admin/settings" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
               Settings
             </NavLink>

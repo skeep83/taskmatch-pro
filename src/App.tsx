@@ -38,6 +38,7 @@ import AdminFinance from "./pages/admin/Finance";
 import AdminRisk from "./pages/admin/Risk";
 import AdminContent from "./pages/admin/Content";
 import AdminSettings from "./pages/admin/Settings";
+import AdminCurrencies from "./pages/admin/Currencies";
 import HowItWorks from "./pages/HowItWorks";
 import PageTransition from "./components/PageTransition";
 
@@ -81,6 +82,7 @@ const AppContent = () => {
             <Route path="finance" element={<AdminFinance />} />
             <Route path="risk" element={<AdminRisk />} />
             <Route path="content" element={<AdminContent />} />
+            <Route path="currencies" element={<AdminCurrencies />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
