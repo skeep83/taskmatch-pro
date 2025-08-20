@@ -4,6 +4,7 @@ import { FloatingCard } from "@/components/ui/floating-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
 import { useNavigate, Link } from "react-router-dom";
 import { 
   Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, 
@@ -16,6 +17,7 @@ import dashboardPro from "@/assets/dashboard-pro.jpg";
 const DashboardPro = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
+  const { formatPrice, loading: currencyLoading } = useCurrency();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -246,7 +248,7 @@ const DashboardPro = () => {
           <FloatingCard className="p-6 text-center" delay={100} hover glow>
             <AnimatedIcon icon={Wallet} size={32} className="text-success mb-4" />
             <div className="text-2xl font-bold text-success mb-1">
-              ${(walletBalance/100).toFixed(2)}
+              {formatPrice(walletBalance)}
             </div>
             <div className="text-sm text-muted-foreground">Баланс</div>
           </FloatingCard>
@@ -262,7 +264,7 @@ const DashboardPro = () => {
           <FloatingCard className="p-6 text-center" delay={300} hover glow>
             <AnimatedIcon icon={DollarSign} size={32} className="text-primary mb-4" />
             <div className="text-2xl font-bold text-primary mb-1">
-              ${(monthlyEarnings/100).toFixed(0)}
+              {formatPrice(monthlyEarnings)}
             </div>
             <div className="text-sm text-muted-foreground">Этот месяц</div>
           </FloatingCard>
@@ -360,7 +362,11 @@ const DashboardPro = () => {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                           <div className="flex items-center gap-1">
                             <AnimatedIcon icon={DollarSign} size={14} />
-                            ${(j.budget_min_cents/100).toFixed(0)} - ${(j.budget_max_cents/100).toFixed(0)}
+                            {j.budget_min_cents && j.budget_max_cents ? 
+                              `${formatPrice(j.budget_min_cents)} - ${formatPrice(j.budget_max_cents)}` :
+                              j.budget_min_cents ? `от ${formatPrice(j.budget_min_cents)}` :
+                              j.budget_max_cents ? `до ${formatPrice(j.budget_max_cents)}` : 'Договорная'
+                            }
                           </div>
                           <div className="flex items-center gap-1">
                             <AnimatedIcon icon={Calendar} size={14} />
@@ -487,15 +493,15 @@ const DashboardPro = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Сегодня</span>
-                  <span className="font-semibold">$125.00</span>
+                  <span className="font-semibold">{formatPrice(12500)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Эта неделя</span>
-                  <span className="font-semibold">$850.00</span>
+                  <span className="font-semibold">{formatPrice(85000)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Этот месяц</span>
-                  <span className="font-semibold text-primary">$2,340.00</span>
+                  <span className="font-semibold text-primary">{formatPrice(234000)}</span>
                 </div>
               </div>
               
@@ -513,7 +519,7 @@ const DashboardPro = () => {
               </div>
               
               <p className="text-sm text-muted-foreground mb-4">
-                Доступно для вывода: <span className="font-semibold text-success">${(walletBalance/100).toFixed(2)}</span>
+                Доступно для вывода: <span className="font-semibold text-success">{formatPrice(walletBalance)}</span>
               </p>
               
               <button className="btn-hero w-full text-sm animate-pulse-glow flex items-center justify-center gap-2">
