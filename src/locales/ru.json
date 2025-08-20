@@ -208,5 +208,17 @@
   
   "loading.translations": "Загрузка переводов...",
   "common.required": "*",
-  "common.optional": "(необязательно)"
+  "common.optional": "(необязательно)",
+  "common.loading": "Загрузка...",
+  
+  "feed.title": "Лента заказов",
+  "feed.search": "Поиск по заказам...",
+  "feed.category.all": "Все категории",
+  "feed.accept_job": "Принять заказ",
+  "feed.no_jobs": "Заказов не найдено",
+  
+  "notifications.error": "Ошибка",
+  "notifications.job_accepted": "Заказ принят",
+  
+  "dashboard.welcome": "Добро пожаловать в ServiceHub"
 }

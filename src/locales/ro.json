@@ -208,5 +208,17 @@
   
   "loading.translations": "Se încarcă traducerile...",
   "common.required": "*",
-  "common.optional": "(opțional)"
+  "common.optional": "(opțional)",
+  "common.loading": "Se încarcă...",
+  
+  "feed.title": "Fluxul comenzilor",
+  "feed.search": "Căutare în comenzi...",
+  "feed.category.all": "Toate categoriile",
+  "feed.accept_job": "Acceptă comanda",
+  "feed.no_jobs": "Nu s-au găsit comenzi",
+  
+  "notifications.error": "Eroare",
+  "notifications.job_accepted": "Comandă acceptată",
+  
+  "dashboard.welcome": "Bun venit la ServiceHub"
 }
