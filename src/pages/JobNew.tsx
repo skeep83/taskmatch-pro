@@ -1,8 +1,8 @@
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useI18n } from "@/i18n";
-import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useLocation } from "react-router-dom";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
@@ -15,7 +15,7 @@ const JobNew = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState<Array<{ id: string; key: string; label_ru?: string; label_ro?: string }>>([]);
+  const [categories, setCategories] = useState<Array<{ id: string; name: string; name_ro?: string; icon?: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -25,7 +25,11 @@ const JobNew = () => {
     (async () => {
       try {
         const { supabase } = await import("@/integrations/supabase/client");
-        const { data, error } = await (supabase as any).from("categories").select("id,key,label_ru,label_ro").order("key");
+        const { data, error } = await (supabase as any)
+          .from("service_categories")
+          .select("id,name,name_ro,icon")
+          .eq('is_active', true)
+          .order("name");
         if (error) throw error;
         setCategories(data || []);
       } catch (e) {
@@ -44,6 +48,7 @@ const JobNew = () => {
     const fd = new FormData(e.currentTarget);
     const category_id = String(fd.get("category_id") || "");
     const description = String(fd.get("description") || "");
+    const urgency = String(fd.get("urgency") || "normal");
     const budget_min = Number(fd.get("budget_min") || 0);
     const budget_max = Number(fd.get("budget_max") || 0);
     const date = String(fd.get("date") || "");
@@ -67,8 +72,9 @@ const JobNew = () => {
       const insertPayload: any = {
         client_id: userId,
         category_id,
-        title: null,
+        title: description.substring(0, 100), // Используем первую часть описания как заголовок
         description,
+        urgency,
         budget_min_cents: isFinite(budget_min) ? Math.round(budget_min * 100) : null,
         budget_max_cents: isFinite(budget_max) ? Math.round(budget_max * 100) : null,
         scheduled_at,
@@ -82,11 +88,10 @@ const JobNew = () => {
       if (error) throw error;
 
       // Upload photos to private bucket and link to job
-      const files = fd.getAll('photos').filter((f) => f instanceof File) as File[];
-      if (created?.id && files.length) {
+      if (created?.id && uploadedFiles.length) {
         const bucket = (supabase as any).storage.from('evidence');
-        for (let i = 0; i < Math.min(files.length, 8); i++) {
-          const file = files[i];
+        for (let i = 0; i < Math.min(uploadedFiles.length, 8); i++) {
+          const file = uploadedFiles[i];
           try {
             const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
             const path = `job/${created.id}/${Date.now()}-${i}.${ext}`;
@@ -102,7 +107,17 @@ const JobNew = () => {
         }
       }
 
-      toast({ title: "Заказ создан", description: "Мы уведомим специалистов" });
+      // Trigger smart matching to find nearby professionals
+      try {
+        await (supabase as any).functions.invoke('job-smart-match', {
+          body: { jobId: created.id }
+        });
+      } catch (matchError) {
+        console.warn('Smart matching failed:', matchError);
+        // Continue even if matching fails
+      }
+
+      toast({ title: "Заказ создан", description: "Мы нашли специалистов в вашем районе и отправили им уведомления" });
       navigate("/dashboard", { replace: true });
     } catch (err: any) {
       console.error(err);
@@ -113,7 +128,9 @@ const JobNew = () => {
   };
 
   const categoryOptions = useMemo(() => categories.map(c => (
-    <option key={c.id} value={c.id}>{c.label_ru || c.key}</option>
+    <option key={c.id} value={c.id}>
+      {c.icon && `${c.icon} `}{c.name}
+    </option>
   )), [categories]);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -226,7 +243,7 @@ const JobNew = () => {
 
                   <FloatingCard className="p-6">
                     <label className="block text-sm font-medium mb-3">Приоритет</label>
-                    <select className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all">
+                    <select name="urgency" className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all">
                       <option value="normal">Обычный</option>
                       <option value="urgent">Срочно (+30%)</option>
                       <option value="same_day">В тот же день (+50%)</option>
@@ -338,12 +355,12 @@ const JobNew = () => {
                       onChange={handleFileInput}
                       className="hidden"
                       id="photo-upload"
+                      name="photos"
                     />
                     <label htmlFor="photo-upload" className="btn-hero inline-flex items-center gap-2">
                       <Upload className="w-4 h-4" />
                       Выбрать файлы
                     </label>
-                    <input name="photos" type="hidden" />
                   </div>
 
                   {uploadedFiles.length > 0 && (
