@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { FloatingCard } from "@/components/ui/floating-card";
@@ -11,7 +11,7 @@ import { Clock, Euro, Users, Eye, Gavel, Trophy, Timer } from "lucide-react";
 import tendersImage from "@/assets/tenders-auction.jpg";
 
 const TendersList = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
