@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import {
@@ -13,7 +13,7 @@ import {
 import businessDashboard from "@/assets/business-dashboard.jpg";
 
 const DashboardBusiness = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -81,6 +81,99 @@ const DashboardBusiness = () => {
       setLoading(false);
     })();
   }, []);
+
+  const handleSaveSettings = async () => {
+    if (!businessId) return;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('business_accounts')
+        .update({
+          company_name: companyName,
+          vat_number: vat,
+          idno,
+          legal_address: addr,
+          rate_multiplier: mult
+        })
+        .eq('id', businessId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Настройки сохранены",
+        description: "Данные компании успешно обновлены"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Ошибка",
+        description: error.message || "Не удалось сохранить настройки",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!businessId || !memberUserId.trim()) return;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('business_members')
+        .insert({
+          business_id: businessId,
+          user_id: memberUserId,
+          role: 'member'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Сотрудник добавлен",
+        description: "Новый сотрудник успешно добавлен в команду"
+      });
+
+      setMemberUserId("");
+      
+      // Reload members
+      const { data } = await supabase
+        .from('business_members')
+        .select('*')
+        .eq('business_id', businessId);
+      setMembers(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Ошибка",
+        description: error.message || "Не удалось добавить сотрудника",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('business_members')
+        .delete()
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Сотрудник удален",
+        description: "Сотрудник исключен из команды"
+      });
+
+      setMembers(members.filter(m => m.id !== memberId));
+    } catch (error: any) {
+      toast({
+        title: "Ошибка",
+        description: error.message || "Не удалось удалить сотрудника",
+        variant: "destructive"
+      });
+    }
+  };
 
   const loadBusinessAnalytics = async (businessId: string, supabase: any) => {
     // Load business jobs and calculate metrics
@@ -385,7 +478,7 @@ const DashboardBusiness = () => {
                   </div>
 
                   <div className="mt-6 flex gap-4">
-                    <button className="btn-hero">Сохранить изменения</button>
+                    <button className="btn-hero" onClick={handleSaveSettings}>Сохранить изменения</button>
                     <button className="btn-ghost">Загрузить договор</button>
                   </div>
                 </FloatingCard>
@@ -404,7 +497,7 @@ const DashboardBusiness = () => {
                       value={memberUserId} 
                       onChange={(e)=>setMemberUserId(e.target.value)} 
                     />
-                    <button className="btn-hero px-6">Добавить сотрудника</button>
+                    <button className="btn-hero px-6" onClick={handleAddMember}>Добавить сотрудника</button>
                   </div>
 
                   <div className="space-y-3">
@@ -429,7 +522,12 @@ const DashboardBusiness = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <button className="btn-ghost text-sm">Лимиты</button>
-                            <button className="btn-ghost text-sm text-destructive">Удалить</button>
+                            <button 
+                              className="btn-ghost text-sm text-destructive"
+                              onClick={() => handleRemoveMember(m.id)}
+                            >
+                              Удалить
+                            </button>
                           </div>
                         </div>
                       </FloatingCard>

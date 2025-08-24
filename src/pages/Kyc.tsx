@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Kyc = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);

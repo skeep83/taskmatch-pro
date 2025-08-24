@@ -1,8 +1,8 @@
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Seo } from "@/components/Seo";
 
 const PaymentCanceled = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   return (
     <main className="container mx-auto py-16 text-center">
       <Seo title={`${t('app.name')} — Canceled`} description="Payment canceled" canonical="/payment-canceled" />

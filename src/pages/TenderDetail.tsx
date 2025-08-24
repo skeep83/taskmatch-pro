@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
-import { useI18n } from "@/i18n";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { useParams } from "react-router-dom";
 
 const TenderDetail = () => {
-  const { t } = useI18n();
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const { id } = useParams();
   const [tender, setTender] = useState<any | null>(null);

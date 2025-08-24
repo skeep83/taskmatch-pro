@@ -188,6 +188,78 @@ const DashboardPro = () => {
     window.open(videoUrl, '_blank');
   };
 
+  const handleStartWork = async (jobId: string) => {
+    if (!userId) return;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('jobs')
+        .update({ 
+          status: 'in_progress',
+          start_confirmed: true
+        })
+        .eq('id', jobId)
+        .eq('pro_id', userId)
+        .eq('status', 'accepted');
+
+      if (error) throw error;
+
+      toast({ 
+        title: "Работа начата", 
+        description: "Статус заказа изменен на 'В процессе'" 
+      });
+
+      // Refresh active jobs
+      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
+      await loadActiveJobs(userId, refreshSupabase);
+    } catch (error: any) {
+      toast({ 
+        title: "Ошибка", 
+        description: error.message || "Не удалось начать работу", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const handleFinishWork = async (jobId: string) => {
+    if (!userId) return;
+    
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase
+        .from('jobs')
+        .update({ 
+          status: 'done',
+          end_confirmed: true
+        })
+        .eq('id', jobId)
+        .eq('pro_id', userId)
+        .eq('status', 'in_progress');
+
+      if (error) throw error;
+
+      toast({ 
+        title: "Работа завершена", 
+        description: "Заказ успешно завершен" 
+      });
+
+      // Refresh active jobs
+      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
+      await loadActiveJobs(userId, refreshSupabase);
+    } catch (error: any) {
+      toast({ 
+        title: "Ошибка", 
+        description: error.message || "Не удалось завершить работу", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const handleOpenChat = (jobId: string) => {
+    navigate(`/messages?job=${jobId}`);
+  };
+
   if (loading) return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div 
@@ -470,15 +542,28 @@ const DashboardPro = () => {
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <button className="btn-ghost text-sm flex items-center gap-2">
+                        <button 
+                          className="btn-ghost text-sm flex items-center gap-2"
+                          onClick={() => handleOpenChat(j.id)}
+                        >
                           <AnimatedIcon icon={MessageSquare} size={16} />
                           Чат
                         </button>
                         {j.status === 'accepted' && (
-                          <button className="btn-hero text-sm">Начать работу</button>
+                          <button 
+                            className="btn-hero text-sm"
+                            onClick={() => handleStartWork(j.id)}
+                          >
+                            Начать работу
+                          </button>
                         )}
                         {j.status === 'in_progress' && (
-                          <button className="btn-hero text-sm">Завершить</button>
+                          <button 
+                            className="btn-hero text-sm"
+                            onClick={() => handleFinishWork(j.id)}
+                          >
+                            Завершить
+                          </button>
                         )}
                       </div>
                     </div>
