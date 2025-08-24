@@ -749,6 +749,7 @@ export type Database = {
           location_address: string | null
           location_lat: number | null
           location_lng: number | null
+          otp_code: string | null
           pro_id: string | null
           scheduled_at: string | null
           start_confirmed: boolean
@@ -768,6 +769,7 @@ export type Database = {
           location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          otp_code?: string | null
           pro_id?: string | null
           scheduled_at?: string | null
           start_confirmed?: boolean
@@ -787,6 +789,7 @@ export type Database = {
           location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          otp_code?: string | null
           pro_id?: string | null
           scheduled_at?: string | null
           start_confirmed?: boolean
