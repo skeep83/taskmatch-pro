@@ -84,6 +84,11 @@ export function useCurrency() {
     const amount = amountCents / 100;
     const decimalPlaces = currency.decimal_places || 2;
     
+    // Молдавский лей отображается после суммы
+    if (currency.code === 'MDL') {
+      return `${amount.toFixed(decimalPlaces)} ${currency.symbol}`;
+    }
+    
     return `${currency.symbol}${amount.toFixed(decimalPlaces)}`;
   };
 
