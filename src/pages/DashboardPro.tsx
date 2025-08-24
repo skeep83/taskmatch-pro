@@ -12,6 +12,7 @@ import {
   Settings, Bell, Zap, Video, MapPin, CheckCircle, AlertCircle,
   BarChart3, DollarSign
 } from "lucide-react";
+import { StarRating } from "@/components/ui/star-rating";
 import dashboardPro from "@/assets/dashboard-pro.jpg";
 
 const DashboardPro = () => {
@@ -255,10 +256,16 @@ const DashboardPro = () => {
           
           <FloatingCard className="p-6 text-center" delay={200} hover glow>
             <AnimatedIcon icon={Star} size={32} className="text-amber-500 mb-4" />
-            <div className="text-2xl font-bold text-amber-500 mb-1">
-              {ratingAvg ? ratingAvg.toFixed(1) : '—'}
+            <div className="flex flex-col items-center">
+              <StarRating 
+                rating={ratingAvg || 0} 
+                size="md" 
+                showValue 
+                showCount 
+                count={ratingCount}
+                className="mb-1"
+              />
             </div>
-            <div className="text-sm text-muted-foreground">Рейтинг ({ratingCount})</div>
           </FloatingCard>
           
           <FloatingCard className="p-6 text-center" delay={300} hover glow>

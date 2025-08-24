@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { Search, Filter, Star, Clock, MapPin, Zap } from "lucide-react";
+import { StarRating } from "@/components/ui/star-rating";
 import proPlaceholder from "@/assets/pro-placeholder.jpg";
 import servicesHero from "@/assets/services-hero.jpg";
 import cardBgPattern from "@/assets/card-bg-pattern.jpg";
@@ -174,10 +175,12 @@ const Catalog = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                      <AnimatedIcon icon={Star} size={16} />
-                      {r.avg_score.toFixed(1)}
-                    </div>
+                    <StarRating 
+                      rating={r.avg_score} 
+                      size="sm" 
+                      showValue={false}
+                      className="px-3 py-1 rounded-full bg-primary/10"
+                    />
                   </div>
 
                   <div className="flex-1 mb-6">
@@ -196,6 +199,14 @@ const Catalog = () => {
                       <div className="flex items-center gap-1 text-success">
                         <AnimatedIcon icon={Zap} size={14} />
                         {r.rating_count} отзывов
+                      </div>
+                      <div className="flex items-center">
+                        <StarRating 
+                          rating={r.avg_score} 
+                          size="sm" 
+                          showValue
+                          className="text-sm"
+                        />
                       </div>
                     </div>
                   </div>

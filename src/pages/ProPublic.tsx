@@ -1,6 +1,7 @@
 import { Seo } from "@/components/Seo";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import { StarRating } from "@/components/ui/star-rating";
 
 const ProPublic = () => {
   const { id } = useParams();
@@ -55,7 +56,15 @@ const ProPublic = () => {
             <div className="flex-1">
               <h1 className="text-2xl font-semibold mb-2">Специалист #{String(id).slice(0,8)}</h1>
               <p className="text-sm text-muted-foreground mb-2">Категории: {catLabels || '—'}</p>
-              <p className="text-sm">Рейтинг: {rating.avg_score.toFixed(1)} ({rating.rating_count})</p>
+              <div className="flex items-center gap-2 mb-2">
+                <StarRating 
+                  rating={rating.avg_score} 
+                  size="sm" 
+                  showValue 
+                  showCount 
+                  count={rating.rating_count}
+                />
+              </div>
               <p className="text-sm mt-2">Ставки: {profile.hourly_rate_cents ? `$${(profile.hourly_rate_cents/100).toFixed(2)}/ч` : 'по договоренности'}{profile.fixed_price_cents ? ` • фикс. $${(profile.fixed_price_cents/100).toFixed(2)}` : ''}</p>
               <p className="text-sm mt-4 whitespace-pre-wrap">{profile.bio || 'Описание отсутствует'}</p>
             </div>
