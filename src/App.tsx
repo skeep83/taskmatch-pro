@@ -9,15 +9,12 @@ import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import Auth from "./pages/Auth";
-import Pro from "./pages/Pro";
 import JobNew from "./pages/JobNew";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
 import Diagnostics from "./components/Diagnostics";
-import DashboardClient from "./pages/DashboardClient";
-import DashboardPro from "./pages/DashboardPro";
-import DashboardBusiness from "./pages/DashboardBusiness";
+import UnifiedDashboard from "./pages/UnifiedDashboard";
 import Messages from "./pages/Messages";
 import Kyc from "./pages/Kyc";
 import ProProfile from "./pages/ProProfile";
@@ -56,11 +53,8 @@ const AppContent = () => {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/pro" element={<Pro />} />
           <Route path="/job/new" element={<JobNew />} />
-          <Route path="/dashboard" element={<DashboardClient />} />
-          <Route path="/pro/dashboard" element={<DashboardPro />} />
-          <Route path="/business/dashboard" element={<DashboardBusiness />} />
+          <Route path="/dashboard" element={<UnifiedDashboard />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/messages/:id" element={<Messages />} />
           <Route path="/kyc" element={<Kyc />} />
