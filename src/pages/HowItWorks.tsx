@@ -12,6 +12,12 @@ import {
   ChevronDown, Play, Phone, Mail, MapPin, Eye, Lock, Coins
 } from "lucide-react";
 import servicesHero from "@/assets/services-hero.jpg";
+import securityImg from "@/assets/features/security.jpg";
+import speedImg from "@/assets/features/speed.jpg";
+import qualityImg from "@/assets/features/quality.jpg";
+import availabilityImg from "@/assets/features/availability.jpg";
+import guaranteesImg from "@/assets/features/guarantees.jpg";
+import growthImg from "@/assets/features/growth.jpg";
 
 const HowItWorks = () => {
   const { t } = useEnhancedI18n();
@@ -58,42 +64,48 @@ const HowItWorks = () => {
       title: "Безопасность",
       description: "Эскроу-платежи, проверка документов, страховка",
       gradient: "from-red-500 to-rose-500",
-      stats: "99.8% безопасных сделок"
+      stats: "99.8% безопасных сделок",
+      image: securityImg
     },
     {
       icon: Zap,
       title: "Скорость",
       description: "Мгновенные отклики, быстрое выполнение заказов",
       gradient: "from-yellow-500 to-amber-500",
-      stats: "< 15 мин средний отклик"
+      stats: "< 15 мин средний отклик",
+      image: speedImg
     },
     {
       icon: Users,
       title: "Качество",
       description: "Проверенные специалисты, система рейтингов",
       gradient: "from-blue-500 to-indigo-500",
-      stats: "4.9/5 средний рейтинг"
+      stats: "4.9/5 средний рейтинг",
+      image: qualityImg
     },
     {
       icon: Globe,
       title: "Доступность",
       description: "Работаем в 50+ городах по всей стране",
       gradient: "from-green-500 to-teal-500",
-      stats: "24/7 поддержка"
+      stats: "24/7 поддержка",
+      image: availabilityImg
     },
     {
       icon: Award,
       title: "Гарантии",
       description: "Возврат средств, повторное выполнение",
       gradient: "from-purple-500 to-violet-500",
-      stats: "100% гарантия качества"
+      stats: "100% гарантия качества",
+      image: guaranteesImg
     },
     {
       icon: TrendingUp,
       title: "Рост",
       description: "Постоянно расширяем список услуг",
       gradient: "from-pink-500 to-rose-500",
-      stats: "+200% роста в год"
+      stats: "+200% роста в год",
+      image: growthImg
     }
   ];
 
@@ -300,26 +312,35 @@ const HowItWorks = () => {
               hover
               glow
             >
-              {/* Background Gradient */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-10 transition-opacity`}></div>
+              {/* Background Image */}
+              <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
+                <img 
+                  src={feature.image} 
+                  alt={feature.title}
+                  className="w-full h-full object-cover rounded-2xl"
+                />
+              </div>
               
-              <div className="relative">
+              {/* Background Gradient Overlay */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-10 group-hover:opacity-20 transition-opacity rounded-2xl`}></div>
+              
+              <div className="relative z-10">
                 <div className="mb-6">
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} bg-opacity-10`}>
+                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} bg-opacity-20 backdrop-blur-sm`}>
                     <AnimatedIcon 
                       icon={feature.icon} 
                       size={32}
-                      className={`bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}
+                      className="text-white drop-shadow-lg"
                       delayMs={index * 150}
                     />
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
+                <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-lg">{feature.title}</h3>
+                <p className="text-white/90 leading-relaxed mb-4 drop-shadow">
                   {feature.description}
                 </p>
-                <div className={`text-sm font-semibold bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}>
+                <div className="text-sm font-semibold text-white drop-shadow-lg bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
                   {feature.stats}
                 </div>
               </div>
