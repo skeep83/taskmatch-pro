@@ -90,7 +90,13 @@ const DashboardPro = () => {
       .in('status', ['accepted', 'in_progress', 'done'])
       .order('created_at', { ascending: false })
       .limit(20);
-    setMyActiveJobs(data || []);
+    
+    const jobs = data || [];
+    setMyActiveJobs(jobs);
+    
+    // Calculate completed jobs count
+    const completed = jobs.filter(job => job.status === 'done').length;
+    setCompletedJobs(completed);
   };
 
   const loadWalletBalance = async (uid: string, supabase: any) => {
