@@ -20,6 +20,7 @@ const Messages = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [text, setText] = useState("");
   const [presence, setPresence] = useState<Record<string, any>>({});
   const [otherOnline, setOtherOnline] = useState(false);
@@ -46,6 +47,28 @@ const Messages = () => {
         .order("last_message_at", { ascending: false })
         .limit(50);
       setChats(data || []);
+
+      // Load profiles for chat participants
+      if (data && data.length > 0) {
+        const userIds = new Set<string>();
+        data.forEach((chat: any) => {
+          if (chat.client_id !== uid) userIds.add(chat.client_id);
+          if (chat.professional_id !== uid) userIds.add(chat.professional_id);
+        });
+
+        if (userIds.size > 0) {
+          const { data: profilesData } = await (supabase as any)
+            .from("profiles")
+            .select("id, full_name, first_name, last_name")
+            .in("id", Array.from(userIds));
+          
+          const profilesMap: Record<string, any> = {};
+          (profilesData || []).forEach((profile: any) => {
+            profilesMap[profile.id] = profile;
+          });
+          setProfiles(profilesMap);
+        }
+      }
     })();
   }, [navigate, toast]);
 
@@ -177,30 +200,43 @@ const Messages = () => {
                     <p className="text-sm">Нет активных чатов</p>
                   </div>
                 )}
-                {chats.map((c) => (
-                  <FloatingCard 
-                    key={c.id} 
-                    className={`p-3 cursor-pointer transition-all hover:scale-[1.02] ${
-                      String(c.id) === String(id) ? 'ring-2 ring-primary bg-primary/5' : ''
-                    }`}
-                    onClick={() => navigate(`/messages/${c.id}`)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        {String(c.id).slice(0, 2).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">
-                          Заказ #{String(c.job_id || c.tender_id || c.id).slice(0, 8)}
+                {chats.map((c) => {
+                  const otherUserId = c.client_id === userId ? c.professional_id : c.client_id;
+                  const otherProfile = profiles[otherUserId];
+                  const displayName = otherProfile?.full_name || 
+                                     (otherProfile?.first_name && otherProfile?.last_name ? 
+                                       `${otherProfile.first_name} ${otherProfile.last_name}` : 
+                                       'Пользователь');
+                  const jobNumber = String(c.job_id || c.tender_id || c.id).slice(0, 8);
+
+                  return (
+                    <FloatingCard 
+                      key={c.id} 
+                      className={`p-3 cursor-pointer transition-all hover:scale-[1.02] ${
+                        String(c.id) === String(id) ? 'ring-2 ring-primary bg-primary/5' : ''
+                      }`}
+                      onClick={() => navigate(`/messages/${c.id}`)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                          {displayName.slice(0, 2).toUpperCase()}
                         </div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm truncate">
+                            {displayName}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            Заказ #{jobNumber}
+                          </div>
+                          <div className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </FloatingCard>
-                ))}
+                    </FloatingCard>
+                  );
+                })}
               </div>
             </GlassMorphism>
 
@@ -224,8 +260,21 @@ const Messages = () => {
                       </div>
                       <div>
                         <div className="font-medium">
-                          {selectedChat ? `Заказ #${String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}` : 'Чат'}
+                          {selectedChat ? (() => {
+                            const otherUserId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
+                            const otherProfile = profiles[otherUserId];
+                            const displayName = otherProfile?.full_name || 
+                                               (otherProfile?.first_name && otherProfile?.last_name ? 
+                                                 `${otherProfile.first_name} ${otherProfile.last_name}` : 
+                                                 'Пользователь');
+                            return displayName;
+                          })() : 'Чат'}
                         </div>
+                        {selectedChat && (
+                          <div className="text-xs text-muted-foreground">
+                            Заказ #{String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}
+                          </div>
+                        )}
                         <div className="text-xs text-muted-foreground flex items-center gap-1">
                           <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
                           {otherTyping ? 'Печатает…' : (otherOnline ? 'В сети' : 'Не в сети')}

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 export const Header = () => {
   const { t, changeLanguage, language } = useEnhancedI18n();
@@ -49,7 +50,7 @@ export const Header = () => {
           <Link to="/feed" className="text-sm font-medium hover:text-primary transition-colors story-link">
             {t("nav.feed")}
           </Link>
-          <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors story-link">
+          <Link to="/dashboard/client" className="text-sm font-medium hover:text-primary transition-colors story-link">
             {t("nav.dashboard")}
           </Link>
           <Link to="/messages" className="text-sm font-medium hover:text-primary transition-colors story-link">
@@ -87,6 +88,7 @@ export const Header = () => {
           </div>
           
           {authed && <NotificationCenter />}
+          {authed && <RoleSwitcher />}
           
           {authed ? (
             <button onClick={signOut} className="btn-ghost">

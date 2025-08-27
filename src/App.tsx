@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -14,7 +14,9 @@ import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
 import Diagnostics from "./components/Diagnostics";
-import UnifiedDashboard from "./pages/UnifiedDashboard";
+import DashboardClient from "./pages/DashboardClient";
+import DashboardPro from "./pages/DashboardPro";
+import DashboardBusiness from "./pages/DashboardBusiness";
 import Messages from "./pages/Messages";
 import Kyc from "./pages/Kyc";
 import ProProfile from "./pages/ProProfile";
@@ -54,7 +56,10 @@ const AppContent = () => {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/job/new" element={<JobNew />} />
-          <Route path="/dashboard" element={<UnifiedDashboard />} />
+        <Route path="/dashboard/client" element={<DashboardClient />} />
+        <Route path="/dashboard/pro" element={<DashboardPro />} />
+        <Route path="/dashboard/business" element={<DashboardBusiness />} />
+        <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/messages/:id" element={<Messages />} />
           <Route path="/kyc" element={<Kyc />} />
