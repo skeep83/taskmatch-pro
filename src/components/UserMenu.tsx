@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  User, Briefcase, Building2,
+  User, Briefcase, Building2, Settings, LogOut,
   ChevronDown 
 } from "lucide-react";
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -44,7 +46,7 @@ const roleItems: RoleItem[] = [
   }
 ];
 
-export const RoleSwitcher = () => {
+export const UserMenu = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
@@ -75,10 +77,11 @@ export const RoleSwitcher = () => {
       const rolesList = (roles || []).map((r: any) => r.role as UserRole);
       setUserRoles(rolesList);
 
-      // Set default current role
-      if (rolesList.includes('pro')) {
+      // Set default current role based on current path
+      const currentPath = window.location.pathname;
+      if (currentPath.includes('/dashboard/pro') && rolesList.includes('pro')) {
         setCurrentRole('pro');
-      } else if (rolesList.includes('business')) {
+      } else if (currentPath.includes('/dashboard/business') && rolesList.includes('business')) {
         setCurrentRole('business');
       } else {
         setCurrentRole('client');
@@ -105,6 +108,12 @@ export const RoleSwitcher = () => {
         title: "Успешно", 
         description: `Роль "${roleItems.find(r => r.key === role)?.title}" активирована` 
       });
+
+      // Navigate to the new role dashboard
+      const roleItem = roleItems.find(r => r.key === role);
+      if (roleItem) {
+        navigate(roleItem.route);
+      }
     } catch (error: any) {
       toast({ 
         title: "Ошибка", 
@@ -122,6 +131,11 @@ export const RoleSwitcher = () => {
     }
   };
 
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
+
   if (!userId || userRoles.length === 0) {
     return null;
   }
@@ -133,19 +147,25 @@ export const RoleSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-2">
           {currentRoleItem && <currentRoleItem.icon className="h-4 w-4" />}
-          <span className="hidden sm:inline">{currentRoleItem?.title}</span>
+          <span className="hidden sm:inline">Личный кабинет</span>
           <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 bg-background border z-50">
+        <DropdownMenuLabel>Мои роли</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        
         {roleItems.map((item) => {
           const hasRole = userRoles.includes(item.key);
+          const isActive = currentRole === item.key;
           
           return (
             <DropdownMenuItem
               key={item.key}
               onClick={() => hasRole ? handleRoleChange(item.key) : handleBecomeRole(item.key)}
-              className="flex items-center justify-between"
+              className={`flex items-center justify-between cursor-pointer ${
+                isActive ? 'bg-primary/10 text-primary' : ''
+              }`}
             >
               <div className="flex items-center gap-2">
                 <item.icon className="h-4 w-4" />
@@ -154,9 +174,24 @@ export const RoleSwitcher = () => {
               {!hasRole && (
                 <span className="text-xs text-muted-foreground">Стать</span>
               )}
+              {isActive && (
+                <span className="text-xs text-primary">✓</span>
+              )}
             </DropdownMenuItem>
           );
         })}
+        
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuItem onClick={() => navigate('/pro/profile')} className="cursor-pointer">
+          <Settings className="h-4 w-4 mr-2" />
+          Настройки
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
+          <LogOut className="h-4 w-4 mr-2" />
+          Выход
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

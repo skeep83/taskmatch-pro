@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
-import { RoleSwitcher } from "@/components/RoleSwitcher";
+import { UserMenu } from "@/components/UserMenu";
 
 export const Header = () => {
   const { t, changeLanguage, language } = useEnhancedI18n();
@@ -20,11 +20,6 @@ export const Header = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setAuthed(false);
-    navigate("/");
-  };
 
   return (
     <header className="w-full glass-nav sticky top-0 z-50">
@@ -83,13 +78,9 @@ export const Header = () => {
           </div>
           
           {authed && <NotificationCenter />}
-          {authed && <RoleSwitcher />}
+          {authed && <UserMenu />}
           
-          {authed ? (
-            <button onClick={signOut} className="btn-ghost text-sm">
-              Выход
-            </button>
-          ) : (
+          {!authed && (
             <Link to="/auth" className="btn-hero text-sm">
               Вход
             </Link>
