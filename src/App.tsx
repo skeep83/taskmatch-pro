@@ -56,10 +56,10 @@ const AppContent = () => {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/job/new" element={<JobNew />} />
-        <Route path="/dashboard/client" element={<DashboardClient />} />
-        <Route path="/dashboard/pro" element={<DashboardPro />} />
-        <Route path="/dashboard/business" element={<DashboardBusiness />} />
-        <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
+          <Route path="/dashboard/client" element={<DashboardClient />} />
+          <Route path="/dashboard/pro" element={<DashboardPro />} />
+          <Route path="/dashboard/business" element={<DashboardBusiness />} />
+          <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/messages/:id" element={<Messages />} />
           <Route path="/kyc" element={<Kyc />} />
