@@ -29,7 +29,7 @@ export const Header = () => {
   return (
     <header className="w-full glass-nav sticky top-0 z-50">
       <nav className="container mx-auto flex items-center justify-between py-4 px-6">
-        <Link to="/" className="flex items-center gap-3 group" aria-label={t("app.name")}> 
+        <Link to="/" className="flex items-center gap-3 group flex-shrink-0" aria-label={t("app.name")}> 
           <div 
             className="h-10 w-10 rounded-xl shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
             style={{background: "var(--gradient-primary)"}} 
@@ -37,53 +37,48 @@ export const Header = () => {
           <span className="text-xl font-display font-bold text-gradient">{t("app.name")}</span>
         </Link>
         
-        <div className="hidden md:flex items-center gap-8">
-          <Link to="/how-it-works" className="text-sm font-medium hover:text-primary transition-colors story-link">
+        <div className="hidden lg:flex items-center gap-6">
+          <Link to="/how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
             {t("nav.how_it_works")}
           </Link>
-          <Link to="/catalog" className="text-sm font-medium hover:text-primary transition-colors story-link">
+          <Link to="/catalog" className="text-sm font-medium hover:text-primary transition-colors">
             {t("nav.catalog")}
           </Link>
-          <Link to="/job/new" className="text-sm font-medium hover:text-primary transition-colors story-link">
+          <Link to="/job/new" className="text-sm font-medium hover:text-primary transition-colors">
             {t("nav.find_pro")}
           </Link>
-          <Link to="/feed" className="text-sm font-medium hover:text-primary transition-colors story-link">
+          <Link to="/feed" className="text-sm font-medium hover:text-primary transition-colors">
             {t("nav.feed")}
           </Link>
-          <Link to="/dashboard/client" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            {t("nav.dashboard")}
-          </Link>
-          <Link to="/messages" className="text-sm font-medium hover:text-primary transition-colors story-link">
+          <Link to="/messages" className="text-sm font-medium hover:text-primary transition-colors">
             {t("nav.messages")}
-          </Link>
-          <Link to="/admin" className="text-sm font-medium hover:text-primary transition-colors story-link">
-            {t("nav.admin")}
           </Link>
         </div>
         
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Language switcher */}
+          <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg bg-muted/50">
             <button 
               aria-label="Русский" 
-              className={`text-sm px-3 py-1.5 rounded-md font-medium transition-all ${
+              className={`text-xs px-2 py-1 rounded-md font-medium transition-all ${
                 language==='ru' 
                   ? 'bg-primary text-primary-foreground shadow-sm' 
                   : 'hover:bg-muted text-muted-foreground hover:text-foreground'
               }`} 
               onClick={() => changeLanguage('ru')}
             >
-              {t("lang.ru")}
+              RU
             </button>
             <button 
               aria-label="Română" 
-              className={`text-sm px-3 py-1.5 rounded-md font-medium transition-all ${
+              className={`text-xs px-2 py-1 rounded-md font-medium transition-all ${
                 language==='ro' 
                   ? 'bg-primary text-primary-foreground shadow-sm' 
                   : 'hover:bg-muted text-muted-foreground hover:text-foreground'
               }`} 
               onClick={() => changeLanguage('ro')}
             >
-              {t("lang.ro")}
+              RO
             </button>
           </div>
           
@@ -91,12 +86,12 @@ export const Header = () => {
           {authed && <RoleSwitcher />}
           
           {authed ? (
-            <button onClick={signOut} className="btn-ghost">
-              {t("nav.sign_out")}
+            <button onClick={signOut} className="btn-ghost text-sm">
+              Выход
             </button>
           ) : (
-            <Link to="/auth" className="btn-hero">
-              {t("nav.sign_in")}
+            <Link to="/auth" className="btn-hero text-sm">
+              Вход
             </Link>
           )}
         </div>
