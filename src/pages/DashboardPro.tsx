@@ -253,7 +253,7 @@ const DashboardPro = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
           <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Wallet className="h-12 w-12 text-green-600 mb-4 mx-auto" />
+            <Wallet className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
             <div className="text-2xl font-bold text-green-600 mb-1">
               {formatPrice(walletBalance)}
             </div>
@@ -261,7 +261,7 @@ const DashboardPro = () => {
           </div>
           
           <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Star className="h-12 w-12 text-yellow-600 mb-4 mx-auto" />
+            <Star className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
             <div className="flex flex-col items-center">
               <StarRating 
                 rating={ratingAvg || 0} 
@@ -275,7 +275,7 @@ const DashboardPro = () => {
           </div>
           
           <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <DollarSign className="h-12 w-12 text-blue-600 mb-4 mx-auto" />
+            <DollarSign className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
             <div className="text-2xl font-bold text-primary mb-1">
               {formatPrice(monthlyEarnings)}
             </div>
@@ -283,13 +283,13 @@ const DashboardPro = () => {
           </div>
           
           <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Award className="h-12 w-12 text-purple-600 mb-4 mx-auto" />
+            <Award className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
             <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
             <div className="text-sm text-muted-foreground">Выполнено</div>
           </div>
           
           <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Clock className="h-12 w-12 text-orange-600 mb-4 mx-auto" />
+            <Clock className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
             <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
             <div className="text-sm text-muted-foreground">Время ответа</div>
           </div>
@@ -299,42 +299,42 @@ const DashboardPro = () => {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
           <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/pro/profile" className="flex flex-col items-center gap-2">
-              <UserCog className="h-10 w-10 text-blue-600" />
+              <UserCog className="h-10 w-10 text-slate-500" />
               <span className="text-sm font-medium">Профиль</span>
             </Link>
           </div>
           
           <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-              <Calendar className="h-10 w-10 text-green-600" />
+              <Calendar className="h-10 w-10 text-slate-500" />
               <span className="text-sm font-medium">Расписание</span>
             </Link>
           </div>
           
           <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/portfolio" className="flex flex-col items-center gap-2">
-              <ImageIcon className="h-10 w-10 text-purple-600" />
+              <ImageIcon className="h-10 w-10 text-slate-500" />
               <span className="text-sm font-medium">Портфолио</span>
             </Link>
           </div>
           
           <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/tenders" className="flex flex-col items-center gap-2">
-              <Briefcase className="h-10 w-10 text-orange-600" />
+              <Briefcase className="h-10 w-10 text-slate-500" />
               <span className="text-sm font-medium">Тендеры</span>
             </Link>
           </div>
           
           <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <button className="flex flex-col items-center gap-2 w-full">
-              <CreditCard className="h-10 w-10 text-indigo-600" />
+              <CreditCard className="h-10 w-10 text-slate-500" />
               <span className="text-sm font-medium">Выплата</span>
             </button>
           </div>
           
           <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/kyc" className="flex flex-col items-center gap-2">
-              <ShieldCheck className="h-10 w-10 text-red-600" />
+              <ShieldCheck className="h-10 w-10 text-slate-500" />
               <span className="text-sm font-medium">KYC</span>
             </Link>
           </div>
@@ -350,9 +350,9 @@ const DashboardPro = () => {
               />
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <Briefcase className="h-10 w-10 text-blue-600" />
-                    <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
+                <div className="flex items-center gap-3">
+                  <Briefcase className="h-10 w-10 text-slate-500" />
+                  <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {nearbyJobs.length} заказов поблизости
@@ -424,9 +424,9 @@ const DashboardPro = () => {
               />
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <Clock className="h-10 w-10 text-orange-600" />
-                    <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
+                <div className="flex items-center gap-3">
+                  <Clock className="h-10 w-10 text-slate-500" />
+                  <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {myActiveJobs.length} активных заказов
@@ -496,9 +496,9 @@ const DashboardPro = () => {
                   <span className="text-sm text-muted-foreground">Статус верификации</span>
                   <div className="flex items-center gap-1">
                     {kycStatus === 'approved' ? (
-                      <CheckCircle className="h-6 w-6 text-green-600" />
+                      <CheckCircle className="h-6 w-6 text-slate-500" />
                     ) : (
-                      <AlertCircle className="h-6 w-6 text-amber-500" />
+                      <AlertCircle className="h-6 w-6 text-slate-500" />
                     )}
                     <span className="text-sm font-medium">
                       {kycStatus === 'approved' ? 'Верифицирован' : 'Проверка'}
@@ -525,7 +525,7 @@ const DashboardPro = () => {
               <div className="space-y-3">
                 {tenders.length === 0 && (
                   <div className="text-center py-4">
-                    <Briefcase className="h-12 w-12 text-gray-400 mb-2 mx-auto" />
+                    <Briefcase className="h-12 w-12 text-slate-500 mb-2 mx-auto" />
                     <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
                   </div>
                 )}
