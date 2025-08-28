@@ -45,17 +45,41 @@ const DashboardPro = () => {
       }
       setUserId(uid);
       
-      const { data: roles, error } = await supabase.from("user_roles").select("role");
+      
+      const { data: roles, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid);
+        
       if (error) {
+        console.error('Role check error:', error);
         toast({ title: "Ошибка", description: error.message, variant: "destructive" });
         navigate("/");
         return;
       }
+      
       const hasPro = (roles || []).some((r: any) => r.role === "pro");
       if (!hasPro) {
-        toast({ title: "Нет доступа", description: "Активируйте роль PRO на странице 'Стать специалистом'", variant: "destructive" });
-        navigate("/pro");
-        return;
+        // Instead of redirecting, create the pro role automatically
+        const { error: insertError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: uid, role: "pro" });
+          
+        if (insertError) {
+          console.error('Insert role error:', insertError);
+          toast({ 
+            title: "Требуется активация", 
+            description: "Активируйте роль специалиста в личном кабинете", 
+            variant: "destructive" 
+          });
+          navigate("/");
+          return;
+        }
+        
+        toast({ 
+          title: "Добро пожаловать!", 
+          description: "Роль специалиста активирована" 
+        });
       }
 
       // Load all necessary data
