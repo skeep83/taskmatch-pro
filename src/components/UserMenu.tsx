@@ -49,166 +49,46 @@ const roleItems: RoleItem[] = [
 export const UserMenu = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
-  const [currentRole, setCurrentRole] = useState<UserRole>('client');
-  const [userId, setUserId] = useState<string | null>(null);
 
-  console.log('UserMenu component started rendering...');
-
-  useEffect(() => {
-    (async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const uid = sessionData.session?.user?.id;
-      
-      if (!uid) return;
-      
-      setUserId(uid);
-
-      // Load user roles (excluding admin roles for security)
-      const { data: roles, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", uid)
-        .in("role", ['client', 'pro', 'business']);
-
-      if (error) {
-        console.error('Error loading roles:', error);
-        // If no roles exist, still show menu so user can activate roles
-        setUserRoles([]);
-        setCurrentRole('client');
-        return;
-      }
-
-      const rolesList = (roles || []).map((r: any) => r.role as UserRole);
-      setUserRoles(rolesList);
-
-      // If no roles, default to client
-      if (rolesList.length === 0) {
-        setCurrentRole('client');
-        return;
-      }
-
-      // Set default current role based on current path
-      const currentPath = window.location.pathname;
-      if (currentPath.includes('/dashboard/pro') && rolesList.includes('pro')) {
-        setCurrentRole('pro');
-      } else if (currentPath.includes('/dashboard/business') && rolesList.includes('business')) {
-        setCurrentRole('business');
-      } else {
-        setCurrentRole('client');
-      }
-    })();
-  }, []);
-
-  const handleBecomeRole = async (role: UserRole) => {
-    if (!userId) return;
-
-    try {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role });
-
-      if (error && !error.message.includes('duplicate')) {
-        throw error;
-      }
-
-      setUserRoles(prev => [...prev, role]);
-      setCurrentRole(role);
-      
-      toast({ 
-        title: "Успешно", 
-        description: `Роль "${roleItems.find(r => r.key === role)?.title}" активирована` 
-      });
-
-      // Navigate to the new role dashboard
-      const roleItem = roleItems.find(r => r.key === role);
-      if (roleItem) {
-        navigate(roleItem.route);
-      }
-    } catch (error: any) {
-      toast({ 
-        title: "Ошибка", 
-        description: error.message || "Не удалось активировать роль", 
-        variant: "destructive" 
-      });
-    }
-  };
-
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    const roleItem = roleItems.find(r => r.key === role);
-    if (roleItem) {
-      navigate(roleItem.route);
-    }
-  };
+  console.log('UserMenu component rendering!');
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+      navigate("/");
+      toast({ title: "Вы вышли из системы" });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
-
-  // Show menu even without roles - user can activate roles from menu
-  if (!userId) {
-    return null;
-  }
-
-  const currentRoleItem = roleItems.find(r => r.key === currentRole);
-
-  // Debug info - показать состояние аутентификации
-  console.log('UserMenu render state:', { 
-    userId, 
-    userRoles, 
-    currentRole, 
-    hasRoles: userRoles.length > 0 
-  });
-
-  // Показать диагностическую информацию, если пользователь авторизован, но меню не показывается
-  if (userId && userRoles.length === 0) {
-    return (
-      <div className="text-red-500 border border-red-500 p-2 text-xs">
-        DEBUG: User authenticated but no roles found. User ID: {userId.slice(0, 8)}...
-      </div>
-    );
-  }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-2">
-          {currentRoleItem && <currentRoleItem.icon className="h-4 w-4" />}
+          <User className="h-4 w-4" />
           <span className="hidden sm:inline">Личный кабинет</span>
           <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 bg-background border z-50">
-        <DropdownMenuLabel>Мои роли</DropdownMenuLabel>
+        <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        {roleItems.map((item) => {
-          const hasRole = userRoles.includes(item.key);
-          const isActive = currentRole === item.key;
-          
-          return (
-            <DropdownMenuItem
-              key={item.key}
-              onClick={() => hasRole ? handleRoleChange(item.key) : handleBecomeRole(item.key)}
-              className={`flex items-center justify-between cursor-pointer ${
-                isActive ? 'bg-primary/10 text-primary' : ''
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <item.icon className="h-4 w-4" />
-                <span>{item.title}</span>
-              </div>
-              {!hasRole && (
-                <span className="text-xs text-muted-foreground">Стать</span>
-              )}
-              {isActive && (
-                <span className="text-xs text-primary">✓</span>
-              )}
-            </DropdownMenuItem>
-          );
-        })}
+        <DropdownMenuItem onClick={() => navigate('/dashboard/client')} className="cursor-pointer">
+          <User className="h-4 w-4 mr-2" />
+          Панель клиента
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem onClick={() => navigate('/dashboard/pro')} className="cursor-pointer">
+          <Briefcase className="h-4 w-4 mr-2" />
+          Панель специалиста
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem onClick={() => navigate('/dashboard/business')} className="cursor-pointer">
+          <Building2 className="h-4 w-4 mr-2" />
+          Панель бизнеса
+        </DropdownMenuItem>
         
         <DropdownMenuSeparator />
         

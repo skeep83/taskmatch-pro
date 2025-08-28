@@ -284,33 +284,21 @@ export const AppNavigation = () => {
             </div>
             
             {/* User-specific components */}
-            {(() => {
-              console.log('AppNavigation auth check:', { isAuthenticated });
-              return isAuthenticated ? (
-                <>
-                  <NotificationCenter />
-                  <div className="bg-blue-500 text-white p-2 text-xs">
-                    USERMENU SHOULD BE HERE
-                  </div>
-                  <UserMenu />
-                  <div className="text-green-500 text-xs border border-green-500 p-1">
-                    AUTH: ✓
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link 
-                    to="/auth" 
-                    className="btn-hero text-sm px-6 py-2 whitespace-nowrap hover-scale shadow-lg"
-                  >
-                    Войти
-                  </Link>
-                  <div className="text-red-500 text-xs border border-red-500 p-1">
-                    NOT AUTH
-                  </div>
-                </div>
-              );
-            })()}
+            {isAuthenticated ? (
+              <>
+                <NotificationCenter />
+                <UserMenu />
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link 
+                  to="/auth" 
+                  className="btn-hero text-sm px-6 py-2 whitespace-nowrap hover-scale shadow-lg"
+                >
+                  Войти
+                </Link>
+              </div>
+            )}
 
             {/* Mobile menu toggle */}
             <Button
