@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { notificationSounds } from '@/utils/notificationSounds';
+import { useSoundSettings } from '@/hooks/useSoundSettings';
 
 interface Notification {
   id: string;
@@ -18,6 +20,7 @@ export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { shouldPlaySound, settings } = useSoundSettings();
 
   // Fetch notifications
   const fetchNotifications = async () => {
@@ -147,6 +150,11 @@ export const useNotifications = () => {
             const newNotification = payload.new as Notification;
             setNotifications(prev => [newNotification, ...prev]);
             setUnreadCount(prev => prev + 1);
+
+            // Play notification sound based on settings
+            if (shouldPlaySound(newNotification.type)) {
+              notificationSounds.playNotification(newNotification.type);
+            }
 
             // Show toast for new notification
             toast({

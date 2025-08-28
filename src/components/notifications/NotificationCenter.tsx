@@ -1,17 +1,22 @@
-import { Bell, BellRing, CheckCheck, X } from 'lucide-react';
+import { Bell, BellRing, CheckCheck, X, Volume2, VolumeX, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useSoundSettings } from '@/hooks/useSoundSettings';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useState } from 'react';
 
 export const NotificationCenter = () => {
   const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
+  const { settings, updateSettings } = useSoundSettings();
   const [isOpen, setIsOpen] = useState(false);
+  const [showSoundSettings, setShowSoundSettings] = useState(false);
 
   const handleNotificationClick = (notification: any) => {
     if (!notification.is_read) {
@@ -78,6 +83,19 @@ export const NotificationCenter = () => {
                 Уведомления
               </CardTitle>
               <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setShowSoundSettings(!showSoundSettings)}
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  title="Настройки звука"
+                >
+                  {settings.enabled ? (
+                    <Volume2 className="h-4 w-4" />
+                  ) : (
+                    <VolumeX className="h-4 w-4" />
+                  )}
+                </Button>
                 {unreadCount > 0 && (
                   <Button
                     onClick={markAllAsRead}
@@ -101,6 +119,74 @@ export const NotificationCenter = () => {
             </div>
           </CardHeader>
           <CardContent className="p-0">
+            {/* Sound Settings Panel */}
+            {showSoundSettings && (
+              <div className="p-4 border-b bg-muted/20">
+                <h4 className="text-sm font-medium mb-3">Настройки звука</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Включить звуки</span>
+                    <Switch
+                      checked={settings.enabled}
+                      onCheckedChange={(enabled) => updateSettings({ enabled })}
+                    />
+                  </div>
+                  
+                  {settings.enabled && (
+                    <>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Громкость</span>
+                          <span className="text-xs text-muted-foreground">
+                            {Math.round(settings.volume * 100)}%
+                          </span>
+                        </div>
+                        <Slider
+                          value={[settings.volume]}
+                          onValueChange={([volume]) => updateSettings({ volume })}
+                          max={1}
+                          min={0}
+                          step={0.1}
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span>Сообщения</span>
+                          <Switch
+                            checked={settings.messageSound}
+                            onCheckedChange={(messageSound) => updateSettings({ messageSound })}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Заказы</span>
+                          <Switch
+                            checked={settings.jobSound}
+                            onCheckedChange={(jobSound) => updateSettings({ jobSound })}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Платежи</span>
+                          <Switch
+                            checked={settings.paymentSound}
+                            onCheckedChange={(paymentSound) => updateSettings({ paymentSound })}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Система</span>
+                          <Switch
+                            checked={settings.systemSound}
+                            onCheckedChange={(systemSound) => updateSettings({ systemSound })}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+            
             <ScrollArea className="h-96">
               {loading ? (
                 <div className="p-4 text-center text-sm text-muted-foreground">
