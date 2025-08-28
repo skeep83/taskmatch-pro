@@ -128,6 +128,8 @@ const Index = () => {
   const [currentTestimonials, setCurrentTestimonials] = useState<typeof testimonials>([]);
   const [animatingCards, setAnimatingCards] = useState<boolean[]>([false, false, false]);
 
+  console.log('Index component rendered, animatingCards:', animatingCards);
+
   // Initialize testimonials based on current language
   useEffect(() => {
     const filteredTestimonials = testimonials.filter(t => t.lang === language);
@@ -352,7 +354,7 @@ const Index = () => {
         <div className="grid md:grid-cols-3 gap-8">
           {currentTestimonials.map((testimonial, index) => (
             <div 
-              key={`${testimonial.author}-${testimonial.location}-${index}`}
+              key={`testimonial-${index}-${testimonial.author}`}
               className={`card-surface p-8 text-left transform transition-all duration-500 ease-in-out ${
                 animatingCards[index]
                   ? 'opacity-0 translate-y-8 scale-95' 
