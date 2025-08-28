@@ -56,23 +56,23 @@ All colors MUST be HSL.
     --brand-3: 280 72% 60%;
     --brand-glow: 258 80% 65%;
     
-    /* Pure neumorphism shadows - subtle contrast like in reference */
+    /* Pure neumorphism shadows - exact colors from reference */
     --shadow-raised: 
-      9px 9px 18px rgba(163, 177, 198, 0.4),
-      -9px -9px 18px rgba(255, 255, 255, 0.6);
+      9px 9px 18px rgba(174, 187, 204, 0.35),
+      -9px -9px 18px rgba(255, 255, 255, 0.5);
     
     --shadow-raised-hover: 
-      14px 14px 28px rgba(163, 177, 198, 0.5),
-      -14px -14px 28px rgba(255, 255, 255, 0.7);
+      14px 14px 28px rgba(174, 187, 204, 0.4),
+      -14px -14px 28px rgba(255, 255, 255, 0.6);
     
     --shadow-raised-strong: 
-      18px 18px 36px rgba(163, 177, 198, 0.6),
-      -18px -18px 36px rgba(255, 255, 255, 0.8);
+      18px 18px 36px rgba(174, 187, 204, 0.5),
+      -18px -18px 36px rgba(255, 255, 255, 0.7);
     
-    /* Neumorphic backgrounds with subtle contrast */
-    --surface-raised: linear-gradient(145deg, hsl(0, 0%, 96%), hsl(0, 0%, 94%));
-    --surface-elevated: linear-gradient(145deg, hsl(0, 0%, 95%), hsl(0, 0%, 93%));
-    --background-neomorphic: hsl(0, 0%, 94%);
+    /* Neumorphic backgrounds - grayish-blue like reference */
+    --surface-raised: linear-gradient(145deg, hsl(220, 16%, 95%), hsl(220, 16%, 92%));
+    --surface-elevated: linear-gradient(145deg, hsl(220, 16%, 94%), hsl(220, 16%, 91%));
+    --background-neomorphic: hsl(220, 16%, 93%);
     
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -118,20 +118,20 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Neumorphism shadows for dark mode - bright highlights */
+    /* Neumorphism shadows for dark mode */
     --shadow-raised: 
-      12px 12px 24px rgba(0, 0, 0, 0.7),
-      -12px -12px 24px rgba(255, 255, 255, 0.15);
+      9px 9px 18px rgba(0, 0, 0, 0.4),
+      -9px -9px 18px rgba(255, 255, 255, 0.08);
     
     --shadow-raised-hover: 
-      16px 16px 32px rgba(0, 0, 0, 0.8),
-      -16px -16px 32px rgba(255, 255, 255, 0.2);
+      14px 14px 28px rgba(0, 0, 0, 0.5),
+      -14px -14px 28px rgba(255, 255, 255, 0.1);
     
     --shadow-raised-strong: 
-      20px 20px 40px rgba(0, 0, 0, 0.9),
-      -20px -20px 40px rgba(255, 255, 255, 0.25);
+      18px 18px 36px rgba(0, 0, 0, 0.6),
+      -18px -18px 36px rgba(255, 255, 255, 0.12);
 
-    --background-neomorphic: hsl(220, 13%, 20%);
+    --background-neomorphic: hsl(220, 16%, 18%);
     
     /* Navigation depth */
     --nav-z-index: 50;
@@ -169,8 +169,8 @@ All colors MUST be HSL.
   .btn-hero:active {
     transform: translateY(1px);
     box-shadow: 
-      4px 4px 8px rgba(163, 177, 198, 0.3),
-      -4px -4px 8px rgba(255, 255, 255, 0.4);
+      4px 4px 8px rgba(174, 187, 204, 0.25),
+      -4px -4px 8px rgba(255, 255, 255, 0.3);
   }
   
   .btn-ghost {
@@ -186,8 +186,8 @@ All colors MUST be HSL.
   .btn-ghost:active {
     transform: translateY(1px);
     box-shadow: 
-      4px 4px 8px rgba(163, 177, 198, 0.3),
-      -4px -4px 8px rgba(255, 255, 255, 0.4);
+      4px 4px 8px rgba(174, 187, 204, 0.25),
+      -4px -4px 8px rgba(255, 255, 255, 0.3);
   }
   
   /* Pure neumorphic card surfaces */
