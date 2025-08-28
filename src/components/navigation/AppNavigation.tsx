@@ -250,7 +250,7 @@ export const AppNavigation = () => {
                     asChild
                     className={cn(
                       "relative",
-                      action.priority && "btn-hero animate-pulse-glow"
+                      action.priority && "bg-primary text-white hover:bg-primary/90 shadow-lg animate-pulse-glow"
                     )}
                   >
                     <Link to={action.href} className="flex items-center gap-2">
