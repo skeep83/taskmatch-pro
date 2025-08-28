@@ -62,18 +62,15 @@ const Index = () => {
               </div>
 
               {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-8 text-muted-foreground animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <div className="flex items-center gap-2">
-                  <NeumorphicIcon icon={ShieldCheck} size={52} variant="square" delayMs={0} />
-                  <span className="text-sm font-medium">Безопасные платежи</span>
+              <div className="flex flex-wrap items-center gap-6 text-muted-foreground animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Безопасные платежи</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <NeumorphicIcon icon={Zap} size={52} variant="square" delayMs={150} />
-                  <span className="text-sm font-medium">Мгновенные отклики</span>
+                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Мгновенные отклики</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <NeumorphicIcon icon={Award} size={52} variant="square" delayMs={300} />
-                  <span className="text-sm font-medium">Проверенные специалисты</span>
+                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Проверенные специалисты</span>
                 </div>
               </div>
             </div>
