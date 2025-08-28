@@ -1388,6 +1388,33 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          ip_address: unknown
+          request_count: number | null
+          window_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          ip_address: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          ip_address?: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       ratings: {
         Row: {
           comment: string | null
@@ -1795,6 +1822,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      cleanup_rate_limits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       find_nearby_pros: {
         Args: {
           job_category_id: string
@@ -1844,6 +1875,10 @@ export type Database = {
           p_resource_type: string
           p_user_agent?: string
         }
+        Returns: undefined
+      }
+      log_security_event: {
+        Args: { details?: Json; event_type: string }
         Returns: undefined
       }
       make_user_admin: {
