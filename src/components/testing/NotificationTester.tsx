@@ -63,10 +63,9 @@ export const NotificationTester = () => {
         return;
       }
 
-      // Create test notification directly in database
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
+      // Use the notifications-send edge function to create notification
+      const { data, error } = await supabase.functions.invoke('notifications-send', {
+        body: {
           user_id: user.id,
           type: notificationType.type,
           title: notificationType.title,
@@ -77,14 +76,15 @@ export const NotificationTester = () => {
             test: true,
             timestamp: new Date().toISOString()
           },
-          is_read: false
-        });
+          channels: ['push'] // This will create the notification in DB
+        }
+      });
 
       if (error) {
-        console.error('Error creating test notification:', error);
+        console.error('Error creating test notification via edge function:', error);
         toast({
           title: 'Ошибка',
-          description: 'Не удалось создать тестовое уведомление',
+          description: `Не удалось создать тестовое уведомление: ${error.message}`,
           variant: 'destructive'
         });
         return;
@@ -98,11 +98,11 @@ export const NotificationTester = () => {
         description: `Создано тестовое уведомление: ${notificationType.title}`,
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in test notification:', error);
       toast({
         title: 'Ошибка',
-        description: 'Произошла ошибка при создании уведомления',
+        description: `Произошла ошибка при создании уведомления: ${error.message}`,
         variant: 'destructive'
       });
     } finally {
