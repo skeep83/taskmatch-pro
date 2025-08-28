@@ -20,9 +20,16 @@ export const NotificationCenter = () => {
     
     // Handle navigation based on notification type
     if (notification.type === 'job_match' && notification.data?.job_id) {
-      // Navigate to job details
+      window.location.href = `/job/${notification.data.job_id}`;
+    } else if (notification.type === 'message' && notification.data?.chat_id) {
+      // Navigate to chat with the sender
+      window.location.href = `/messages?chat=${notification.data.chat_id}`;
+    } else if (notification.type === 'job_update' && notification.data?.job_id) {
       window.location.href = `/job/${notification.data.job_id}`;
     }
+    
+    // Close the popover after navigation
+    setIsOpen(false);
   };
 
   const getNotificationIcon = (type: string) => {
@@ -49,14 +56,14 @@ export const NotificationCenter = () => {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           {unreadCount > 0 ? (
-            <BellRing className="h-5 w-5" />
+            <BellRing className="h-5 w-5 text-red-500 animate-pulse" />
           ) : (
-            <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5 text-slate-500" />
           )}
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs animate-pulse"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </Badge>
@@ -139,6 +146,11 @@ export const NotificationCenter = () => {
                           <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                             {notification.message}
                           </p>
+                          {notification.type === 'message' && notification.data?.sender_name && (
+                            <p className="text-xs text-primary mt-1 font-medium">
+                              От: {notification.data.sender_name}
+                            </p>
+                          )}
                           {notification.data?.distance && (
                             <p className="text-xs text-primary mt-1">
                               Расстояние: {notification.data.distance.toFixed(1)} км

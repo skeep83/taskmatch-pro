@@ -22,9 +22,13 @@ export const useNotifications = () => {
   // Fetch notifications
   const fetchNotifications = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -68,9 +72,13 @@ export const useNotifications = () => {
   // Mark all as read
   const markAllAsRead = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
+        .eq('user_id', user.id)
         .eq('is_read', false);
 
       if (error) throw error;
@@ -116,50 +124,70 @@ export const useNotifications = () => {
 
   // Set up real-time subscription
   useEffect(() => {
-    fetchNotifications();
+    let channel: any = null;
+    
+    const setupRealtimeSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const channel = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-        },
-        (payload) => {
-          const newNotification = payload.new as Notification;
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
+      await fetchNotifications();
 
-          // Show toast for new notification
-          toast({
-            title: newNotification.title,
-            description: newNotification.message,
-            duration: 5000,
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'notifications',
-        },
-        (payload) => {
-          const updatedNotification = payload.new as Notification;
-          setNotifications(prev =>
-            prev.map(n =>
-              n.id === updatedNotification.id ? updatedNotification : n
-            )
-          );
-        }
-      )
-      .subscribe();
+      channel = supabase
+        .channel('notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('New notification received:', payload);
+            const newNotification = payload.new as Notification;
+            setNotifications(prev => [newNotification, ...prev]);
+            setUnreadCount(prev => prev + 1);
+
+            // Show toast for new notification
+            toast({
+              title: newNotification.title,
+              description: newNotification.message,
+              duration: 5000,
+            });
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('Notification updated:', payload);
+            const updatedNotification = payload.new as Notification;
+            setNotifications(prev =>
+              prev.map(n =>
+                n.id === updatedNotification.id ? updatedNotification : n
+              )
+            );
+            
+            // Update unread count if notification was read
+            if (updatedNotification.is_read) {
+              setUnreadCount(prev => Math.max(0, prev - 1));
+            }
+          }
+        )
+        .subscribe();
+    };
+
+    setupRealtimeSubscription();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, []);
 
