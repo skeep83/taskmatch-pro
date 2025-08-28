@@ -164,7 +164,7 @@ export const AppNavigation = () => {
   return (
     <>
       {/* Desktop Navigation */}
-      <header className="w-full glass-nav sticky top-0 z-50 border-b border-border/40">
+      <header className="w-full card-surface sticky top-0 z-50 border-0">
         <nav className="container mx-auto flex items-center justify-between py-3 px-6">
           {/* Logo */}
           <Link 
@@ -191,7 +191,8 @@ export const AppNavigation = () => {
                     Услуги
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                    <div className="card-surface border-0 shadow-none">
+                      <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
                           <Link
@@ -217,7 +218,8 @@ export const AppNavigation = () => {
                       <ListItem href="/tenders" title="Тендеры">
                         Корпоративные конкурсы
                       </ListItem>
-                    </ul>
+                      </ul>
+                    </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
@@ -266,7 +268,7 @@ export const AppNavigation = () => {
             )}
 
             {/* Language switcher */}
-            <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg bg-muted/50">
+            <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg card-surface border-0 shadow-none bg-transparent">
               <button 
                 aria-label="Русский" 
                 className={cn(
@@ -325,7 +327,7 @@ export const AppNavigation = () => {
 
       {/* Mobile Navigation Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-background/95 backdrop-blur-md">
+        <div className="lg:hidden fixed inset-0 z-50" style={{ background: 'var(--background-neomorphic)' }}>
           <div className="container mx-auto p-6">
             <div className="flex items-center justify-between mb-8">
               <Link 
@@ -355,20 +357,28 @@ export const AppNavigation = () => {
               {quickAccess
                 .filter(item => !item.requiresRole || userRoles.includes(item.requiresRole))
                 .map((item) => (
-                <Link
+                <div
                   key={item.href}
-                  to={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-xl border transition-colors",
+                    "card-surface flex flex-col items-center gap-2 p-4 cursor-pointer transition-colors border-0",
                     item.active 
-                      ? "bg-primary/10 border-primary/20 text-primary" 
-                      : "bg-muted/50 border-border hover:bg-muted"
+                      ? "bg-primary/10 text-primary" 
+                      : "hover:bg-muted/50"
                   )}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setMobileMenuOpen(false);
+                      navigate(item.href);
+                    }
+                  }}
                 >
                   <item.icon className="h-6 w-6" />
                   <span className="text-sm font-medium">{item.title}</span>
-                </Link>
+                </div>
               ))}
             </div>
 
@@ -388,12 +398,12 @@ export const AppNavigation = () => {
               {isAuthenticated && (
                 <div className="grid gap-3">
                   {serviceActions.map((action) => (
-                    <Link
-                      key={action.href}
-                      to={action.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-lg border bg-muted/50 hover:bg-muted transition-colors"
-                    >
+                      <Link
+                        key={action.href}
+                        to={action.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="card-surface flex items-center gap-3 p-3 border-0 hover:bg-muted/50 transition-colors"
+                      >
                       <action.icon className="h-5 w-5" />
                       <span className="font-medium">{action.title}</span>
                       {action.badge && (
@@ -408,12 +418,12 @@ export const AppNavigation = () => {
 
               <div className="grid gap-3">
                 {mainNavItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                  >
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="card-surface flex items-center gap-3 p-3 border-0 hover:bg-muted/50 transition-colors"
+                    >
                     <item.icon className="h-5 w-5" />
                     <div>
                       <div className="font-medium">{item.title}</div>
