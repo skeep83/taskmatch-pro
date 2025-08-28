@@ -126,39 +126,65 @@ const testimonials = [
 const Index = () => {
   const { t, language } = useEnhancedI18n();
   const [currentTestimonials, setCurrentTestimonials] = useState<typeof testimonials>([]);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [animatingCards, setAnimatingCards] = useState<boolean[]>([false, false, false]);
 
-  // Initialize and update testimonials based on current language
+  // Initialize testimonials based on current language
   useEffect(() => {
     const filteredTestimonials = testimonials.filter(t => t.lang === language);
-    // Get first 3 testimonials for the current language
     setCurrentTestimonials(filteredTestimonials.slice(0, 3));
   }, [language]);
 
-  // Auto-rotate testimonials every 5 seconds
+  // Auto-rotate individual testimonials with staggered timing
   useEffect(() => {
     const filteredTestimonials = testimonials.filter(t => t.lang === language);
-    if (filteredTestimonials.length <= 3) return; // Don't rotate if we have 3 or fewer testimonials
+    if (filteredTestimonials.length <= 3) return;
 
-    const interval = setInterval(() => {
-      setIsAnimating(true);
-      
-      setTimeout(() => {
-        // Get 3 random testimonials for current language
-        const randomTestimonials = [...filteredTestimonials]
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3);
-        setCurrentTestimonials(randomTestimonials);
-        
-        // Start fade in animation
+    const intervals: NodeJS.Timeout[] = [];
+
+    // Create individual timers for each card with different delays
+    [0, 1, 2].forEach((cardIndex) => {
+      const interval = setInterval(() => {
+        // Start fade out animation for this specific card
+        setAnimatingCards(prev => {
+          const newState = [...prev];
+          newState[cardIndex] = true;
+          return newState;
+        });
+
         setTimeout(() => {
-          setIsAnimating(false);
-        }, 50);
-      }, 400); // Wait for fade out animation
-      
-    }, 5000); // Change every 5 seconds
+          // Replace testimonial for this card
+          setCurrentTestimonials(prev => {
+            const newTestimonials = [...prev];
+            const availableTestimonials = filteredTestimonials.filter(
+              (t, index) => !prev.some(current => current.author === t.author)
+            );
+            
+            if (availableTestimonials.length > 0) {
+              const randomTestimonial = availableTestimonials[
+                Math.floor(Math.random() * availableTestimonials.length)
+              ];
+              newTestimonials[cardIndex] = randomTestimonial;
+            }
+            
+            return newTestimonials;
+          });
 
-    return () => clearInterval(interval);
+          // Start fade in animation
+          setTimeout(() => {
+            setAnimatingCards(prev => {
+              const newState = [...prev];
+              newState[cardIndex] = false;
+              return newState;
+            });
+          }, 100);
+        }, 400);
+        
+      }, 6500 + (cardIndex * 2000)); // 6.5s, 8.5s, 10.5s intervals
+
+      intervals.push(interval);
+    });
+
+    return () => intervals.forEach(clearInterval);
   }, [language]);
 
   return (
@@ -326,14 +352,14 @@ const Index = () => {
         <div className="grid md:grid-cols-3 gap-8">
           {currentTestimonials.map((testimonial, index) => (
             <div 
-              key={`${testimonial.author}-${testimonial.location}-${Date.now()}`}
+              key={`${testimonial.author}-${testimonial.location}-${index}`}
               className={`card-surface p-8 text-left transform transition-all duration-500 ease-in-out ${
-                isAnimating 
+                animatingCards[index]
                   ? 'opacity-0 translate-y-8 scale-95' 
                   : 'opacity-100 translate-y-0 scale-100'
               }`}
               style={{ 
-                transitionDelay: isAnimating ? `${index * 100}ms` : `${index * 150}ms`
+                transitionDelay: `${index * 150}ms`
               }}
             >
               <div className="flex items-center gap-1 mb-6">
