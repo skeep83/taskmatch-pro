@@ -53,6 +53,8 @@ export const UserMenu = () => {
   const [currentRole, setCurrentRole] = useState<UserRole>('client');
   const [userId, setUserId] = useState<string | null>(null);
 
+  console.log('UserMenu component started rendering...');
+
   useEffect(() => {
     (async () => {
       const { data: sessionData } = await supabase.auth.getSession();
