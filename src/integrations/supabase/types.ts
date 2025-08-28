@@ -1045,6 +1045,47 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_media: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          file_name: string | null
+          file_size: number | null
+          file_type: string
+          file_url: string
+          id: string
+          portfolio_item_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type: string
+          file_url: string
+          id?: string
+          portfolio_item_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          id?: string
+          portfolio_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_media_portfolio_item_id_fkey"
+            columns: ["portfolio_item_id"]
+            isOneToOne: false
+            referencedRelation: "portfolio_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_photos: {
         Row: {
           created_at: string

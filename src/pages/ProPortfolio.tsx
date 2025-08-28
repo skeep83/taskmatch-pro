@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FloatingCard } from "@/components/ui/floating-card";
-import { Upload, Plus, Image, Trash2 } from "lucide-react";
+import { Upload, Plus, Image, Trash2, X, Camera, Film, FileImage } from "lucide-react";
 import { toast } from "sonner";
 
 const ProPortfolio = () => {
@@ -17,7 +17,7 @@ const ProPortfolio = () => {
   const [items, setItems] = useState<any[]>([]);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -27,7 +27,19 @@ const ProPortfolio = () => {
       const uid = s.session?.user?.id || null;
       if (!uid) { window.location.href = '/auth'; return; }
       setUserId(uid);
-      const { data } = await (supabase as any).from('portfolio_items').select('*').eq('pro_id', uid).order('created_at', { ascending: false });
+      const { data } = await (supabase as any)
+        .from('portfolio_items')
+        .select(`
+          *,
+          portfolio_media (
+            id,
+            file_url,
+            file_type,
+            display_order
+          )
+        `)
+        .eq('pro_id', uid)
+        .order('created_at', { ascending: false });
       setItems(data || []);
     })();
   }, []);
@@ -35,27 +47,93 @@ const ProPortfolio = () => {
   const refresh = async () => {
     if (!userId) return;
     const { supabase } = await import("@/integrations/supabase/client");
-    const { data } = await (supabase as any).from('portfolio_items').select('*').eq('pro_id', userId).order('created_at', { ascending: false });
+    const { data } = await (supabase as any)
+      .from('portfolio_items')
+      .select(`
+        *,
+        portfolio_media (
+          id,
+          file_url,
+          file_type,
+          display_order
+        )
+      `)
+      .eq('pro_id', userId)
+      .order('created_at', { ascending: false });
     setItems(data || []);
   };
 
   const addItem = async () => {
     try {
-      if (!userId || !file) return;
+      if (!userId || files.length === 0 || !title.trim()) return;
       setUploading(true);
       const { supabase } = await import("@/integrations/supabase/client");
-      const ext = file.name.split('.').pop();
-      const path = `${userId}/${crypto.randomUUID()}.${ext}`;
-      const { error: uerr } = await supabase.storage.from('portfolio').upload(path, file, { upsert: false, contentType: file.type });
-      if (uerr) throw uerr;
-      const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(path);
-      const image_url = publicUrl || path;
-      const { error: ierr } = await (supabase as any).from('portfolio_items').insert({ pro_id: userId, title, description: desc, image_url });
-      if (ierr) throw ierr;
-      setTitle(''); setDesc(''); setFile(null);
+      
+      // First create the portfolio item
+      const { data: portfolioItem, error: itemError } = await (supabase as any)
+        .from('portfolio_items')
+        .insert({ 
+          pro_id: userId, 
+          title: title.trim(), 
+          description: desc.trim() || null,
+          image_url: '' // Will be updated with first image
+        })
+        .select()
+        .single();
+      
+      if (itemError) throw itemError;
+      
+      // Upload all files and create media records
+      const mediaPromises = files.map(async (file, index) => {
+        const ext = file.name.split('.').pop();
+        const path = `${userId}/${portfolioItem.id}/${crypto.randomUUID()}.${ext}`;
+        
+        // Upload file
+        const { error: uploadError } = await supabase.storage
+          .from('portfolio')
+          .upload(path, file, { upsert: false, contentType: file.type });
+        
+        if (uploadError) throw uploadError;
+        
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('portfolio')
+          .getPublicUrl(path);
+        
+        // Create media record
+        const fileType = file.type.startsWith('video/') ? 'video' : 'image';
+        const { error: mediaError } = await (supabase as any)
+          .from('portfolio_media')
+          .insert({
+            portfolio_item_id: portfolioItem.id,
+            file_url: publicUrl,
+            file_type: fileType,
+            file_name: file.name,
+            file_size: file.size,
+            display_order: index
+          });
+        
+        if (mediaError) throw mediaError;
+        
+        // Update portfolio item with first image URL
+        if (index === 0) {
+          await (supabase as any)
+            .from('portfolio_items')
+            .update({ image_url: publicUrl })
+            .eq('id', portfolioItem.id);
+        }
+        
+        return publicUrl;
+      });
+      
+      await Promise.all(mediaPromises);
+      
+      setTitle(''); 
+      setDesc(''); 
+      setFiles([]);
       toast.success('Работа успешно добавлена в портфолио');
       await refresh();
-    } catch (e:any) {
+    } catch (e: any) {
       console.error(e);
       toast.error(e?.message || 'Ошибка при добавлении работы');
     } finally {
@@ -66,6 +144,7 @@ const ProPortfolio = () => {
   const deleteItem = async (itemId: string) => {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
+      // Delete portfolio item (cascade will delete media records)
       const { error } = await (supabase as any).from('portfolio_items').delete().eq('id', itemId);
       if (error) throw error;
       toast.success('Работа удалена из портфолио');
@@ -74,6 +153,20 @@ const ProPortfolio = () => {
       console.error(e);
       toast.error(e?.message || 'Ошибка при удалении работы');
     }
+  };
+
+  const handleFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    setFiles(prev => [...prev, ...selectedFiles]);
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const getFileIcon = (file: File) => {
+    if (file.type.startsWith('video/')) return <Film className="h-4 w-4" />;
+    return <FileImage className="h-4 w-4" />;
   };
 
   return (
@@ -92,73 +185,137 @@ const ProPortfolio = () => {
         </div>
 
         {/* Add New Item Section */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <div className="card-surface p-8 border-dashed border-2 border-primary/20 hover:border-primary/40 transition-colors">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-semibold mb-2">Добавить новую работу</h2>
-              <p className="text-muted-foreground">Покажите свои лучшие проекты потенциальным клиентам</p>
-            </div>
+        <div className="max-w-5xl mx-auto mb-16">
+          <Card className="border-0 bg-gradient-to-br from-card via-card/95 to-card/80 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+                <Plus className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <CardTitle className="text-2xl font-display font-bold text-gradient">
+                Добавить новую работу
+              </CardTitle>
+              <p className="text-muted-foreground text-lg">
+                Создайте альбом из фотографий и видео ваших лучших проектов
+              </p>
+            </CardHeader>
             
-            <div className="grid gap-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
+            <CardContent className="space-y-8">
+              {/* Form Fields */}
+              <div className="grid lg:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
                     Название работы
                   </label>
                   <Input
                     placeholder="Например: Ремонт ванной комнаты"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    className="h-12 border-0 bg-background/50 backdrop-blur-sm shadow-inner"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Краткое описание
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-secondary" />
+                    Описание работ
                   </label>
                   <Textarea
-                    placeholder="Описание выполненных работ..."
+                    placeholder="Опишите детали проекта, использованные материалы, сложности..."
                     value={desc}
                     onChange={(e) => setDesc(e.target.value)}
-                    rows={2}
+                    rows={3}
+                    className="border-0 bg-background/50 backdrop-blur-sm shadow-inner resize-none"
                   />
                 </div>
               </div>
-              
-              <div className="flex flex-col sm:flex-row gap-3 items-end">
-                <div className="flex-1 space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Фото или видео
+
+              {/* File Upload Section */}
+              <div className="space-y-4">
+                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-accent" />
+                  Фотографии и видео
+                </label>
+                
+                {/* Upload Area */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*,video/*"
+                    onChange={handleFileSelection}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    id="file-upload"
+                  />
+                  <label 
+                    htmlFor="file-upload"
+                    className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 cursor-pointer group"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                      <Camera className="h-8 w-8 text-primary" />
+                    </div>
+                    <p className="text-lg font-semibold text-foreground mb-2">
+                      Перетащите файлы или нажмите для выбора
+                    </p>
+                    <p className="text-sm text-muted-foreground text-center">
+                      Поддерживаются изображения (JPG, PNG, WebP) и видео (MP4, MOV)
+                      <br />
+                      Максимальный размер файла: 50MB
+                    </p>
                   </label>
-                  <div className="relative">
-                    <Input
-                      type="file"
-                      accept="image/*,video/*"
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
-                      className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                    />
-                    <Upload className="absolute right-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  </div>
                 </div>
+
+                {/* Selected Files Preview */}
+                {files.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-xl">
+                    {files.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <div className="aspect-square rounded-lg bg-background/80 border border-border/50 flex flex-col items-center justify-center p-3 hover:bg-background transition-colors">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                            {getFileIcon(file)}
+                          </div>
+                          <p className="text-xs font-medium text-center line-clamp-2">
+                            {file.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {(file.size / 1024 / 1024).toFixed(1)} MB
+                          </p>
+                        </div>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeFile(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-center pt-4">
                 <Button
                   onClick={addItem}
-                  disabled={uploading || !file || !title.trim()}
-                  className="btn-hero min-w-[140px]"
+                  disabled={uploading || files.length === 0 || !title.trim()}
+                  className="btn-hero px-8 py-3 text-lg font-semibold min-w-[200px]"
                 >
                   {uploading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Загрузка...
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
+                      Создаём альбом...
                     </>
                   ) : (
                     <>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Добавить работу
+                      <Plus className="h-5 w-5 mr-3" />
+                      Создать альбом ({files.length})
                     </>
                   )}
                 </Button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Portfolio Grid */}
@@ -177,40 +334,64 @@ const ProPortfolio = () => {
               {items.map((item, index) => (
                 <div 
                   key={item.id} 
-                  className="card-surface p-6 text-center cursor-pointer group animate-fade-in"
+                  className="card-surface p-0 overflow-hidden cursor-pointer group animate-fade-in hover-scale"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="relative mb-4">
-                    <div className="aspect-video overflow-hidden rounded-xl">
+                  <div className="relative">
+                    <div className="aspect-video overflow-hidden">
                       <MediaViewer
-                        src={item.image_url}
+                        src={item.portfolio_media?.[0]?.file_url || item.image_url}
                         alt={item.title || 'Работа'}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         enableZoom
                       />
                     </div>
+                    
+                    {/* Media Count Badge */}
+                    {item.portfolio_media && item.portfolio_media.length > 1 && (
+                      <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                        <Image className="h-3 w-3" />
+                        {item.portfolio_media.length}
+                      </div>
+                    )}
+                    
+                    {/* Delete Button */}
                     <Button
                       variant="destructive"
                       size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 h-8 w-8 p-0"
-                      onClick={() => deleteItem(item.id)}
+                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 h-8 w-8 p-0 backdrop-blur-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteItem(item.id);
+                      }}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="p-6 space-y-3">
                     <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
                       {item.title || 'Без названия'}
                     </h3>
                     {item.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                         {item.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-2">
-                      <Image className="h-3 w-3" />
-                      <span>Добавлено {new Date(item.created_at).toLocaleDateString()}</span>
+                    
+                    <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Image className="h-3 w-3" />
+                        <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                      </div>
+                      {item.portfolio_media && item.portfolio_media.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <span>Альбом</span>
+                          <Badge variant="secondary" className="text-xs px-2 py-0">
+                            {item.portfolio_media.length}
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
