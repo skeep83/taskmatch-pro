@@ -2,7 +2,7 @@ import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
-import { NotificationTester } from "@/components/testing/NotificationTester";
+
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
 import { Wrench, Zap, Sparkles, Paintbrush, Package, Cog, ShieldCheck, Crown, Star, Rocket, Award } from "lucide-react";
@@ -211,20 +211,6 @@ const Index = () => {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Notification Testing Section - Development Only */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Тестирование системы
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Проверьте работу уведомлений и звуковых эффектов
-          </p>
-        </div>
-        
-        <NotificationTester />
       </section>
     </main>
   );
