@@ -385,7 +385,9 @@ const Index = () => {
                   className="w-full h-auto rounded-3xl shadow-2xl animate-float-slow"
                   loading="eager"
                   fetchPriority="high"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                  width="612"
+                  height="408"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 612px"
                   decoding="sync"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-3xl" />
