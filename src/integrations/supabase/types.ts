@@ -1889,6 +1889,13 @@ export type Database = {
         Args: { _pro_id: string }
         Returns: undefined
       }
+      validate_user_role_assignment: {
+        Args: {
+          new_role: Database["public"]["Enums"]["app_role"]
+          target_user_id: string
+        }
+        Returns: boolean
+      }
       verify_admin_access: {
         Args: { required_role?: string }
         Returns: boolean
