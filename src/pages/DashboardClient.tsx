@@ -44,16 +44,16 @@ export default function DashboardClient() {
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <FloatingCard className="p-8 text-center">
+        <div className="card-surface p-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Загружаем кабинет клиента...</h1>
           <div className="animate-spin">⏳</div>
-        </FloatingCard>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
+    <main className="min-h-screen">
       <div className="container mx-auto py-8 px-6">
         {/* Header */}
         <div className="mb-12">

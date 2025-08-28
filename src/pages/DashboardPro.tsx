@@ -204,33 +204,21 @@ const DashboardPro = () => {
   };
 
   if (loading) return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${dashboardPro})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
-      <FloatingCard className="p-8 text-center animate-pulse-glow">
+    <main className="relative min-h-screen flex items-center justify-center">
+      <div className="card-surface p-8 text-center animate-pulse-glow">
         <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем кабинет специалиста...</h1>
         <div className="flex items-center justify-center gap-2">
           <AnimatedIcon icon={Clock} className="animate-spin" />
         </div>
-      </FloatingCard>
+      </div>
     </main>
   );
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      {/* Background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${dashboardPro})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
-      
+    <main className="min-h-screen">
       <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
       
-      <div className="container mx-auto py-8 px-6 relative z-10">
+      <div className="container mx-auto py-8 px-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
           <div className="animate-fade-in">
