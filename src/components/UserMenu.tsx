@@ -152,6 +152,23 @@ export const UserMenu = () => {
 
   const currentRoleItem = roleItems.find(r => r.key === currentRole);
 
+  // Debug info - показать состояние аутентификации
+  console.log('UserMenu render state:', { 
+    userId, 
+    userRoles, 
+    currentRole, 
+    hasRoles: userRoles.length > 0 
+  });
+
+  // Показать диагностическую информацию, если пользователь авторизован, но меню не показывается
+  if (userId && userRoles.length === 0) {
+    return (
+      <div className="text-red-500 border border-red-500 p-2 text-xs">
+        DEBUG: User authenticated but no roles found. User ID: {userId.slice(0, 8)}...
+      </div>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
