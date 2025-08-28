@@ -38,7 +38,7 @@ const Index = () => {
             <div className="text-left lg:pr-8">
               <div className="mb-8 animate-fade-in">
                 <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                  <NeumorphicIcon icon={Rocket} size={56} variant="square" />
+                  <Rocket size={24} className="text-primary" />
                   <span className="text-sm font-medium text-primary">Платформа нового поколения</span>
                 </div>
                 <h1 className="text-5xl lg:text-7xl font-display font-bold mb-6 leading-tight">
