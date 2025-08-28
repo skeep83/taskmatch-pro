@@ -17,6 +17,7 @@ import { StarRating } from "@/components/ui/star-rating";
 import dashboardPro from "@/assets/dashboard-pro.jpg";
 import proWorkspace from "@/assets/pro-workspace.jpg";
 import jobManagement from "@/assets/job-management.jpg";
+import kycVerification from "@/assets/kyc-verification.jpg";
 
 const DashboardPro = () => {
   const { t } = useEnhancedI18n();
@@ -233,20 +234,22 @@ const DashboardPro = () => {
           </div>
           
           <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <NeumorphicIcon icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
-                size={32} 
-                variant="square"
-                className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
+            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 relative overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-20 bg-cover bg-center"
+                style={{ backgroundImage: `url(${kycVerification})` }}
               />
-              <span className="text-sm font-medium">
-                KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
-              </span>
+              <div className="relative z-10 flex items-center gap-3">
+                {kycStatus === 'approved' ? (
+                  <CheckCircle className="h-8 w-8 text-slate-500" />
+                ) : (
+                  <AlertCircle className="h-8 w-8 text-slate-500" />
+                )}
+                <span className="text-sm font-medium">
+                  KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
+                </span>
+              </div>
             </div>
-            <button className="btn-ghost flex items-center gap-2">
-              <NeumorphicIcon icon={Bell} size={32} variant="square" />
-              Уведомления
-            </button>
           </div>
         </div>
 
