@@ -98,7 +98,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <EnhancedI18nProvider>
       <TooltipProvider>
-        <div style={{ background: 'hsl(var(--background))' }}>
+        <div style={{ background: 'var(--background-neomorphic)' }}>
           <Toaster />
           <Sonner />
           <Diagnostics />

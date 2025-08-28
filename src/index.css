@@ -50,34 +50,29 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* ServiceHub - Raised/Convex design system */
+    /* ServiceHub - Pure Neumorphism like in images */
     --brand-1: 258 80% 50%;
     --brand-2: 199 89% 48%;
     --brand-3: 280 72% 60%;
     --brand-glow: 258 80% 65%;
     
-    /* Raised/convex shadows for elevated appearance */
+    /* Pure neumorphism shadows - exact match to reference images */
     --shadow-raised: 
-      0 1px 3px rgba(0, 0, 0, 0.12),
-      0 4px 8px rgba(0, 0, 0, 0.08),
-      0 8px 16px rgba(0, 0, 0, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      8px 8px 16px rgba(163, 177, 198, 0.15),
+      -8px -8px 16px rgba(255, 255, 255, 0.7);
     
     --shadow-raised-hover: 
-      0 2px 6px rgba(0, 0, 0, 0.15),
-      0 6px 12px rgba(0, 0, 0, 0.1),
-      0 12px 24px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      12px 12px 24px rgba(163, 177, 198, 0.2),
+      -12px -12px 24px rgba(255, 255, 255, 0.8);
     
     --shadow-raised-strong: 
-      0 4px 8px rgba(0, 0, 0, 0.16),
-      0 8px 16px rgba(0, 0, 0, 0.12),
-      0 16px 32px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      16px 16px 32px rgba(163, 177, 198, 0.25),
+      -16px -16px 32px rgba(255, 255, 255, 0.9);
     
-    /* Clean backgrounds with subtle gradients for depth */
-    --surface-raised: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 98%));
-    --surface-elevated: linear-gradient(145deg, hsl(0 0% 99%), hsl(0 0% 96%));
+    /* Neumorphic backgrounds */
+    --surface-raised: hsl(0, 0%, 96%);
+    --surface-elevated: hsl(0, 0%, 95%);
+    --background-neomorphic: hsl(0, 0%, 93%);
     
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -123,24 +118,20 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Raised shadows for dark mode */
+    /* Neumorphism shadows for dark mode */
     --shadow-raised: 
-      0 1px 3px rgba(0, 0, 0, 0.3),
-      0 4px 8px rgba(0, 0, 0, 0.2),
-      0 8px 16px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      8px 8px 16px rgba(0, 0, 0, 0.4),
+      -8px -8px 16px rgba(255, 255, 255, 0.1);
     
     --shadow-raised-hover: 
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      0 6px 12px rgba(0, 0, 0, 0.3),
-      0 12px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      12px 12px 24px rgba(0, 0, 0, 0.5),
+      -12px -12px 24px rgba(255, 255, 255, 0.15);
     
     --shadow-raised-strong: 
-      0 4px 8px rgba(0, 0, 0, 0.5),
-      0 8px 16px rgba(0, 0, 0, 0.4),
-      0 16px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      16px 16px 32px rgba(0, 0, 0, 0.6),
+      -16px -16px 32px rgba(255, 255, 255, 0.2);
+
+    --background-neomorphic: hsl(222.2, 84%, 4.9%);
     
     /* Navigation depth */
     --nav-z-index: 50;
@@ -166,9 +157,9 @@ All colors MUST be HSL.
 
 @layer components {
   .btn-hero {
-    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold transition-all duration-300 ease-out;
-    background: linear-gradient(145deg, hsl(var(--primary)), hsl(var(--primary) / 0.9));
-    color: hsl(var(--primary-foreground));
+    @apply inline-flex items-center justify-center rounded-2xl px-8 py-4 font-semibold transition-all duration-300 ease-out border-0;
+    background: var(--surface-raised);
+    color: hsl(var(--primary));
     box-shadow: var(--shadow-raised);
   }
   .btn-hero:hover {
@@ -176,33 +167,34 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-raised-hover);
   }
   .btn-hero:active {
-    transform: translateY(0px);
-    box-shadow: var(--shadow-raised);
+    transform: translateY(1px);
+    box-shadow: 
+      4px 4px 8px rgba(163, 177, 198, 0.2),
+      -4px -4px 8px rgba(255, 255, 255, 0.6);
   }
   
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold border transition-all duration-300 ease-out;
+    @apply inline-flex items-center justify-center rounded-2xl px-8 py-4 font-semibold border-0 transition-all duration-300 ease-out;
     background: var(--surface-raised);
-    border-color: hsl(var(--border));
     color: hsl(var(--foreground));
     box-shadow: var(--shadow-raised);
   }
   .btn-ghost:hover {
-    border-color: hsl(var(--primary));
     transform: translateY(-1px);
     box-shadow: var(--shadow-raised-hover);
   }
   .btn-ghost:active {
-    transform: translateY(0px);
-    box-shadow: var(--shadow-raised);
+    transform: translateY(1px);
+    box-shadow: 
+      4px 4px 8px rgba(163, 177, 198, 0.2),
+      -4px -4px 8px rgba(255, 255, 255, 0.6);
   }
   
-  /* Raised card surfaces */
+  /* Pure neumorphic card surfaces */
   .card-surface {
-    @apply rounded-2xl border p-8 relative transition-all duration-300 ease-out;
+    @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
     background: var(--surface-raised);
     box-shadow: var(--shadow-raised);
-    border-color: hsl(var(--border) / 0.3);
   }
   
   .card-surface:hover {
@@ -211,10 +203,9 @@ All colors MUST be HSL.
   }
   
   .glass-surface {
-    @apply rounded-2xl border p-8 relative transition-all duration-300 ease-out;
+    @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
     background: var(--surface-elevated);
     box-shadow: var(--shadow-raised);
-    border-color: hsl(var(--border) / 0.2);
   }
   
   .glass-surface:hover {
@@ -223,10 +214,9 @@ All colors MUST be HSL.
   }
   
   .acrylic-surface {
-    @apply rounded-2xl border p-8 relative transition-all duration-300 ease-out;
+    @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
     background: var(--surface-elevated);
     box-shadow: var(--shadow-raised-strong);
-    border-color: hsl(var(--border) / 0.4);
   }
   
   .acrylic-surface:hover {
@@ -235,9 +225,8 @@ All colors MUST be HSL.
   }
   
   .glass-nav {
-    @apply border-b sticky top-0 z-50;
+    @apply border-0 sticky top-0 z-50;
     background: var(--surface-raised);
-    border-color: hsl(var(--border) / 0.3);
     box-shadow: var(--shadow-raised);
   }
   
