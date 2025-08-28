@@ -208,7 +208,7 @@ const HowItWorks = () => {
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
           {stats.map((stat, index) => (
-            <GlassMorphism key={index} className="p-6 text-center">
+            <div key={index} className="card-surface p-6 text-center">
               <AnimatedIcon 
                 icon={stat.icon} 
                 size={32} 
@@ -217,7 +217,7 @@ const HowItWorks = () => {
               />
               <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
-            </GlassMorphism>
+            </div>
           ))}
         </div>
       </section>
@@ -244,11 +244,9 @@ const HowItWorks = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="relative">
-                <FloatingCard 
-                  className={`p-8 text-center relative overflow-hidden border-2 border-transparent hover:border-primary/20 transition-all duration-500 bg-gradient-to-br ${step.bgGradient}`}
-                  delay={index * 200}
-                  hover
-                  glow
+                <div 
+                  className={`card-surface p-8 text-center relative overflow-hidden border-0 transition-all duration-500 bg-gradient-to-br ${step.bgGradient}`}
+                  style={{ animationDelay: `${index * 200}ms` }}
                 >
                   {/* Step Number */}
                   <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 flex items-center justify-center">
@@ -281,7 +279,7 @@ const HowItWorks = () => {
                       <ArrowRight className="text-primary/50" size={24} />
                     </div>
                   )}
-                </FloatingCard>
+                </div>
               </div>
             ))}
           </div>
@@ -305,12 +303,10 @@ const HowItWorks = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <FloatingCard 
+            <div 
               key={index}
-              className="group p-8 text-center hover:scale-105 transition-all duration-500 relative overflow-hidden"
-              delay={index * 150}
-              hover
-              glow
+              className="card-surface group p-8 text-center transition-all duration-500 relative overflow-hidden"
+              style={{ animationDelay: `${index * 150}ms` }}
             >
               {/* Background Image */}
               <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
@@ -344,7 +340,7 @@ const HowItWorks = () => {
                   {feature.stats}
                 </div>
               </div>
-            </FloatingCard>
+            </div>
           ))}
         </div>
       </section>
@@ -366,9 +362,9 @@ const HowItWorks = () => {
         
         <div className="max-w-4xl mx-auto space-y-4">
           {faq.map((item, index) => (
-            <GlassMorphism
+            <div
               key={index}
-              className="overflow-hidden transition-all duration-300 hover:shadow-lg"
+              className="card-surface overflow-hidden transition-all duration-300"
             >
               <button
                 onClick={() => toggleFAQ(index)}
@@ -393,14 +389,14 @@ const HowItWorks = () => {
                   </p>
                 </div>
               </div>
-            </GlassMorphism>
+            </div>
           ))}
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="container mx-auto pb-20">
-        <GlassMorphism className="relative p-16 text-center max-w-6xl mx-auto overflow-hidden">
+        <div className="card-surface relative p-16 text-center max-w-6xl mx-auto overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"></div>
           
           <div className="relative">
@@ -461,7 +457,7 @@ const HowItWorks = () => {
               </div>
             </div>
           </div>
-        </GlassMorphism>
+        </div>
       </section>
     </main>
   );
