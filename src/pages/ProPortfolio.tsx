@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
+import { MediaViewer } from "@/components/media";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 
@@ -72,7 +73,12 @@ const ProPortfolio = () => {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
           {items.map((it)=> (
             <figure key={it.id} className="border rounded-md overflow-hidden">
-              <img src={it.image_url} alt={it.title || 'Работа'} className="w-full h-48 object-cover" loading="lazy" />
+              <MediaViewer 
+                src={it.image_url} 
+                alt={it.title || 'Работа'} 
+                className="w-full h-48" 
+                enableZoom 
+              />
               <figcaption className="p-3">
                 <div className="text-sm font-medium">{it.title}</div>
                 {it.description && <div className="text-xs text-muted-foreground">{it.description}</div>}

@@ -2,6 +2,7 @@ import { Seo } from "@/components/Seo";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { StarRating } from "@/components/ui/star-rating";
+import { MediaViewer } from "@/components/media";
 
 const ProPublic = () => {
   const { id } = useParams();
@@ -79,7 +80,12 @@ const ProPublic = () => {
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {portfolio.map((item) => (
                   <figure key={item.id} className="border rounded-md overflow-hidden">
-                    <img src={item.image_url} alt={`Работа специалиста ${String(id).slice(0,8)}`} className="w-full h-40 object-cover" loading="lazy" />
+                    <MediaViewer 
+                      src={item.image_url} 
+                      alt={`Работа специалиста ${String(id).slice(0,8)}`} 
+                      className="w-full h-40" 
+                      enableZoom 
+                    />
                     {item.title && <figcaption className="p-2 text-sm">{item.title}</figcaption>}
                   </figure>
                 ))}
