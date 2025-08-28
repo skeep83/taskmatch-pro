@@ -47,7 +47,8 @@ export const NeumorphicIcon = ({
     >
       <Icon 
         size={actualIconSize} 
-        className="text-slate-600 dark:text-slate-300 transition-colors duration-300"
+        className="text-slate-500 dark:text-slate-400"
+        strokeWidth={2}
       />
     </div>
   );
