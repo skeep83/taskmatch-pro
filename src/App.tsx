@@ -10,7 +10,8 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import Auth from "./pages/Auth";
 import JobNew from "./pages/JobNew";
-import Header from "./components/layout/Header";
+import { AppNavigation } from "./components/navigation/AppNavigation";
+import { FloatingActionButton } from "./components/navigation/FloatingActionButton";
 import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
 import Diagnostics from "./components/Diagnostics";
@@ -48,7 +49,7 @@ const AppContent = () => {
   
   return (
     <>
-      <Header />
+      <AppNavigation />
       <PageTransition>
         <Routes location={location}>
           <Route path="/" element={<Index />} />
@@ -87,6 +88,7 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PageTransition>
+      <FloatingActionButton />
       <Footer />
     </>
   );
