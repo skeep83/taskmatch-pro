@@ -53,7 +53,7 @@ const testimonials = [
     author: "Vasile Ionescu", 
     location: "Ungheni", 
     rating: 5,
-    avatar: anaChisinau,
+    avatar: ionBalti,
     lang: "ro"
   },
   { 
@@ -68,6 +68,70 @@ const testimonials = [
     text: "Mutarea a fost organizată perfect. Băieții au lucrat rapid și cu grijă. Nimic nu s-a stricat. Recomand cu încredere!", 
     author: "Andrei Stanciu", 
     location: "Soroca", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ro"
+  },
+  { 
+    text: "Instalarea aerului condiționat a mers fără probleme. Meșterul a fost punctual și foarte competent. Prețul rezonabil!", 
+    author: "Cristina Lungu", 
+    location: "Strășeni", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ro"
+  },
+  { 
+    text: "Reparația televizorului a fost făcută rapid și eficient. Garanție de 6 luni - foarte serios și profesionist!", 
+    author: "Nicolae Petre", 
+    location: "Edineț", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ro"
+  },
+  { 
+    text: "Vopsirea dormitorului - rezultat perfect! Culoarea exactă cum am cerut, finisaj impecabil. Recomand din suflet!", 
+    author: "Lucia Mihai", 
+    location: "Comrat", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ro"
+  },
+  { 
+    text: "Montarea dulapului în bucătărie. Totul perfect, la timp, cu toate uneltele necesare. Mă voi întoarce cu siguranță!", 
+    author: "Pavel Ciobanu", 
+    location: "Florești", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ro"
+  },
+  { 
+    text: "Curățenie generală după construcție. Echipa a muncit 8 ore non-stop. Casa arată ca nouă! Prețul foarte bun!", 
+    author: "Daniela Sandu", 
+    location: "Drochia", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ro"
+  },
+  { 
+    text: "Repararea robinetului în baie. A venit în 30 de minute, a rezolvat rapid. Tariful transparent, fără surprize!", 
+    author: "Gheorghe Rotaru", 
+    location: "Leova", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ro"
+  },
+  { 
+    text: "Transport mobilă la casă nouă. Băieții au fost foarte atenți, nimic zgâriat. Serviciu de top la prețuri accesibile!", 
+    author: "Svetlana Botnaru", 
+    location: "Anenii Noi", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ro"
+  },
+  { 
+    text: "Montarea unui candelabru în living. Electricianul a fost foarte atent la detalii. Totul funcționează perfect!", 
+    author: "Alexandru Moraru", 
+    location: "Nisporeni", 
     rating: 5,
     avatar: ionBalti,
     lang: "ro"
@@ -119,6 +183,70 @@ const testimonials = [
     location: "Сорока", 
     rating: 5,
     avatar: anaChisinau,
+    lang: "ru"
+  },
+  { 
+    text: "Установка стиральной машины прошла без проблем. Мастер приехал с нужными инструментами и подключил всё за час!", 
+    author: "Ольга Федорова", 
+    location: "Страшены", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ru"
+  },
+  { 
+    text: "Ремонт холодильника выполнен качественно. Быстрая диагностика, замена деталей, гарантия 6 месяцев!", 
+    author: "Василий Попов", 
+    location: "Единцы", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ru"
+  },
+  { 
+    text: "Монтаж кухонной мебели прошёл идеально. Всё ровно, красиво, функционально. Мастер настоящий профессионал!", 
+    author: "Анна Сидорова", 
+    location: "Комрат", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ru"
+  },
+  { 
+    text: "Переезд с помощью ServiceHub — лучшее решение! Грузчики работали быстро и аккуратно. Ничего не повредили!", 
+    author: "Игорь Белый", 
+    location: "Флорешты", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ru"
+  },
+  { 
+    text: "Уборка после ремонта превзошла ожидания. Убрали всю строительную пыль, вымыли окна. Квартира сияет!", 
+    author: "Марианна Русу", 
+    location: "Дрокия", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ru"
+  },
+  { 
+    text: "Замена проводки в старой квартире. Электрик работал очень аккуратно, объяснил каждый этап работы. Отлично!", 
+    author: "Петр Костюк", 
+    location: "Леова", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ru"
+  },
+  { 
+    text: "Доставка и сборка мебели для детской комнаты. Всё сделано идеально, ребёнок счастлив! Быстро и качественно!", 
+    author: "Наталья Григорьева", 
+    location: "Новые Анены", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ru"
+  },
+  { 
+    text: "Монтаж люстры в гостиной. Электрик был очень внимателен к деталям, работал чисто. Результат превосходный!", 
+    author: "Владимир Лазарев", 
+    location: "Ниспорены", 
+    rating: 5,
+    avatar: ionBalti,
     lang: "ru"
   }
 ];
