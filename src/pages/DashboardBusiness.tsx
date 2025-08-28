@@ -142,7 +142,10 @@ export default function DashboardBusiness() {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <Card 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => navigate("/job/new")}
+              >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
                     <Building2 className="h-8 w-8 text-primary" />
@@ -154,7 +157,14 @@ export default function DashboardBusiness() {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <Card 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => {
+                  const tabsList = document.querySelector('[role="tablist"]');
+                  const employeesTab = tabsList?.querySelector('[value="employees"]') as HTMLElement;
+                  employeesTab?.click();
+                }}
+              >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
                     <UserPlus className="h-8 w-8 text-primary" />
@@ -166,7 +176,14 @@ export default function DashboardBusiness() {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <Card 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => {
+                  const tabsList = document.querySelector('[role="tablist"]');
+                  const invoicesTab = tabsList?.querySelector('[value="invoices"]') as HTMLElement;
+                  invoicesTab?.click();
+                }}
+              >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
                     <FileText className="h-8 w-8 text-primary" />
@@ -178,7 +195,14 @@ export default function DashboardBusiness() {
                 </CardContent>
               </Card>
 
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <Card 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => {
+                  const tabsList = document.querySelector('[role="tablist"]');
+                  const analyticsTab = tabsList?.querySelector('[value="analytics"]') as HTMLElement;
+                  analyticsTab?.click();
+                }}
+              >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
                     <BarChart3 className="h-8 w-8 text-primary" />
