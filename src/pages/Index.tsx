@@ -5,6 +5,7 @@ import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Wrench, Zap, Sparkles, Paintbrush, Package, Cog, ShieldCheck, Crown, Star, Rocket, Award } from "lucide-react";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 import anaChisinau from "@/assets/testimonials/ana-chisinau.jpg";
@@ -20,8 +21,138 @@ const categories = [
   { key: "moving", label: "Переезды" },
 ];
 
+// Testimonials data
+const testimonials = [
+  // Romanian testimonials
+  { 
+    text: "Serviciu excelent! Am găsit rapid un instalator care a venit în aceeași zi. Plata prin escrow - siguranță totală.", 
+    author: "Ana Popescu", 
+    location: "Chișinău", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ro"
+  },
+  { 
+    text: "Folosesc ServiceHub pentru căutarea electricianilor. Întotdeauna muncă de calitate și prețuri corecte. Recomand!", 
+    author: "Ion Marin", 
+    location: "Bălți", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ro"
+  },
+  { 
+    text: "Platformă convenabilă pentru comandarea serviciilor pentru casă. Specialiștii sunt verificați, lucrează profesional.", 
+    author: "Elena Rusu", 
+    location: "Cahul", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ro"
+  },
+  { 
+    text: "Am apelat pentru repararea mașinii de spălat. Meșterul a venit foarte repede și a rezolvat problema calitativ. Prețul corect!", 
+    author: "Vasile Ionescu", 
+    location: "Ungheni", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ro"
+  },
+  { 
+    text: "Curățenie de apartament după renovare. Echipa a lucrat impecabil, totul curat și strălucitor. Mulțumesc!", 
+    author: "Maria Gheorghiu", 
+    location: "Orhei", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ro"
+  },
+  { 
+    text: "Mutarea a fost organizată perfect. Băieții au lucrat rapid și cu grijă. Nimic nu s-a stricat. Recomand cu încredere!", 
+    author: "Andrei Stanciu", 
+    location: "Soroca", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ro"
+  },
+  // Russian testimonials
+  { 
+    text: "Отличный сервис! Быстро нашли сантехника, который приехал в тот же день. Оплата через эскроу — полная безопасность.", 
+    author: "Марина Соколова", 
+    location: "Кишинев", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ru"
+  },
+  { 
+    text: "Использую ServiceHub для поиска электриков. Всегда качественная работа и честные цены. Рекомендую!", 
+    author: "Дмитрий Петров", 
+    location: "Бельцы", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ru"
+  },
+  { 
+    text: "Удобная платформа для заказа услуг по дому. Специалисты проверенные, работают профессионально.", 
+    author: "Елена Иванова", 
+    location: "Кагул", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ru"
+  },
+  { 
+    text: "Заказывал покраску квартиры. Мастер выполнил работу на высшем уровне, аккуратно и быстро. Очень доволен!", 
+    author: "Сергей Волков", 
+    location: "Орхей", 
+    rating: 5,
+    avatar: ionBalti,
+    lang: "ru"
+  },
+  { 
+    text: "Ремонт кондиционера прошёл отлично. Специалист приехал точно в срок, диагностировал и устранил поломку быстро.", 
+    author: "Татьяна Козлова", 
+    location: "Унгены", 
+    rating: 5,
+    avatar: elenaCahul,
+    lang: "ru"
+  },
+  { 
+    text: "Генеральная уборка офиса была выполнена безупречно. Команда работала слаженно и качественно. Спасибо!", 
+    author: "Алексей Морозов", 
+    location: "Сорока", 
+    rating: 5,
+    avatar: anaChisinau,
+    lang: "ru"
+  }
+];
+
 const Index = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
+  const [currentTestimonials, setCurrentTestimonials] = useState<typeof testimonials>([]);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Initialize testimonials based on current language
+  useEffect(() => {
+    const filteredTestimonials = testimonials.filter(t => t.lang === language);
+    setCurrentTestimonials(filteredTestimonials.slice(0, 3));
+  }, [language]);
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    if (currentTestimonials.length === 0) return;
+
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      
+      setTimeout(() => {
+        const filteredTestimonials = testimonials.filter(t => t.lang === language);
+        const randomTestimonials = [...filteredTestimonials]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3);
+        setCurrentTestimonials(randomTestimonials);
+        setIsAnimating(false);
+      }, 300); // Wait for fade out animation
+    }, 6000); // Change every 6 seconds
+
+    return () => clearInterval(interval);
+  }, [language, currentTestimonials]);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -186,33 +317,16 @@ const Index = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { 
-              text: "Serviciu excelent! Am găsit rapid un instalator care a venit în aceeași zi. Plata prin escrow - siguranță totală.", 
-              author: "Ana Popescu", 
-              location: "Chișinău", 
-              rating: 5,
-              avatar: anaChisinau
-            },
-            { 
-              text: "Folosesc ServiceHub pentru căutarea electricianilor. Întotdeauna muncă de calitate și prețuri corecte. Recomand!", 
-              author: "Ion Marin", 
-              location: "Bălți", 
-              rating: 5,
-              avatar: ionBalti
-            },
-            { 
-              text: "Platformă convenabilă pentru comandarea serviciilor pentru casă. Specialiștii sunt verificați, lucrează profesional.", 
-              author: "Elena Rusu", 
-              location: "Cahul", 
-              rating: 5,
-              avatar: elenaCahul
-            }
-          ].map((testimonial, index) => (
+          {currentTestimonials.map((testimonial, index) => (
             <div 
-              key={index} 
-              className="card-surface p-8 text-left"
-              style={{ animationDelay: `${index * 150}ms` }}
+              key={`${testimonial.author}-${testimonial.location}-${index}`}
+              className={`card-surface p-8 text-left transition-all duration-300 ${
+                isAnimating ? 'opacity-0 translate-y-4 scale-95' : 'opacity-100 translate-y-0 scale-100'
+              }`}
+              style={{ 
+                animationDelay: isAnimating ? '0ms' : `${index * 150}ms`,
+                transitionDelay: isAnimating ? `${index * 50}ms` : '0ms'
+              }}
             >
               <div className="flex items-center gap-1 mb-6">
                 {[...Array(testimonial.rating)].map((_, i) => (
