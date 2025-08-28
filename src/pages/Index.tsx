@@ -128,31 +128,38 @@ const Index = () => {
   const [currentTestimonials, setCurrentTestimonials] = useState<typeof testimonials>([]);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Initialize testimonials based on current language
+  // Initialize and update testimonials based on current language
   useEffect(() => {
     const filteredTestimonials = testimonials.filter(t => t.lang === language);
+    // Get first 3 testimonials for the current language
     setCurrentTestimonials(filteredTestimonials.slice(0, 3));
   }, [language]);
 
-  // Auto-rotate testimonials
+  // Auto-rotate testimonials every 5 seconds
   useEffect(() => {
-    if (currentTestimonials.length === 0) return;
+    const filteredTestimonials = testimonials.filter(t => t.lang === language);
+    if (filteredTestimonials.length <= 3) return; // Don't rotate if we have 3 or fewer testimonials
 
     const interval = setInterval(() => {
       setIsAnimating(true);
       
       setTimeout(() => {
-        const filteredTestimonials = testimonials.filter(t => t.lang === language);
+        // Get 3 random testimonials for current language
         const randomTestimonials = [...filteredTestimonials]
           .sort(() => Math.random() - 0.5)
           .slice(0, 3);
         setCurrentTestimonials(randomTestimonials);
-        setIsAnimating(false);
-      }, 300); // Wait for fade out animation
-    }, 6000); // Change every 6 seconds
+        
+        // Start fade in animation
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 50);
+      }, 400); // Wait for fade out animation
+      
+    }, 5000); // Change every 5 seconds
 
     return () => clearInterval(interval);
-  }, [language, currentTestimonials]);
+  }, [language]);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -319,13 +326,14 @@ const Index = () => {
         <div className="grid md:grid-cols-3 gap-8">
           {currentTestimonials.map((testimonial, index) => (
             <div 
-              key={`${testimonial.author}-${testimonial.location}-${index}`}
-              className={`card-surface p-8 text-left transition-all duration-300 ${
-                isAnimating ? 'opacity-0 translate-y-4 scale-95' : 'opacity-100 translate-y-0 scale-100'
+              key={`${testimonial.author}-${testimonial.location}-${Date.now()}`}
+              className={`card-surface p-8 text-left transform transition-all duration-500 ease-in-out ${
+                isAnimating 
+                  ? 'opacity-0 translate-y-8 scale-95' 
+                  : 'opacity-100 translate-y-0 scale-100'
               }`}
               style={{ 
-                animationDelay: isAnimating ? '0ms' : `${index * 150}ms`,
-                transitionDelay: isAnimating ? `${index * 50}ms` : '0ms'
+                transitionDelay: isAnimating ? `${index * 100}ms` : `${index * 150}ms`
               }}
             >
               <div className="flex items-center gap-1 mb-6">
