@@ -289,6 +289,9 @@ export const AppNavigation = () => {
               return isAuthenticated ? (
                 <>
                   <NotificationCenter />
+                  <div className="bg-blue-500 text-white p-2 text-xs">
+                    USERMENU SHOULD BE HERE
+                  </div>
                   <UserMenu />
                   <div className="text-green-500 text-xs border border-green-500 p-1">
                     AUTH: ✓
