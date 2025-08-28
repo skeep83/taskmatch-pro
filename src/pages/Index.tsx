@@ -383,6 +383,10 @@ const Index = () => {
                   src={heroDashboard} 
                   alt="ServiceHub Platform" 
                   className="w-full h-auto rounded-3xl shadow-2xl animate-float-slow"
+                  loading="eager"
+                  fetchPriority="high"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                  decoding="sync"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-3xl" />
                 
