@@ -80,153 +80,158 @@ const ProPortfolio = () => {
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <Seo title={`${t('app.name')} — Портфолио`} description="Pro portfolio" canonical="/portfolio" />
       
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-6xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl lg:text-5xl font-display font-bold text-gradient">
-              Мое Портфолио
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Демонстрируйте свои лучшие работы и привлекайте больше клиентов
-            </p>
-          </div>
+      <div className="container mx-auto py-24 px-6">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+            Мое Портфолио
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Демонстрируйте свои лучшие работы и привлекайте больше клиентов
+          </p>
+        </div>
 
-          {/* Add New Item Card */}
-          <FloatingCard className="p-6 border-dashed border-2 border-primary/20 hover:border-primary/40 transition-colors">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Plus className="h-5 w-5 text-primary" />
-                Добавить новую работу
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Название работы
-                    </label>
-                    <Input
-                      placeholder="Например: Ремонт ванной комнаты"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Краткое описание
-                    </label>
-                    <Textarea
-                      placeholder="Описание выполненных работ..."
-                      value={desc}
-                      onChange={(e) => setDesc(e.target.value)}
-                      rows={3}
-                    />
-                  </div>
+        {/* Add New Item Section */}
+        <div className="max-w-4xl mx-auto mb-16">
+          <div className="card-surface p-8 border-dashed border-2 border-primary/20 hover:border-primary/40 transition-colors">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold mb-2">Добавить новую работу</h2>
+              <p className="text-muted-foreground">Покажите свои лучшие проекты потенциальным клиентам</p>
+            </div>
+            
+            <div className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Название работы
+                  </label>
+                  <Input
+                    placeholder="Например: Ремонт ванной комнаты"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
                 </div>
-                
-                <div className="flex flex-col sm:flex-row gap-3 items-end">
-                  <div className="flex-1 space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Фото или видео
-                    </label>
-                    <div className="relative">
-                      <Input
-                        type="file"
-                        accept="image/*,video/*"
-                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                      />
-                      <Upload className="absolute right-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={addItem}
-                    disabled={uploading || !file || !title.trim()}
-                    className="btn-hero min-w-[120px]"
-                  >
-                    {uploading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                        Загрузка...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Добавить
-                      </>
-                    )}
-                  </Button>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Краткое описание
+                  </label>
+                  <Textarea
+                    placeholder="Описание выполненных работ..."
+                    value={desc}
+                    onChange={(e) => setDesc(e.target.value)}
+                    rows={2}
+                  />
                 </div>
-              </div>
-            </CardContent>
-          </FloatingCard>
-
-          {/* Portfolio Grid */}
-          {items.length > 0 ? (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold">Мои работы</h2>
-                <Badge variant="secondary" className="px-3 py-1">
-                  {items.length} {items.length === 1 ? 'работа' : items.length < 5 ? 'работы' : 'работ'}
-                </Badge>
               </div>
               
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {items.map((item) => (
-                  <FloatingCard key={item.id} className="group overflow-hidden">
-                    <div className="relative aspect-video">
+              <div className="flex flex-col sm:flex-row gap-3 items-end">
+                <div className="flex-1 space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Фото или видео
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                      className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                    />
+                    <Upload className="absolute right-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
+                <Button
+                  onClick={addItem}
+                  disabled={uploading || !file || !title.trim()}
+                  className="btn-hero min-w-[140px]"
+                >
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      Загрузка...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Добавить работу
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Portfolio Grid */}
+        {items.length > 0 ? (
+          <div>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl lg:text-4xl font-display font-bold mb-4 text-gradient">
+                Мои работы
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                {items.length} {items.length === 1 ? 'выполненная работа' : items.length < 5 ? 'выполненные работы' : 'выполненных работ'}
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {items.map((item, index) => (
+                <div 
+                  key={item.id} 
+                  className="card-surface p-6 text-center cursor-pointer group animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="relative mb-4">
+                    <div className="aspect-video overflow-hidden rounded-xl">
                       <MediaViewer
                         src={item.image_url}
                         alt={item.title || 'Работа'}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         enableZoom
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        onClick={() => deleteItem(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-1">
-                        {item.title || 'Без названия'}
-                      </h3>
-                      {item.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {item.description}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                        <Image className="h-3 w-3" />
-                        <span>Добавлено {new Date(item.created_at).toLocaleDateString()}</span>
-                      </div>
-                    </CardContent>
-                  </FloatingCard>
-                ))}
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 h-8 w-8 p-0"
+                      onClick={() => deleteItem(item.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
+                      {item.title || 'Без названия'}
+                    </h3>
+                    {item.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-2">
+                      <Image className="h-3 w-3" />
+                      <span>Добавлено {new Date(item.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="card-surface p-12 max-w-md mx-auto">
+              <div className="mb-6">
+                <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+                  <Image className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-2xl font-semibold mb-2">Ваше портфолио пусто</h3>
+                <p className="text-muted-foreground">
+                  Добавьте фотографии ваших лучших работ, чтобы привлечь больше клиентов
+                </p>
               </div>
             </div>
-          ) : (
-            <FloatingCard className="p-12 text-center">
-              <div className="space-y-4">
-                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-                  <Image className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold">Ваше портфолио пусто</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Добавьте фотографии ваших лучших работ, чтобы привлечь больше клиентов
-                  </p>
-                </div>
-              </div>
-            </FloatingCard>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </main>
   );
