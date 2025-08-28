@@ -7,6 +7,9 @@ import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
 import { Wrench, Zap, Sparkles, Paintbrush, Package, Cog, ShieldCheck, Crown, Star, Rocket, Award } from "lucide-react";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
+import anaChisinau from "@/assets/testimonials/ana-chisinau.jpg";
+import ionBalti from "@/assets/testimonials/ion-balti.jpg";
+import elenaCahul from "@/assets/testimonials/elena-cahul.jpg";
 
 const categories = [
   { key: "plumbing", label: "Сантехника" },
@@ -184,13 +187,31 @@ const Index = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { text: "Отличный сервис! Быстро нашли сантехника, который приехал в тот же день. Оплата через эскроу — полная безопасность.", author: "Мария, Москва", rating: 5 },
-            { text: "Использую ServiceHub для поиска электриков. Всегда качественная работа и честные цены. Рекомендую!", author: "Дмитрий, СПб", rating: 5 },
-            { text: "Удобная платформа для заказа услуг по дому. Специалисты проверенные, работают профессионально.", author: "Анна, Екатеринбург", rating: 5 }
+            { 
+              text: "Serviciu excelent! Am găsit rapid un instalator care a venit în aceeași zi. Plata prin escrow - siguranță totală.", 
+              author: "Ana Popescu", 
+              location: "Chișinău", 
+              rating: 5,
+              avatar: anaChisinau
+            },
+            { 
+              text: "Folosesc ServiceHub pentru căutarea electricianilor. Întotdeauna muncă de calitate și prețuri corecte. Recomand!", 
+              author: "Ion Marin", 
+              location: "Bălți", 
+              rating: 5,
+              avatar: ionBalti
+            },
+            { 
+              text: "Platformă convenabilă pentru comandarea serviciilor pentru casă. Specialiștii sunt verificați, lucrează profesional.", 
+              author: "Elena Rusu", 
+              location: "Cahul", 
+              rating: 5,
+              avatar: elenaCahul
+            }
           ].map((testimonial, index) => (
             <div 
               key={index} 
-              className="bg-white dark:bg-white/5 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-white/10 text-left animate-fade-in"
+              className="card-surface p-8 text-left"
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <div className="flex items-center gap-1 mb-6">
@@ -202,11 +223,23 @@ const Index = () => {
                   />
                 ))}
               </div>
-              <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed text-lg">
+              <p className="text-foreground/80 mb-6 leading-relaxed text-lg italic">
                 "{testimonial.text}"
               </p>
-              <div className="font-semibold text-primary text-lg">
-                {testimonial.author}
+              <div className="flex items-center gap-4">
+                <img 
+                  src={testimonial.avatar} 
+                  alt={testimonial.author}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
+                />
+                <div>
+                  <div className="font-semibold text-primary text-lg">
+                    {testimonial.author}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {testimonial.location}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
