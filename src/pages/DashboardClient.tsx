@@ -48,6 +48,20 @@ export default function DashboardClient() {
         return;
       }
 
+      // Ensure user has at least client role
+      const { ensureUserRoles } = await import("@/lib/userRoles");
+      const roleResult = await ensureUserRoles(session.session.user.id);
+      
+      if (!roleResult.success) {
+        toast({ 
+          title: "Ошибка доступа", 
+          description: roleResult.error || "Не удалось загрузить роли пользователя", 
+          variant: "destructive" 
+        });
+        navigate("/");
+        return;
+      }
+
       // Load user's jobs
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")

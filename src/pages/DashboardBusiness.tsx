@@ -4,7 +4,7 @@ import { FloatingCard } from "@/components/ui/floating-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Building2, Users, TrendingUp, FileText, Settings, Bell,
   DollarSign, Calendar, BarChart3, Shield, Clock, Award,
@@ -15,6 +15,7 @@ import businessDashboard from "@/assets/business-dashboard.jpg";
 const DashboardBusiness = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [biz, setBiz] = useState<any | null>(null);
@@ -45,8 +46,40 @@ const DashboardBusiness = () => {
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id || null;
-      if (!uid) { window.location.href = '/auth'; return; }
+      if (!uid) { 
+        navigate('/auth'); 
+        return; 
+      }
       setUserId(uid);
+
+      // Ensure user has roles and create business role if needed
+      const { ensureUserRoles, createUserRole, hasUserRole } = await import("@/lib/userRoles");
+      const roleResult = await ensureUserRoles(uid);
+      
+      if (!roleResult.success) {
+        toast({ title: "Ошибка", description: roleResult.error || "Ошибка проверки ролей", variant: "destructive" });
+        navigate("/");
+        return;
+      }
+      
+      // Check if user has business role, if not - create it
+      if (!hasUserRole(roleResult.roles, 'business')) {
+        const createResult = await createUserRole(uid, 'business');
+        if (!createResult.success) {
+          toast({ 
+            title: "Требуется активация", 
+            description: "Активируйте бизнес-роль в личном кабинете", 
+            variant: "destructive" 
+          });
+          navigate("/");
+          return;
+        }
+        
+        toast({ 
+          title: "Бизнес-аккаунт активирован", 
+          description: "Теперь вы можете управлять бизнес-заказами" 
+        });
+      }
 
       // load categories
       const { data: cats } = await supabase.from('categories').select('id, key, label_ru, label_ro').order('key');

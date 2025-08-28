@@ -45,28 +45,20 @@ const DashboardPro = () => {
       }
       setUserId(uid);
       
+      // Ensure user has roles and create pro role if needed
+      const { ensureUserRoles, createUserRole, hasUserRole } = await import("@/lib/userRoles");
+      const roleResult = await ensureUserRoles(uid);
       
-      const { data: roles, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", uid);
-        
-      if (error) {
-        console.error('Role check error:', error);
-        toast({ title: "Ошибка", description: error.message, variant: "destructive" });
+      if (!roleResult.success) {
+        toast({ title: "Ошибка", description: roleResult.error || "Ошибка проверки ролей", variant: "destructive" });
         navigate("/");
         return;
       }
       
-      const hasPro = (roles || []).some((r: any) => r.role === "pro");
-      if (!hasPro) {
-        // Instead of redirecting, create the pro role automatically
-        const { error: insertError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: uid, role: "pro" });
-          
-        if (insertError) {
-          console.error('Insert role error:', insertError);
+      // Check if user has pro role, if not - create it
+      if (!hasUserRole(roleResult.roles, 'pro')) {
+        const createResult = await createUserRole(uid, 'pro');
+        if (!createResult.success) {
           toast({ 
             title: "Требуется активация", 
             description: "Активируйте роль специалиста в личном кабинете", 
@@ -162,132 +154,6 @@ const DashboardPro = () => {
       .order('created_at', { ascending: false })
       .limit(5);
     setTenders(data || []);
-  };
-
-  const handleAcceptJob = async (jobId: string) => {
-    if (!userId) return;
-    
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await supabase
-        .from('jobs')
-        .update({ 
-          status: 'accepted', 
-          pro_id: userId 
-        })
-        .eq('id', jobId)
-        .eq('status', 'new');
-
-      if (error) throw error;
-
-      toast({ 
-        title: "Заказ принят", 
-        description: "Заказ успешно принят в работу" 
-      });
-
-      // Refresh data
-      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
-      await Promise.all([
-        loadNearbyJobs(userId, refreshSupabase),
-        loadActiveJobs(userId, refreshSupabase)
-      ]);
-    } catch (error: any) {
-      toast({ 
-        title: "Ошибка", 
-        description: error.message || "Не удалось принять заказ", 
-        variant: "destructive" 
-      });
-    }
-  };
-
-  const handleOfferPrice = (jobId: string) => {
-    navigate(`/job/${jobId}/application`);
-  };
-
-  const handleVideoEvaluation = (jobId: string) => {
-    // Generate video room URL (in real app, this would be handled by backend)
-    const roomId = `job-${jobId}-${Date.now()}`;
-    const videoUrl = `https://meet.jit.si/${roomId}`;
-    
-    toast({ 
-      title: "Видео-оценка", 
-      description: "Открываем комнату для видео-оценки..." 
-    });
-    
-    // Open video in new tab
-    window.open(videoUrl, '_blank');
-  };
-
-  const handleStartWork = async (jobId: string) => {
-    if (!userId) return;
-    
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await supabase
-        .from('jobs')
-        .update({ 
-          status: 'in_progress',
-          start_confirmed: true
-        })
-        .eq('id', jobId)
-        .eq('pro_id', userId)
-        .eq('status', 'accepted');
-
-      if (error) throw error;
-
-      toast({ 
-        title: "Работа начата", 
-        description: "Статус заказа изменен на 'В процессе'" 
-      });
-
-      // Refresh active jobs
-      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
-      await loadActiveJobs(userId, refreshSupabase);
-    } catch (error: any) {
-      toast({ 
-        title: "Ошибка", 
-        description: error.message || "Не удалось начать работу", 
-        variant: "destructive" 
-      });
-    }
-  };
-
-  const handleFinishWork = async (jobId: string) => {
-    if (!userId) return;
-    
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await supabase
-        .from('jobs')
-        .update({ 
-          status: 'done',
-          end_confirmed: true
-        })
-        .eq('id', jobId)
-        .eq('pro_id', userId)
-        .eq('status', 'in_progress');
-
-      if (error) throw error;
-
-      toast({ 
-        title: "Работа завершена", 
-        description: "Заказ успешно завершен" 
-      });
-
-      // Refresh active jobs
-      const { supabase: refreshSupabase } = await import("@/integrations/supabase/client");
-      await loadActiveJobs(userId, refreshSupabase);
-    } catch (error: any) {
-      toast({ 
-        title: "Ошибка", 
-        description: error.message || "Не удалось завершить работу", 
-        variant: "destructive" 
-      });
-    }
-  };
-
-  const handleOpenChat = (jobId: string) => {
-    navigate(`/messages?job=${jobId}`);
   };
 
   if (loading) return (
@@ -463,57 +329,44 @@ const DashboardPro = () => {
                   </div>
                 )}
 
-                {nearbyJobs.map((j, index) => (
-                  <FloatingCard key={j.id} className="p-6" delay={index * 50} hover>
-                    <div className="flex items-start justify-between gap-4">
+                {nearbyJobs.map((job, index) => (
+                  <FloatingCard key={job.id} className="p-6" delay={index * 100} hover glow>
+                    <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h4 className="font-semibold mb-2">{j.description}</h4>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                        <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                           <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={DollarSign} size={14} />
-                            {j.budget_min_cents && j.budget_max_cents ? 
-                              `${formatPrice(j.budget_min_cents)} - ${formatPrice(j.budget_max_cents)}` :
-                              j.budget_min_cents ? `от ${formatPrice(j.budget_min_cents)}` :
-                              j.budget_max_cents ? `до ${formatPrice(j.budget_max_cents)}` : 'Договорная'
-                            }
+                            <AnimatedIcon icon={Calendar} size={16} />
+                            <span>{job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Не указано'}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={Calendar} size={14} />
-                            {j.scheduled_at ? new Date(j.scheduled_at).toLocaleDateString() : 'Гибкий график'}
+                            <AnimatedIcon icon={DollarSign} size={16} />
+                            <span>
+                              {job.budget_min_cents && job.budget_max_cents
+                                ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
+                                : job.budget_min_cents
+                                ? `от ${formatPrice(job.budget_min_cents)}`
+                                : job.budget_max_cents
+                                ? `до ${formatPrice(job.budget_max_cents)}`
+                                : 'Договорная'
+                              }
+                            </span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={MapPin} size={14} />
-                            Рядом
-                          </div>
-                        </div>
-                        
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                          <div className="w-2 h-2 rounded-full bg-blue-500" />
-                          Новый заказ
                         </div>
                       </div>
+                    </div>
 
-                      <div className="flex flex-col gap-2">
-                        <button 
-                          onClick={() => handleAcceptJob(j.id)}
-                          className="btn-hero text-sm animate-pulse-glow"
-                        >
-                          Принять
-                        </button>
-                        <button 
-                          onClick={() => handleOfferPrice(j.id)}
-                          className="btn-ghost text-sm"
-                        >
-                          Предложить цену
-                        </button>
-                        <button 
-                          onClick={() => handleVideoEvaluation(j.id)}
-                          className="btn-ghost text-sm flex items-center gap-1"
-                        >
-                          <AnimatedIcon icon={Video} size={14} />
-                          Видео-оценка
-                        </button>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <button className="btn-hero text-sm px-4 py-2">
+                        Принять заказ
+                      </button>
+                      <button className="btn-ghost text-sm px-4 py-2">
+                        Предложить цену
+                      </button>
+                      <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
+                        <AnimatedIcon icon={Video} size={16} />
+                        Видео-оценка
+                      </button>
                     </div>
                   </FloatingCard>
                 ))}
@@ -522,80 +375,61 @@ const DashboardPro = () => {
 
             {/* Active Jobs */}
             <FloatingCard className="p-8" delay={300} hover>
-              <div className="flex items-center gap-3 mb-6">
-                <AnimatedIcon icon={Clock} size={28} className="text-primary" />
-                <h2 className="text-2xl font-display font-bold">Мои активные заказы</h2>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <AnimatedIcon icon={Clock} size={28} className="text-primary" />
+                  <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {myActiveJobs.length} активных заказов
+                </div>
               </div>
 
               <div className="space-y-4">
                 {myActiveJobs.length === 0 && (
-                  <div className="text-center py-8">
-                    <AnimatedIcon icon={Clock} size={32} className="text-muted-foreground mb-3" />
-                    <p className="text-muted-foreground">Пока нет активных заказов</p>
+                  <div className="text-center py-12">
+                    <AnimatedIcon icon={Clock} size={48} className="text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Нет активных заказов</h3>
+                    <p className="text-muted-foreground">Найдите новые заказы выше</p>
                   </div>
                 )}
 
-                {myActiveJobs.map((j, index) => (
-                  <FloatingCard key={j.id} className="p-6" delay={index * 50} hover>
-                    <div className="flex items-start justify-between gap-4">
+                {myActiveJobs.map((job, index) => (
+                  <FloatingCard key={job.id} className="p-6" delay={index * 100} hover glow>
+                    <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h4 className="font-semibold mb-2">{j.description}</h4>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                          <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={Clock} size={14} />
-                            {j.status === 'accepted' ? 'Принят' : 
-                             j.status === 'in_progress' ? 'В работе' : 
-                             j.status === 'done' ? 'Завершен' : j.status}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={Calendar} size={14} />
-                            {j.scheduled_at ? new Date(j.scheduled_at).toLocaleDateString() : 'Без срока'}
-                          </div>
-                        </div>
-                        
-                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
-                          j.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
-                          j.status === 'in_progress' ? 'bg-purple-100 text-purple-800' :
-                          j.status === 'done' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          <div className={`w-2 h-2 rounded-full ${
-                            j.status === 'accepted' ? 'bg-amber-500' :
-                            j.status === 'in_progress' ? 'bg-purple-500' :
-                            j.status === 'done' ? 'bg-green-500' :
-                            'bg-gray-500'
-                          }`} />
-                          {j.status === 'accepted' ? 'Принят к работе' :
-                           j.status === 'in_progress' ? 'В процессе' :
-                           j.status === 'done' ? 'Завершен' : j.status}
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold">{job.description || 'Заказ'}</h3>
+                          <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                            job.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
+                            job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                            job.status === 'done' ? 'bg-green-100 text-green-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {job.status === 'accepted' ? 'Принят' :
+                             job.status === 'in_progress' ? 'В работе' :
+                             job.status === 'done' ? 'Завершен' :
+                             job.status}
+                          </span>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="flex flex-col gap-2">
-                        <button 
-                          className="btn-ghost text-sm flex items-center gap-2"
-                          onClick={() => handleOpenChat(j.id)}
-                        >
-                          <AnimatedIcon icon={MessageSquare} size={16} />
-                          Чат
+                    <div className="flex items-center gap-3">
+                      {job.status === 'accepted' && (
+                        <button className="btn-hero text-sm px-4 py-2">
+                          Начать работу
                         </button>
-                        {j.status === 'accepted' && (
-                          <button 
-                            className="btn-hero text-sm"
-                            onClick={() => handleStartWork(j.id)}
-                          >
-                            Начать работу
-                          </button>
-                        )}
-                        {j.status === 'in_progress' && (
-                          <button 
-                            className="btn-hero text-sm"
-                            onClick={() => handleFinishWork(j.id)}
-                          >
-                            Завершить
-                          </button>
-                        )}
-                      </div>
+                      )}
+                      {job.status === 'in_progress' && (
+                        <button className="btn-hero text-sm px-4 py-2">
+                          Завершить работу
+                        </button>
+                      )}
+                      <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
+                        <AnimatedIcon icon={MessageSquare} size={16} />
+                        Чат
+                      </button>
                     </div>
                   </FloatingCard>
                 ))}
@@ -605,107 +439,88 @@ const DashboardPro = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Earnings Analytics */}
+            {/* Account Overview */}
             <FloatingCard className="p-6" delay={400} hover>
-              <div className="flex items-center gap-3 mb-4">
-                <AnimatedIcon icon={TrendingUp} size={24} className="text-primary" />
-                <h3 className="font-semibold">Аналитика доходов</h3>
-              </div>
-              
+              <h3 className="font-semibold mb-4">Обзор аккаунта</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Сегодня</span>
-                  <span className="font-semibold">{formatPrice(12500)}</span>
+                  <span className="text-sm text-muted-foreground">Статус верификации</span>
+                  <div className="flex items-center gap-1">
+                    <AnimatedIcon 
+                      icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
+                      size={16} 
+                      className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
+                    />
+                    <span className="text-sm font-medium">
+                      {kycStatus === 'approved' ? 'Верифицирован' : 'Проверка'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Эта неделя</span>
-                  <span className="font-semibold">{formatPrice(85000)}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Этот месяц</span>
-                  <span className="font-semibold text-primary">{formatPrice(234000)}</span>
-                </div>
-              </div>
-              
-              <button className="btn-ghost w-full text-sm mt-4 flex items-center justify-center gap-2">
-                <AnimatedIcon icon={BarChart3} size={16} />
-                Подробная аналитика
-              </button>
-            </FloatingCard>
-
-            {/* Instant Payout */}
-            <FloatingCard className="p-6" delay={500} hover>
-              <div className="flex items-center gap-3 mb-4">
-                <AnimatedIcon icon={Zap} size={24} className="text-accent" />
-                <h3 className="font-semibold">Мгновенные выплаты</h3>
-              </div>
-              
-              <p className="text-sm text-muted-foreground mb-4">
-                Доступно для вывода: <span className="font-semibold text-success">{formatPrice(walletBalance)}</span>
-              </p>
-              
-              <button className="btn-hero w-full text-sm animate-pulse-glow flex items-center justify-center gap-2">
-                <AnimatedIcon icon={CreditCard} size={16} />
-                Запросить выплату
-              </button>
-              
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Средства поступят в течение 15 минут
-              </p>
-            </FloatingCard>
-
-            {/* Tenders */}
-            <FloatingCard className="p-6" delay={600} hover>
-              <div className="flex items-center gap-3 mb-4">
-                <AnimatedIcon icon={Briefcase} size={24} className="text-primary" />
-                <h3 className="font-semibold">Активные тендеры</h3>
-              </div>
-              
-              <div className="space-y-3">
-                {tenders.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
-                ) : (
-                  tenders.map((t, index) => (
-                    <div key={t.id} className="p-3 rounded-lg border hover:bg-muted/30 transition-colors">
-                      <h5 className="font-medium text-sm mb-1">{t.title}</h5>
-                      <p className="text-xs text-muted-foreground">
-                        До {new Date(t.deadline_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))
-                )}
-              </div>
-              
-              <Link to="/tenders" className="btn-ghost w-full text-sm mt-4">
-                Посмотреть все тендеры
-              </Link>
-            </FloatingCard>
-
-            {/* Performance Metrics */}
-            <FloatingCard className="p-6" delay={700} hover>
-              <h3 className="font-semibold mb-4">Показатели</h3>
-              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Время ответа</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
-                    <span className="text-sm font-medium">Отлично</span>
-                  </div>
+                  <span className="text-sm font-medium">{responseTime}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Качество работ</span>
-                  <div className="flex items-center gap-1">
-                    <AnimatedIcon icon={Star} size={14} className="text-amber-500" />
-                    <span className="text-sm font-medium">4.9</span>
-                  </div>
+                  <span className="text-sm text-muted-foreground">Всего заказов</span>
+                  <span className="text-sm font-medium">{completedJobs}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Надежность</span>
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
-                    <span className="text-sm font-medium">98%</span>
+              </div>
+            </FloatingCard>
+
+            {/* Quick Actions */}
+            <FloatingCard className="p-6" delay={500} hover>
+              <h3 className="font-semibold mb-4">Быстрые действия</h3>
+              <div className="space-y-3">
+                <Link to="/pro/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                  <AnimatedIcon icon={Settings} size={20} className="text-primary" />
+                  <span className="text-sm">Настройки профиля</span>
+                </Link>
+                <Link to="/kyc" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                  <AnimatedIcon icon={ShieldCheck} size={20} className="text-primary" />
+                  <span className="text-sm">Верификация</span>
+                </Link>
+                <Link to="/portfolio" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                  <AnimatedIcon icon={ImageIcon} size={20} className="text-primary" />
+                  <span className="text-sm">Портфолио</span>
+                </Link>
+                <button className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors w-full text-left">
+                  <AnimatedIcon icon={CreditCard} size={20} className="text-primary" />
+                  <span className="text-sm">Запросить выплату</span>
+                </button>
+              </div>
+            </FloatingCard>
+
+            {/* Trending Tenders */}
+            <FloatingCard className="p-6" delay={600} hover>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Актуальные тендеры</h3>
+                <Link to="/tenders" className="text-sm text-primary hover:underline">Все тендеры</Link>
+              </div>
+              
+              <div className="space-y-3">
+                {tenders.length === 0 && (
+                  <div className="text-center py-4">
+                    <AnimatedIcon icon={Briefcase} size={32} className="text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
                   </div>
-                </div>
+                )}
+
+                {tenders.slice(0, 3).map((tender, index) => (
+                  <div key={tender.id} className="p-3 rounded-lg border hover:bg-muted/30 transition-colors cursor-pointer">
+                    <div className="font-medium text-sm mb-1">{tender.title || 'Тендер'}</div>
+                    <div className="text-xs text-muted-foreground mb-2">
+                      Заявок: {tender.bids_count || 0}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-success font-medium">
+                        {tender.budget_cents ? formatPrice(tender.budget_cents) : 'Договорная'}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {tender.deadline ? new Date(tender.deadline).toLocaleDateString() : 'Без срока'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </FloatingCard>
           </div>
