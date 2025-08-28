@@ -189,25 +189,22 @@ const Index = () => {
           ].map((testimonial, index) => (
             <div 
               key={index} 
-              className="card-surface p-8 text-left"
+              className="bg-white dark:bg-white/5 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-white/10 text-left animate-fade-in"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-1 mb-6">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <NeumorphicIcon 
+                  <Star 
                     key={i} 
-                    icon={Star} 
-                    size={40}
-                    variant="square"
-                    className="text-amber-400"
-                    delayMs={index * 150 + i * 50}
+                    size={20}
+                    className="text-amber-400 fill-amber-400"
                   />
                 ))}
               </div>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed text-lg">
                 "{testimonial.text}"
               </p>
-              <div className="font-semibold text-primary">
+              <div className="font-semibold text-primary text-lg">
                 {testimonial.author}
               </div>
             </div>
