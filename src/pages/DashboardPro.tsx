@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { StarRating } from "@/components/ui/star-rating";
 import dashboardPro from "@/assets/dashboard-pro.jpg";
+import proWorkspace from "@/assets/pro-workspace.jpg";
+import jobManagement from "@/assets/job-management.jpg";
 
 const DashboardPro = () => {
   const { t } = useEnhancedI18n();
@@ -250,16 +252,16 @@ const DashboardPro = () => {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
-          <div className="card-surface p-6 text-center">
-            <NeumorphicIcon icon={Wallet} size={48} variant="square" className="mb-4 mx-auto" />
-            <div className="text-2xl font-bold text-success mb-1">
+          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
+            <Wallet className="h-12 w-12 text-green-600 mb-4 mx-auto" />
+            <div className="text-2xl font-bold text-green-600 mb-1">
               {formatPrice(walletBalance)}
             </div>
             <div className="text-sm text-muted-foreground">Баланс</div>
           </div>
           
-          <div className="card-surface p-6 text-center">
-            <NeumorphicIcon icon={Star} size={48} variant="square" className="mb-4 mx-auto" />
+          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
+            <Star className="h-12 w-12 text-yellow-600 mb-4 mx-auto" />
             <div className="flex flex-col items-center">
               <StarRating 
                 rating={ratingAvg || 0} 
@@ -272,22 +274,22 @@ const DashboardPro = () => {
             </div>
           </div>
           
-          <div className="card-surface p-6 text-center">
-            <NeumorphicIcon icon={DollarSign} size={48} variant="square" className="mb-4 mx-auto" />
+          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
+            <DollarSign className="h-12 w-12 text-blue-600 mb-4 mx-auto" />
             <div className="text-2xl font-bold text-primary mb-1">
               {formatPrice(monthlyEarnings)}
             </div>
             <div className="text-sm text-muted-foreground">Этот месяц</div>
           </div>
           
-          <div className="card-surface p-6 text-center">
-            <NeumorphicIcon icon={Award} size={48} variant="square" className="mb-4 mx-auto" />
+          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
+            <Award className="h-12 w-12 text-purple-600 mb-4 mx-auto" />
             <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
             <div className="text-sm text-muted-foreground">Выполнено</div>
           </div>
           
-          <div className="card-surface p-6 text-center">
-            <NeumorphicIcon icon={Clock} size={48} variant="square" className="mb-4 mx-auto" />
+          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
+            <Clock className="h-12 w-12 text-orange-600 mb-4 mx-auto" />
             <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
             <div className="text-sm text-muted-foreground">Время ответа</div>
           </div>
@@ -295,44 +297,44 @@ const DashboardPro = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-          <div className="card-surface p-4 text-center cursor-pointer">
+          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/pro/profile" className="flex flex-col items-center gap-2">
-              <NeumorphicIcon icon={UserCog} size={40} variant="square" />
+              <UserCog className="h-10 w-10 text-blue-600" />
               <span className="text-sm font-medium">Профиль</span>
             </Link>
           </div>
           
-          <div className="card-surface p-4 text-center cursor-pointer">
+          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-              <NeumorphicIcon icon={Calendar} size={40} variant="square" />
+              <Calendar className="h-10 w-10 text-green-600" />
               <span className="text-sm font-medium">Расписание</span>
             </Link>
           </div>
           
-          <div className="card-surface p-4 text-center cursor-pointer">
+          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/portfolio" className="flex flex-col items-center gap-2">
-              <NeumorphicIcon icon={ImageIcon} size={40} variant="square" />
+              <ImageIcon className="h-10 w-10 text-purple-600" />
               <span className="text-sm font-medium">Портфолио</span>
             </Link>
           </div>
           
-          <div className="card-surface p-4 text-center cursor-pointer">
+          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/tenders" className="flex flex-col items-center gap-2">
-              <NeumorphicIcon icon={Briefcase} size={40} variant="square" />
+              <Briefcase className="h-10 w-10 text-orange-600" />
               <span className="text-sm font-medium">Тендеры</span>
             </Link>
           </div>
           
-          <div className="card-surface p-4 text-center cursor-pointer">
+          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <button className="flex flex-col items-center gap-2 w-full">
-              <NeumorphicIcon icon={CreditCard} size={40} variant="square" />
+              <CreditCard className="h-10 w-10 text-indigo-600" />
               <span className="text-sm font-medium">Выплата</span>
             </button>
           </div>
           
-          <div className="card-surface p-4 text-center cursor-pointer">
+          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
             <Link to="/kyc" className="flex flex-col items-center gap-2">
-              <NeumorphicIcon icon={ShieldCheck} size={40} variant="square" />
+              <ShieldCheck className="h-10 w-10 text-red-600" />
               <span className="text-sm font-medium">KYC</span>
             </Link>
           </div>
@@ -341,133 +343,145 @@ const DashboardPro = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Available Jobs */}
           <div className="lg:col-span-2 space-y-8">
-            <div className="card-surface p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <NeumorphicIcon icon={Briefcase} size={40} variant="square" />
-                  <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {nearbyJobs.length} заказов поблизости
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {nearbyJobs.length === 0 && (
-                  <div className="text-center py-12">
-                    <NeumorphicIcon icon={Briefcase} size={64} variant="square" className="mb-4 mx-auto" />
-                    <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
-                    <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
-                    <Link to="/pro/profile" className="btn-hero">
-                      Настроить профиль
-                    </Link>
+            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-8 relative overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 bg-cover bg-center"
+                style={{ backgroundImage: `url(${proWorkspace})` }}
+              />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <Briefcase className="h-10 w-10 text-blue-600" />
+                    <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
                   </div>
-                )}
+                  <div className="text-sm text-muted-foreground">
+                    {nearbyJobs.length} заказов поблизости
+                  </div>
+                </div>
 
-                {nearbyJobs.slice(0, 5).map((job, index) => (
-                  <div key={job.id} className="card-surface p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                          <div className="flex items-center gap-1">
-                            <NeumorphicIcon icon={Calendar} size={20} variant="square" />
-                            <span>{job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Не указано'}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <NeumorphicIcon icon={DollarSign} size={20} variant="square" />
-                            <span>
-                              {job.budget_min_cents && job.budget_max_cents
-                                ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
-                                : job.budget_min_cents
-                                ? `от ${formatPrice(job.budget_min_cents)}`
-                                : job.budget_max_cents
-                                ? `до ${formatPrice(job.budget_max_cents)}`
-                                : 'Договорная'
-                              }
-                            </span>
+                <div className="space-y-4">
+                  {nearbyJobs.length === 0 && (
+                    <div className="text-center py-12">
+                      <Briefcase className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
+                      <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
+                      <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
+                      <Link to="/pro/profile" className="btn-hero">
+                        Настроить профиль
+                      </Link>
+                    </div>
+                  )}
+
+                  {nearbyJobs.slice(0, 5).map((job, index) => (
+                    <div key={job.id} className="bg-white/80 backdrop-blur-sm p-6 rounded-lg border border-gray-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-5 w-5" />
+                              <span>{job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Не указано'}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <DollarSign className="h-5 w-5" />
+                              <span>
+                                {job.budget_min_cents && job.budget_max_cents
+                                  ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
+                                  : job.budget_min_cents
+                                  ? `от ${formatPrice(job.budget_min_cents)}`
+                                  : job.budget_max_cents
+                                  ? `до ${formatPrice(job.budget_max_cents)}`
+                                  : 'Договорная'
+                                }
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-3">
-                      <button className="btn-hero text-sm px-4 py-2">
-                        Принять заказ
-                      </button>
-                      <button className="btn-ghost text-sm px-4 py-2">
-                        Предложить цену
-                      </button>
-                      <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                        <NeumorphicIcon icon={Video} size={20} variant="square" />
-                        Видео-оценка
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button className="btn-hero text-sm px-4 py-2">
+                          Принять заказ
+                        </button>
+                        <button className="btn-ghost text-sm px-4 py-2">
+                          Предложить цену
+                        </button>
+                        <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
+                          <Video className="h-5 w-5" />
+                          Видео-оценка
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Active Jobs */}
-            <div className="card-surface p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <NeumorphicIcon icon={Clock} size={40} variant="square" />
-                  <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {myActiveJobs.length} активных заказов
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {myActiveJobs.length === 0 && (
-                  <div className="text-center py-12">
-                    <NeumorphicIcon icon={Clock} size={64} variant="square" className="mb-4 mx-auto" />
-                    <h3 className="text-lg font-semibold mb-2">Нет активных заказов</h3>
-                    <p className="text-muted-foreground">Найдите новые заказы выше</p>
+            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-8 relative overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-10 bg-cover bg-center"
+                style={{ backgroundImage: `url(${jobManagement})` }}
+              />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-10 w-10 text-orange-600" />
+                    <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
                   </div>
-                )}
+                  <div className="text-sm text-muted-foreground">
+                    {myActiveJobs.length} активных заказов
+                  </div>
+                </div>
 
-                {myActiveJobs.map((job, index) => (
-                  <div key={job.id} className="card-surface p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold">{job.description || 'Заказ'}</h3>
-                          <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                            job.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
-                            job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                            job.status === 'done' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {job.status === 'accepted' ? 'Принят' :
-                             job.status === 'in_progress' ? 'В работе' :
-                             job.status === 'done' ? 'Завершен' :
-                             job.status}
-                          </span>
+                <div className="space-y-4">
+                  {myActiveJobs.length === 0 && (
+                    <div className="text-center py-12">
+                      <Clock className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
+                      <h3 className="text-lg font-semibold mb-2">Нет активных заказов</h3>
+                      <p className="text-muted-foreground">Найдите новые заказы выше</p>
+                    </div>
+                  )}
+
+                  {myActiveJobs.map((job, index) => (
+                    <div key={job.id} className="bg-white/80 backdrop-blur-sm p-6 rounded-lg border border-gray-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-semibold">{job.description || 'Заказ'}</h3>
+                            <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                              job.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
+                              job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                              job.status === 'done' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {job.status === 'accepted' ? 'Принят' :
+                               job.status === 'in_progress' ? 'В работе' :
+                               job.status === 'done' ? 'Завершен' :
+                               job.status}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-3">
-                      {job.status === 'accepted' && (
-                        <button className="btn-hero text-sm px-4 py-2">
-                          Начать работу
+                      <div className="flex items-center gap-3">
+                        {job.status === 'accepted' && (
+                          <button className="btn-hero text-sm px-4 py-2">
+                            Начать работу
+                          </button>
+                        )}
+                        {job.status === 'in_progress' && (
+                          <button className="btn-hero text-sm px-4 py-2">
+                            Завершить работу
+                          </button>
+                        )}
+                        <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
+                          <MessageSquare className="h-5 w-5" />
+                          Чат
                         </button>
-                      )}
-                      {job.status === 'in_progress' && (
-                        <button className="btn-hero text-sm px-4 py-2">
-                          Завершить работу
-                        </button>
-                      )}
-                      <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                        <NeumorphicIcon icon={MessageSquare} size={20} variant="square" />
-                        Чат
-                      </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -475,18 +489,17 @@ const DashboardPro = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Account Overview */}
-            <div className="card-surface p-6">
+            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-6">
               <h3 className="font-semibold mb-4">Обзор аккаунта</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Статус верификации</span>
                   <div className="flex items-center gap-1">
-                    <NeumorphicIcon 
-                      icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
-                      size={24} 
-                      variant="square"
-                      className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
-                    />
+                    {kycStatus === 'approved' ? (
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-6 w-6 text-amber-500" />
+                    )}
                     <span className="text-sm font-medium">
                       {kycStatus === 'approved' ? 'Верифицирован' : 'Проверка'}
                     </span>
@@ -503,7 +516,7 @@ const DashboardPro = () => {
               </div>
             </div>
 
-            <div className="card-surface p-6">
+            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Актуальные тендеры</h3>
                 <Link to="/tenders" className="text-sm text-primary hover:underline">Все тендеры</Link>
@@ -512,7 +525,7 @@ const DashboardPro = () => {
               <div className="space-y-3">
                 {tenders.length === 0 && (
                   <div className="text-center py-4">
-                    <NeumorphicIcon icon={Briefcase} size={48} variant="square" className="mb-2 mx-auto" />
+                    <Briefcase className="h-12 w-12 text-gray-400 mb-2 mx-auto" />
                     <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
                   </div>
                 )}
