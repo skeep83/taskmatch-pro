@@ -17,6 +17,7 @@ export default function DashboardBusiness() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     checkAuth();
@@ -72,7 +73,7 @@ export default function DashboardBusiness() {
         </div>
 
         {/* Main Content with Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -143,12 +144,12 @@ export default function DashboardBusiness() {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
+                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
                 onClick={() => navigate("/job/new")}
               >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <Building2 className="h-8 w-8 text-primary" />
+                    <AnimatedIcon icon={Building2} className="h-8 w-8 text-primary" />
                     <div>
                       <h3 className="font-semibold mb-1">Создать заказ</h3>
                       <p className="text-sm text-muted-foreground">Для компании</p>
@@ -158,16 +159,12 @@ export default function DashboardBusiness() {
               </Card>
 
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => {
-                  const tabsList = document.querySelector('[role="tablist"]');
-                  const employeesTab = tabsList?.querySelector('[value="employees"]') as HTMLElement;
-                  employeesTab?.click();
-                }}
+                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                onClick={() => setActiveTab("employees")}
               >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <UserPlus className="h-8 w-8 text-primary" />
+                    <AnimatedIcon icon={UserPlus} className="h-8 w-8 text-primary" />
                     <div>
                       <h3 className="font-semibold mb-1">Пригласить сотрудника</h3>
                       <p className="text-sm text-muted-foreground">Расширить команду</p>
@@ -177,16 +174,12 @@ export default function DashboardBusiness() {
               </Card>
 
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => {
-                  const tabsList = document.querySelector('[role="tablist"]');
-                  const invoicesTab = tabsList?.querySelector('[value="invoices"]') as HTMLElement;
-                  invoicesTab?.click();
-                }}
+                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                onClick={() => setActiveTab("invoices")}
               >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <FileText className="h-8 w-8 text-primary" />
+                    <AnimatedIcon icon={FileText} className="h-8 w-8 text-primary" />
                     <div>
                       <h3 className="font-semibold mb-1">Создать инвойс</h3>
                       <p className="text-sm text-muted-foreground">Финансы</p>
@@ -196,16 +189,12 @@ export default function DashboardBusiness() {
               </Card>
 
               <Card 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => {
-                  const tabsList = document.querySelector('[role="tablist"]');
-                  const analyticsTab = tabsList?.querySelector('[value="analytics"]') as HTMLElement;
-                  analyticsTab?.click();
-                }}
+                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                onClick={() => setActiveTab("analytics")}
               >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <BarChart3 className="h-8 w-8 text-primary" />
+                    <AnimatedIcon icon={BarChart3} className="h-8 w-8 text-primary" />
                     <div>
                       <h3 className="font-semibold mb-1">Посмотреть отчеты</h3>
                       <p className="text-sm text-muted-foreground">Аналитика</p>
