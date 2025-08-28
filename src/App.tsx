@@ -98,12 +98,14 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <EnhancedI18nProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Diagnostics />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <div style={{ background: 'hsl(var(--background))' }}>
+          <Toaster />
+          <Sonner />
+          <Diagnostics />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </div>
       </TooltipProvider>
     </EnhancedI18nProvider>
   </QueryClientProvider>

@@ -50,17 +50,23 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* ServiceHub additions */
+    /* ServiceHub - Clean design system */
     --brand-1: 258 80% 50%;
     --brand-2: 199 89% 48%;
     --brand-3: 280 72% 60%;
     --brand-glow: 258 80% 65%;
-    --gradient-primary: linear-gradient(135deg, hsl(var(--brand-1)) 0%, hsl(var(--brand-2)) 50%, hsl(var(--brand-3)) 100%);
-    --gradient-surface: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--card)/0.8) 100%);
-    --gradient-glass: linear-gradient(145deg, hsl(var(--background)/0.6) 0%, hsl(var(--background)/0.3) 100%);
-    --shadow-soft: 0 8px 30px hsl(var(--brand-1) / 0.15);
-    --shadow-strong: 0 12px 40px hsl(var(--brand-1) / 0.25);
-    --shadow-glow: 0 0 80px hsl(var(--brand-glow) / 0.3);
+    
+    /* Clean shadows like in the image */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.1);
+    --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12), 0 16px 32px rgba(0, 0, 0, 0.15);
+    --shadow-glow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+    
+    /* Clean backgrounds - no gradients, pure white/colors */
+    --surface-clean: 0 0% 100%;
+    --surface-elevated: 0 0% 100%;
+    --surface-glass: 0 0% 100%;
+    
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
@@ -105,9 +111,10 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --shadow-soft: 0 8px 30px hsl(var(--brand-1) / 0.25);
-    --shadow-strong: 0 12px 40px hsl(var(--brand-1) / 0.35);
-    --shadow-glow: 0 0 80px hsl(var(--brand-glow) / 0.4);
+    /* Clean shadows for dark mode */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.5);
     
     /* Navigation depth */
     --nav-z-index: 50;
@@ -122,7 +129,8 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground antialiased font-sans text-[22px] leading-relaxed;
+    @apply text-foreground antialiased font-sans text-[22px] leading-relaxed;
+    background: hsl(var(--background));
   }
 
   h1, h2, h3 {
@@ -132,76 +140,68 @@ All colors MUST be HSL.
 
 @layer components {
   .btn-hero {
-    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold shadow-lg transition-all duration-500 ease-out transform;
-    background-image: var(--gradient-primary);
+    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold transition-all duration-300 ease-out;
+    background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
+    box-shadow: var(--shadow-medium);
   }
   .btn-hero:hover {
-    transform: translateY(-1px) scale(1.01);
-    box-shadow: var(--shadow-glow), var(--shadow-strong);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-strong);
   }
+  
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold border-2 transition-all duration-500 ease-out;
+    @apply inline-flex items-center justify-center rounded-xl px-8 py-4 font-semibold border transition-all duration-300 ease-out;
+    background: hsl(var(--surface-clean));
     border-color: hsl(var(--border));
     color: hsl(var(--foreground));
-    background: var(--gradient-glass);
-    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft);
   }
   .btn-ghost:hover {
     border-color: hsl(var(--primary));
-    background: hsl(var(--primary)/0.1);
-    transform: translateY(-0.5px);
-    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
   }
+  
+  /* Clean card surfaces like in the image */
   .card-surface {
-    @apply rounded-2xl border p-8 backdrop-blur-sm relative overflow-hidden;
-    background: var(--gradient-surface);
-    box-shadow: var(--shadow-soft);
-    border-color: hsl(var(--border)/0.5);
+    @apply rounded-2xl border p-8 relative;
+    background: hsl(var(--surface-clean));
+    box-shadow: var(--shadow-medium);
+    border-color: hsl(var(--border));
   }
-  .card-surface::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(var(--primary)/0.3), transparent);
-  }
-  .glass-surface {
-    @apply rounded-2xl border p-8 backdrop-blur-xl relative;
-    background: var(--gradient-glass);
-    box-shadow: var(--shadow-soft);
-    border-color: hsl(var(--border)/0.3);
-  }
-  .acrylic-surface {
-    @apply rounded-2xl border p-8 backdrop-blur-2xl relative;
-    background: linear-gradient(135deg, hsl(var(--brand-1) / 0.08), hsl(var(--brand-2) / 0.06))
-      , var(--gradient-glass);
+  
+  .card-surface:hover {
+    transform: translateY(-1px);
     box-shadow: var(--shadow-strong);
-    border-color: hsl(var(--primary)/0.2);
   }
-  .acrylic-surface::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, hsl(var(--primary)/0.4), transparent, hsl(var(--accent)/0.4));
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: xor;
+  
+  .glass-surface {
+    @apply rounded-2xl border p-8 relative;
+    background: hsl(var(--surface-elevated));
+    box-shadow: var(--shadow-soft);
+    border-color: hsl(var(--border));
   }
+  
+  .acrylic-surface {
+    @apply rounded-2xl border p-8 relative;
+    background: hsl(var(--surface-elevated));
+    box-shadow: var(--shadow-strong);
+    border-color: hsl(var(--border));
+  }
+  
   .glass-nav {
-    @apply border-b backdrop-blur-xl sticky top-0 z-50;
-    background: var(--gradient-glass);
-    border-color: hsl(var(--border)/0.3);
+    @apply border-b sticky top-0 z-50;
+    background: hsl(var(--surface-clean));
+    border-color: hsl(var(--border));
+    box-shadow: var(--shadow-soft);
   }
+  
   .text-gradient {
-    background-image: var(--gradient-primary);
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    filter: drop-shadow(0 2px 4px hsl(var(--primary)/0.3));
   }
 }
 
