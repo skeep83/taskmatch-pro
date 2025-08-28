@@ -44,9 +44,10 @@ export const AppNavigation = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setIsAuthenticated(!!session?.user);
+      const isAuth = !!session?.user;
+      setIsAuthenticated(isAuth);
       
-      if (session?.user) {
+      if (isAuth && session?.user) {
         // Load user roles
         const { data: roles } = await supabase
           .from("user_roles")
@@ -66,9 +67,14 @@ export const AppNavigation = () => {
         } else {
           setCurrentRole('client');
         }
+      } else {
+        // Reset state when logged out
+        setUserRoles([]);
+        setCurrentRole('client');
       }
     });
 
+    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session?.user);
     });
@@ -284,9 +290,14 @@ export const AppNavigation = () => {
                 <UserMenu />
               </>
             ) : (
-              <Link to="/auth" className="btn-hero text-sm whitespace-nowrap">
-                Войти
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link 
+                  to="/auth" 
+                  className="btn-hero text-sm px-6 py-2 whitespace-nowrap hover-scale"
+                >
+                  Войти
+                </Link>
+              </div>
             )}
 
             {/* Mobile menu toggle */}
@@ -353,6 +364,17 @@ export const AppNavigation = () => {
 
             {/* Mobile Navigation Links */}
             <div className="space-y-4">
+              {/* Login button for unauthenticated users */}
+              {!isAuthenticated && (
+                <Link
+                  to="/auth"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 p-4 rounded-lg btn-hero text-center font-medium"
+                >
+                  Войти в аккаунт
+                </Link>
+              )}
+
               {isAuthenticated && (
                 <div className="grid gap-3">
                   {serviceActions.map((action) => (
