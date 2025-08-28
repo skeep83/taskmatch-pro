@@ -43,30 +43,40 @@ export const AppNavigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const isAuth = !!session?.user;
       setIsAuthenticated(isAuth);
       
       if (isAuth && session?.user) {
-        // Load user roles
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .in("role", ['client', 'pro', 'business']);
-        
-        const rolesList = (roles || []).map((r: any) => r.role as UserRole);
-        setUserRoles(rolesList);
-        
-        // Determine current role from path
-        const currentPath = location.pathname;
-        if (currentPath.includes('/dashboard/pro') && rolesList.includes('pro')) {
-          setCurrentRole('pro');
-        } else if (currentPath.includes('/dashboard/business') && rolesList.includes('business')) {
-          setCurrentRole('business');
-        } else {
-          setCurrentRole('client');
-        }
+        // Use setTimeout to avoid blocking the auth state change
+        setTimeout(async () => {
+          try {
+            // Load user roles
+            const { data: roles } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", session.user.id)
+              .in("role", ['client', 'pro', 'business']);
+            
+            const rolesList = (roles || []).map((r: any) => r.role as UserRole);
+            setUserRoles(rolesList);
+            
+            // Determine current role from path
+            const currentPath = location.pathname;
+            if (currentPath.includes('/dashboard/pro') && rolesList.includes('pro')) {
+              setCurrentRole('pro');
+            } else if (currentPath.includes('/dashboard/business') && rolesList.includes('business')) {
+              setCurrentRole('business');
+            } else {
+              setCurrentRole('client');
+            }
+          } catch (error) {
+            console.error('Error loading user roles:', error);
+            // Set default state on error
+            setUserRoles([]);
+            setCurrentRole('client');
+          }
+        }, 0);
       } else {
         // Reset state when logged out
         setUserRoles([]);
@@ -80,7 +90,7 @@ export const AppNavigation = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [location.pathname]);
+  }, [location.pathname]); // Add location.pathname as dependency
 
   const mainNavItems = [
     {
