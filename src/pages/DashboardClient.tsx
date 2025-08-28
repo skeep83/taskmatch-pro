@@ -37,10 +37,12 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('DashboardClient: Starting loadDashboard...');
     loadDashboard();
   }, []);
 
   const loadDashboard = async () => {
+    console.log('DashboardClient: loadDashboard started');
     try {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session?.user) {
@@ -89,6 +91,8 @@ export default function DashboardClient() {
         variant: "destructive"
       });
     } finally {
+      
+      console.log('DashboardClient: Loading complete, setting loading to false');
       setLoading(false);
     }
   };
