@@ -178,10 +178,10 @@ const Index = () => {
               newState[cardIndex] = false;
               return newState;
             });
-          }, 100);
-        }, 400);
+          }, 200);
+        }, 800); // Wait for fade out animation
         
-      }, 6500 + (cardIndex * 2000)); // 6.5s, 8.5s, 10.5s intervals
+      }, 13000 + (cardIndex * 4000)); // 13s, 17s, 21s intervals
 
       intervals.push(interval);
     });
@@ -355,13 +355,13 @@ const Index = () => {
           {currentTestimonials.map((testimonial, index) => (
             <div 
               key={`testimonial-${index}-${testimonial.author}`}
-              className={`card-surface p-8 text-left transform transition-all duration-500 ease-in-out ${
+              className={`card-surface p-8 text-left transform transition-all duration-1000 ease-in-out ${
                 animatingCards[index]
                   ? 'opacity-0 translate-y-8 scale-95' 
                   : 'opacity-100 translate-y-0 scale-100'
               }`}
               style={{ 
-                transitionDelay: `${index * 150}ms`
+                transitionDelay: `${index * 300}ms`
               }}
             >
               <div className="flex items-center gap-1 mb-6">
