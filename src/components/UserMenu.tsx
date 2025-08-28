@@ -71,11 +71,20 @@ export const UserMenu = () => {
 
       if (error) {
         console.error('Error loading roles:', error);
+        // If no roles exist, still show menu so user can activate roles
+        setUserRoles([]);
+        setCurrentRole('client');
         return;
       }
 
       const rolesList = (roles || []).map((r: any) => r.role as UserRole);
       setUserRoles(rolesList);
+
+      // If no roles, default to client
+      if (rolesList.length === 0) {
+        setCurrentRole('client');
+        return;
+      }
 
       // Set default current role based on current path
       const currentPath = window.location.pathname;
@@ -136,7 +145,8 @@ export const UserMenu = () => {
     navigate("/");
   };
 
-  if (!userId || userRoles.length === 0) {
+  // Show menu even without roles - user can activate roles from menu
+  if (!userId) {
     return null;
   }
 
