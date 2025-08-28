@@ -1,7 +1,7 @@
 import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { FloatingCard } from "@/components/ui/floating-card";
-import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
 import { Wrench, Zap, Sparkles, Paintbrush, Package, Cog, ShieldCheck, Crown, Star, Rocket, Award } from "lucide-react";
@@ -38,7 +38,7 @@ const Index = () => {
             <div className="text-left lg:pr-8">
               <div className="mb-8 animate-fade-in">
                 <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                  <AnimatedIcon icon={Rocket} size={20} />
+                  <NeumorphicIcon icon={Rocket} size={32} />
                   <span className="text-sm font-medium text-primary">Платформа нового поколения</span>
                 </div>
                 <h1 className="text-5xl lg:text-7xl font-display font-bold mb-6 leading-tight">
@@ -64,15 +64,15 @@ const Index = () => {
               {/* Trust Indicators */}
               <div className="flex flex-wrap items-center gap-8 text-muted-foreground animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <div className="flex items-center gap-2">
-                  <AnimatedIcon icon={ShieldCheck} delayMs={0} />
+                  <NeumorphicIcon icon={ShieldCheck} size={28} delayMs={0} />
                   <span className="text-sm font-medium">Безопасные платежи</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <AnimatedIcon icon={Zap} delayMs={150} />
+                  <NeumorphicIcon icon={Zap} size={28} delayMs={150} />
                   <span className="text-sm font-medium">Мгновенные отклики</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <AnimatedIcon icon={Award} delayMs={300} />
+                  <NeumorphicIcon icon={Award} size={28} delayMs={300} />
                   <span className="text-sm font-medium">Проверенные специалисты</span>
                 </div>
               </div>
@@ -153,10 +153,10 @@ const Index = () => {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="mb-4">
-                  <AnimatedIcon 
+                  <NeumorphicIcon 
                     icon={IconCmp} 
-                    size={40}
-                    className="text-primary group-hover:scale-110 transition-transform" 
+                    size={64}
+                    className="group-hover:scale-110 transition-transform mx-auto" 
                     delayMs={index * 100}
                   />
                 </div>
@@ -191,12 +191,12 @@ const Index = () => {
               className="card-surface p-8 text-left"
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="flex items-center gap-1 mb-4">
+              <div className="flex items-center gap-2 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <AnimatedIcon 
+                  <NeumorphicIcon 
                     key={i} 
                     icon={Star} 
-                    size={16} 
+                    size={24}
                     className="text-amber-400"
                     delayMs={index * 150 + i * 50}
                   />
