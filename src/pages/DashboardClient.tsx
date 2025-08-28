@@ -67,7 +67,7 @@ export default function DashboardClient() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={Briefcase} size={32} className="text-primary" />
               <div>
@@ -75,9 +75,9 @@ export default function DashboardClient() {
                 <p className="text-sm text-muted-foreground">Найти специалиста</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={Calendar} size={32} className="text-primary" />
               <div>
@@ -85,9 +85,9 @@ export default function DashboardClient() {
                 <p className="text-sm text-muted-foreground">История заказов</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={User} size={32} className="text-primary" />
               <div>
@@ -95,9 +95,9 @@ export default function DashboardClient() {
                 <p className="text-sm text-muted-foreground">Настройки аккаунта</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={Settings} size={32} className="text-primary" />
               <div>
@@ -105,17 +105,17 @@ export default function DashboardClient() {
                 <p className="text-sm text-muted-foreground">Уведомления</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
         </div>
 
         {/* Recent Activity */}
-        <FloatingCard className="p-8">
+        <div className="card-surface p-8">
           <h2 className="text-2xl font-bold mb-6">Недавняя активность</h2>
           <div className="text-center py-12">
             <p className="text-muted-foreground">Пока нет активности</p>
             <p className="text-sm text-muted-foreground mt-2">Создайте свой первый заказ</p>
           </div>
-        </FloatingCard>
+        </div>
       </div>
     </main>
   );

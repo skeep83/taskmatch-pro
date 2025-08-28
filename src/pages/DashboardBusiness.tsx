@@ -67,28 +67,28 @@ export default function DashboardBusiness() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <FloatingCard className="p-6 text-center">
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={BarChart3} size={32} className="text-primary mb-4" />
             <div className="text-2xl font-bold mb-1">$0.00</div>
             <div className="text-sm text-muted-foreground">Общие расходы</div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center">
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={Users} size={32} className="text-success mb-4" />
             <div className="text-2xl font-bold mb-1">0</div>
             <div className="text-sm text-muted-foreground">Сотрудников</div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center">
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={Building2} size={32} className="text-accent mb-4" />
             <div className="text-2xl font-bold mb-1">0</div>
             <div className="text-sm text-muted-foreground">Заказов</div>
-          </FloatingCard>
+          </div>
         </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={Building2} size={32} className="text-primary" />
               <div>
@@ -96,9 +96,9 @@ export default function DashboardBusiness() {
                 <p className="text-sm text-muted-foreground">Для компании</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={Users} size={32} className="text-primary" />
               <div>
@@ -106,9 +106,9 @@ export default function DashboardBusiness() {
                 <p className="text-sm text-muted-foreground">Управление</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={BarChart3} size={32} className="text-primary" />
               <div>
@@ -116,9 +116,9 @@ export default function DashboardBusiness() {
                 <p className="text-sm text-muted-foreground">Аналитика</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
 
-          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+          <div className="card-surface p-6 text-center cursor-pointer">
             <div className="flex flex-col items-center gap-4">
               <AnimatedIcon icon={Settings} size={32} className="text-primary" />
               <div>
@@ -126,17 +126,17 @@ export default function DashboardBusiness() {
                 <p className="text-sm text-muted-foreground">Компания</p>
               </div>
             </div>
-          </FloatingCard>
+          </div>
         </div>
 
         {/* Company Setup */}
-        <FloatingCard className="p-8">
+        <div className="card-surface p-8">
           <h2 className="text-2xl font-bold mb-6">Настройка компании</h2>
           <div className="text-center py-12">
             <p className="text-muted-foreground">Настройте данные компании</p>
             <p className="text-sm text-muted-foreground mt-2">Заполните профиль для начала работы</p>
           </div>
-        </FloatingCard>
+        </div>
       </div>
     </main>
   );

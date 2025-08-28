@@ -261,15 +261,15 @@ const DashboardPro = () => {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
-          <FloatingCard className="p-6 text-center" delay={100} hover glow>
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={Wallet} size={32} className="text-success mb-4" />
             <div className="text-2xl font-bold text-success mb-1">
               {formatPrice(walletBalance)}
             </div>
             <div className="text-sm text-muted-foreground">Баланс</div>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-6 text-center" delay={200} hover glow>
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={Star} size={32} className="text-amber-500 mb-4" />
             <div className="flex flex-col items-center">
               <StarRating 
@@ -281,78 +281,78 @@ const DashboardPro = () => {
                 className="mb-1"
               />
             </div>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-6 text-center" delay={300} hover glow>
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={DollarSign} size={32} className="text-primary mb-4" />
             <div className="text-2xl font-bold text-primary mb-1">
               {formatPrice(monthlyEarnings)}
             </div>
             <div className="text-sm text-muted-foreground">Этот месяц</div>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-6 text-center" delay={400} hover glow>
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={Award} size={32} className="text-accent mb-4" />
             <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
             <div className="text-sm text-muted-foreground">Выполнено</div>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-6 text-center" delay={500} hover glow>
+          <div className="card-surface p-6 text-center">
             <AnimatedIcon icon={Clock} size={32} className="text-purple-500 mb-4" />
             <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
             <div className="text-sm text-muted-foreground">Время ответа</div>
-          </FloatingCard>
+          </div>
         </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={100}>
+          <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/pro/profile" className="flex flex-col items-center gap-2">
               <AnimatedIcon icon={UserCog} size={24} className="text-primary" />
               <span className="text-sm font-medium">Профиль</span>
             </Link>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={200}>
+          <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
               <AnimatedIcon icon={Calendar} size={24} className="text-primary" />
               <span className="text-sm font-medium">Расписание</span>
             </Link>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={300}>
+          <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/portfolio" className="flex flex-col items-center gap-2">
               <AnimatedIcon icon={ImageIcon} size={24} className="text-primary" />
               <span className="text-sm font-medium">Портфолио</span>
             </Link>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={400}>
+          <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/tenders" className="flex flex-col items-center gap-2">
               <AnimatedIcon icon={Briefcase} size={24} className="text-primary" />
               <span className="text-sm font-medium">Тендеры</span>
             </Link>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={500}>
+          <div className="card-surface p-4 text-center cursor-pointer">
             <button className="flex flex-col items-center gap-2 w-full">
               <AnimatedIcon icon={CreditCard} size={24} className="text-primary" />
               <span className="text-sm font-medium">Выплата</span>
             </button>
-          </FloatingCard>
+          </div>
           
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={600}>
+          <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/kyc" className="flex flex-col items-center gap-2">
               <AnimatedIcon icon={ShieldCheck} size={24} className="text-primary" />
               <span className="text-sm font-medium">KYC</span>
             </Link>
-          </FloatingCard>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Available Jobs */}
           <div className="lg:col-span-2 space-y-8">
-            <FloatingCard className="p-8" delay={200} hover>
+            <div className="card-surface p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <AnimatedIcon icon={Briefcase} size={28} className="text-primary" />
@@ -376,7 +376,7 @@ const DashboardPro = () => {
                 )}
 
                 {nearbyJobs.slice(0, 5).map((job, index) => (
-                  <FloatingCard key={job.id} className="p-6" delay={index * 100} hover glow>
+                  <div key={job.id} className="card-surface p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
@@ -414,13 +414,13 @@ const DashboardPro = () => {
                         Видео-оценка
                       </button>
                     </div>
-                  </FloatingCard>
+                  </div>
                 ))}
               </div>
-            </FloatingCard>
+            </div>
 
             {/* Active Jobs */}
-            <FloatingCard className="p-8" delay={300} hover>
+            <div className="card-surface p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <AnimatedIcon icon={Clock} size={28} className="text-primary" />
@@ -441,7 +441,7 @@ const DashboardPro = () => {
                 )}
 
                 {myActiveJobs.map((job, index) => (
-                  <FloatingCard key={job.id} className="p-6" delay={index * 100} hover glow>
+                  <div key={job.id} className="card-surface p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
@@ -477,16 +477,16 @@ const DashboardPro = () => {
                         Чат
                       </button>
                     </div>
-                  </FloatingCard>
+                  </div>
                 ))}
               </div>
-            </FloatingCard>
+            </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Account Overview */}
-            <FloatingCard className="p-6" delay={400} hover>
+            <div className="card-surface p-6">
               <h3 className="font-semibold mb-4">Обзор аккаунта</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -511,10 +511,9 @@ const DashboardPro = () => {
                   <span className="text-sm font-medium">{completedJobs}</span>
                 </div>
               </div>
-            </FloatingCard>
+            </div>
 
-            {/* Trending Tenders */}
-            <FloatingCard className="p-6" delay={600} hover>
+            <div className="card-surface p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Актуальные тендеры</h3>
                 <Link to="/tenders" className="text-sm text-primary hover:underline">Все тендеры</Link>
@@ -545,7 +544,7 @@ const DashboardPro = () => {
                   </div>
                 ))}
               </div>
-            </FloatingCard>
+            </div>
           </div>
         </div>
       </div>
