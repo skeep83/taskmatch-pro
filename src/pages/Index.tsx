@@ -38,7 +38,7 @@ const Index = () => {
             <div className="text-left lg:pr-8">
               <div className="mb-8 animate-fade-in">
                 <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                  <NeumorphicIcon icon={Rocket} size={32} />
+                  <NeumorphicIcon icon={Rocket} size={40} variant="square" />
                   <span className="text-sm font-medium text-primary">Платформа нового поколения</span>
                 </div>
                 <h1 className="text-5xl lg:text-7xl font-display font-bold mb-6 leading-tight">
@@ -64,15 +64,15 @@ const Index = () => {
               {/* Trust Indicators */}
               <div className="flex flex-wrap items-center gap-8 text-muted-foreground animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <div className="flex items-center gap-2">
-                  <NeumorphicIcon icon={ShieldCheck} size={28} delayMs={0} />
+                  <NeumorphicIcon icon={ShieldCheck} size={36} variant="square" delayMs={0} />
                   <span className="text-sm font-medium">Безопасные платежи</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <NeumorphicIcon icon={Zap} size={28} delayMs={150} />
+                  <NeumorphicIcon icon={Zap} size={36} variant="square" delayMs={150} />
                   <span className="text-sm font-medium">Мгновенные отклики</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <NeumorphicIcon icon={Award} size={28} delayMs={300} />
+                  <NeumorphicIcon icon={Award} size={36} variant="square" delayMs={300} />
                   <span className="text-sm font-medium">Проверенные специалисты</span>
                 </div>
               </div>
@@ -155,7 +155,8 @@ const Index = () => {
                 <div className="mb-4">
                   <NeumorphicIcon 
                     icon={IconCmp} 
-                    size={64}
+                    size={80}
+                    variant="square"
                     className="group-hover:scale-110 transition-transform mx-auto" 
                     delayMs={index * 100}
                   />
@@ -196,7 +197,8 @@ const Index = () => {
                   <NeumorphicIcon 
                     key={i} 
                     icon={Star} 
-                    size={24}
+                    size={32}
+                    variant="square"
                     className="text-amber-400"
                     delayMs={index * 150 + i * 50}
                   />

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { FloatingCard } from "@/components/ui/floating-card";
-import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
@@ -208,7 +208,7 @@ const DashboardPro = () => {
       <div className="card-surface p-8 text-center animate-pulse-glow">
         <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем кабинет специалиста...</h1>
         <div className="flex items-center justify-center gap-2">
-          <AnimatedIcon icon={Clock} className="animate-spin" />
+          <NeumorphicIcon icon={Clock} size={32} variant="square" className="animate-spin" />
         </div>
       </div>
     </main>
@@ -232,8 +232,9 @@ const DashboardPro = () => {
           
           <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <AnimatedIcon icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
-                size={20} 
+              <NeumorphicIcon icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
+                size={32} 
+                variant="square"
                 className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
               />
               <span className="text-sm font-medium">
@@ -241,7 +242,7 @@ const DashboardPro = () => {
               </span>
             </div>
             <button className="btn-ghost flex items-center gap-2">
-              <AnimatedIcon icon={Bell} size={20} />
+              <NeumorphicIcon icon={Bell} size={32} variant="square" />
               Уведомления
             </button>
           </div>
@@ -250,7 +251,7 @@ const DashboardPro = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
           <div className="card-surface p-6 text-center">
-            <AnimatedIcon icon={Wallet} size={32} className="text-success mb-4" />
+            <NeumorphicIcon icon={Wallet} size={48} variant="square" className="mb-4 mx-auto" />
             <div className="text-2xl font-bold text-success mb-1">
               {formatPrice(walletBalance)}
             </div>
@@ -258,7 +259,7 @@ const DashboardPro = () => {
           </div>
           
           <div className="card-surface p-6 text-center">
-            <AnimatedIcon icon={Star} size={32} className="text-amber-500 mb-4" />
+            <NeumorphicIcon icon={Star} size={48} variant="square" className="mb-4 mx-auto" />
             <div className="flex flex-col items-center">
               <StarRating 
                 rating={ratingAvg || 0} 
@@ -272,7 +273,7 @@ const DashboardPro = () => {
           </div>
           
           <div className="card-surface p-6 text-center">
-            <AnimatedIcon icon={DollarSign} size={32} className="text-primary mb-4" />
+            <NeumorphicIcon icon={DollarSign} size={48} variant="square" className="mb-4 mx-auto" />
             <div className="text-2xl font-bold text-primary mb-1">
               {formatPrice(monthlyEarnings)}
             </div>
@@ -280,13 +281,13 @@ const DashboardPro = () => {
           </div>
           
           <div className="card-surface p-6 text-center">
-            <AnimatedIcon icon={Award} size={32} className="text-accent mb-4" />
+            <NeumorphicIcon icon={Award} size={48} variant="square" className="mb-4 mx-auto" />
             <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
             <div className="text-sm text-muted-foreground">Выполнено</div>
           </div>
           
           <div className="card-surface p-6 text-center">
-            <AnimatedIcon icon={Clock} size={32} className="text-purple-500 mb-4" />
+            <NeumorphicIcon icon={Clock} size={48} variant="square" className="mb-4 mx-auto" />
             <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
             <div className="text-sm text-muted-foreground">Время ответа</div>
           </div>
@@ -296,42 +297,42 @@ const DashboardPro = () => {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
           <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/pro/profile" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={UserCog} size={24} className="text-primary" />
+              <NeumorphicIcon icon={UserCog} size={40} variant="square" />
               <span className="text-sm font-medium">Профиль</span>
             </Link>
           </div>
           
           <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={Calendar} size={24} className="text-primary" />
+              <NeumorphicIcon icon={Calendar} size={40} variant="square" />
               <span className="text-sm font-medium">Расписание</span>
             </Link>
           </div>
           
           <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/portfolio" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={ImageIcon} size={24} className="text-primary" />
+              <NeumorphicIcon icon={ImageIcon} size={40} variant="square" />
               <span className="text-sm font-medium">Портфолио</span>
             </Link>
           </div>
           
           <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/tenders" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={Briefcase} size={24} className="text-primary" />
+              <NeumorphicIcon icon={Briefcase} size={40} variant="square" />
               <span className="text-sm font-medium">Тендеры</span>
             </Link>
           </div>
           
           <div className="card-surface p-4 text-center cursor-pointer">
             <button className="flex flex-col items-center gap-2 w-full">
-              <AnimatedIcon icon={CreditCard} size={24} className="text-primary" />
+              <NeumorphicIcon icon={CreditCard} size={40} variant="square" />
               <span className="text-sm font-medium">Выплата</span>
             </button>
           </div>
           
           <div className="card-surface p-4 text-center cursor-pointer">
             <Link to="/kyc" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={ShieldCheck} size={24} className="text-primary" />
+              <NeumorphicIcon icon={ShieldCheck} size={40} variant="square" />
               <span className="text-sm font-medium">KYC</span>
             </Link>
           </div>
@@ -343,7 +344,7 @@ const DashboardPro = () => {
             <div className="card-surface p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <AnimatedIcon icon={Briefcase} size={28} className="text-primary" />
+                  <NeumorphicIcon icon={Briefcase} size={40} variant="square" />
                   <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -354,7 +355,7 @@ const DashboardPro = () => {
               <div className="space-y-4">
                 {nearbyJobs.length === 0 && (
                   <div className="text-center py-12">
-                    <AnimatedIcon icon={Briefcase} size={48} className="text-muted-foreground mb-4" />
+                    <NeumorphicIcon icon={Briefcase} size={64} variant="square" className="mb-4 mx-auto" />
                     <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
                     <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
                     <Link to="/pro/profile" className="btn-hero">
@@ -370,11 +371,11 @@ const DashboardPro = () => {
                         <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                           <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={Calendar} size={16} />
+                            <NeumorphicIcon icon={Calendar} size={20} variant="square" />
                             <span>{job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Не указано'}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={DollarSign} size={16} />
+                            <NeumorphicIcon icon={DollarSign} size={20} variant="square" />
                             <span>
                               {job.budget_min_cents && job.budget_max_cents
                                 ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
@@ -398,7 +399,7 @@ const DashboardPro = () => {
                         Предложить цену
                       </button>
                       <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                        <AnimatedIcon icon={Video} size={16} />
+                        <NeumorphicIcon icon={Video} size={20} variant="square" />
                         Видео-оценка
                       </button>
                     </div>
@@ -411,7 +412,7 @@ const DashboardPro = () => {
             <div className="card-surface p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <AnimatedIcon icon={Clock} size={28} className="text-primary" />
+                  <NeumorphicIcon icon={Clock} size={40} variant="square" />
                   <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -422,7 +423,7 @@ const DashboardPro = () => {
               <div className="space-y-4">
                 {myActiveJobs.length === 0 && (
                   <div className="text-center py-12">
-                    <AnimatedIcon icon={Clock} size={48} className="text-muted-foreground mb-4" />
+                    <NeumorphicIcon icon={Clock} size={64} variant="square" className="mb-4 mx-auto" />
                     <h3 className="text-lg font-semibold mb-2">Нет активных заказов</h3>
                     <p className="text-muted-foreground">Найдите новые заказы выше</p>
                   </div>
@@ -461,7 +462,7 @@ const DashboardPro = () => {
                         </button>
                       )}
                       <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                        <AnimatedIcon icon={MessageSquare} size={16} />
+                        <NeumorphicIcon icon={MessageSquare} size={20} variant="square" />
                         Чат
                       </button>
                     </div>
@@ -480,9 +481,10 @@ const DashboardPro = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Статус верификации</span>
                   <div className="flex items-center gap-1">
-                    <AnimatedIcon 
+                    <NeumorphicIcon 
                       icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
-                      size={16} 
+                      size={24} 
+                      variant="square"
                       className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
                     />
                     <span className="text-sm font-medium">
@@ -510,7 +512,7 @@ const DashboardPro = () => {
               <div className="space-y-3">
                 {tenders.length === 0 && (
                   <div className="text-center py-4">
-                    <AnimatedIcon icon={Briefcase} size={32} className="text-muted-foreground mb-2" />
+                    <NeumorphicIcon icon={Briefcase} size={48} variant="square" className="mb-2 mx-auto" />
                     <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
                   </div>
                 )}

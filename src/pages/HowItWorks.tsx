@@ -2,7 +2,7 @@ import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
-import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -171,7 +171,7 @@ const HowItWorks = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-lg opacity-30 animate-pulse"></div>
               <GlassMorphism className="relative p-6 rounded-full">
-                <AnimatedIcon icon={Sparkles} size={56} className="text-primary" />
+                <NeumorphicIcon icon={Sparkles} size={72} variant="square" className="text-primary" />
               </GlassMorphism>
             </div>
           </div>
@@ -209,10 +209,11 @@ const HowItWorks = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
           {stats.map((stat, index) => (
             <div key={index} className="card-surface p-6 text-center">
-              <AnimatedIcon 
+              <NeumorphicIcon 
                 icon={stat.icon} 
-                size={32} 
-                className="text-primary mx-auto mb-3"
+                size={48} 
+                variant="square"
+                className="mx-auto mb-3"
                 delayMs={index * 100}
               />
               <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
@@ -258,9 +259,10 @@ const HowItWorks = () => {
                     <div className={`absolute inset-0 bg-gradient-to-r ${step.gradient} rounded-full blur-lg opacity-20 animate-pulse`}></div>
                     <div className={`relative w-20 h-20 mx-auto rounded-full bg-gradient-to-r ${step.gradient} p-0.5`}>
                       <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                        <AnimatedIcon 
+                        <NeumorphicIcon 
                           icon={step.icon} 
-                          size={32}
+                          size={48}
+                          variant="square"
                           className="text-foreground"
                           delayMs={index * 200}
                         />
@@ -323,9 +325,10 @@ const HowItWorks = () => {
               <div className="relative z-10">
                 <div className="mb-6">
                   <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} bg-opacity-20 backdrop-blur-sm`}>
-                    <AnimatedIcon 
+                    <NeumorphicIcon 
                       icon={feature.icon} 
-                      size={32}
+                      size={56}
+                      variant="square"
                       className="text-white drop-shadow-lg"
                       delayMs={index * 150}
                     />

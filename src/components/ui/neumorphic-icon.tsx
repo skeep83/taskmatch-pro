@@ -22,12 +22,12 @@ export const NeumorphicIcon = ({
   style,
   ...props 
 }: NeumorphicIconProps) => {
-  const actualIconSize = iconSize || size * 0.5;
+  const actualIconSize = iconSize || size * 0.4;
   
   const variantStyles = {
     circle: 'rounded-full',
-    rounded: 'rounded-2xl',
-    square: 'rounded-lg'
+    rounded: 'rounded-2xl', 
+    square: 'rounded-2xl' // Made more rounded like in reference
   };
 
   return (
