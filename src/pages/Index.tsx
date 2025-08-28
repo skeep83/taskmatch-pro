@@ -89,38 +89,35 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-3xl" />
                 
                 {/* Floating Stats Cards */}
-                <FloatingCard 
-                  className="absolute -top-6 -left-6 p-4 w-56"
-                  delay={600}
-                  glow
+                <div 
+                  className="card-surface absolute -top-6 -left-6 p-4 w-56"
+                  style={{ animationDelay: '600ms' }}
                 >
                   <div className="text-center">
                     <div className="text-3xl font-bold text-primary mb-1">25K+</div>
                     <div className="text-sm text-muted-foreground">Выполненных заказов</div>
                   </div>
-                </FloatingCard>
+                </div>
 
-                <FloatingCard 
-                  className="absolute -bottom-6 -right-6 p-4 w-56"
-                  delay={800}
-                  glow
+                <div 
+                  className="card-surface absolute -bottom-6 -right-6 p-4 w-56"
+                  style={{ animationDelay: '800ms' }}
                 >
                   <div className="text-center">
                     <div className="text-3xl font-bold text-accent mb-1">4.9★</div>
                     <div className="text-sm text-muted-foreground">Средний рейтинг</div>
                   </div>
-                </FloatingCard>
+                </div>
 
-                <FloatingCard 
-                  className="absolute -top-6 -right-6 p-4 w-48"
-                  delay={700}
-                  glow
+                <div 
+                  className="card-surface absolute -top-6 -right-6 p-4 w-48"
+                  style={{ animationDelay: '700ms' }}
                 >
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-500 mb-1">98%</div>
                     <div className="text-sm text-muted-foreground">Довольных клиентов</div>
                   </div>
-                </FloatingCard>
+                </div>
               </div>
             </div>
           </div>
@@ -150,11 +147,10 @@ const Index = () => {
             };
             const IconCmp = iconsByKey[c.key] || Sparkles;
             return (
-              <FloatingCard 
+              <div 
                 key={c.key} 
-                className="p-6 text-center cursor-pointer group"
-                delay={index * 100}
-                hover
+                className="card-surface p-6 text-center cursor-pointer group"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="mb-4">
                   <AnimatedIcon 
@@ -167,7 +163,7 @@ const Index = () => {
                 <div className="font-semibold group-hover:text-primary transition-colors">
                   {c.label}
                 </div>
-              </FloatingCard>
+              </div>
             );
           })}
         </div>
@@ -190,11 +186,10 @@ const Index = () => {
             { text: "Использую ServiceHub для поиска электриков. Всегда качественная работа и честные цены. Рекомендую!", author: "Дмитрий, СПб", rating: 5 },
             { text: "Удобная платформа для заказа услуг по дому. Специалисты проверенные, работают профессионально.", author: "Анна, Екатеринбург", rating: 5 }
           ].map((testimonial, index) => (
-            <FloatingCard 
+            <div 
               key={index} 
-              className="p-8 text-left"
-              delay={index * 150}
-              hover
+              className="card-surface p-8 text-left"
+              style={{ animationDelay: `${index * 150}ms` }}
             >
               <div className="flex items-center gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
@@ -213,7 +208,7 @@ const Index = () => {
               <div className="font-semibold text-primary">
                 {testimonial.author}
               </div>
-            </FloatingCard>
+            </div>
           ))}
         </div>
       </section>
