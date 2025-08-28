@@ -68,24 +68,44 @@ const JobNew = () => {
         navigate("/auth");
         return;
       }
+
+      // Check if this is for a business account
+      const { data: businessData } = await supabase
+        .from("business_accounts")
+        .select("id")
+        .eq("owner_id", userId)
+        .maybeSingle();
+
       const scheduled_at = date && time ? new Date(`${date}T${time}:00Z`).toISOString() : null;
       const insertPayload: any = {
         client_id: userId,
         category_id,
-        title: description.substring(0, 100), // Используем первую часть описания как заголовок
+        title: description.substring(0, 100),
         description,
-        urgency,
         budget_min_cents: isFinite(budget_min) ? Math.round(budget_min * 100) : null,
         budget_max_cents: isFinite(budget_max) ? Math.round(budget_max * 100) : null,
         scheduled_at,
+        urgency
       };
+      
       if (presetProId) insertPayload.pro_id = presetProId;
-      const { data: created, error } = await (supabase as any)
+      
+      const { data: created, error } = await supabase
         .from("jobs")
         .insert(insertPayload)
         .select('id')
         .single();
       if (error) throw error;
+
+      // Link to business if this is a business user
+      if (businessData?.id && created?.id) {
+        await supabase
+          .from("business_jobs")
+          .insert({
+            business_id: businessData.id,
+            job_id: created.id
+          });
+      }
 
       // Upload photos to private bucket and link to job
       if (created?.id && uploadedFiles.length) {

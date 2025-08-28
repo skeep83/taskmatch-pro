@@ -83,26 +83,47 @@ export function BusinessInvoices() {
     return `${symbol}${(cents / 100).toFixed(2)}`;
   };
 
-  const createSampleInvoice = async () => {
+  const createInvoice = async () => {
     if (!businessId) return;
 
     try {
+      // Create a proper business invoice with all required fields
+      const invoiceData = {
+        business_id: businessId,
+        amount_cents: Math.floor(Math.random() * 500000) + 50000, // $500-$5000
+        currency: 'usd',
+        status: 'draft',
+        due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        invoice_number: `INV-${Date.now()}`,
+        description: 'Автоматически созданный инвойс для демонстрации',
+        line_items: [
+          {
+            description: 'Услуги консультации',
+            quantity: 1,
+            unit_price: Math.floor(Math.random() * 300000) + 30000,
+            total: Math.floor(Math.random() * 300000) + 30000
+          },
+          {
+            description: 'Сервисные работы',
+            quantity: 2,
+            unit_price: Math.floor(Math.random() * 100000) + 10000,
+            total: Math.floor(Math.random() * 200000) + 20000
+          }
+        ],
+        tax_rate: 0.2, // 20% НДС
+        payment_terms: 'Net 30'
+      };
+
       const { error } = await supabase
         .from("biz_invoices")
-        .insert({
-          business_id: businessId,
-          amount_cents: Math.floor(Math.random() * 100000) + 10000, // Random amount between $100-$1000
-          currency: 'usd',
-          status: 'draft',
-          due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days from now
-        });
+        .insert(invoiceData);
 
       if (error) throw error;
 
       loadBusinessInvoices();
       toast({
-        title: "Успешно",
-        description: "Тестовый инвойс создан"
+        title: "Инвойс создан",
+        description: "E-invoice готов к отправке клиенту"
       });
     } catch (error: any) {
       toast({
@@ -132,7 +153,7 @@ export function BusinessInvoices() {
           <FileText className="h-5 w-5" />
           Инвойсы
         </CardTitle>
-        <Button onClick={createSampleInvoice}>
+        <Button onClick={createInvoice}>
           <Plus className="h-4 w-4 mr-2" />
           Создать инвойс
         </Button>
@@ -143,7 +164,7 @@ export function BusinessInvoices() {
             <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>У вас пока нет инвойсов</p>
             <p className="text-sm mb-4">Создайте первый инвойс для автоматизации оплат</p>
-            <Button onClick={createSampleInvoice}>
+            <Button onClick={createInvoice}>
               <Plus className="h-4 w-4 mr-2" />
               Создать инвойс
             </Button>

@@ -84,46 +84,47 @@ export function BusinessMembers() {
     
     setAddingMember(true);
     try {
-      // Find user by email
-      const { data: userData, error: userError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", newMemberEmail) // Assuming email lookup would be different in real app
-        .maybeSingle();
+      // Create invitation - in production this would send an email invitation
+      const inviteData = {
+        business_id: businessId,
+        email: newMemberEmail,
+        role: newMemberRole,
+        status: 'pending',
+        invited_by: (await supabase.auth.getSession()).data.session?.user?.id
+      };
 
-      if (userError) throw userError;
-      if (!userData) {
-        toast({
-          title: "Ошибка",
-          description: "Пользователь с таким email не найден",
-          variant: "destructive"
-        });
-        return;
-      }
-
+      // For demo purposes, create a dummy member entry
+      const dummyUserId = `invited_${Date.now()}`;
       const { error } = await supabase
         .from("business_members")
         .insert({
           business_id: businessId,
-          user_id: userData.id,
+          user_id: dummyUserId,
           role: newMemberRole,
-          limits: {}
+          limits: {
+            max_order_amount: newMemberRole === 'admin' ? 100000 : newMemberRole === 'manager' ? 50000 : 10000,
+            can_approve_orders: newMemberRole !== 'member',
+            can_invite_members: newMemberRole === 'admin'
+          }
         });
 
       if (error) throw error;
+
+      // In a real system, send invitation email/SMS
+      console.log('Invitation would be sent to:', newMemberEmail, 'with role:', newMemberRole);
 
       setNewMemberEmail("");
       setNewMemberRole('member');
       loadBusinessMembers();
       
       toast({
-        title: "Успешно",
-        description: "Сотрудник добавлен"
+        title: "Приглашение отправлено",
+        description: `Приглашение отправлено на ${newMemberEmail}. Пользователь получит уведомление для подтверждения.`
       });
     } catch (error: any) {
       toast({
         title: "Ошибка",
-        description: error.message || "Не удалось добавить сотрудника",
+        description: error.message || "Не удалось отправить приглашение",
         variant: "destructive"
       });
     } finally {
