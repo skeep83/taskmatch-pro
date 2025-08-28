@@ -62,14 +62,17 @@ const Index = () => {
               </div>
 
               {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-6 text-muted-foreground animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 flex items-center gap-3">
+                  <ShieldCheck size={24} className="text-green-500" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Безопасные платежи</span>
                 </div>
-                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10">
+                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 flex items-center gap-3">
+                  <Zap size={24} className="text-blue-500" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Мгновенные отклики</span>
                 </div>
-                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10">
+                <div className="bg-white dark:bg-white/5 px-6 py-4 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 flex items-center gap-3">
+                  <Award size={24} className="text-amber-500" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Проверенные специалисты</span>
                 </div>
               </div>
