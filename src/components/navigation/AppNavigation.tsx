@@ -43,8 +43,11 @@ export const AppNavigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    console.log('AppNavigation: Setting up auth listener');
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       const isAuth = !!session?.user;
+      console.log('AppNavigation: Auth state changed', { event, isAuth, user: session?.user?.email });
       setIsAuthenticated(isAuth);
       
       if (isAuth && session?.user) {
@@ -57,6 +60,7 @@ export const AppNavigation = () => {
         
         const rolesList = (roles || []).map((r: any) => r.role as UserRole);
         setUserRoles(rolesList);
+        console.log('AppNavigation: User roles loaded', rolesList);
         
         // Determine current role from path
         const currentPath = location.pathname;
@@ -71,12 +75,15 @@ export const AppNavigation = () => {
         // Reset state when logged out
         setUserRoles([]);
         setCurrentRole('client');
+        console.log('AppNavigation: User logged out, resetting state');
       }
     });
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session?.user);
+      const isAuth = !!session?.user;
+      console.log('AppNavigation: Initial session check', { isAuth, user: session?.user?.email });
+      setIsAuthenticated(isAuth);
     });
 
     return () => subscription.unsubscribe();
@@ -284,21 +291,34 @@ export const AppNavigation = () => {
             </div>
             
             {/* User-specific components */}
-            {isAuthenticated ? (
-              <>
-                <NotificationCenter />
-                <UserMenu />
-              </>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link 
-                  to="/auth" 
-                  className="btn-hero text-sm px-6 py-2 whitespace-nowrap hover-scale"
-                >
-                  Войти
-                </Link>
-              </div>
-            )}
+            {(() => {
+              console.log('AppNavigation: Rendering auth section', { isAuthenticated, userRoles });
+              return isAuthenticated ? (
+                <>
+                  <NotificationCenter />
+                  <UserMenu />
+                </>
+              ) : (
+                <div className="flex items-center gap-2" style={{border: "2px solid red", padding: "4px"}}>
+                  <Link 
+                    to="/auth" 
+                    className="bg-red-500 text-white px-4 py-2 rounded font-bold border-2 border-yellow-400"
+                    onClick={() => console.log('Login button clicked')}
+                    style={{
+                      backgroundColor: "red",
+                      color: "white", 
+                      padding: "8px 16px",
+                      borderRadius: "8px",
+                      fontWeight: "bold",
+                      textDecoration: "none",
+                      display: "inline-block"
+                    }}
+                  >
+                    ВОЙТИ ТЕСТ
+                  </Link>
+                </div>
+              );
+            })()}
 
             {/* Mobile menu toggle */}
             <Button
