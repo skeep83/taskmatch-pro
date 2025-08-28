@@ -50,13 +50,13 @@ const Index = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
-                <Link to="/catalog" className="btn-hero text-lg px-8 py-4 animate-pulse-glow">
+                <Link to="/catalog" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg">
                   🔍 Найти специалиста
                 </Link>
-                <Link to="/auth" className="btn-ghost text-lg px-8 py-4 hover-scale">
+                <Link to="/auth" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg">
                   💼 Стать исполнителем
                 </Link>
-                <Link to="/tenders" className="btn-ghost text-lg px-8 py-4 hover-scale">
+                <Link to="/tenders" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg">
                   🏢 Корпоративные тендеры
                 </Link>
               </div>
