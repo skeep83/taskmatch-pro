@@ -56,17 +56,17 @@ All colors MUST be HSL.
     --brand-3: 280 72% 60%;
     --brand-glow: 258 80% 65%;
     
-    /* Pure neumorphism shadows - exact colors from reference */
+    /* Pure neumorphism shadows - darker for better contrast */
     --shadow-raised: 
-      9px 9px 18px rgba(174, 187, 204, 0.35),
+      9px 9px 18px rgba(174, 187, 204, 0.5),
       -9px -9px 18px rgba(255, 255, 255, 0.5);
     
     --shadow-raised-hover: 
-      14px 14px 28px rgba(174, 187, 204, 0.4),
+      14px 14px 28px rgba(174, 187, 204, 0.6),
       -14px -14px 28px rgba(255, 255, 255, 0.6);
     
     --shadow-raised-strong: 
-      18px 18px 36px rgba(174, 187, 204, 0.5),
+      18px 18px 36px rgba(174, 187, 204, 0.7),
       -18px -18px 36px rgba(255, 255, 255, 0.7);
     
     /* Neumorphic backgrounds - grayish-blue like reference */
@@ -169,7 +169,7 @@ All colors MUST be HSL.
   .btn-hero:active {
     transform: translateY(1px);
     box-shadow: 
-      4px 4px 8px rgba(174, 187, 204, 0.25),
+      4px 4px 8px rgba(174, 187, 204, 0.4),
       -4px -4px 8px rgba(255, 255, 255, 0.3);
   }
   
@@ -186,7 +186,7 @@ All colors MUST be HSL.
   .btn-ghost:active {
     transform: translateY(1px);
     box-shadow: 
-      4px 4px 8px rgba(174, 187, 204, 0.25),
+      4px 4px 8px rgba(174, 187, 204, 0.4),
       -4px -4px 8px rgba(255, 255, 255, 0.3);
   }
   
