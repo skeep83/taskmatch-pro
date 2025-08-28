@@ -1,533 +1,143 @@
-import { useEffect, useMemo, useState } from "react";
-import { Seo } from "@/components/Seo";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { useEnhancedI18n } from "@/i18n/enhanced";
-import { useToast } from "@/hooks/use-toast";
-import { useCurrency } from "@/hooks/useCurrency";
-import { useNavigate, Link } from "react-router-dom";
-import { 
-  Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, 
-  CreditCard, Briefcase, Clock, ShieldCheck, TrendingUp, Award,
-  Settings, Bell, Zap, Video, MapPin, CheckCircle, AlertCircle,
-  BarChart3, DollarSign
-} from "lucide-react";
-import { StarRating } from "@/components/ui/star-rating";
-import dashboardPro from "@/assets/dashboard-pro.jpg";
+import { Briefcase, User, Calendar, Settings, Wallet, Star } from "lucide-react";
 
-const DashboardPro = () => {
-  const { t } = useEnhancedI18n();
-  const { toast } = useToast();
-  const { formatPrice, loading: currencyLoading } = useCurrency();
+export default function DashboardPro() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [nearbyJobs, setNearbyJobs] = useState<any[]>([]);
-  const [myActiveJobs, setMyActiveJobs] = useState<any[]>([]);
-  const [walletBalance, setWalletBalance] = useState<number>(0);
-  const [ratingAvg, setRatingAvg] = useState<number | null>(null);
-  const [ratingCount, setRatingCount] = useState<number>(0);
-  const [kycStatus, setKycStatus] = useState<string>('pending');
-  const [monthlyEarnings, setMonthlyEarnings] = useState<number>(0);
-  const [completedJobs, setCompletedJobs] = useState<number>(0);
-  const [responseTime, setResponseTime] = useState<string>('< 1 час');
-  const [tenders, setTenders] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    (async () => {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data: s } = await supabase.auth.getSession();
-      const uid = s.session?.user?.id || null;
-      if (!uid) {
-        toast({ title: "Требуется вход", description: "Пожалуйста, войдите" });
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      console.log('Checking authentication...');
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session.session?.user) {
+        console.log('No user session found, redirecting to auth');
         navigate("/auth");
         return;
       }
-      setUserId(uid);
-      
-      // Ensure user has roles and create pro role if needed
-      const { ensureUserRoles, createUserRole, hasUserRole } = await import("@/lib/userRoles");
-      const roleResult = await ensureUserRoles(uid);
-      
-      if (!roleResult.success) {
-        toast({ title: "Ошибка", description: roleResult.error || "Ошибка проверки ролей", variant: "destructive" });
-        navigate("/");
-        return;
-      }
-      
-      // Check if user has pro role, if not - create it
-      if (!hasUserRole(roleResult.roles, 'pro')) {
-        const createResult = await createUserRole(uid, 'pro');
-        if (!createResult.success) {
-          toast({ 
-            title: "Требуется активация", 
-            description: "Активируйте роль специалиста в личном кабинете", 
-            variant: "destructive" 
-          });
-          navigate("/");
-          return;
-        }
-        
-        toast({ 
-          title: "Добро пожаловать!", 
-          description: "Роль специалиста активирована" 
-        });
-      }
 
-      // Load all necessary data
-      await Promise.all([
-        loadNearbyJobs(uid, supabase),
-        loadActiveJobs(uid, supabase),
-        loadWalletBalance(uid, supabase),
-        loadRatings(uid, supabase),
-        loadKycStatus(uid, supabase),
-        loadTenders(uid, supabase)
-      ]);
-
+      console.log('User authenticated:', session.session.user.email);
+      setUser(session.session.user);
       setLoading(false);
-    })();
-  }, [navigate, toast]);
-
-  const loadNearbyJobs = async (uid: string, supabase: any) => {
-    const { data } = await supabase
-      .from('jobs')
-      .select('id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
-      .eq('status', 'new')
-      .order('created_at', { ascending: false })
-      .limit(20);
-    setNearbyJobs(data || []);
+    } catch (error: any) {
+      console.error('Auth check error:', error);
+      toast({ 
+        title: "Ошибка", 
+        description: error.message || "Ошибка аутентификации", 
+        variant: "destructive" 
+      });
+      setLoading(false);
+    }
   };
 
-  const loadActiveJobs = async (uid: string, supabase: any) => {
-    const { data } = await supabase
-      .from('jobs')
-      .select('id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
-      .eq('pro_id', uid)
-      .in('status', ['accepted', 'in_progress', 'done'])
-      .order('created_at', { ascending: false })
-      .limit(20);
-    
-    const jobs = data || [];
-    setMyActiveJobs(jobs);
-    
-    // Calculate completed jobs count
-    const completed = jobs.filter(job => job.status === 'done').length;
-    setCompletedJobs(completed);
-  };
-
-  const loadWalletBalance = async (uid: string, supabase: any) => {
-    const { data: wallet } = await supabase
-      .from('wallets')
-      .select('balance_cents')
-      .eq('pro_id', uid)
-      .maybeSingle();
-    setWalletBalance(wallet?.balance_cents || 0);
-  };
-
-  const loadRatings = async (uid: string, supabase: any) => {
-    const { data: ratings } = await supabase
-      .from('ratings')
-      .select('score')
-      .eq('to_user_id', uid)
-      .limit(200);
-    const scores = (ratings || []).map((r: any) => r.score as number);
-    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
-    setRatingAvg(avg);
-    setRatingCount(scores.length);
-  };
-
-  const loadKycStatus = async (uid: string, supabase: any) => {
-    const { data: docs } = await supabase
-      .from('kyc_documents')
-      .select('status')
-      .eq('user_id', uid)
-      .order('created_at', { ascending: false })
-      .limit(1);
-    setKycStatus(docs?.[0]?.status || 'pending');
-  };
-
-  const loadTenders = async (uid: string, supabase: any) => {
-    const { data } = await supabase
-      .from('tenders')
-      .select('*')
-      .eq('status', 'open')
-      .order('created_at', { ascending: false })
-      .limit(5);
-    setTenders(data || []);
-  };
-
-  if (loading) return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${dashboardPro})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
-      <FloatingCard className="p-8 text-center animate-pulse-glow">
-        <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем кабинет специалиста...</h1>
-        <div className="flex items-center justify-center gap-2">
-          <AnimatedIcon icon={Clock} className="animate-spin" />
-        </div>
-      </FloatingCard>
-    </main>
-  );
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <FloatingCard className="p-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">Загружаем кабинет специалиста...</h1>
+          <div className="animate-spin">⏳</div>
+        </FloatingCard>
+      </main>
+    );
+  }
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      {/* Background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${dashboardPro})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
-      
-      <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
-      
-      <div className="container mx-auto py-8 px-6 relative z-10">
+    <main className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
+      <div className="container mx-auto py-8 px-6">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
-          <div className="animate-fade-in">
-            <h1 className="text-4xl lg:text-5xl font-display font-bold text-gradient mb-2">
-              Кабинет специалиста
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Управляйте заказами и развивайте бизнес
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <AnimatedIcon icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
-                size={20} 
-                className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
-              />
-              <span className="text-sm font-medium">
-                KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
-              </span>
-            </div>
-            <button className="btn-ghost flex items-center gap-2">
-              <AnimatedIcon icon={Bell} size={20} />
-              Уведомления
-            </button>
-          </div>
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-gradient mb-2">
+            Кабинет специалиста
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Добро пожаловать, {user?.email}
+          </p>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
-          <FloatingCard className="p-6 text-center" delay={100} hover glow>
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <FloatingCard className="p-6 text-center">
             <AnimatedIcon icon={Wallet} size={32} className="text-success mb-4" />
-            <div className="text-2xl font-bold text-success mb-1">
-              {formatPrice(walletBalance)}
-            </div>
+            <div className="text-2xl font-bold text-success mb-1">$0.00</div>
             <div className="text-sm text-muted-foreground">Баланс</div>
           </FloatingCard>
-          
-          <FloatingCard className="p-6 text-center" delay={200} hover glow>
+
+          <FloatingCard className="p-6 text-center">
             <AnimatedIcon icon={Star} size={32} className="text-amber-500 mb-4" />
-            <div className="flex flex-col items-center">
-              <StarRating 
-                rating={ratingAvg || 0} 
-                size="md" 
-                showValue 
-                showCount 
-                count={ratingCount}
-                className="mb-1"
-              />
-            </div>
+            <div className="text-2xl font-bold mb-1">0</div>
+            <div className="text-sm text-muted-foreground">Рейтинг</div>
           </FloatingCard>
-          
-          <FloatingCard className="p-6 text-center" delay={300} hover glow>
-            <AnimatedIcon icon={DollarSign} size={32} className="text-primary mb-4" />
-            <div className="text-2xl font-bold text-primary mb-1">
-              {formatPrice(monthlyEarnings)}
-            </div>
-            <div className="text-sm text-muted-foreground">Этот месяц</div>
-          </FloatingCard>
-          
-          <FloatingCard className="p-6 text-center" delay={400} hover glow>
-            <AnimatedIcon icon={Award} size={32} className="text-accent mb-4" />
-            <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
-            <div className="text-sm text-muted-foreground">Выполнено</div>
-          </FloatingCard>
-          
-          <FloatingCard className="p-6 text-center" delay={500} hover glow>
-            <AnimatedIcon icon={Clock} size={32} className="text-purple-500 mb-4" />
-            <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
-            <div className="text-sm text-muted-foreground">Время ответа</div>
+
+          <FloatingCard className="p-6 text-center">
+            <AnimatedIcon icon={Briefcase} size={32} className="text-primary mb-4" />
+            <div className="text-2xl font-bold mb-1">0</div>
+            <div className="text-sm text-muted-foreground">Заказов</div>
           </FloatingCard>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={100}>
-            <Link to="/pro/profile" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={UserCog} size={24} className="text-primary" />
-              <span className="text-sm font-medium">Профиль</span>
-            </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+            <div className="flex flex-col items-center gap-4">
+              <AnimatedIcon icon={Briefcase} size={32} className="text-primary" />
+              <div>
+                <h3 className="font-semibold mb-1">Найти заказы</h3>
+                <p className="text-sm text-muted-foreground">Доступные заказы</p>
+              </div>
+            </div>
           </FloatingCard>
-          
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={200}>
-            <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={Calendar} size={24} className="text-primary" />
-              <span className="text-sm font-medium">Расписание</span>
-            </Link>
+
+          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+            <div className="flex flex-col items-center gap-4">
+              <AnimatedIcon icon={Calendar} size={32} className="text-primary" />
+              <div>
+                <h3 className="font-semibold mb-1">Мои заказы</h3>
+                <p className="text-sm text-muted-foreground">Активные заказы</p>
+              </div>
+            </div>
           </FloatingCard>
-          
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={300}>
-            <Link to="/portfolio" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={ImageIcon} size={24} className="text-primary" />
-              <span className="text-sm font-medium">Портфолио</span>
-            </Link>
+
+          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+            <div className="flex flex-col items-center gap-4">
+              <AnimatedIcon icon={User} size={32} className="text-primary" />
+              <div>
+                <h3 className="font-semibold mb-1">Профиль</h3>
+                <p className="text-sm text-muted-foreground">Настройки услуг</p>
+              </div>
+            </div>
           </FloatingCard>
-          
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={400}>
-            <Link to="/tenders" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={Briefcase} size={24} className="text-primary" />
-              <span className="text-sm font-medium">Тендеры</span>
-            </Link>
-          </FloatingCard>
-          
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={500}>
-            <button className="flex flex-col items-center gap-2 w-full">
-              <AnimatedIcon icon={CreditCard} size={24} className="text-primary" />
-              <span className="text-sm font-medium">Выплата</span>
-            </button>
-          </FloatingCard>
-          
-          <FloatingCard className="p-4 text-center cursor-pointer hover:scale-105 transition-all" delay={600}>
-            <Link to="/kyc" className="flex flex-col items-center gap-2">
-              <AnimatedIcon icon={ShieldCheck} size={24} className="text-primary" />
-              <span className="text-sm font-medium">KYC</span>
-            </Link>
+
+          <FloatingCard className="p-6 text-center cursor-pointer hover:scale-105 transition-all">
+            <div className="flex flex-col items-center gap-4">
+              <AnimatedIcon icon={Settings} size={32} className="text-primary" />
+              <div>
+                <h3 className="font-semibold mb-1">Настройки</h3>
+                <p className="text-sm text-muted-foreground">Аккаунт</p>
+              </div>
+            </div>
           </FloatingCard>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Available Jobs */}
-            <FloatingCard className="p-8" delay={200} hover>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <AnimatedIcon icon={Briefcase} size={28} className="text-primary" />
-                  <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {nearbyJobs.length} заказов поблизости
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {nearbyJobs.length === 0 && (
-                  <div className="text-center py-12">
-                    <AnimatedIcon icon={Briefcase} size={48} className="text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
-                    <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
-                    <Link to="/pro/profile" className="btn-hero">
-                      Настроить профиль
-                    </Link>
-                  </div>
-                )}
-
-                {nearbyJobs.map((job, index) => (
-                  <FloatingCard key={job.id} className="p-6" delay={index * 100} hover glow>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                          <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={Calendar} size={16} />
-                            <span>{job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Не указано'}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <AnimatedIcon icon={DollarSign} size={16} />
-                            <span>
-                              {job.budget_min_cents && job.budget_max_cents
-                                ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
-                                : job.budget_min_cents
-                                ? `от ${formatPrice(job.budget_min_cents)}`
-                                : job.budget_max_cents
-                                ? `до ${formatPrice(job.budget_max_cents)}`
-                                : 'Договорная'
-                              }
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <button className="btn-hero text-sm px-4 py-2">
-                        Принять заказ
-                      </button>
-                      <button className="btn-ghost text-sm px-4 py-2">
-                        Предложить цену
-                      </button>
-                      <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                        <AnimatedIcon icon={Video} size={16} />
-                        Видео-оценка
-                      </button>
-                    </div>
-                  </FloatingCard>
-                ))}
-              </div>
-            </FloatingCard>
-
-            {/* Active Jobs */}
-            <FloatingCard className="p-8" delay={300} hover>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <AnimatedIcon icon={Clock} size={28} className="text-primary" />
-                  <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {myActiveJobs.length} активных заказов
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {myActiveJobs.length === 0 && (
-                  <div className="text-center py-12">
-                    <AnimatedIcon icon={Clock} size={48} className="text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Нет активных заказов</h3>
-                    <p className="text-muted-foreground">Найдите новые заказы выше</p>
-                  </div>
-                )}
-
-                {myActiveJobs.map((job, index) => (
-                  <FloatingCard key={job.id} className="p-6" delay={index * 100} hover glow>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold">{job.description || 'Заказ'}</h3>
-                          <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                            job.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
-                            job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                            job.status === 'done' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {job.status === 'accepted' ? 'Принят' :
-                             job.status === 'in_progress' ? 'В работе' :
-                             job.status === 'done' ? 'Завершен' :
-                             job.status}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      {job.status === 'accepted' && (
-                        <button className="btn-hero text-sm px-4 py-2">
-                          Начать работу
-                        </button>
-                      )}
-                      {job.status === 'in_progress' && (
-                        <button className="btn-hero text-sm px-4 py-2">
-                          Завершить работу
-                        </button>
-                      )}
-                      <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                        <AnimatedIcon icon={MessageSquare} size={16} />
-                        Чат
-                      </button>
-                    </div>
-                  </FloatingCard>
-                ))}
-              </div>
-            </FloatingCard>
+        {/* Available Jobs */}
+        <FloatingCard className="p-8">
+          <h2 className="text-2xl font-bold mb-6">Доступные заказы</h2>
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Пока нет доступных заказов</p>
+            <p className="text-sm text-muted-foreground mt-2">Настройте профиль для получения заказов</p>
           </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Account Overview */}
-            <FloatingCard className="p-6" delay={400} hover>
-              <h3 className="font-semibold mb-4">Обзор аккаунта</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Статус верификации</span>
-                  <div className="flex items-center gap-1">
-                    <AnimatedIcon 
-                      icon={kycStatus === 'approved' ? CheckCircle : AlertCircle} 
-                      size={16} 
-                      className={kycStatus === 'approved' ? 'text-success' : 'text-amber-500'} 
-                    />
-                    <span className="text-sm font-medium">
-                      {kycStatus === 'approved' ? 'Верифицирован' : 'Проверка'}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Время ответа</span>
-                  <span className="text-sm font-medium">{responseTime}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Всего заказов</span>
-                  <span className="text-sm font-medium">{completedJobs}</span>
-                </div>
-              </div>
-            </FloatingCard>
-
-            {/* Quick Actions */}
-            <FloatingCard className="p-6" delay={500} hover>
-              <h3 className="font-semibold mb-4">Быстрые действия</h3>
-              <div className="space-y-3">
-                <Link to="/pro/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                  <AnimatedIcon icon={Settings} size={20} className="text-primary" />
-                  <span className="text-sm">Настройки профиля</span>
-                </Link>
-                <Link to="/kyc" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                  <AnimatedIcon icon={ShieldCheck} size={20} className="text-primary" />
-                  <span className="text-sm">Верификация</span>
-                </Link>
-                <Link to="/portfolio" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                  <AnimatedIcon icon={ImageIcon} size={20} className="text-primary" />
-                  <span className="text-sm">Портфолио</span>
-                </Link>
-                <button className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors w-full text-left">
-                  <AnimatedIcon icon={CreditCard} size={20} className="text-primary" />
-                  <span className="text-sm">Запросить выплату</span>
-                </button>
-              </div>
-            </FloatingCard>
-
-            {/* Trending Tenders */}
-            <FloatingCard className="p-6" delay={600} hover>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Актуальные тендеры</h3>
-                <Link to="/tenders" className="text-sm text-primary hover:underline">Все тендеры</Link>
-              </div>
-              
-              <div className="space-y-3">
-                {tenders.length === 0 && (
-                  <div className="text-center py-4">
-                    <AnimatedIcon icon={Briefcase} size={32} className="text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
-                  </div>
-                )}
-
-                {tenders.slice(0, 3).map((tender, index) => (
-                  <div key={tender.id} className="p-3 rounded-lg border hover:bg-muted/30 transition-colors cursor-pointer">
-                    <div className="font-medium text-sm mb-1">{tender.title || 'Тендер'}</div>
-                    <div className="text-xs text-muted-foreground mb-2">
-                      Заявок: {tender.bids_count || 0}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-success font-medium">
-                        {tender.budget_cents ? formatPrice(tender.budget_cents) : 'Договорная'}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {tender.deadline ? new Date(tender.deadline).toLocaleDateString() : 'Без срока'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </FloatingCard>
-          </div>
-        </div>
+        </FloatingCard>
       </div>
     </main>
   );
-};
-
-export default DashboardPro;
+}
