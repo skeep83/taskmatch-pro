@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
 import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink, Image, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
@@ -441,7 +442,9 @@ export const JobApplicationsList = ({
         Отклики специалистов ({applications.length})
       </h3>
       
-      {applications.map((application) => {
+      {applications.length === 1 ? (
+        // Для одного отклика показываем как обычно
+        applications.map((application) => {
         const isSelected = selectedProId === application.pro_id;
         const canSelect = jobStatus === 'new' && !selectedProId;
         
@@ -683,7 +686,224 @@ export const JobApplicationsList = ({
             </CardContent>
           </Card>
         );
-      })}
+        })
+      ) : (
+        // Для нескольких откликов используем карусель
+        <Carousel className="w-full">
+          <CarouselContent className="-ml-4">
+            {applications.map((application) => {
+              const isSelected = selectedProId === application.pro_id;
+              const canSelect = jobStatus === 'new' && !selectedProId;
+              
+              // Формируем имя специалиста
+              const profileName = application.profiles?.full_name || 
+                (application.profiles?.first_name && application.profiles?.last_name 
+                  ? `${application.profiles.first_name} ${application.profiles.last_name}` 
+                  : null);
+              const displayName = profileName || 'Новый специалист';
+              const initials = profileName 
+                ? profileName.split(' ').map(n => n[0]).join('').toUpperCase()
+                : 'НС';
+              
+              return (
+                <CarouselItem key={application.id} className="pl-4 basis-full lg:basis-4/5">
+                  <Card className={`transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="w-12 h-12 flex-shrink-0">
+                          <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                            {initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-semibold flex items-center gap-2 mb-1">
+                                <span className="truncate">{displayName}</span>
+                                {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
+                              </h4>
+                               <div className="flex items-center gap-2">
+                                 <Badge variant="secondary" className="text-xs">Специалист</Badge>
+                                 {application.rating && application.rating.rating_count > 0 ? (
+                                   <StarRating 
+                                     rating={application.rating.avg_score} 
+                                     size="sm" 
+                                     readonly 
+                                     className="flex-shrink-0" 
+                                   />
+                                 ) : (
+                                   <span className="text-xs text-muted-foreground">Новый специалист</span>
+                                 )}
+                               </div>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <div className="text-xl font-bold text-primary whitespace-nowrap">
+                                {formatPrice(application.price_cents)}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(application.created_at), { 
+                                  addSuffix: true, 
+                                  locale: ru 
+                                })}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* ETA и гарантия */}
+                          <div className="flex flex-wrap gap-3 text-sm">
+                            {application.eta_slot && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                <span className="truncate">Время: {application.eta_slot}</span>
+                              </div>
+                            )}
+                            {application.warranty_days && (
+                              <div className="flex items-center gap-1">
+                                <Shield className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                <span className="whitespace-nowrap">Гарантия: {application.warranty_days} дн.</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-0 space-y-3">
+                      {/* Note */}
+                      {application.note && (
+                        <div className="p-3 bg-muted rounded-lg">
+                          <p className="text-sm font-medium mb-1">Комментарий к отклику:</p>
+                          <p className="text-sm">{application.note}</p>
+                        </div>
+                      )}
+
+                      {/* Portfolio */}
+                      {application.portfolio && application.portfolio.length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium mb-2">Портфолио:</p>
+                          {application.portfolio.map((item) => {
+                            const mediaItems = item.portfolio_media && item.portfolio_media.length > 0 
+                              ? item.portfolio_media.sort((a, b) => a.display_order - b.display_order)
+                              : [{ file_url: item.image_url, file_type: 'image', display_order: 0 }];
+                            
+                            return (
+                              <PortfolioCarousel 
+                                key={item.id}
+                                media={mediaItems}
+                                title={item.title || `Работы ${displayName}`}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Bio */}
+                      {application.proProfile?.bio && (
+                        <div>
+                          <p className="text-sm font-medium mb-1">О специалисте:</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {application.proProfile.bio}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex gap-2 pt-2">
+                        {/* Profile Dialog */}
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" className="flex-1">
+                              <User className="w-4 h-4 mr-1" />
+                              Профиль
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Профиль специалиста</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="w-16 h-16">
+                                  <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
+                                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                                    {initials}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <h3 className="text-lg font-semibold">{displayName}</h3>
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="secondary">Специалист</Badge>
+                                    {application.rating && application.rating.rating_count > 0 ? (
+                                      <div className="flex items-center gap-1">
+                                        <StarRating rating={application.rating.avg_score} size="sm" readonly />
+                                        <span className="text-sm text-muted-foreground">
+                                          ({application.rating.rating_count} отзывов)
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-sm text-muted-foreground">Новый специалист</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {application.proProfile?.bio && (
+                                <div>
+                                  <h4 className="font-medium mb-2">О специалисте</h4>
+                                  <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
+                                </div>
+                              )}
+                              
+                              {/* Service Info */}
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                {application.proProfile?.radius_km && (
+                                  <div>
+                                    <span className="font-medium">Радиус работы:</span>
+                                    <span className="ml-1">{application.proProfile.radius_km} км</span>
+                                  </div>
+                                )}
+                                {application.proProfile?.hourly_rate_cents && (
+                                  <div>
+                                    <span className="font-medium">Почасовая ставка:</span>
+                                    <span className="ml-1">{formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <div className="flex gap-2">
+                                <Button asChild variant="outline" className="flex-1">
+                                  <Link to={`/pro/${application.pro_id}`}>
+                                    <ExternalLink className="w-4 h-4 mr-1" />
+                                    Полный профиль
+                                  </Link>
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+
+                        {/* Select Button */}
+                        {canSelect && (
+                          <Button 
+                            onClick={() => handleSelectApplication(application.id)}
+                            disabled={selecting === application.id}
+                            className="flex-1"
+                          >
+                            {selecting === application.id ? 'Выбираем...' : 'Выбрать'}
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+          <CarouselPrevious className="hidden lg:flex" />
+          <CarouselNext className="hidden lg:flex" />
+        </Carousel>
+      )}
     </div>
   );
 };
