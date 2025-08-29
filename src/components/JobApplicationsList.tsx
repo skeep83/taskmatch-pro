@@ -7,9 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
-import { Clock, Shield, MessageSquare, CheckCircle } from 'lucide-react';
+import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { OptimizedImage } from '@/components/media/OptimizedImage';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 
 interface JobApplication {
   id: string;
@@ -25,6 +28,15 @@ interface JobApplication {
     full_name?: string;
     avatar_url?: string;
   };
+  rating?: {
+    avg_score: number;
+    rating_count: number;
+  };
+  portfolio?: Array<{
+    id: string;
+    image_url: string;
+    title?: string;
+  }>;
 }
 
 interface JobApplicationsListProps {
@@ -72,7 +84,7 @@ export const JobApplicationsList = ({
 
       if (priceError) throw priceError;
 
-      // Для каждого предложения цены загружаем профиль отдельно
+      // Для каждого предложения цены загружаем профиль, рейтинг и портфолио
       const priceProposalsWithProfiles = [];
       if (priceProposals && priceProposals.length > 0) {
         for (const proposal of priceProposals) {
@@ -89,13 +101,41 @@ export const JobApplicationsList = ({
         }
       }
 
-      // Объединяем оба типа откликов
+      // Дополняем данные рейтингом и портфолио для всех откликов
       const allApplications = [
         ...(regularApplications || []),
         ...priceProposalsWithProfiles
       ];
 
-      setApplications(allApplications);
+      // Загружаем рейтинг и портфолио для каждого специалиста
+      const enhancedApplications = [];
+      for (const app of allApplications) {
+        // Загружаем рейтинг
+        const { data: ratingData } = await supabase
+          .from('pro_rating_stats')
+          .select('avg_score, rating_count')
+          .eq('pro_id', app.pro_id)
+          .maybeSingle();
+
+        // Загружаем портфолио (первые 3 работы)
+        const { data: portfolioData } = await supabase
+          .from('portfolio_items')
+          .select('id, image_url, title')
+          .eq('pro_id', app.pro_id)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        enhancedApplications.push({
+          ...app,
+          rating: ratingData ? {
+            avg_score: Number(ratingData.avg_score || 0),
+            rating_count: ratingData.rating_count || 0
+          } : { avg_score: 0, rating_count: 0 },
+          portfolio: portfolioData || []
+        });
+      }
+
+      setApplications(enhancedApplications);
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast({
@@ -193,6 +233,16 @@ export const JobApplicationsList = ({
                     </h4>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">Специалист</Badge>
+                      {application.rating && application.rating.rating_count > 0 && (
+                        <StarRating 
+                          rating={application.rating.avg_score} 
+                          size="sm" 
+                          showValue 
+                          showCount 
+                          count={application.rating.rating_count}
+                          className="text-xs"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -236,17 +286,97 @@ export const JobApplicationsList = ({
                   )}
                 </div>
 
-                {canSelect && (
-                  <div className="pt-2">
+                {application.portfolio && application.portfolio.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Портфолио:</p>
+                    <div className="flex gap-2 overflow-x-auto">
+                      {application.portfolio.map((item) => (
+                        <div key={item.id} className="flex-shrink-0">
+                          <OptimizedImage
+                            src={item.image_url}
+                            alt={item.title || 'Работа специалиста'}
+                            className="w-16 h-16 rounded object-cover"
+                            bucket="portfolio"
+                            enableZoom
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <User className="w-4 h-4 mr-1" />
+                        Профиль
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                          <Avatar className="w-8 h-8">
+                            <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
+                            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
+                              {initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          {displayName}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        {application.rating && (
+                          <div className="flex items-center gap-2">
+                            <StarRating 
+                              rating={application.rating.avg_score} 
+                              size="md" 
+                              showValue 
+                              showCount 
+                              count={application.rating.rating_count}
+                            />
+                          </div>
+                        )}
+                        {application.portfolio && application.portfolio.length > 0 && (
+                          <div>
+                            <h4 className="font-medium mb-2">Портфолио</h4>
+                            <div className="grid grid-cols-3 gap-2">
+                              {application.portfolio.map((item) => (
+                                <div key={item.id} className="aspect-square">
+                                  <OptimizedImage
+                                    src={item.image_url}
+                                    alt={item.title || 'Работа специалиста'}
+                                    className="w-full h-full rounded object-cover"
+                                    bucket="portfolio"
+                                    enableZoom
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex justify-center">
+                          <Link to={`/pro/${application.pro_id}`} target="_blank">
+                            <Button variant="outline" size="sm">
+                              <ExternalLink className="w-4 h-4 mr-1" />
+                              Полный профиль
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {canSelect && (
                     <Button
                       onClick={() => handleSelectApplication(application.id)}
                       disabled={selecting === application.id}
-                      className="w-full"
+                      className="flex-1"
                     >
-                      {selecting === application.id ? 'Выбираю...' : 'Выбрать специалиста'}
+                      {selecting === application.id ? 'Выбираю...' : 'Выбрать'}
                     </Button>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {isSelected && (
                   <div className="pt-2">
