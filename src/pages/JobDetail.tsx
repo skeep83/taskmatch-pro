@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Seo } from '@/components/Seo';
 import { JobApplicationsList } from '@/components/JobApplicationsList';
 import { JobResponseForm } from '@/components/JobResponseForm';
+import { OptimizedImage } from '@/components/media/OptimizedImage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -46,6 +47,7 @@ const JobDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [job, setJob] = useState<Job | null>(null);
+  const [jobPhotos, setJobPhotos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -53,6 +55,7 @@ const JobDetail = () => {
   useEffect(() => {
     if (jobId) {
       fetchJob();
+      fetchJobPhotos();
       getCurrentUser();
     }
   }, [jobId]);
@@ -103,6 +106,21 @@ const JobDetail = () => {
       navigate('/dashboard');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchJobPhotos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('job_photos')
+        .select('*')
+        .eq('job_id', jobId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setJobPhotos(data || []);
+    } catch (error) {
+      console.error('Error fetching job photos:', error);
     }
   };
 
@@ -208,6 +226,24 @@ const JobDetail = () => {
                   </div>
                 )}
               </div>
+
+              {/* Job Photos */}
+              {jobPhotos.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Фотографии заказа</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {jobPhotos.map((photo, index) => (
+                      <div key={photo.id} className="aspect-square rounded-lg overflow-hidden">
+                        <OptimizedImage
+                          src={photo.file_url}
+                          alt={`Фото заказа ${index + 1}`}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
