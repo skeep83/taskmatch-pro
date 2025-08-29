@@ -636,31 +636,30 @@ export function JobApplicationsList({
                       <h4 className="font-semibold text-sm">{item.title}</h4>
                     )}
                     
-                    {/* Additional media from portfolio_media */}
-                    {item.portfolio_media && item.portfolio_media.length > 0 && (
-                      <div className="grid grid-cols-2 gap-2">
-                        {item.portfolio_media
-                          .sort((a, b) => a.display_order - b.display_order)
-                          .slice(0, 4)
-                          .map((media) => (
-                             <div key={media.id} className="relative aspect-square rounded overflow-hidden bg-gray-100">
-                               {media.file_type.startsWith('image/') ? (
-                                 <OptimizedImage
-                                   src={media.file_url}
-                                   alt={media.file_name || 'Дополнительное фото'}
-                                   width={200}
-                                   height={200}
-                                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                                 />
-                               ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                                  <FileText className="w-6 h-6 text-gray-400" />
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                      </div>
-                    )}
+                     {/* Additional media from portfolio_media */}
+                     {item.portfolio_media && item.portfolio_media.length > 0 && (
+                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                         {item.portfolio_media
+                           .sort((a, b) => a.display_order - b.display_order)
+                           .map((media) => (
+                              <div key={media.id} className="relative aspect-square rounded overflow-hidden bg-gray-100">
+                                {media.file_type.startsWith('image/') ? (
+                                  <OptimizedImage
+                                    src={media.file_url}
+                                    alt={media.file_name || 'Дополнительное фото'}
+                                    width={200}
+                                    height={200}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                                  />
+                                ) : (
+                                 <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                                   <FileText className="w-6 h-6 text-gray-400" />
+                                 </div>
+                               )}
+                             </div>
+                           ))}
+                       </div>
+                     )}
                   </div>
                 ))}
               </div>
