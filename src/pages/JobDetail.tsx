@@ -24,6 +24,8 @@ import {
   Trash2,
   ZoomIn
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { StarRating } from '@/components/ui/star-rating';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -60,6 +62,7 @@ const JobDetail = () => {
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [showPriceProposal, setShowPriceProposal] = useState(false);
   const [clientRating, setClientRating] = useState<{average: number, count: number} | null>(null);
+  const [clientProfile, setClientProfile] = useState<any>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [jobApplications, setJobApplications] = useState<any[]>([]);
 
@@ -110,6 +113,7 @@ const JobDetail = () => {
       
       setJob(data);
       await loadJobData();
+      await loadClientData(data.client_id);
     } catch (error: any) {
       console.error('Error fetching job:', error);
       toast({
@@ -150,6 +154,32 @@ const JobDetail = () => {
       }
     } catch (error) {
       console.error('Error loading job data:', error);
+    }
+  };
+
+  const loadClientData = async (clientId: string) => {
+    try {
+      // Load client profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, full_name, avatar_url')
+        .eq('id', clientId)
+        .maybeSingle();
+      
+      setClientProfile(profile);
+
+      // Load client rating (average rating given to this client)
+      const { data: clientRatings } = await supabase
+        .from('ratings')
+        .select('score')
+        .eq('to_user_id', clientId);
+      
+      if (clientRatings && clientRatings.length > 0) {
+        const average = clientRatings.reduce((sum, r) => sum + r.score, 0) / clientRatings.length;
+        setClientRating({ average, count: clientRatings.length });
+      }
+    } catch (error) {
+      console.error('Error loading client data:', error);
     }
   };
 
@@ -283,6 +313,53 @@ const JobDetail = () => {
             <span>•</span>
             {getStatusBadge(job.status)}
           </div>
+
+          {/* Client Info Card for Professionals */}
+          {userRole === 'pro' && clientProfile && (
+            <div className="card-surface p-6 mb-8">
+              <h3 className="text-xl font-semibold mb-4 flex items-center gap-3">
+                <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                Информация о заказчике
+              </h3>
+              <div className="flex items-center gap-4">
+                <Avatar className="w-16 h-16">
+                  <AvatarImage 
+                    src={clientProfile.avatar_url || ''} 
+                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                    {clientProfile.full_name 
+                      ? clientProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                      : (clientProfile.first_name && clientProfile.last_name 
+                        ? `${clientProfile.first_name[0]}${clientProfile.last_name[0]}`.toUpperCase()
+                        : 'К')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h4 className="text-lg font-semibold">
+                    {clientProfile.full_name || 
+                     (clientProfile.first_name && clientProfile.last_name 
+                       ? `${clientProfile.first_name} ${clientProfile.last_name}` 
+                       : 'Клиент')}
+                  </h4>
+                  {clientRating && clientRating.count > 0 && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <StarRating 
+                        rating={clientRating.average} 
+                        size="sm" 
+                        showValue 
+                        showCount 
+                        count={clientRating.count}
+                      />
+                    </div>
+                  )}
+                  {(!clientRating || clientRating.count === 0) && (
+                    <p className="text-sm text-muted-foreground mt-1">Новый клиент</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Main Content */}
