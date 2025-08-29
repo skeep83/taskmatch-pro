@@ -72,7 +72,16 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				"2xl": "1.5rem",
+				"3xl": "2rem",
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'medium': 'var(--shadow-medium)',
+				'strong': 'var(--shadow-strong)',
+				'shield': '0 8px 32px rgba(99, 115, 129, 0.12)',
+				'shield-hover': '0 12px 40px rgba(99, 115, 129, 0.18)',
 			},
 			keyframes: {
 				'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
@@ -89,7 +98,9 @@ export default {
 				'pulse-glow': { '0%, 100%': { boxShadow: '0 0 15px hsl(var(--primary)/0.2)' }, '50%': { boxShadow: '0 0 25px hsl(var(--primary)/0.4), 0 0 35px hsl(var(--accent)/0.2)' } },
 				'bounce-gentle': { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-2px)' } },
 				'rotate-slow': { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } },
-				'gradient-shift': { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } }
+				'gradient-shift': { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
+				'fade-in-up': { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+				'pulse-soft': { '0%, 100%': { opacity: '1', transform: 'scale(1)' }, '50%': { opacity: '0.8', transform: 'scale(1.05)' } },
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -102,6 +113,9 @@ export default {
 				'slide-out-right': 'slide-out-right 0.3s cubic-bezier(0.55, 0.06, 0.68, 0.19)',
 				'enter': 'fade-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
 				'exit': 'fade-out 0.4s cubic-bezier(0.55, 0.06, 0.68, 0.19), scale-out 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+				'float': 'float 6s ease-in-out infinite',
+				'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
+				'fade-in-up': 'fade-in-up 0.5s ease-out',
 				// Hover-only animations (no infinite by default)
 				'float-slow': 'float 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'glow-soft': 'glow 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',

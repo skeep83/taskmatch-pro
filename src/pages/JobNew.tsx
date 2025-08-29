@@ -220,47 +220,42 @@ const JobNew = () => {
 
         {/* Main Form */}
         <div className="max-w-2xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {step === 1 && (
-                  <>
-                    <span className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
-                    Детали услуги
-                  </>
-                )}
-                {step === 2 && (
-                  <>
-                    <span className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
-                    Бюджет и время
-                  </>
-                )}
-                {step === 3 && (
-                  <>
-                    <span className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
-                    Фотографии (опционально)
-                  </>
-                )}
+          <Card className="card-surface shadow-shield">
+            <CardHeader className="text-center pb-8">
+              <div className="shield-icon mx-auto mb-4">
+                {step === 1 && <CheckCircle className="w-6 h-6 text-primary" />}
+                {step === 2 && <Clock className="w-6 h-6 text-primary" />}
+                {step === 3 && <Camera className="w-6 h-6 text-primary" />}
+              </div>
+              <CardTitle className="text-2xl">
+                {step === 1 && "Детали услуги"}
+                {step === 2 && "Бюджет и время"}
+                {step === 3 && "Фотографии (опционально)"}
               </CardTitle>
+              <p className="text-muted-foreground mt-2">
+                {step === 1 && "Опишите что нужно сделать"}
+                {step === 2 && "Укажите бюджет и удобное время"}
+                {step === 3 && "Добавьте фото для лучшего понимания задачи"}
+              </p>
             </CardHeader>
 
-            <CardContent>
-              <form onSubmit={onSubmit} className="space-y-6">
+            <CardContent className="space-y-8">
+              <form onSubmit={onSubmit} className="space-y-8">
                 {/* Step 1: Service Details */}
                 {step === 1 && (
-                  <div className="space-y-6">
-                    <div>
-                      <Label htmlFor="category_id">Категория услуги *</Label>
+                  <div className="space-y-6 animate-fade-in-up">
+                    <div className="space-y-3">
+                      <Label htmlFor="category_id" className="text-base font-medium">Категория услуги *</Label>
                       <Select 
                         value={formData.category_id || presetCategory} 
                         onValueChange={(value) => updateFormData('category_id', value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12 rounded-2xl border-primary/20 focus-shield">
                           <SelectValue placeholder="Выберите категорию" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-2xl shadow-medium">
                           {categories.map(cat => (
-                            <SelectItem key={cat.id} value={cat.id}>
+                            <SelectItem key={cat.id} value={cat.id} className="rounded-xl">
                               {cat.icon} {cat.name}
                             </SelectItem>
                           ))}
@@ -268,42 +263,43 @@ const JobNew = () => {
                       </Select>
                     </div>
 
-                    <div>
-                      <Label htmlFor="urgency">Приоритет</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="urgency" className="text-base font-medium">Приоритет</Label>
                       <Select value={formData.urgency} onValueChange={(value) => updateFormData('urgency', value)}>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12 rounded-2xl border-primary/20 focus-shield">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="normal">Обычный</SelectItem>
-                          <SelectItem value="urgent">Срочно (+30%)</SelectItem>
-                          <SelectItem value="same_day">В тот же день (+50%)</SelectItem>
+                        <SelectContent className="rounded-2xl shadow-medium">
+                          <SelectItem value="normal" className="rounded-xl">Обычный</SelectItem>
+                          <SelectItem value="urgent" className="rounded-xl">Срочно (+30%)</SelectItem>
+                          <SelectItem value="same_day" className="rounded-xl">В тот же день (+50%)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div>
-                      <Label htmlFor="description">Описание задачи *</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="description" className="text-base font-medium">Описание задачи *</Label>
                       <Textarea
                         id="description"
                         value={formData.description}
                         onChange={(e) => updateFormData('description', e.target.value)}
                         placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
                         rows={4}
+                        className="rounded-2xl border-primary/20 focus-shield resize-none"
                         required
                       />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Чем подробнее описание, тем точнее будут предложения специалистов
+                      <p className="text-sm text-muted-foreground">
+                        💡 Чем подробнее описание, тем точнее будут предложения специалистов
                       </p>
                     </div>
 
-                    <div className="flex gap-2">
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Zap className="w-3 h-3" />
+                    <div className="flex flex-wrap gap-3">
+                      <Badge variant="secondary" className="status-info text-sm py-2 px-4">
+                        <Zap className="w-4 h-4 mr-2" />
                         Мгновенные отклики
                       </Badge>
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Shield className="w-3 h-3" />
+                      <Badge variant="secondary" className="status-success text-sm py-2 px-4">
+                        <Shield className="w-4 h-4 mr-2" />
                         Защита эскроу
                       </Badge>
                     </div>
@@ -433,12 +429,13 @@ const JobNew = () => {
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between pt-6 border-t">
+                <div className="flex justify-between pt-8 border-t border-border/50">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={prevStep}
                     disabled={step === 1}
+                    className="btn-shield-outline"
                   >
                     Назад
                   </Button>
@@ -448,12 +445,20 @@ const JobNew = () => {
                       type="button"
                       onClick={nextStep}
                       disabled={step === 1 && (!formData.category_id || !formData.description)}
+                      className="btn-shield"
                     >
                       Далее
                     </Button>
                   ) : (
-                    <Button type="submit" disabled={loading}>
-                      {loading ? "Создание..." : "Создать заказ"}
+                    <Button type="submit" disabled={loading} className="btn-shield">
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                          Создание...
+                        </>
+                      ) : (
+                        "Создать заказ"
+                      )}
                     </Button>
                   )}
                 </div>

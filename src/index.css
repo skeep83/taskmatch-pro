@@ -8,38 +8,34 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 258 80% 50%; /* Brand primary (indigo-violet) */
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215 16% 35%;
-
-    --accent: 199 89% 48%; /* Cyan accent */
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --success: 142 70% 40%;
-    --success-foreground: 144 100% 97%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.75rem;
+    /* Soft neutral palette inspired by the shield design */
+    --background: 245 247 250;
+    --foreground: 51 65 85;
+    --card: 255 255 255;
+    --card-foreground: 51 65 85;
+    --popover: 255 255 255;
+    --popover-foreground: 51 65 85;
+    --primary: 99 115 129; /* Muted blue-gray like the shield */
+    --primary-foreground: 255 255 255;
+    --secondary: 241 245 249;
+    --secondary-foreground: 71 85 105;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
+    --accent: 241 245 249;
+    --accent-foreground: 71 85 105;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 99 115 129;
+    --radius: 1rem; /* Increased for softer, more rounded appearance */
+    
+    /* Custom design tokens matching the shield aesthetic */
+    --shadow-soft: 0 4px 20px rgba(71, 85, 105, 0.08);
+    --shadow-medium: 0 8px 30px rgba(71, 85, 105, 0.12);
+    --shadow-strong: 0 12px 40px rgba(71, 85, 105, 0.15);
+    --gradient-shield: linear-gradient(135deg, hsl(var(--primary)), hsl(220 14% 45%));
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -156,109 +152,101 @@ All colors MUST be HSL.
 }
 
 @layer components {
-  .btn-hero {
-    @apply inline-flex items-center justify-center rounded-2xl px-8 py-4 font-semibold transition-all duration-300 ease-out border-0;
-    background: var(--surface-raised);
-    color: hsl(var(--primary));
-    box-shadow: var(--shadow-raised);
-  }
-  .btn-hero:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-raised-hover);
-  }
-  .btn-hero:active {
-    transform: translateY(1px);
-    box-shadow: 
-      4px 4px 8px rgba(174, 187, 204, 0.4),
-      -4px -4px 8px rgba(255, 255, 255, 0.3);
-  }
-  
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-2xl px-8 py-4 font-semibold border-0 transition-all duration-300 ease-out;
-    background: var(--surface-raised);
-    color: hsl(var(--foreground));
-    box-shadow: var(--shadow-raised);
-  }
-  .btn-ghost:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-raised-hover);
-  }
-  .btn-ghost:active {
-    transform: translateY(1px);
-    box-shadow: 
-      4px 4px 8px rgba(174, 187, 204, 0.4),
-      -4px -4px 8px rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Pure neumorphic card surfaces */
+  /* Enhanced soft styling matching the shield design */
   .card-surface {
-    @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
-    background: var(--surface-raised);
-    box-shadow: var(--shadow-raised);
+    @apply bg-card rounded-2xl border-0 shadow-[var(--shadow-soft)] transition-all duration-300;
   }
   
-  .card-surface:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-raised-hover);
+  .card-hover {
+    @apply hover:shadow-[var(--shadow-medium)] hover:scale-[1.02] transition-all duration-300;
   }
   
-  .glass-surface {
-    @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
-    background: var(--surface-elevated);
-    box-shadow: var(--shadow-raised);
+  .shield-button {
+    @apply relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-2xl shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-medium)] transition-all duration-300 border-0;
   }
   
-  .glass-surface:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-raised-hover);
+  .shield-icon {
+    @apply w-12 h-12 p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl shadow-[var(--shadow-soft)] flex items-center justify-center transition-all duration-300;
   }
   
-  .acrylic-surface {
-    @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
-    background: var(--surface-elevated);
-    box-shadow: var(--shadow-raised-strong);
-  }
-  
-  .acrylic-surface:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-raised-hover);
-  }
-  
-  .glass-nav {
-    @apply border-0 sticky top-0 z-50;
-    background: var(--surface-raised);
-    box-shadow: var(--shadow-raised);
+  .floating-card {
+    @apply bg-white/95 backdrop-blur-md rounded-3xl shadow-[var(--shadow-medium)] border border-white/20 transition-all duration-300;
   }
   
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    @apply bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent;
+  }
+  
+  .section-soft {
+    @apply py-20 px-6;
+  }
+  
+  .container-shield {
+    @apply max-w-7xl mx-auto;
+  }
+  
+  /* Soft focus rings */
+  .focus-shield {
+    @apply focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all duration-300;
+  }
+  
+  /* Shield-inspired gradient backgrounds */
+  .bg-shield-gradient {
+    background: var(--gradient-shield);
+  }
+  
+  .bg-shield-light {
+    background: linear-gradient(135deg, hsl(var(--muted)), hsl(var(--background)));
+  }
+  
+  /* Soft interactive elements */
+  .btn-shield {
+    @apply shield-button px-8 py-4 font-medium text-lg hover:scale-105 active:scale-95;
+  }
+  
+  .btn-shield-outline {
+    @apply border-2 border-primary/30 text-primary bg-primary/5 rounded-2xl px-6 py-3 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300;
+  }
+  
+  /* Status indicators with shield styling */
+  .status-shield {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-[var(--shadow-soft)];
+  }
+  
+  .status-success {
+    @apply status-shield bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+  
+  .status-warning {
+    @apply status-shield bg-amber-50 text-amber-700 border border-amber-200;
+  }
+  
+  .status-error {
+    @apply status-shield bg-red-50 text-red-700 border border-red-200;
+  }
+  
+  .status-info {
+    @apply status-shield bg-blue-50 text-blue-700 border border-blue-200;
+  }
+  
+  /* Legacy button styles for compatibility */
+  .btn-hero {
+    @apply btn-shield;
+  }
+  
+  .btn-ghost {
+    @apply btn-shield-outline;
   }
 }
 
 @layer utilities {
-  .hover-scale { @apply transition-transform duration-300 ease-out hover:scale-[1.02]; }
-  .hover-float { @apply transition-transform duration-500 ease-out hover:animate-float-slow; }
-  .hover-glow { @apply transition-all duration-500 ease-out hover:animate-glow-soft; }
-  .hover-bounce { @apply transition-transform duration-500 ease-out hover:animate-bounce-gentle; }
-  .story-link { position: relative; display: inline-block; }
-  .story-link::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right; transition: transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-  .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
-  
-  /* Navigation specific animations */
-  .animate-float-slow {
+  /* Enhanced animations */
+  .animate-float {
     animation: float 6s ease-in-out infinite;
   }
   
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-  
-  .animate-gradient-shift {
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
+  .animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
   }
   
   @keyframes float {
@@ -266,15 +254,31 @@ All colors MUST be HSL.
     50% { transform: translateY(-10px); }
   }
   
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
-    50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.6), 0 0 40px hsl(var(--primary) / 0.3); }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
   }
   
-  @keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  .hover-scale { @apply transition-transform duration-300 ease-out hover:scale-[1.02]; }
+  .hover-float { @apply transition-transform duration-500 ease-out hover:animate-float-slow; }
+  .hover-glow { @apply transition-all duration-500 ease-out hover:animate-glow-soft; }
+  .hover-bounce { @apply transition-transform duration-500 ease-out hover:animate-bounce-gentle; }
+  .story-link { position: relative; display: inline-block; }
+  .story-link::after { 
+    content: ""; 
+    position: absolute; 
+    left: 0; 
+    bottom: 0; 
+    width: 100%; 
+    height: 2px; 
+    background: hsl(var(--primary)); 
+    transform: scaleX(0); 
+    transform-origin: bottom right; 
+    transition: transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+  }
+  .story-link:hover::after { 
+    transform: scaleX(1); 
+    transform-origin: bottom left; 
   }
 }
 
