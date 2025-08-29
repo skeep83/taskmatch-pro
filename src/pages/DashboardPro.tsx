@@ -390,11 +390,14 @@ const DashboardPro = () => {
                       </div>
 
                       <div className="flex items-center gap-3">
+                        <Link 
+                          to={`/job/${job.id}`}
+                          className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors"
+                        >
+                          Подробнее
+                        </Link>
                         <button className="bg-primary text-white hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold transition-colors">
                           Принять заказ
-                        </button>
-                        <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors">
-                          Подробнее
                         </button>
                         <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors">
                           <Video className="h-4 w-4" />
