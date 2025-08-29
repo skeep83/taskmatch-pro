@@ -637,10 +637,15 @@ export function JobApplicationsList({
                   
                   // Добавляем дополнительные изображения
                   if (item.portfolio_media) {
+                    console.log('🔍 Processing portfolio_media:', item.portfolio_media);
                     item.portfolio_media
-                      .filter(media => media.file_type.startsWith('image/'))
+                      .filter(media => {
+                        console.log('📁 Media file_type:', media.file_type);
+                        return media.file_type === 'image' || media.file_type.startsWith('image/');
+                      })
                       .sort((a, b) => a.display_order - b.display_order)
                       .forEach(media => {
+                        console.log('✅ Adding media to images:', media);
                         allImages.push({
                           id: media.id,
                           url: media.file_url,
