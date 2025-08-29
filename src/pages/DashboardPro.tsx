@@ -221,141 +221,129 @@ const DashboardPro = () => {
     <main className="min-h-screen">
       <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
       
-      <div className="container mx-auto py-8 px-6">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12">
-          <div className="animate-fade-in">
-            <h1 className="text-4xl lg:text-5xl font-display font-bold text-gradient mb-2">
-              Кабинет специалиста
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Управляйте заказами и развивайте бизнес
-            </p>
-          </div>
+      {/* Header Section */}
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+            Кабинет специалиста
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Управляйте заказами и развивайте бизнес
+          </p>
           
-          <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 relative overflow-hidden">
-              <div 
-                className="absolute inset-0 opacity-20 bg-cover bg-center"
-                style={{ backgroundImage: `url(${kycVerification})` }}
-              />
-              <div className="relative z-10 flex items-center gap-3">
-                {kycStatus === 'approved' ? (
-                  <CheckCircle className="h-8 w-8 text-slate-500" />
-                ) : (
-                  <AlertCircle className="h-8 w-8 text-slate-500" />
-                )}
-                <span className="text-sm font-medium">
-                  KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
-                </span>
+          <div className="flex justify-center mt-8">
+            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              {kycStatus === 'approved' ? (
+                <CheckCircle className="h-6 w-6 text-green-500" />
+              ) : (
+                <AlertCircle className="h-6 w-6 text-orange-500" />
+              )}
+              <span className="text-sm font-medium">
+                KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto">
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
+            <div className="card-surface p-6 text-center">
+              <Wallet className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="text-2xl font-bold text-green-600 mb-1">
+                {formatPrice(walletBalance)}
+              </div>
+              <div className="text-sm text-muted-foreground">Баланс</div>
+            </div>
+            
+            <div className="card-surface p-6 text-center">
+              <Star className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="flex flex-col items-center">
+                <StarRating 
+                  rating={ratingAvg || 0} 
+                  size="md" 
+                  showValue 
+                  showCount 
+                  count={ratingCount}
+                  className="mb-1"
+                />
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
-          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Wallet className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
-            <div className="text-2xl font-bold text-green-600 mb-1">
-              {formatPrice(walletBalance)}
+            
+            <div className="card-surface p-6 text-center">
+              <DollarSign className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="text-2xl font-bold text-primary mb-1">
+                {formatPrice(monthlyEarnings)}
+              </div>
+              <div className="text-sm text-muted-foreground">Этот месяц</div>
             </div>
-            <div className="text-sm text-muted-foreground">Баланс</div>
-          </div>
-          
-          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Star className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
-            <div className="flex flex-col items-center">
-              <StarRating 
-                rating={ratingAvg || 0} 
-                size="md" 
-                showValue 
-                showCount 
-                count={ratingCount}
-                className="mb-1"
-              />
+            
+            <div className="card-surface p-6 text-center">
+              <Award className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
+              <div className="text-sm text-muted-foreground">Выполнено</div>
+            </div>
+            
+            <div className="card-surface p-6 text-center">
+              <Clock className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
+              <div className="text-sm text-muted-foreground">Время ответа</div>
             </div>
           </div>
-          
-          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <DollarSign className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
-            <div className="text-2xl font-bold text-primary mb-1">
-              {formatPrice(monthlyEarnings)}
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
+            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+              <Link to="/pro/profile" className="flex flex-col items-center gap-2">
+                <UserCog className="h-10 w-10 text-primary" />
+                <span className="text-sm font-medium">Профиль</span>
+              </Link>
             </div>
-            <div className="text-sm text-muted-foreground">Этот месяц</div>
+            
+            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+              <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
+                <Calendar className="h-10 w-10 text-primary" />
+                <span className="text-sm font-medium">Расписание</span>
+              </Link>
+            </div>
+            
+            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+              <Link to="/portfolio" className="flex flex-col items-center gap-2">
+                <ImageIcon className="h-10 w-10 text-primary" />
+                <span className="text-sm font-medium">Портфолио</span>
+              </Link>
+            </div>
+            
+            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+              <Link to="/tenders" className="flex flex-col items-center gap-2">
+                <Briefcase className="h-10 w-10 text-primary" />
+                <span className="text-sm font-medium">Тендеры</span>
+              </Link>
+            </div>
+            
+            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+              <button className="flex flex-col items-center gap-2 w-full">
+                <CreditCard className="h-10 w-10 text-primary" />
+                <span className="text-sm font-medium">Выплата</span>
+              </button>
+            </div>
+            
+            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+              <Link to="/kyc" className="flex flex-col items-center gap-2">
+                <ShieldCheck className="h-10 w-10 text-primary" />
+                <span className="text-sm font-medium">KYC</span>
+              </Link>
+            </div>
           </div>
-          
-          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Award className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
-            <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
-            <div className="text-sm text-muted-foreground">Выполнено</div>
-          </div>
-          
-          <div className="p-6 text-center rounded-xl bg-white shadow-lg border border-gray-100">
-            <Clock className="h-12 w-12 text-slate-500 mb-4 mx-auto" />
-            <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
-            <div className="text-sm text-muted-foreground">Время ответа</div>
-          </div>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <Link to="/pro/profile" className="flex flex-col items-center gap-2">
-              <UserCog className="h-10 w-10 text-slate-500" />
-              <span className="text-sm font-medium">Профиль</span>
-            </Link>
-          </div>
-          
-          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-              <Calendar className="h-10 w-10 text-slate-500" />
-              <span className="text-sm font-medium">Расписание</span>
-            </Link>
-          </div>
-          
-          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <Link to="/portfolio" className="flex flex-col items-center gap-2">
-              <ImageIcon className="h-10 w-10 text-slate-500" />
-              <span className="text-sm font-medium">Портфолио</span>
-            </Link>
-          </div>
-          
-          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <Link to="/tenders" className="flex flex-col items-center gap-2">
-              <Briefcase className="h-10 w-10 text-slate-500" />
-              <span className="text-sm font-medium">Тендеры</span>
-            </Link>
-          </div>
-          
-          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <button className="flex flex-col items-center gap-2 w-full">
-              <CreditCard className="h-10 w-10 text-slate-500" />
-              <span className="text-sm font-medium">Выплата</span>
-            </button>
-          </div>
-          
-          <div className="p-4 text-center cursor-pointer rounded-xl bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <Link to="/kyc" className="flex flex-col items-center gap-2">
-              <ShieldCheck className="h-10 w-10 text-slate-500" />
-              <span className="text-sm font-medium">KYC</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Available Jobs */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-8 relative overflow-hidden">
-              <div 
-                className="absolute inset-0 opacity-10 bg-cover bg-center"
-                style={{ backgroundImage: `url(${proWorkspace})` }}
-              />
-              <div className="relative z-10">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Available Jobs */}
+            <div className="lg:col-span-2 space-y-8">
+              <div className="card-surface p-8">
                 <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Briefcase className="h-10 w-10 text-slate-500" />
-                  <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
+                  <div className="flex items-center gap-3">
+                    <Briefcase className="h-10 w-10 text-primary" />
+                    <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {nearbyJobs.length} заказов поблизости
@@ -368,14 +356,14 @@ const DashboardPro = () => {
                       <Briefcase className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
                       <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
                       <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
-                      <Link to="/pro/profile" className="btn-hero">
+                      <Link to="/pro/profile" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg">
                         Настроить профиль
                       </Link>
                     </div>
                   )}
 
                   {nearbyJobs.slice(0, 5).map((job, index) => (
-                    <div key={job.id} className="bg-white/80 backdrop-blur-sm p-6 rounded-lg border border-gray-200">
+                    <div key={job.id} className="card-surface p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
@@ -402,84 +390,59 @@ const DashboardPro = () => {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <button className="btn-hero text-sm px-4 py-2">
+                        <button className="bg-primary text-white hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold transition-colors">
                           Принять заказ
                         </button>
-                        <button className="btn-ghost text-sm px-4 py-2">
-                          Предложить цену
+                        <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors">
+                          Подробнее
                         </button>
-                        <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                          <Video className="h-5 w-5" />
-                          Видео-оценка
+                        <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors">
+                          <Video className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
 
-            {/* Active Jobs */}
-            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-8 relative overflow-hidden">
-              <div 
-                className="absolute inset-0 opacity-10 bg-cover bg-center"
-                style={{ backgroundImage: `url(${jobManagement})` }}
-              />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Clock className="h-10 w-10 text-slate-500" />
-                  <h2 className="text-2xl font-display font-bold">Мои заказы</h2>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {myActiveJobs.length} активных заказов
-                  </div>
+              {/* My Active Jobs */}
+              <div className="card-surface p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <Clock className="h-10 w-10 text-primary" />
+                  <h2 className="text-2xl font-display font-bold">Мои активные заказы</h2>
                 </div>
 
                 <div className="space-y-4">
                   {myActiveJobs.length === 0 && (
                     <div className="text-center py-12">
                       <Clock className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
-                      <h3 className="text-lg font-semibold mb-2">Нет активных заказов</h3>
-                      <p className="text-muted-foreground">Найдите новые заказы выше</p>
+                      <p className="text-muted-foreground">У вас нет активных заказов</p>
                     </div>
                   )}
 
-                  {myActiveJobs.map((job, index) => (
-                    <div key={job.id} className="bg-white/80 backdrop-blur-sm p-6 rounded-lg border border-gray-200">
+                  {myActiveJobs.slice(0, 3).map((job) => (
+                    <div key={job.id} className="card-surface p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold">{job.description || 'Заказ'}</h3>
-                            <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                              job.status === 'accepted' ? 'bg-amber-100 text-amber-800' :
-                              job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                              job.status === 'done' ? 'bg-green-100 text-green-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {job.status === 'accepted' ? 'Принят' :
-                               job.status === 'in_progress' ? 'В работе' :
-                               job.status === 'done' ? 'Завершен' :
-                               job.status}
-                            </span>
+                          <h3 className="font-semibold mb-2">{job.description || 'Заказ'}</h3>
+                          <div className="text-sm text-muted-foreground mb-2">
+                            Статус: {job.status === 'accepted' ? 'Принят' : job.status === 'in_progress' ? 'В работе' : 'Выполнен'}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {job.budget_min_cents && job.budget_max_cents
+                              ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
+                              : 'Договорная'
+                            }
                           </div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3">
-                        {job.status === 'accepted' && (
-                          <button className="btn-hero text-sm px-4 py-2">
-                            Начать работу
-                          </button>
-                        )}
-                        {job.status === 'in_progress' && (
-                          <button className="btn-hero text-sm px-4 py-2">
-                            Завершить работу
-                          </button>
-                        )}
-                        <button className="btn-ghost text-sm px-4 py-2 flex items-center gap-1">
-                          <MessageSquare className="h-5 w-5" />
-                          Чат
+                        <button className="bg-primary text-white hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold transition-colors">
+                          Управлять
+                        </button>
+                        <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors">
+                          <MessageSquare className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
@@ -487,73 +450,91 @@ const DashboardPro = () => {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Account Overview */}
-            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-6">
-              <h3 className="font-semibold mb-4">Обзор аккаунта</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Статус верификации</span>
-                  <div className="flex items-center gap-1">
-                    {kycStatus === 'approved' ? (
-                      <CheckCircle className="h-6 w-6 text-slate-500" />
-                    ) : (
-                      <AlertCircle className="h-6 w-6 text-slate-500" />
-                    )}
-                    <span className="text-sm font-medium">
-                      {kycStatus === 'approved' ? 'Верифицирован' : 'Проверка'}
-                    </span>
-                  </div>
+            {/* Sidebar */}
+            <div className="space-y-8">
+              {/* Tenders */}
+              <div className="card-surface p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <TrendingUp className="h-8 w-8 text-primary" />
+                  <h3 className="font-bold">Открытые тендеры</h3>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Время ответа</span>
-                  <span className="text-sm font-medium">{responseTime}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Всего заказов</span>
-                  <span className="text-sm font-medium">{completedJobs}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Актуальные тендеры</h3>
-                <Link to="/tenders" className="text-sm text-primary hover:underline">Все тендеры</Link>
-              </div>
-              
-              <div className="space-y-3">
-                {tenders.length === 0 && (
-                  <div className="text-center py-4">
-                    <Briefcase className="h-12 w-12 text-slate-500 mb-2 mx-auto" />
-                    <p className="text-sm text-muted-foreground">Нет активных тендеров</p>
+                
+                {tenders.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Нет открытых тендеров
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {tenders.slice(0, 3).map((tender) => (
+                      <div key={tender.id} className="card-surface p-4">
+                        <h4 className="font-medium text-sm mb-1">{tender.title}</h4>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          До {new Date(tender.deadline).toLocaleDateString()}
+                        </p>
+                        <button className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-semibold transition-colors w-full">
+                          Подать заявку
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
+              </div>
 
-                {tenders.slice(0, 3).map((tender, index) => (
-                  <div key={tender.id} className="p-3 rounded-lg border hover:bg-muted/30 transition-colors cursor-pointer">
-                    <div className="font-medium text-sm mb-1">{tender.title || 'Тендер'}</div>
-                    <div className="text-xs text-muted-foreground mb-2">
-                      Заявок: {tender.bids_count || 0}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-success font-medium">
-                        {tender.budget_cents ? formatPrice(tender.budget_cents) : 'Договорная'}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {tender.deadline ? new Date(tender.deadline).toLocaleDateString() : 'Без срока'}
-                      </span>
+              {/* Recent Activity */}
+              <div className="card-surface p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <BarChart3 className="h-8 w-8 text-primary" />
+                  <h3 className="font-bold">Активность</h3>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="text-sm">
+                    <div className="flex justify-between mb-1">
+                      <span>Откликов сегодня</span>
+                      <span className="font-semibold">0</span>
                     </div>
                   </div>
-                ))}
+                  
+                  <div className="text-sm">
+                    <div className="flex justify-between mb-1">
+                      <span>Просмотров профиля</span>
+                      <span className="font-semibold">12</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm">
+                    <div className="flex justify-between mb-1">
+                      <span>Новых сообщений</span>
+                      <span className="font-semibold">3</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Tips */}
+              <div className="card-surface p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Zap className="h-8 w-8 text-primary" />
+                  <h3 className="font-bold">Советы</h3>
+                </div>
+                
+                <div className="space-y-3 text-sm">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                    <p className="font-medium mb-1">Быстрые отклики</p>
+                    <p className="text-muted-foreground">Отвечайте на заказы в течение 30 минут для повышения рейтинга</p>
+                  </div>
+                  
+                  <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                    <p className="font-medium mb-1">Качественные фото</p>
+                    <p className="text-muted-foreground">Добавьте фото работ в портфолио для привлечения клиентов</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 };
