@@ -229,7 +229,13 @@ const JobEdit = () => {
       }
 
       // Refresh photos after upload
+      console.log('Refreshing photos after upload...');
       await fetchJobPhotos();
+      console.log('Photos refreshed, current count:', existingPhotos.length);
+      
+      // Clear uploaded files from state
+      setUploadedFiles([]);
+      setDeletedPhotoIds([]);
 
       toast({
         title: 'Заказ обновлен',
