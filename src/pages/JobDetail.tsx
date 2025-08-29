@@ -285,7 +285,15 @@ const JobDetail = () => {
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <Button variant="outline" onClick={() => navigate(-1)} className="card-surface">
+            <Button variant="outline" onClick={() => {
+              if (userRole === 'pro') {
+                navigate('/dashboard/pro');
+              } else if (userRole === 'client') {
+                navigate('/dashboard/client');
+              } else {
+                navigate('/feed');
+              }
+            }} className="card-surface">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Назад
             </Button>
