@@ -677,7 +677,7 @@ const JobDetail = () => {
 
             {/* Professional Action Buttons */}
             {canApply && (
-              <Card className="transition-all">
+              <Card className="transition-all shadow-elegant">
                 <CardContent className="pt-6 pb-6">
                   {!showPriceProposal ? (
                     <>
@@ -686,7 +686,7 @@ const JobDetail = () => {
                       </h3>
                       
                       {/* Single Button */}
-                      <div className="flex justify-center">
+                      <div className="flex justify-center mb-6">
                         <Button 
                           className="flex-1 max-w-xs"
                           onClick={() => setShowPriceProposal(true)}
@@ -694,6 +694,60 @@ const JobDetail = () => {
                           <User className="w-4 h-4 mr-1" />
                           Откликнуться
                         </Button>
+                      </div>
+
+                      {/* Client Info */}
+                      {clientProfile && (
+                        <div className="border-t pt-4 mb-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage 
+                                src={clientProfile.avatar_url || ''} 
+                                alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
+                              />
+                              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                                {clientProfile.full_name 
+                                  ? clientProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                                  : (clientProfile.first_name && clientProfile.last_name 
+                                    ? `${clientProfile.first_name[0]}${clientProfile.last_name[0]}`.toUpperCase()
+                                    : 'К')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h4 className="font-medium text-sm">
+                                {clientProfile.full_name || 
+                                 (clientProfile.first_name && clientProfile.last_name 
+                                   ? `${clientProfile.first_name} ${clientProfile.last_name}` 
+                                   : 'Клиент')}
+                              </h4>
+                              <div className="flex items-center gap-1">
+                                {clientRating && clientRating.count > 0 ? (
+                                  <>
+                                    <StarRating 
+                                      rating={clientRating.average} 
+                                      size="sm" 
+                                      showValue={false}
+                                      readonly 
+                                    />
+                                    <span className="text-xs text-muted-foreground ml-1">
+                                      ({clientRating.count})
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">Новый клиент</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Job Description */}
+                      <div className="border-t pt-4">
+                        <h4 className="font-medium text-sm mb-2">Описание заказа</h4>
+                        <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                          {job.description}
+                        </p>
                       </div>
                     </>
                   ) : (
