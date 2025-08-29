@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save } from 'lucide-react';
+import { AnimatedIcon } from '@/components/ui/animated-icon';
+import { ArrowLeft, Save, Camera, Upload, X } from 'lucide-react';
 
 interface Job {
   id: string;
@@ -18,6 +19,12 @@ interface Job {
   urgency: string;
 }
 
+interface JobPhoto {
+  id: string;
+  file_url: string;
+  created_at: string;
+}
+
 const JobEdit = () => {
   const { id: jobId } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -26,11 +33,16 @@ const JobEdit = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [existingPhotos, setExistingPhotos] = useState<JobPhoto[]>([]);
+  const [deletedPhotoIds, setDeletedPhotoIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (jobId) {
       fetchJob();
       fetchCategories();
+      fetchJobPhotos();
     }
   }, [jobId]);
 
@@ -89,6 +101,21 @@ const JobEdit = () => {
     }
   };
 
+  const fetchJobPhotos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('job_photos')
+        .select('*')
+        .eq('job_id', jobId)
+        .order('created_at');
+
+      if (error) throw error;
+      setExistingPhotos(data || []);
+    } catch (error) {
+      console.error('Error fetching job photos:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
@@ -124,6 +151,38 @@ const JobEdit = () => {
 
       if (error) throw error;
 
+      // Delete removed photos
+      if (deletedPhotoIds.length > 0) {
+        await supabase
+          .from('job_photos')
+          .delete()
+          .in('id', deletedPhotoIds);
+      }
+
+      // Upload new photos
+      if (uploadedFiles.length > 0) {
+        const bucket = supabase.storage.from('evidence');
+        for (let i = 0; i < Math.min(uploadedFiles.length, 8); i++) {
+          const file = uploadedFiles[i];
+          try {
+            const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+            const path = `job/${jobId}/${Date.now()}-${i}.${ext}`;
+            const { error: upErr } = await bucket.upload(path, file, { 
+              upsert: true, 
+              contentType: file.type || 'image/jpeg' 
+            });
+            if (upErr) throw upErr;
+            
+            const { error: insErr } = await supabase
+              .from('job_photos')
+              .insert({ job_id: jobId, file_url: path });
+            if (insErr) throw insErr;
+          } catch (e) {
+            console.warn('Photo upload failed', e);
+          }
+        }
+      }
+
       toast({
         title: 'Заказ обновлен',
         description: 'Изменения успешно сохранены'
@@ -139,6 +198,43 @@ const JobEdit = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const files = Array.from(e.dataTransfer.files);
+    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+  };
+
+  const removeNewFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingPhoto = (photoId: string) => {
+    setDeletedPhotoIds(prev => [...prev, photoId]);
+    setExistingPhotos(prev => prev.filter(photo => photo.id !== photoId));
+  };
+
+  const getPhotoUrl = (path: string) => {
+    const { data } = supabase.storage.from('evidence').getPublicUrl(path);
+    return data.publicUrl;
   };
 
   if (loading) {
@@ -276,6 +372,92 @@ const JobEdit = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
                   />
                 </div>
+              </div>
+
+              {/* Photos Section */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-3">Фотографии</label>
+                
+                {/* Existing Photos */}
+                {existingPhotos.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">Текущие фотографии:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {existingPhotos.map((photo) => (
+                        <div key={photo.id} className="relative group">
+                          <img
+                            src={getPhotoUrl(photo.file_url)}
+                            alt="Job photo"
+                            className="w-full h-20 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeExistingPhoto(photo.id)}
+                            className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Upload New Photos */}
+                <div
+                  className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${
+                    dragActive ? 'border-primary bg-primary/5' : 'border-gray-300'
+                  }`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                >
+                  <AnimatedIcon icon={Camera} className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-2">
+                    Перетащите фото сюда или выберите файлы
+                  </p>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileInput}
+                    className="hidden"
+                    id="photo-upload-edit"
+                  />
+                  <label 
+                    htmlFor="photo-upload-edit" 
+                    className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer inline-flex items-center gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Добавить фото
+                  </label>
+                </div>
+
+                {/* New Photos Preview */}
+                {uploadedFiles.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">Новые фотографии:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {uploadedFiles.map((file, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Upload ${index + 1}`}
+                            className="w-full h-20 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeNewFile(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-4 pt-6">
