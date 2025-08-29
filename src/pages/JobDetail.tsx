@@ -315,6 +315,80 @@ const JobDetail = () => {
     }
   };
 
+  const handleStartWork = async () => {
+    if (!job || !currentUser || currentUser.id !== job.pro_id) {
+      toast({
+        title: 'Ошибка',
+        description: 'У вас нет прав для выполнения этого действия',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({ 
+          status: 'in_progress',
+          start_confirmed: true
+        })
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Работа начата',
+        description: 'Статус заказа изменен на "В работе"'
+      });
+      
+      await fetchJob();
+    } catch (error: any) {
+      console.error('Error starting work:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось обновить статус: ${error.message}`,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleCompleteWork = async () => {
+    if (!job || !currentUser || currentUser.id !== job.pro_id) {
+      toast({
+        title: 'Ошибка',
+        description: 'У вас нет прав для выполнения этого действия',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({ 
+          status: 'done',
+          end_confirmed: true
+        })
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Работа завершена',
+        description: 'Статус заказа изменен на "Выполнен"'
+      });
+      
+      await fetchJob();
+    } catch (error: any) {
+      console.error('Error completing work:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось обновить статус: ${error.message}`,
+        variant: 'destructive'
+      });
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusMap = {
       new: { label: 'Новый', variant: 'default' as const },
@@ -332,6 +406,9 @@ const JobDetail = () => {
   const canEdit = isJobOwner && !hasPayment && job?.status === 'new';
   const isProfessional = userRole === 'pro' && job?.status === 'new';
   const canApply = isProfessional && !job?.pro_id && currentUser?.id !== job?.client_id;
+  const isAssignedPro = currentUser && job && currentUser.id === job.pro_id;
+  const canStartWork = isAssignedPro && job?.status === 'accepted' && !jobStatusData.start_confirmed;
+  const canCompleteWork = isAssignedPro && job?.status === 'in_progress' && jobStatusData.start_confirmed && !jobStatusData.end_confirmed;
 
   if (loading) {
     return <div className="container mx-auto py-8">Загрузка...</div>;
@@ -824,6 +901,62 @@ const JobDetail = () => {
                           </Button>
                         </CardContent>
                       </Card>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Professional Work Management */}
+              {isAssignedPro && (
+                <div className="card-surface p-6 relative z-10">
+                  <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
+                    <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                    Управление работой
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {canStartWork && (
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 className="font-medium text-blue-900 mb-2">Готовы начать работу?</h4>
+                        <p className="text-sm text-blue-700 mb-4">
+                          Нажмите кнопку, когда приступите к выполнению заказа. 
+                          Статус заказа изменится на "В работе".
+                        </p>
+                        <Button 
+                          onClick={handleStartWork}
+                          className="w-full bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Clock className="w-4 h-4 mr-2" />
+                          Начать выполнение работы
+                        </Button>
+                      </div>
+                    )}
+
+                    {canCompleteWork && (
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 className="font-medium text-green-900 mb-2">Работа выполнена?</h4>
+                        <p className="text-sm text-green-700 mb-4">
+                          Нажмите кнопку, когда закончите выполнение заказа. 
+                          Статус заказа изменится на "Выполнен".
+                        </p>
+                        <Button 
+                          onClick={handleCompleteWork}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                        >
+                          <Star className="w-4 h-4 mr-2" />
+                          Завершить работу
+                        </Button>
+                      </div>
+                    )}
+
+                    {job.status === 'done' && (
+                      <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
+                        <Star className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                        <h4 className="font-medium text-emerald-900 mb-1">Работа завершена!</h4>
+                        <p className="text-sm text-emerald-700">
+                          Заказ успешно выполнен. Ожидайте оценку от заказчика.
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
