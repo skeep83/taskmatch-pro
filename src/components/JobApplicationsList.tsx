@@ -362,10 +362,14 @@ export function JobApplicationsList({
         <h3 className="text-xl font-semibold text-foreground">
           Отклики специалистов ({applications.length})
         </h3>
+        {/* Debug info */}
+        <div className="text-sm text-muted-foreground">
+          Текущая карточка: {currentIndex + 1} / {applications.length}
+        </div>
       </div>
       
       {/* Card Deck Container */}
-      <div className="relative w-full max-w-md mx-auto h-[600px]">
+      <div className="relative w-full max-w-md mx-auto h-[600px] border border-dashed border-muted-foreground/20 rounded-lg">
         <AnimatePresence mode="wait">
           {applications.map((application, index) => {
             const isSelected = selectedProId === application.pro_id;
