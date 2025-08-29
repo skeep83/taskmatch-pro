@@ -894,11 +894,14 @@ const JobDetail = () => {
                     {/* Professional Avatar and Info */}
                     {proProfile && (
                       <div className="flex flex-col items-center mb-6">
-                        <div className="relative">
-                          <Avatar className="w-32 h-32 mb-4 animate-bounce border-4 border-primary/20 shadow-lg shadow-primary/20">
+                        <div className="relative group">
+                          <div className="absolute -inset-4 bg-gradient-to-r from-primary via-accent to-primary rounded-full blur-lg opacity-30 animate-pulse group-hover:opacity-50 transition-opacity duration-500"></div>
+                          <div className="absolute -inset-2 bg-gradient-to-r from-primary/40 to-accent/40 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
+                          <Avatar className="w-32 h-32 mb-4 relative border-4 border-white/50 shadow-2xl shadow-primary/30 transform hover:scale-110 transition-all duration-500 hover:shadow-primary/50">
                             <AvatarImage 
                               src={proProfile.avatar_url || ''} 
                               alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
+                              className="transition-all duration-500 group-hover:brightness-110"
                             />
                             <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-2xl">
                               {proProfile.full_name 
@@ -908,30 +911,32 @@ const JobDetail = () => {
                                   : 'С')}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="absolute -inset-2 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 animate-pulse"></div>
                         </div>
-                        <h5 className="font-bold text-xl text-center mb-2">
+                        <h5 className="font-bold text-xl text-center mb-2 animate-fade-in">
                           {proProfile.full_name || 
                            (proProfile.first_name && proProfile.last_name 
                              ? `${proProfile.first_name} ${proProfile.last_name}` 
                              : 'Специалист')}
                         </h5>
-                        <Badge variant="default" className="animate-pulse bg-gradient-to-r from-primary to-accent text-white">Специалист</Badge>
+                        <Badge variant="default" className="bg-gradient-to-r from-primary to-accent text-white transform hover:scale-105 transition-transform duration-300">Специалист</Badge>
                       </div>
                     )}
 
                     {/* Rating Section */}
                     <div className="space-y-6">
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground mb-6 font-medium">Поставьте оценку от 1 до 5 звезд</p>
-                        <div className="transform hover:scale-110 transition-transform duration-300">
-                          <StarRating
-                            rating={rating}
-                            readonly={false}
-                            size="lg"
-                            className="justify-center star-rating-animated"
-                            onRatingChange={setRating}
-                          />
+                        <p className="text-sm text-muted-foreground mb-6 font-medium animate-fade-in">Поставьте оценку от 1 до 5 звезд</p>
+                        <div className="relative group">
+                          <div className="absolute -inset-3 bg-gradient-to-r from-yellow-400/20 via-orange-400/20 to-red-400/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div className="relative transform hover:scale-110 transition-all duration-300">
+                            <StarRating
+                              rating={rating}
+                              readonly={false}
+                              size="lg"
+                              className="justify-center [&>*]:transition-all [&>*]:duration-300 [&>*]:hover:drop-shadow-lg [&>*]:hover:brightness-125"
+                              onRatingChange={setRating}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -948,10 +953,11 @@ const JobDetail = () => {
                       <Button 
                         onClick={handleSubmitRating}
                         disabled={rating === 0}
-                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold py-3 transform hover:scale-105 transition-all duration-300 shadow-lg"
+                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:hover:scale-100 disabled:opacity-50 relative overflow-hidden group"
                       >
-                        <Send className="w-5 h-5 mr-2" />
-                        Отправить оценку
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                        <Send className="w-5 h-5 mr-2 relative z-10" />
+                        <span className="relative z-10">Отправить оценку</span>
                       </Button>
                     </div>
                   </div>
