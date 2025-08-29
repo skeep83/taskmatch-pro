@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FloatingCard } from "@/components/ui/floating-card";
-import { Upload, Plus, Image, Trash2, X, Camera, Film, FileImage } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Upload, Plus, Image, Trash2, X, Camera, Film, FileImage, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 const ProPortfolio = () => {
@@ -167,6 +168,90 @@ const ProPortfolio = () => {
   const getFileIcon = (file: File) => {
     if (file.type.startsWith('video/')) return <Film className="h-4 w-4" />;
     return <FileImage className="h-4 w-4" />;
+  };
+
+  // Portfolio Carousel Component
+  const PortfolioCarousel = ({ media, title }: { media: any[], title: string }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    
+    if (!media || media.length === 0) {
+      return (
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <Image className="h-12 w-12 text-muted-foreground" />
+        </div>
+      );
+    }
+
+    if (media.length === 1) {
+      return (
+        <MediaViewer
+          src={media[0].file_url}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          enableZoom
+        />
+      );
+    }
+
+    const nextImage = () => {
+      setCurrentIndex((prev) => (prev + 1) % media.length);
+    };
+
+    const prevImage = () => {
+      setCurrentIndex((prev) => (prev - 1 + media.length) % media.length);
+    };
+
+    return (
+      <div className="relative w-full h-full">
+        <MediaViewer
+          src={media[currentIndex]?.file_url}
+          alt={`${title} - ${currentIndex + 1}`}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          enableZoom
+        />
+        
+        {/* Navigation Arrows */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-8 w-8 p-0 backdrop-blur-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            prevImage();
+          }}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-8 w-8 p-0 backdrop-blur-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            nextImage();
+          }}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+
+        {/* Dots Indicator */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {media.map((_, index) => (
+            <button
+              key={index}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                index === currentIndex ? 'bg-white' : 'bg-white/50'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentIndex(index);
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -339,11 +424,10 @@ const ProPortfolio = () => {
                 >
                   <div className="relative">
                     <div className="aspect-video overflow-hidden">
-                      <MediaViewer
-                        src={item.portfolio_media?.[0]?.file_url || item.image_url}
-                        alt={item.title || 'Работа'}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        enableZoom
+                      {/* Portfolio Media Carousel */}
+                      <PortfolioCarousel 
+                        media={item.portfolio_media || (item.image_url ? [{ file_url: item.image_url, file_type: 'image' }] : [])}
+                        title={item.title || 'Работа'}
                       />
                     </div>
                     
