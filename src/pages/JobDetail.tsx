@@ -66,6 +66,7 @@ const JobDetail = () => {
   const [clientProfile, setClientProfile] = useState<any>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [jobApplications, setJobApplications] = useState<any[]>([]);
+  const [assignedPro, setAssignedPro] = useState<any>(null);
   const { formatPrice } = useCurrency();
 
   useEffect(() => {
@@ -116,6 +117,9 @@ const JobDetail = () => {
       setJob(data);
       await loadJobData();
       await loadClientData(data.client_id);
+      if (data.pro_id) {
+        await loadAssignedProfessional(data.pro_id);
+      }
     } catch (error: any) {
       console.error('Error fetching job:', error);
       toast({
@@ -182,6 +186,59 @@ const JobDetail = () => {
       }
     } catch (error) {
       console.error('Error loading client data:', error);
+    }
+  };
+
+  const loadAssignedProfessional = async (proId: string) => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, full_name, avatar_url')
+        .eq('id', proId)
+        .maybeSingle();
+
+      const { data: proProfile } = await supabase
+        .from('pro_profiles')
+        .select('*')
+        .eq('user_id', proId)
+        .maybeSingle();
+
+      const { data: ratings } = await supabase
+        .from('ratings')
+        .select('score')
+        .eq('to_user_id', proId);
+
+      let proRating = null;
+      if (ratings && ratings.length > 0) {
+        const average = ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length;
+        proRating = { average, count: ratings.length };
+      }
+
+      const { data: portfolioData } = await supabase
+        .from('portfolio_items')
+        .select(`
+          id,
+          title,
+          description,
+          portfolio_media (
+            id,
+            file_url,
+            file_type,
+            display_order
+          )
+        `)
+        .eq('pro_id', proId)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      setAssignedPro({
+        profile,
+        proProfile,
+        rating: proRating,
+        portfolio: portfolioData || []
+      });
+    } catch (error) {
+      console.error('Error loading assigned professional:', error);
     }
   };
 
@@ -433,18 +490,132 @@ const JobDetail = () => {
                   </div>
                 )}
 
-                {job.pro_id && (
-                  <div className="card-surface p-6">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                        <User className="w-5 h-5 text-orange-500" />
-                      </div>
-                      <span className="font-semibold text-lg">Специалист</span>
-                    </div>
-                    <p className="text-muted-foreground">Назначен специалист</p>
-                  </div>
-                )}
               </div>
+
+              {/* Assigned Professional Section */}
+              {job.pro_id && assignedPro && (
+                <div className="card-surface p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                      <User className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <span className="font-semibold text-lg">Назначен специалист</span>
+                  </div>
+                  
+                  <div className="border border-border/50 rounded-lg p-4">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage 
+                          src={assignedPro.profile?.avatar_url || ''} 
+                          alt={assignedPro.profile?.full_name || `${assignedPro.profile?.first_name} ${assignedPro.profile?.last_name}` || 'Специалист'} 
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                          {assignedPro.profile?.full_name 
+                            ? assignedPro.profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                            : (assignedPro.profile?.first_name && assignedPro.profile?.last_name 
+                              ? `${assignedPro.profile.first_name[0]}${assignedPro.profile.last_name[0]}`.toUpperCase()
+                              : 'С')}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="font-semibold text-lg">
+                            {assignedPro.profile?.full_name || 
+                             (assignedPro.profile?.first_name && assignedPro.profile?.last_name 
+                               ? `${assignedPro.profile.first_name} ${assignedPro.profile.last_name}` 
+                               : 'Специалист')}
+                          </h4>
+                          <Badge variant="default" className="bg-orange-100 text-orange-800 hover:bg-orange-200">
+                            Специалист
+                          </Badge>
+                        </div>
+
+                        <div className="flex items-center gap-4 mb-3">
+                          {assignedPro.rating && assignedPro.rating.count > 0 ? (
+                            <div className="flex items-center gap-2">
+                              <StarRating 
+                                rating={assignedPro.rating.average} 
+                                size="sm" 
+                                showValue={false}
+                                readonly 
+                              />
+                              <span className="text-sm text-muted-foreground">
+                                ({assignedPro.rating.count} отзыв{assignedPro.rating.count === 1 ? '' : assignedPro.rating.count < 5 ? 'а' : 'ов'})
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">Новый специалист</span>
+                          )}
+                        </div>
+
+                        {assignedPro.proProfile?.bio && (
+                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                            {assignedPro.proProfile.bio}
+                          </p>
+                        )}
+
+                        {assignedPro.proProfile?.hourly_rate_cents && (
+                          <div className="flex items-center gap-2 mb-3">
+                            <Euro className="w-4 h-4 text-success" />
+                            <span className="text-sm font-medium">
+                              {formatPrice(assignedPro.proProfile.hourly_rate_cents)}/час
+                            </span>
+                          </div>
+                        )}
+
+                        {assignedPro.portfolio && assignedPro.portfolio.length > 0 && (
+                          <div className="mt-3">
+                            <p className="text-sm font-medium text-muted-foreground mb-2">Примеры работ:</p>
+                            <div className="flex gap-2">
+                              {assignedPro.portfolio.slice(0, 3).map((item: any) => {
+                                const firstMedia = item.portfolio_media?.[0];
+                                if (!firstMedia) return null;
+                                
+                                const imageUrl = supabase.storage.from('portfolio').getPublicUrl(firstMedia.file_url).data.publicUrl;
+                                return (
+                                  <div key={item.id} className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
+                                    <img
+                                      src={imageUrl}
+                                      alt={item.title}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                );
+                              })}
+                              {assignedPro.portfolio.length > 3 && (
+                                <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                                  <span className="text-xs text-muted-foreground font-medium">
+                                    +{assignedPro.portfolio.length - 3}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 mt-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate(`/pro/${job.pro_id}`)}
+                          >
+                            Профиль
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate(`/messages?user=${job.pro_id}`)}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            Написать
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Job Photos */}
               {jobPhotos.length > 0 && (
