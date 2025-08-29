@@ -1,0 +1,31 @@
+-- First, let's check what categories we have and create missing ones
+INSERT INTO public.categories (id, key, label_ru, label_ro) VALUES
+('b131ec56-3326-4929-9622-c2a04864f379', 'electrical', 'Электрика', 'Electricitate'),
+('a1b2c3d4-5678-9012-3456-789012345678', 'plumbing', 'Сантехника', 'Instalații sanitare'),
+('b2c3d4e5-6789-0123-4567-890123456789', 'renovation', 'Ремонт', 'Renovare'),
+('c3d4e5f6-7890-1234-5678-901234567890', 'cleaning', 'Уборка', 'Curățenie'),
+('d4e5f6g7-8901-2345-6789-012345678901', 'transport', 'Транспорт', 'Transport')
+ON CONFLICT (id) DO UPDATE SET 
+  label_ru = EXCLUDED.label_ru,
+  label_ro = EXCLUDED.label_ro;
+
+-- Now add the foreign key constraint
+ALTER TABLE public.jobs 
+ADD CONSTRAINT jobs_category_id_fkey 
+FOREIGN KEY (category_id) REFERENCES public.categories(id);
+
+-- Fix storage policies - delete the failed insert first
+DELETE FROM storage.objects WHERE name = 'evidence' AND bucket_id = 'evidence';
+
+-- Create proper storage policies for evidence bucket
+CREATE POLICY "Authenticated users can upload to evidence bucket" ON storage.objects
+FOR INSERT WITH CHECK (
+  bucket_id = 'evidence' AND 
+  auth.role() = 'authenticated'
+);
+
+CREATE POLICY "Users can view evidence files" ON storage.objects
+FOR SELECT USING (
+  bucket_id = 'evidence' AND 
+  auth.role() = 'authenticated'
+);
