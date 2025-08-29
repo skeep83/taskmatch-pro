@@ -28,6 +28,12 @@ interface JobApplication {
     full_name?: string;
     avatar_url?: string;
   };
+  proProfile?: {
+    bio?: string;
+    hourly_rate_cents?: number;
+    fixed_price_cents?: number;
+    radius_km?: number;
+  };
   rating?: {
     avg_score: number;
     rating_count: number;
@@ -377,6 +383,36 @@ export const JobApplicationsList = ({
                             />
                           </div>
                         )}
+                        
+                        {application.proProfile && (
+                          <div className="space-y-2">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              {application.proProfile.hourly_rate_cents && (
+                                <div>
+                                  <span className="text-muted-foreground">Почасовая ставка:</span>
+                                  <div className="font-medium">${(application.proProfile.hourly_rate_cents / 100).toFixed(2)}/час</div>
+                                </div>
+                              )}
+                              {application.proProfile.fixed_price_cents && (
+                                <div>
+                                  <span className="text-muted-foreground">Фиксированная ставка:</span>
+                                  <div className="font-medium">${(application.proProfile.fixed_price_cents / 100).toFixed(2)}</div>
+                                </div>
+                              )}
+                              <div>
+                                <span className="text-muted-foreground">Радиус работы:</span>
+                                <div className="font-medium">{application.proProfile.radius_km || 10} км</div>
+                              </div>
+                            </div>
+                            {application.proProfile.bio && (
+                              <div>
+                                <span className="text-sm text-muted-foreground">О себе:</span>
+                                <p className="text-sm mt-1 p-2 bg-muted/50 rounded">{application.proProfile.bio}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
                         {application.portfolio && application.portfolio.length > 0 && (
                           <div>
                             <h4 className="font-medium mb-2">Портфолио</h4>
@@ -395,6 +431,7 @@ export const JobApplicationsList = ({
                             </div>
                           </div>
                         )}
+                        
                         <div className="flex justify-center">
                           <Link to={`/pro/${application.pro_id}`} target="_blank">
                             <Button variant="outline" size="sm">
