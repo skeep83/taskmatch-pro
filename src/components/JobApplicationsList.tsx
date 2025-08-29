@@ -659,23 +659,40 @@ export function JobApplicationsList({
                       )}
                       
                       {allImages.length > 0 && (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {allImages.map((image) => (
-                            <div key={image.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group cursor-pointer">
-                              <OptimizedImage
-                                src={image.url}
-                                alt={image.title}
-                                width={300}
-                                height={300}
-                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                              />
-                              {image.isMain && (
-                                <div className="absolute top-2 left-2 bg-primary/80 text-primary-foreground text-xs px-2 py-1 rounded">
-                                  Главное
+                            <motion.div 
+                              key={image.id} 
+                              className="relative rounded-xl overflow-hidden bg-muted group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300"
+                              whileHover={{ scale: 1.02 }}
+                              transition={{ duration: 0.2 }}
+                              onClick={() => window.open(image.url, '_blank')}
+                            >
+                              <div className="aspect-[4/3] relative">
+                                <OptimizedImage
+                                  src={image.url}
+                                  alt={image.title}
+                                  width={600}
+                                  height={450}
+                                  className="w-full h-full object-cover"
+                                />
+                                {image.isMain && (
+                                  <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-sm px-3 py-1 rounded-lg font-medium shadow-lg">
+                                    Главное фото
+                                  </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                <div className="absolute bottom-3 left-3 right-3 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <p className="text-sm font-medium truncate">{image.title}</p>
+                                  <p className="text-xs opacity-80">Нажмите для увеличения</p>
                                 </div>
-                              )}
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
-                            </div>
+                                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                                    <ExternalLink className="w-4 h-4 text-white" />
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
                           ))}
                         </div>
                       )}
