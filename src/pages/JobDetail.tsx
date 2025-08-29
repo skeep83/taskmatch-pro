@@ -302,18 +302,20 @@ const JobDetail = () => {
                     Фотографии заказа
                     <Badge variant="secondary" className="ml-2">{jobPhotos.length}</Badge>
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr">
                     {jobPhotos.map((photo, index) => (
                       <div key={photo.id} className="relative group">
-                        <div className="aspect-square w-full bg-muted rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md">
-                          <OptimizedImage
-                            src={photo.file_url}
-                            alt={`Фото заказа ${index + 1}`}
-                            bucket="evidence"
-                            className="w-full h-full"
-                            objectFit="cover"
-                            enableZoom={true}
-                          />
+                        <div className="w-full h-0 pb-[100%] relative bg-muted rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md">
+                          <div className="absolute inset-0">
+                            <OptimizedImage
+                              src={photo.file_url}
+                              alt={`Фото заказа ${index + 1}`}
+                              bucket="evidence"
+                              className="absolute inset-0 w-full h-full"
+                              objectFit="cover"
+                              enableZoom={true}
+                            />
+                          </div>
                         </div>
                       </div>
                     ))}
