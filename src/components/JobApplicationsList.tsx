@@ -457,91 +457,91 @@ export const JobApplicationsList = ({
         
         return (
           <Card key={application.id} className={`transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold flex items-center gap-2 truncate">
-                      <span className="truncate">{displayName}</span>
-                      {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
-                    </h4>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="secondary">Специалист</Badge>
-                      {application.rating && application.rating.rating_count > 0 && (
-                        <StarRating 
-                          rating={application.rating.avg_score} 
-                          size="sm" 
-                          showValue 
-                          showCount 
-                          count={application.rating.rating_count}
-                          className="text-xs"
-                        />
-                      )}
+            <CardHeader className="pb-3">
+              <div className="flex items-start gap-3">
+                <Avatar className="w-12 h-12 flex-shrink-0">
+                  <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-semibold flex items-center gap-2 mb-1">
+                        <span className="truncate">{displayName}</span>
+                        {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">Специалист</Badge>
+                        {application.rating && application.rating.rating_count > 0 && (
+                          <StarRating 
+                            rating={application.rating.avg_score} 
+                            size="sm" 
+                            showValue={false}
+                            readonly 
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-xl font-bold text-primary whitespace-nowrap">
+                        {formatPrice(application.price_cents)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(application.created_at), { 
+                          addSuffix: true, 
+                          locale: ru 
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">
-                    {formatPrice(application.price_cents)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {formatDistanceToNow(new Date(application.created_at), { 
-                      addSuffix: true, 
-                      locale: ru 
-                    })}
+                  
+                  <div className="flex flex-wrap gap-3 text-sm">
+                    {application.eta_slot && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                        <span className="truncate">Время: {application.eta_slot}</span>
+                      </div>
+                    )}
+                    {application.warranty_days && application.warranty_days > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Shield className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <span className="whitespace-nowrap">Гарантия: {application.warranty_days} дн.</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </CardHeader>
             
-            <CardContent className="pt-0">
-              <div className="space-y-3">
+            <CardContent className="pt-0 space-y-3">
                 {application.note && (
-                  <div>
-                    <p className="text-sm font-medium mb-1">Комментарий:</p>
-                    <p className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
-                      {application.note}
-                    </p>
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm font-medium mb-1">Комментарий к отклику:</p>
+                    <p className="text-sm">{application.note}</p>
                   </div>
                 )}
-                
-                <div className="flex flex-wrap gap-4 text-sm">
-                  {application.eta_slot && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-blue-500" />
-                      <span>Время: {application.eta_slot}</span>
-                    </div>
-                  )}
-                  {application.warranty_days && application.warranty_days > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Shield className="w-4 h-4 text-green-500" />
-                      <span>Гарантия: {application.warranty_days} дн.</span>
-                    </div>
-                  )}
-                </div>
 
                 {application.portfolio && application.portfolio.length > 0 && (
                   <div>
                     <p className="text-sm font-medium mb-2">Портфолио:</p>
-                    <div className="flex gap-2 overflow-x-auto">
-                      {application.portfolio.map((item) => (
-                        <div key={item.id} className="flex-shrink-0">
-                          <OptimizedImage
-                            src={item.image_url}
-                            alt={item.title || 'Работа специалиста'}
-                            className="w-16 h-16 rounded object-cover"
-                            bucket="portfolio"
-                            enableZoom
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    <PortfolioCarousel 
+                      media={application.portfolio.flatMap(item => [
+                        ...(item.portfolio_media || []).sort((a, b) => a.display_order - b.display_order),
+                        ...(item.image_url ? [{ file_url: item.image_url, file_type: 'image/jpeg' }] : [])
+                      ])}
+                      title={`Работы ${displayName}`}
+                    />
+                  </div>
+                )}
+
+                {application.proProfile?.bio && (
+                  <div>
+                    <p className="text-sm font-medium mb-1">О специалисте:</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {application.proProfile.bio}
+                    </p>
                   </div>
                 )}
 
@@ -671,14 +671,13 @@ export const JobApplicationsList = ({
                   )}
                 </div>
 
-                {isSelected && (
-                  <div className="pt-2">
-                    <Badge variant="default" className="w-full justify-center">
-                      ✓ Выбранный специалист
-                    </Badge>
-                  </div>
-                )}
-              </div>
+                 {isSelected && (
+                   <div className="pt-2">
+                     <Badge variant="default" className="w-full justify-center">
+                       ✓ Выбранный специалист
+                     </Badge>
+                   </div>
+                 )}
             </CardContent>
           </Card>
         );
