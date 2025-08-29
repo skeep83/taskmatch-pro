@@ -540,39 +540,46 @@ export function JobApplicationsList({
           })}
         </AnimatePresence>
         
-        {/* Navigation */}
-        {applications.length > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-6">
+        {/* Navigation - Always show if there are applications */}
+        {applications.length > 0 && (
+          <div className="flex items-center justify-center gap-4 mt-8 p-4 bg-muted/50 rounded-xl">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentIndex((prev) => (prev - 1 + applications.length) % applications.length)}
-              className="w-10 h-10 rounded-full p-0"
+              className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
+              disabled={applications.length <= 1}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </Button>
             
-            <div className="flex gap-2">
-              {applications.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                    index === currentIndex 
-                      ? 'bg-primary scale-125' 
-                      : 'bg-muted hover:bg-muted-foreground/20'
-                  }`}
-                />
-              ))}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-muted-foreground">
+                {currentIndex + 1} из {applications.length}
+              </span>
+              <div className="flex gap-2">
+                {applications.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`w-4 h-4 rounded-full transition-all duration-300 border-2 ${
+                      index === currentIndex 
+                        ? 'bg-primary border-primary scale-125 shadow-lg' 
+                        : 'bg-transparent border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/20'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
             
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentIndex((prev) => (prev + 1) % applications.length)}
-              className="w-10 h-10 rounded-full p-0"
+              className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
+              disabled={applications.length <= 1}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
         )}
