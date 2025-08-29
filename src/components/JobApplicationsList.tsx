@@ -274,7 +274,7 @@ export const JobApplicationsList = ({
       </div>
       
       {/* Carousel Container */}
-      <div className="relative py-8 px-4 h-[600px]">
+      <div className="relative py-8 px-4 h-[700px]">
         {/* Cards Stack */}
         <div className="relative w-full h-full perspective-1000">
           {applications.map((application, index) => {
@@ -341,7 +341,7 @@ export const JobApplicationsList = ({
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="relative">
                         <div className="absolute inset-0 bg-white/20 rounded-full blur-sm scale-110"></div>
-                        <Avatar className="relative w-20 h-20 ring-4 ring-white shadow-2xl z-10">
+                        <Avatar className="relative w-24 h-24 ring-4 ring-white shadow-2xl z-10">
                           <AvatarImage 
                             src={application.profiles?.avatar_url || ''} 
                             alt={displayName}
