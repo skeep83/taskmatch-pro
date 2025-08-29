@@ -31,14 +31,14 @@ export function AvatarUpload({ userId, currentAvatarUrl, userName, onAvatarUpdat
         throw new Error('Размер файла не должен превышать 5MB');
       }
 
-      // Create unique filename
+      // Create unique filename with user ID folder structure
       const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+      const fileName = `avatars/${userId}/${Date.now()}.${fileExt}`;
 
       // Upload to storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('portfolio')
-        .upload(`avatars/${fileName}`, file, {
+        .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false
         });
@@ -48,7 +48,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, userName, onAvatarUpdat
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('portfolio')
-        .getPublicUrl(`avatars/${fileName}`);
+        .getPublicUrl(fileName);
 
       // Update profile with avatar URL
       const { error: updateError } = await supabase
