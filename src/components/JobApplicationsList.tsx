@@ -280,6 +280,7 @@ export function JobApplicationsList({
   };
 
   const handlePortfolioOpen = (application: JobApplication) => {
+    console.log('🖼️ Opening portfolio for:', application.pro_id, application);
     setSelectedPortfolio(application);
     setPortfolioModalOpen(true);
   };
@@ -592,7 +593,7 @@ export function JobApplicationsList({
 
       {/* Portfolio Modal */}
       <Dialog open={portfolioModalOpen} onOpenChange={setPortfolioModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
