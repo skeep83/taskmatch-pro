@@ -281,8 +281,10 @@ export function JobApplicationsList({
 
   const handlePortfolioOpen = (application: JobApplication) => {
     console.log('🖼️ Opening portfolio for:', application.pro_id, application);
+    console.log('🎭 Modal state before:', { portfolioModalOpen, selectedPortfolio: !!selectedPortfolio });
     setSelectedPortfolio(application);
     setPortfolioModalOpen(true);
+    console.log('🎭 Modal state after:', { portfolioModalOpen: true, selectedPortfolio: !!application });
   };
 
   if (loading) {
@@ -593,7 +595,7 @@ export function JobApplicationsList({
 
       {/* Portfolio Modal */}
       <Dialog open={portfolioModalOpen} onOpenChange={setPortfolioModalOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
@@ -618,6 +620,8 @@ export function JobApplicationsList({
             {selectedPortfolio?.portfolio && selectedPortfolio.portfolio.length > 0 ? (
               <div className="space-y-8">
                 {selectedPortfolio.portfolio.map((item) => {
+                  console.log('🖼️ Processing portfolio item:', item);
+                  
                   // Собираем все изображения: основное + дополнительные
                   const allImages = [];
                   
@@ -646,6 +650,8 @@ export function JobApplicationsList({
                       });
                   }
 
+                  console.log('🎨 All images for item:', allImages);
+
                   return (
                     <div key={item.id} className="space-y-4">
                       {item.title && (
@@ -655,7 +661,7 @@ export function JobApplicationsList({
                       {allImages.length > 0 && (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                           {allImages.map((image) => (
-                            <div key={image.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group">
+                            <div key={image.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group cursor-pointer">
                               <OptimizedImage
                                 src={image.url}
                                 alt={image.title}
@@ -664,7 +670,7 @@ export function JobApplicationsList({
                                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                               />
                               {image.isMain && (
-                                <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                <div className="absolute top-2 left-2 bg-primary/80 text-primary-foreground text-xs px-2 py-1 rounded">
                                   Главное
                                 </div>
                               )}
