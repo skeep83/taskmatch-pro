@@ -23,7 +23,8 @@ import {
   Star,
   Edit,
   Trash2,
-  ZoomIn
+  ZoomIn,
+  DollarSign
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
@@ -675,23 +676,25 @@ const JobDetail = () => {
 
             {/* Professional Action Buttons */}
             {canApply && (
-              <div className="card-surface p-8 text-center">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center justify-center gap-3">
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Заинтересованы в заказе?
                 </h2>
-                <div className="flex flex-wrap gap-4 justify-center">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <Button 
                     onClick={() => setShowPriceProposal(true)}
-                    className="btn-hero text-lg px-8 py-3"
+                    className="btn-hero h-14 text-lg font-semibold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
+                    <DollarSign className="w-5 h-5" />
                     Предложить цену
                   </Button>
                   <Button 
                     onClick={() => setShowApplicationForm(true)}
                     variant="outline"
-                    className="border-primary text-primary hover:bg-primary hover:text-white text-lg px-8 py-3"
+                    className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-lg"
                   >
+                    <User className="w-5 h-5" />
                     Откликнуться
                   </Button>
                 </div>

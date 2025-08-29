@@ -97,15 +97,31 @@ export const JobResponseForm = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Send className="w-5 h-5 text-primary" />
+    <Card className="card-surface border-0 shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5 border-b">
+        <CardTitle className="flex items-center gap-3 text-xl">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <Send className="w-5 h-5 text-primary" />
+          </div>
           Откликнуться на заказ
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground">
           Предложите свою цену и условия для заказа "{jobTitle}"
         </p>
+        {(budgetMin || budgetMax) && (
+          <div className="flex items-center gap-2 text-sm">
+            <Euro className="w-4 h-4 text-success" />
+            <span className="font-medium">
+              Бюджет: {budgetMin && budgetMax 
+                ? `${formatPrice(budgetMin * 100)} - ${formatPrice(budgetMax * 100)}`
+                : budgetMin 
+                ? `от ${formatPrice(budgetMin * 100)}`
+                : budgetMax 
+                ? `до ${formatPrice(budgetMax * 100)}`
+                : 'Не указан'}
+            </span>
+          </div>
+        )}
       </CardHeader>
       
       <CardContent>
