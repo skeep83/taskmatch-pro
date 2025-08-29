@@ -894,31 +894,26 @@ const JobDetail = () => {
                     {/* Professional Avatar and Info */}
                     {proProfile && (
                       <div className="flex flex-col items-center mb-6">
-                        <div className="relative group">
-                          <div className="absolute -inset-4 bg-gradient-to-r from-primary via-accent to-primary rounded-full blur-lg opacity-30 animate-pulse group-hover:opacity-50 transition-opacity duration-500"></div>
-                          <div className="absolute -inset-2 bg-gradient-to-r from-primary/40 to-accent/40 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
-                          <Avatar className="w-32 h-32 mb-4 relative border-4 border-white/50 shadow-2xl shadow-primary/30 transform hover:scale-110 transition-all duration-500 hover:shadow-primary/50">
-                            <AvatarImage 
-                              src={proProfile.avatar_url || ''} 
-                              alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
-                              className="transition-all duration-500 group-hover:brightness-110"
-                            />
-                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-2xl">
-                              {proProfile.full_name 
-                                ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
-                                : (proProfile.first_name && proProfile.last_name 
-                                  ? `${proProfile.first_name[0]}${proProfile.last_name[0]}`.toUpperCase()
-                                  : 'С')}
-                            </AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <h5 className="font-bold text-xl text-center mb-2 animate-fade-in">
+                        <Avatar className="w-40 h-40 mb-4 border-4 border-white/50 shadow-2xl">
+                          <AvatarImage 
+                            src={proProfile.avatar_url || ''} 
+                            alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
+                          />
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-3xl">
+                            {proProfile.full_name 
+                              ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                              : (proProfile.first_name && proProfile.last_name 
+                                ? `${proProfile.first_name[0]}${proProfile.last_name[0]}`.toUpperCase()
+                                : 'С')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h5 className="font-bold text-xl text-center mb-2">
                           {proProfile.full_name || 
                            (proProfile.first_name && proProfile.last_name 
                              ? `${proProfile.first_name} ${proProfile.last_name}` 
                              : 'Специалист')}
                         </h5>
-                        <Badge variant="default" className="bg-gradient-to-r from-primary to-accent text-white transform hover:scale-105 transition-transform duration-300">Специалист</Badge>
+                        <Badge variant="default" className="bg-gradient-to-r from-primary to-accent text-white">Специалист</Badge>
                       </div>
                     )}
 
