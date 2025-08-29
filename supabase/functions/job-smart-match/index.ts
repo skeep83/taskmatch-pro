@@ -76,6 +76,8 @@ serve(async (req) => {
         `)
         .eq('category_id', job.category_id)
         .eq('is_active', true)
+        .not('location_lat', 'is', null)
+        .not('location_lng', 'is', null)
         .limit(maxResults);
 
       if (prosError) {

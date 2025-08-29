@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.scores-refresh-user]
 verify_jwt = true
+
+[functions.job-application-create]
+verify_jwt = true
+
+[functions.job-application-select]
+verify_jwt = true
