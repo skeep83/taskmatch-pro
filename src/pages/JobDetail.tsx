@@ -31,7 +31,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { ProTipsCarousel } from '@/components/ProTipsCarousel';
 
 interface Job {
   id: string;
@@ -784,9 +783,6 @@ const JobDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-8 mt-8">
-            {/* Tips Carousel */}
-            <ProTipsCarousel />
-            
             {/* Statistics Card */}
             <div className="card-surface p-6 mb-8">
               <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
