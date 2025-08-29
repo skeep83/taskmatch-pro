@@ -473,7 +473,7 @@ const JobDetail = () => {
           {/* Sidebar */}
           <div className="space-y-8">
             {/* Statistics Card */}
-            <div className="card-surface p-6">
+            <div className="card-surface p-6 mb-8">
               <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                 Статистика заказа
