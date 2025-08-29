@@ -321,7 +321,7 @@ const JobDetail = () => {
                 <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                 Информация о заказчике
               </h3>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <Avatar className="w-12 h-12">
                   <AvatarImage 
                     src={clientProfile.avatar_url || ''} 
@@ -335,7 +335,7 @@ const JobDetail = () => {
                         : 'К')}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
+                <div>
                   <h4 className="font-semibold">
                     {clientProfile.full_name || 
                      (clientProfile.first_name && clientProfile.last_name 
