@@ -6,7 +6,6 @@ import { Seo } from '@/components/Seo';
 import { JobApplicationsList } from '@/components/JobApplicationsList';
 import { JobResponseForm } from '@/components/JobResponseForm';
 import { PriceProposalForm } from '@/components/PriceProposalForm';
-import { ProTipsCarousel } from '@/components/ProTipsCarousel';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import interestedInJobImage from '@/assets/interested-in-job.png';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -673,13 +672,6 @@ const JobDetail = () => {
                   selectedProId={job.pro_id}
                   onApplicationSelect={() => fetchJob()}
                 />
-              </div>
-            )}
-
-            {/* Professional Tips Carousel */}
-            {isProfessional && (
-              <div className="mb-8">
-                <ProTipsCarousel />
               </div>
             )}
 
