@@ -491,39 +491,64 @@ export const JobApplicationsList = ({
           : 'НС';
         
         return (
-          <div key={application.id} className={`relative overflow-hidden rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white ${
-            isSelected ? 'ring-2 ring-primary' : ''
-          }`}>
-            {/* Gradient Header */}
-            <div className="relative h-40 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400">
-              {/* Avatar in center */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Avatar className="w-20 h-20 ring-4 ring-white shadow-lg">
-                  <AvatarImage 
-                    src={application.profiles?.avatar_url || ''} 
-                    alt={displayName}
-                  />
-                  <AvatarFallback className="text-xl font-bold bg-white text-gray-800">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              
-              {/* Profile link icon */}
-              <Link
-                to={`/pro/${application.pro_id}`}
-                className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
-              >
-                <ExternalLink className="h-5 w-5" />
-              </Link>
-              
-              {/* Selected badge */}
-              {isSelected && (
-                <div className="absolute top-4 left-4">
-                  <CheckCircle className="w-6 h-6 text-white" />
+          <motion.div
+            key={application.id}
+            initial={{ opacity: 0, y: 50, rotateX: -15 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="w-full perspective-1000"
+          >
+            <div 
+              className={`group relative overflow-hidden rounded-3xl card-3d bg-white ${
+                isSelected ? 'ring-4 ring-primary ring-opacity-50' : ''
+              }`}
+              style={{
+                transformStyle: 'preserve-3d',
+                boxShadow: `
+                  0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                  0 15px 35px -5px rgba(0, 0, 0, 0.15),
+                  0 0 0 1px rgba(255, 255, 255, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                  inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+                `
+              }}
+            >
+              {/* Gradient Header with enhanced 3D effect */}
+              <div className="relative h-40 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 overflow-hidden">
+                {/* Additional depth layer */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                
+                {/* Avatar with enhanced shadow */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-white/20 rounded-full blur-sm scale-110"></div>
+                    <Avatar className="relative w-20 h-20 ring-4 ring-white shadow-2xl z-10">
+                      <AvatarImage 
+                        src={application.profiles?.avatar_url || ''} 
+                        alt={displayName}
+                      />
+                      <AvatarFallback className="text-xl font-bold bg-white text-gray-800 shadow-inner">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
                 </div>
-              )}
-            </div>
+                
+                {/* Profile link icon */}
+                <Link
+                  to={`/pro/${application.pro_id}`}
+                  className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+                >
+                  <ExternalLink className="h-5 w-5" />
+                </Link>
+                
+                {/* Selected badge */}
+                {isSelected && (
+                  <div className="absolute top-4 left-4">
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
+                )}
+              </div>
             
             {/* White content area */}
             <div className="p-6 space-y-4">
@@ -653,6 +678,7 @@ export const JobApplicationsList = ({
               )}
             </div>
           </div>
+        </motion.div>
         );
       })}
     </div>
