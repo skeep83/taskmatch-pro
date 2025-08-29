@@ -792,39 +792,41 @@ const JobDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-8">
-            {/* Job Status Progress */}
+            {/* Job Status and Statistics Combined */}
             <div className="card-surface p-6">
               <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                Статус выполнения
+                Статус и статистика заказа
               </h3>
-              <JobStatusProgress 
-                status={job.status}
-                startConfirmed={jobStatusData.start_confirmed}
-                endConfirmed={jobStatusData.end_confirmed}
-              />
-            </div>
+              
+              {/* Job Status Progress */}
+              <div className="mb-8">
+                <h4 className="text-lg font-medium mb-4 text-muted-foreground">Прогресс выполнения</h4>
+                <JobStatusProgress 
+                  status={job.status}
+                  startConfirmed={jobStatusData.start_confirmed}
+                  endConfirmed={jobStatusData.end_confirmed}
+                />
+              </div>
 
-            {/* Statistics Card */}
-            <div className="card-surface p-6 mb-8">
-              <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
-                <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                Статистика заказа
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-3 border-b border-border/50">
-                  <span className="text-muted-foreground">Статус:</span>
-                  {getStatusBadge(job.status)}
-                </div>
-                
-                <div className="flex items-center justify-between py-3 border-b border-border/50">
-                  <span className="text-muted-foreground">Создан:</span>
-                  <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
-                </div>
+              {/* Statistics */}
+              <div>
+                <h4 className="text-lg font-medium mb-4 text-muted-foreground">Информация о заказе</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-3 border-b border-border/50">
+                    <span className="text-muted-foreground">Статус:</span>
+                    {getStatusBadge(job.status)}
+                  </div>
+                  
+                  <div className="flex items-center justify-between py-3 border-b border-border/50">
+                    <span className="text-muted-foreground">Создан:</span>
+                    <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
+                  </div>
 
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-muted-foreground">Категория:</span>
-                  <span className="font-medium">{job.categories.label_ru}</span>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground">Категория:</span>
+                    <span className="font-medium">{job.categories.label_ru}</span>
+                  </div>
                 </div>
               </div>
             </div>

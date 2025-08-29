@@ -89,7 +89,8 @@ export default {
 				'pulse-glow': { '0%, 100%': { boxShadow: '0 0 15px hsl(var(--primary)/0.2)' }, '50%': { boxShadow: '0 0 25px hsl(var(--primary)/0.4), 0 0 35px hsl(var(--accent)/0.2)' } },
 				'bounce-gentle': { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-2px)' } },
 				'rotate-slow': { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } },
-				'gradient-shift': { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } }
+				'gradient-shift': { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
+				'progress-fill': { '0%': { width: '0%' }, '100%': { width: 'var(--progress-width)' } }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -113,7 +114,8 @@ export default {
 				// Infinite versions for special cases
 				'float-infinite': 'float 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite',
 				'glow-infinite': 'glow 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite',
-				'pulse-infinite': 'pulse-glow 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite'
+				'pulse-infinite': 'pulse-glow 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite',
+				'progress-fill': 'progress-fill 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
 			}
 		}
 	},

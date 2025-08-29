@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircle, Clock, PlayCircle, AlertCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 
 interface JobStatusProgressProps {
   status: 'new' | 'accepted' | 'in_progress' | 'done' | 'cancelled';
@@ -46,7 +45,6 @@ export function JobStatusProgress({
   endConfirmed = false, 
   className = "" 
 }: JobStatusProgressProps) {
-  console.log('JobStatusProgress render:', { status, startConfirmed, endConfirmed });
   
   const statusInfo = getStatusInfo(status);
   const progressValue = getProgressValue(status);
@@ -82,9 +80,26 @@ export function JobStatusProgress({
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>Прогресс выполнения</span>
-          <span>{progressValue}%</span>
+          <span className="animate-fade-in">{progressValue}%</span>
         </div>
-        <Progress value={progressValue} className="h-2" />
+        <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-1000 ease-out animate-progress-fill"
+            style={{ 
+              width: `${progressValue}%`,
+              '--progress-width': `${progressValue}%`
+            } as React.CSSProperties}
+          />
+          {progressValue > 0 && (
+            <div 
+              className="absolute top-0 h-full w-4 bg-white/30 rounded-full animate-pulse"
+              style={{ 
+                left: `${Math.max(0, progressValue - 15)}%`,
+                animationDuration: '2s'
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Status Steps */}
@@ -95,12 +110,20 @@ export function JobStatusProgress({
           const StepIcon = step.icon;
 
           return (
-            <div key={step.key} className="flex items-center gap-3">
-              <div className={`p-2 rounded-full border transition-colors ${
+            <div 
+              key={step.key} 
+              className={`flex items-center gap-3 transition-all duration-500 ${
+                isCurrent ? 'animate-fade-in' : ''
+              }`}
+              style={{ 
+                animationDelay: `${index * 100}ms` 
+              }}
+            >
+              <div className={`p-2 rounded-full border transition-all duration-500 ${
                 isCompleted 
-                  ? 'bg-primary text-primary-foreground border-primary' 
+                  ? 'bg-primary text-primary-foreground border-primary animate-scale-in' 
                   : 'bg-muted text-muted-foreground border-muted'
-              }`}>
+              } ${isCurrent ? 'ring-2 ring-primary/20 animate-pulse' : ''}`}>
                 <StepIcon className="h-4 w-4" />
               </div>
               <div className="flex-1">
@@ -139,7 +162,10 @@ export function JobStatusProgress({
                 )}
               </div>
               {isCurrent && (
-                <Clock className="h-4 w-4 text-primary animate-pulse" />
+                <div className="flex items-center gap-1 animate-fade-in">
+                  <Clock className="h-4 w-4 text-primary animate-pulse" />
+                  <span className="text-xs text-primary font-medium">В процессе</span>
+                </div>
               )}
             </div>
           );
@@ -148,7 +174,7 @@ export function JobStatusProgress({
 
       {/* Additional Info */}
       {status === 'in_progress' && (
-        <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+        <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg animate-fade-in">
           <p className="text-sm text-primary font-medium">Работы в процессе выполнения</p>
           <p className="text-xs text-muted-foreground mt-1">
             Вы можете связаться со специалистом через чат для уточнения деталей
@@ -157,7 +183,7 @@ export function JobStatusProgress({
       )}
 
       {status === 'done' && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg animate-scale-in">
           <p className="text-sm text-green-700 font-medium">Заказ выполнен!</p>
           <p className="text-xs text-green-600 mt-1">
             Не забудьте оставить отзыв о работе специалиста
