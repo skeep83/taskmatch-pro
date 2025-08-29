@@ -290,41 +290,27 @@ const HowItWorks = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="card-surface group p-8 text-center transition-all duration-500 relative overflow-hidden"
+                className="card-surface group p-8 text-center transition-all duration-500 hover:shadow-2xl"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                {/* Background Image */}
-                <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
-                  <img 
-                    src={feature.image} 
-                    alt={feature.title}
-                    className="w-full h-full object-cover rounded-2xl"
-                  />
+                <div className="mb-6">
+                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} shadow-lg`}>
+                    <NeumorphicIcon 
+                      icon={feature.icon} 
+                      size={56}
+                      variant="square"
+                      className="text-white"
+                      delayMs={index * 150}
+                    />
+                  </div>
                 </div>
                 
-                {/* Background Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-10 group-hover:opacity-20 transition-opacity rounded-2xl`}></div>
-                
-                <div className="relative z-10">
-                  <div className="mb-6">
-                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} bg-opacity-20 backdrop-blur-sm`}>
-                      <NeumorphicIcon 
-                        icon={feature.icon} 
-                        size={56}
-                        variant="square"
-                        className="text-white drop-shadow-lg"
-                        delayMs={index * 150}
-                      />
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-lg">{feature.title}</h3>
-                  <p className="text-white/90 leading-relaxed mb-4 drop-shadow">
-                    {feature.description}
-                  </p>
-                  <div className="text-sm font-semibold text-white drop-shadow-lg bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
-                    {feature.stats}
-                  </div>
+                <h3 className="text-2xl font-bold mb-3 text-gradient-subtle">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  {feature.description}
+                </p>
+                <div className="text-sm font-semibold text-primary bg-primary/10 rounded-full px-4 py-2">
+                  {feature.stats}
                 </div>
               </div>
             ))}
