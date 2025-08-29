@@ -368,7 +368,7 @@ const JobDetail = () => {
                         <Dialog key={photo.id}>
                           <DialogTrigger asChild>
                             <div className="relative group cursor-pointer">
-                              <div className="aspect-square bg-muted rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:scale-105">
+                              <div className="aspect-square card-surface rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:scale-105">
                                 <img
                                   src={imageUrl}
                                   alt={`Фото заказа ${index + 1}`}
