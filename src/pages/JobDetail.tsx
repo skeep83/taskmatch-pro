@@ -39,11 +39,6 @@ interface Job {
     label_ru: string;
     label_ro: string;
   };
-  pro_profile?: {
-    first_name: string;
-    last_name: string;
-    avatar_url?: string;
-  };
 }
 
 const JobDetail = () => {
@@ -85,24 +80,37 @@ const JobDetail = () => {
   };
 
   const fetchJob = async () => {
+    console.log('Fetching job with ID:', jobId);
     try {
       const { data, error } = await supabase
         .from('jobs')
         .select(`
           *,
-          categories!inner(key, label_ru, label_ro),
-          pro_profile:profiles!pro_id(first_name, last_name, avatar_url)
+          categories!inner(key, label_ru, label_ro)
         `)
         .eq('id', jobId)
         .single();
 
-      if (error) throw error;
+      console.log('Job query result:', { data, error });
+
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
+      
+      console.log('Job loaded successfully:', data);
       setJob(data);
     } catch (error: any) {
       console.error('Error fetching job:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
       toast({
         title: 'Ошибка',
-        description: 'Не удалось загрузить заказ',
+        description: `Не удалось загрузить заказ: ${error.message}`,
         variant: 'destructive'
       });
       navigate('/dashboard');
@@ -205,11 +213,11 @@ const JobDetail = () => {
                   </div>
                 )}
 
-                {job.pro_profile && (
+                {job.pro_id && (
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-orange-500" />
                     <span className="font-medium">Специалист:</span>
-                    <span>{job.pro_profile.first_name} {job.pro_profile.last_name}</span>
+                    <span>Назначен специалист</span>
                   </div>
                 )}
               </div>
