@@ -390,24 +390,24 @@ export function JobApplicationsList({
                 {/* 3D Card with gradient background like reference */}
                 <div className="card-3d group relative w-full max-w-xs mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
                   {/* Top gradient section (like in reference) */}
-                  <div className="relative h-36 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 overflow-hidden">
+                  <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 overflow-hidden">
                     {/* Decorative gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
                     
-                    {/* Avatar in center top */}
-                    <div className="absolute inset-x-0 -bottom-10 flex justify-center">
+                    {/* Avatar positioned to overlap sections */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-8">
                       <motion.div
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         transition={{ duration: 0.2 }}
                         className="relative"
                       >
-                        <Avatar className="w-20 h-20 ring-4 ring-white shadow-2xl">
+                        <Avatar className="w-16 h-16 ring-4 ring-white shadow-xl">
                           <AvatarImage 
                             src={application.profiles?.avatar_url || ''} 
                             alt={profileName}
                             className="object-cover"
                           />
-                          <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-xl">
+                          <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-lg">
                             {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
