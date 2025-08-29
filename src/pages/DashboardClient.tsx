@@ -224,56 +224,58 @@ export default function DashboardClient() {
 
   return (
     <main className="min-h-screen">
-      <div className="container mx-auto py-8 px-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gradient mb-2">
+      {/* Header Section */}
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Кабинет клиента
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Добро пожаловать, {user?.email}
           </p>
         </div>
 
         {/* Main Content with Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Обзор</span>
-            </TabsTrigger>
-            <TabsTrigger value="jobs" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden sm:inline">Заказы</span>
-            </TabsTrigger>
-            <TabsTrigger value="tenders" className="flex items-center gap-2">
-              <Gavel className="h-4 w-4" />
-              <span className="hidden sm:inline">Тендеры</span>
-            </TabsTrigger>
-            <TabsTrigger value="subscription" className="flex items-center gap-2">
-              <Crown className="h-4 w-4" />
-              <span className="hidden sm:inline">Подписка</span>
-            </TabsTrigger>
-            <TabsTrigger value="payments" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">Платежи</span>
-            </TabsTrigger>
-            <TabsTrigger value="referrals" className="flex items-center gap-2">
-              <Gift className="h-4 w-4" />
-              <span className="hidden sm:inline">Рефералы</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Настройки</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="max-w-7xl mx-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <div className="card-surface p-2 rounded-2xl">
+              <TabsList className="grid w-full grid-cols-7 bg-transparent">
+                <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Обзор</span>
+                </TabsTrigger>
+                <TabsTrigger value="jobs" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Briefcase className="h-4 w-4" />
+                  <span className="hidden sm:inline">Заказы</span>
+                </TabsTrigger>
+                <TabsTrigger value="tenders" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Gavel className="h-4 w-4" />
+                  <span className="hidden sm:inline">Тендеры</span>
+                </TabsTrigger>
+                <TabsTrigger value="subscription" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Crown className="h-4 w-4" />
+                  <span className="hidden sm:inline">Подписка</span>
+                </TabsTrigger>
+                <TabsTrigger value="payments" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <CreditCard className="h-4 w-4" />
+                  <span className="hidden sm:inline">Платежи</span>
+                </TabsTrigger>
+                <TabsTrigger value="referrals" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Gift className="h-4 w-4" />
+                  <span className="hidden sm:inline">Рефералы</span>
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">Настройки</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card>
-                <CardContent className="pt-6">
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-8">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Всего заказов</p>
@@ -281,11 +283,9 @@ export default function DashboardClient() {
                     </div>
                     <Briefcase className="h-8 w-8 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardContent className="pt-6">
+                <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Активных</p>
@@ -293,11 +293,9 @@ export default function DashboardClient() {
                     </div>
                     <Clock className="h-8 w-8 text-accent" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardContent className="pt-6">
+                <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Завершено</p>
@@ -305,11 +303,9 @@ export default function DashboardClient() {
                     </div>
                     <CheckCircle className="h-8 w-8 text-success" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardContent className="pt-6">
+                <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Потрачено</p>
@@ -317,17 +313,15 @@ export default function DashboardClient() {
                     </div>
                     <DollarSign className="h-8 w-8 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => navigate("/job/new")}
-              >
-                <CardContent className="pt-6">
+              {/* Quick Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => navigate("/job/new")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={Plus} className="h-8 w-8 text-primary" />
                     <div>
@@ -335,14 +329,12 @@ export default function DashboardClient() {
                       <p className="text-sm text-muted-foreground">Инстант-бронирование</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => setActiveTab("tenders")}
-              >
-                <CardContent className="pt-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => setActiveTab("tenders")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={Gavel} className="h-8 w-8 text-primary" />
                     <div>
@@ -350,14 +342,12 @@ export default function DashboardClient() {
                       <p className="text-sm text-muted-foreground">Получить предложения</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => setActiveTab("subscription")}
-              >
-                <CardContent className="pt-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => setActiveTab("subscription")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={Crown} className="h-8 w-8 text-primary" />
                     <div>
@@ -365,14 +355,12 @@ export default function DashboardClient() {
                       <p className="text-sm text-muted-foreground">Подписка Premium</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => navigate("/messages")}
-              >
-                <CardContent className="pt-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => navigate("/messages")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={MessageSquare} className="h-8 w-8 text-primary" />
                     <div>
@@ -380,16 +368,12 @@ export default function DashboardClient() {
                       <p className="text-sm text-muted-foreground">Чат со специалистами</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
 
-            {/* Recent Jobs */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Последние заказы</CardTitle>
-              </CardHeader>
-              <CardContent>
+              {/* Recent Jobs */}
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6">Последние заказы</h2>
                 {jobs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -427,21 +411,19 @@ export default function DashboardClient() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          {/* Jobs Tab */}
-          <TabsContent value="jobs">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Мои заказы</CardTitle>
-                <Button onClick={() => navigate("/job/new")}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Создать заказ
-                </Button>
-              </CardHeader>
-              <CardContent>
+            {/* Jobs Tab */}
+            <TabsContent value="jobs">
+              <div className="card-surface p-8">
+                <div className="flex flex-row items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold">Мои заказы</h2>
+                  <Button onClick={() => navigate("/job/new")}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Создать заказ
+                  </Button>
+                </div>
                 {jobs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -463,29 +445,31 @@ export default function DashboardClient() {
                         <TableRow key={job.id}>
                           <TableCell>
                             <div>
-                              <div className="font-medium">{job.title || "Без названия"}</div>
+                              <div className="font-medium">{job.title}</div>
                               <div className="text-sm text-muted-foreground">
                                 {job.categories?.label_ru || "Другое"}
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{getStatusBadge(job.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getStatusBadge(job.status)}
+                              {job.urgency !== 'normal' && getUrgencyBadge(job.urgency)}
+                            </div>
+                          </TableCell>
                           <TableCell>{formatPrice(job.budget_min_cents, job.budget_max_cents)}</TableCell>
-                          <TableCell>{new Date(job.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            {new Date(job.created_at).toLocaleDateString('ru-RU')}
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Button variant="outline" size="sm">
                                 <Eye className="h-4 w-4" />
                               </Button>
                               {job.pro_id && (
-                                <>
-                                  <Button variant="outline" size="sm">
-                                    <MessageSquare className="h-4 w-4" />
-                                  </Button>
-                                  <Button variant="outline" size="sm">
-                                    <Video className="h-4 w-4" />
-                                  </Button>
-                                </>
+                                <Button variant="outline" size="sm">
+                                  <MessageSquare className="h-4 w-4" />
+                                </Button>
                               )}
                             </div>
                           </TableCell>
@@ -494,216 +478,174 @@ export default function DashboardClient() {
                     </TableBody>
                   </Table>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          {/* Tenders Tab */}
-          <TabsContent value="tenders">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gavel className="h-5 w-5" />
-                  Тендеры
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            {/* Tenders Tab */}
+            <TabsContent value="tenders">
+              <div className="card-surface p-8">
+                <div className="flex flex-row items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold">Мои тендеры</h2>
+                  <Button onClick={() => navigate("/tenders/new")}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Создать тендер
+                  </Button>
+                </div>
                 <div className="text-center py-8 text-muted-foreground">
                   <Gavel className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Функция тендеров в разработке</p>
-                  <p className="text-sm">Скоро вы сможете создавать тендеры и получать предложения от специалистов</p>
+                  <p>У вас пока нет тендеров</p>
+                  <p className="text-sm">Создайте тендер для получения предложений от специалистов</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          {/* Subscription Tab */}
-          <TabsContent value="subscription">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Crown className="h-5 w-5" />
-                    HomeCare Подписка
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Subscription Tab */}
+            <TabsContent value="subscription">
+              <div className="space-y-6">
+                {/* Current Plan */}
+                <div className="card-surface p-8">
+                  <h2 className="text-2xl font-semibold mb-6">Подписка HomeCare</h2>
+                  <div className="grid md:grid-cols-3 gap-6">
                     <div className="border rounded-lg p-6">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">Basic</h3>
-                        <div className="text-2xl font-bold mb-4">$9.99/мес</div>
-                        <ul className="text-sm space-y-2 mb-6">
-                          <li>✓ Приоритетная поддержка</li>
-                          <li>✓ Скидка 5% на заказы</li>
-                          <li>✓ SLA 24 часа</li>
-                        </ul>
-                        <Button variant="outline" className="w-full">Выбрать</Button>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Shield className="h-6 w-6 text-primary" />
+                        <h3 className="text-lg font-semibold">Basic</h3>
                       </div>
+                      <div className="text-2xl font-bold mb-2">₽99 <span className="text-sm font-normal">/мес</span></div>
+                      <ul className="space-y-2 text-sm">
+                        <li>• Приоритетная поддержка</li>
+                        <li>• Скидка 5% на заказы</li>
+                        <li>• Расширенная гарантия</li>
+                      </ul>
                     </div>
-
-                    <div className="border rounded-lg p-6 border-primary bg-primary/5">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">Plus</h3>
-                        <div className="text-2xl font-bold mb-4">$19.99/мес</div>
-                        <ul className="text-sm space-y-2 mb-6">
-                          <li>✓ Все из Basic</li>
-                          <li>✓ Скидка 10% на заказы</li>
-                          <li>✓ SLA 12 часов</li>
-                          <li>✓ Приоритетное размещение</li>
-                        </ul>
-                        <Button className="w-full">Выбрать</Button>
+                    
+                    <div className="border-2 border-primary rounded-lg p-6 bg-primary/5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Crown className="h-6 w-6 text-primary" />
+                        <h3 className="text-lg font-semibold">Plus</h3>
+                        <Badge>Популярный</Badge>
                       </div>
+                      <div className="text-2xl font-bold mb-2">₽199 <span className="text-sm font-normal">/мес</span></div>
+                      <ul className="space-y-2 text-sm mb-4">
+                        <li>• Все из Basic</li>
+                        <li>• Скидка 10% на заказы</li>
+                        <li>• Бесплатная диагностика</li>
+                        <li>• Мгновенные выплаты</li>
+                      </ul>
+                      <Button className="w-full">Выбрать план</Button>
                     </div>
-
+                    
                     <div className="border rounded-lg p-6">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">Max</h3>
-                        <div className="text-2xl font-bold mb-4">$39.99/мес</div>
-                        <ul className="text-sm space-y-2 mb-6">
-                          <li>✓ Все из Plus</li>
-                          <li>✓ Скидка 15% на заказы</li>
-                          <li>✓ SLA 6 часов</li>
-                          <li>✓ Персональный менеджер</li>
-                          <li>✓ Гарантия качества</li>
-                        </ul>
-                        <Button variant="outline" className="w-full">Выбрать</Button>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Zap className="h-6 w-6 text-primary" />
+                        <h3 className="text-lg font-semibold">Max</h3>
                       </div>
+                      <div className="text-2xl font-bold mb-2">₽399 <span className="text-sm font-normal">/мес</span></div>
+                      <ul className="space-y-2 text-sm">
+                        <li>• Все из Plus</li>
+                        <li>• Скидка 15% на заказы</li>
+                        <li>• Персональный менеджер</li>
+                        <li>• VIP поддержка 24/7</li>
+                      </ul>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                </div>
+              </div>
+            </TabsContent>
 
-          {/* Payments Tab */}
-          <TabsContent value="payments">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  История платежей
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            {/* Payments Tab */}
+            <TabsContent value="payments">
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6">История платежей</h2>
                 <div className="text-center py-8 text-muted-foreground">
                   <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Платежей пока нет</p>
-                  <p className="text-sm">Здесь будет история ваших платежей и эскроу</p>
+                  <p>История платежей пуста</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          {/* Referrals Tab */}
-          <TabsContent value="referrals">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gift className="h-5 w-5" />
-                  Реферальная программа
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-6 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">Ваш реферальный код</h3>
-                  <div className="flex items-center gap-2">
-                    <code className="bg-background px-3 py-2 rounded text-lg font-mono">
-                      {stats.refferalCode}
-                    </code>
-                    <Button variant="outline" size="sm">Копировать</Button>
+            {/* Referrals Tab */}
+            <TabsContent value="referrals">
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6">Реферальная программа</h2>
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="font-semibold mb-4">Ваш реферальный код</h3>
+                    <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
+                      <code className="font-mono text-lg">{stats.refferalCode}</code>
+                      <Button variant="outline" size="sm">Копировать</Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Поделитесь этим кодом с друзьями и получайте бонусы за каждого нового пользователя
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Поделитесь кодом с друзьями и получайте бонусы за каждого нового пользователя
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="text-center p-6 border rounded-lg">
-                    <div className="text-3xl font-bold text-primary mb-2">0</div>
-                    <div className="text-sm text-muted-foreground">Приглашенных друзей</div>
-                  </div>
-                  <div className="text-center p-6 border rounded-lg">
-                    <div className="text-3xl font-bold text-success mb-2">$0.00</div>
-                    <div className="text-sm text-muted-foreground">Заработано бонусов</div>
+                  <div>
+                    <h3 className="font-semibold mb-4">Статистика</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Приглашено:</span>
+                        <span className="font-semibold">0</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Заработано:</span>
+                        <span className="font-semibold">₽0</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          {/* Settings Tab */}
-          <TabsContent value="settings">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Профиль
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Settings Tab */}
+            <TabsContent value="settings">
+              <div className="space-y-6">
+                <div className="card-surface p-8">
+                  <h2 className="text-2xl font-semibold mb-6">Профиль</h2>
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-sm font-medium">Email</label>
-                      <div className="text-sm text-muted-foreground">{user?.email}</div>
+                      <label className="block text-sm font-medium mb-2">Email</label>
+                      <input 
+                        type="email" 
+                        value={user?.email || ''} 
+                        disabled 
+                        className="w-full p-3 border rounded-lg bg-muted"
+                      />
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Телефон</label>
-                      <div className="text-sm text-muted-foreground">Не указан</div>
+                      <label className="block text-sm font-medium mb-2">Телефон</label>
+                      <input 
+                        type="tel" 
+                        placeholder="+373 XX XXX XXX"
+                        className="w-full p-3 border rounded-lg"
+                      />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5" />
-                    Адреса
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Адресов пока нет</p>
-                    <p className="text-sm mb-4">Добавьте адреса для быстрого оформления заказов</p>
-                    <Button variant="outline">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Добавить адрес
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Bell className="h-5 w-5" />
-                    Уведомления
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">Email уведомления</div>
-                      <div className="text-sm text-muted-foreground">Получать уведомления на email</div>
+                <div className="card-surface p-8">
+                  <h2 className="text-2xl font-semibold mb-6">Уведомления</h2>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Email уведомления</h4>
+                        <p className="text-sm text-muted-foreground">Получать уведомления на email</p>
+                      </div>
+                      <input type="checkbox" className="toggle" />
                     </div>
-                    <Button variant="outline" size="sm">Настроить</Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">SMS уведомления</div>
-                      <div className="text-sm text-muted-foreground">Получать SMS о статусе заказов</div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">SMS уведомления</h4>
+                        <p className="text-sm text-muted-foreground">Получать SMS о важных событиях</p>
+                      </div>
+                      <input type="checkbox" className="toggle" />
                     </div>
-                    <Button variant="outline" size="sm">Настроить</Button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </section>
     </main>
   );
 }
