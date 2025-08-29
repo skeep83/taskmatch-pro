@@ -316,8 +316,8 @@ const JobDetail = () => {
             {getStatusBadge(job.status)}
           </div>
 
-          {/* Client Info Card for Professionals */}
-          {userRole === 'pro' && clientProfile && (
+          {/* Client Info Card */}
+          {clientProfile && (
             <div className="card-surface p-6 mb-8">
               <h3 className="text-xl font-semibold mb-4 flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
@@ -338,25 +338,21 @@ const JobDetail = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h4 className="font-semibold">
-                    {clientProfile.full_name || 
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <span>{clientProfile.full_name || 
                      (clientProfile.first_name && clientProfile.last_name 
                        ? `${clientProfile.first_name} ${clientProfile.last_name}` 
-                       : 'Клиент')}
-                  </h4>
-                  <div className="flex items-center gap-2 flex-wrap mt-1">
-                    <Badge variant="secondary">Клиент</Badge>
+                       : 'Клиент')}</span>
+                    <Badge variant="secondary" className="text-xs">Клиент</Badge>
                     {clientRating && clientRating.count > 0 && (
                       <StarRating 
                         rating={clientRating.average} 
                         size="sm" 
-                        showValue 
-                        showCount 
-                        count={clientRating.count}
-                        className="text-xs"
+                        showValue={false}
+                        readonly 
                       />
                     )}
-                  </div>
+                  </h4>
                   {(!clientRating || clientRating.count === 0) && (
                     <p className="text-xs text-muted-foreground mt-1">Новый клиент</p>
                   )}
