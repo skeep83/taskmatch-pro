@@ -760,7 +760,7 @@ const JobDetail = () => {
                               <StarRating 
                                 rating={assignedPro.rating.average} 
                                 size="sm" 
-                                showValue={false}
+                                showValue={true}
                                 readonly 
                               />
                               <span className="text-sm text-muted-foreground">
@@ -768,7 +768,15 @@ const JobDetail = () => {
                               </span>
                             </div>
                           ) : (
-                            <span className="text-sm text-muted-foreground">Новый специалист</span>
+                            <div className="flex items-center gap-2">
+                              <StarRating 
+                                rating={0} 
+                                size="sm" 
+                                showValue={false}
+                                readonly 
+                              />
+                              <span className="text-sm text-muted-foreground">Новый специалист</span>
+                            </div>
                           )}
                         </div>
 
