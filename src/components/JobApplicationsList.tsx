@@ -364,13 +364,12 @@ export function JobApplicationsList({
         </h3>
       </div>
       
-      {/* Applications List - 3D Deck */}
-      <div className="relative h-[600px] w-full max-w-md mx-auto">
+      {/* Applications List - 3D Cards */}
+      <div className="flex flex-wrap gap-8 justify-center">
         <AnimatePresence>
           {applications.map((application, index) => {
             const isSelected = selectedProId === application.pro_id;
             const canSelect = jobStatus === 'new' && !selectedProId;
-            const isTopCard = index === currentIndex;
             
             // Формируем имя специалиста
             const profileName = application.profiles?.full_name || 
@@ -381,85 +380,42 @@ export function JobApplicationsList({
             return (
               <motion.div
                 key={application.id}
-                initial={{ 
-                  scale: 0.95,
-                  y: index * 4,
-                  z: -index * 10,
-                  rotateY: index * 2,
-                  opacity: 1 - index * 0.1
-                }}
-                animate={{ 
-                  scale: isTopCard ? 1 : 0.95 - (index - currentIndex) * 0.05,
-                  y: isTopCard ? 0 : (index - currentIndex) * 8,
-                  z: isTopCard ? 0 : -(index - currentIndex) * 20,
-                  rotateY: isTopCard ? 0 : (index - currentIndex) * 3,
-                  opacity: index <= currentIndex + 2 ? 1 - Math.abs(index - currentIndex) * 0.2 : 0
-                }}
-                exit={{ 
-                  scale: 0.8,
-                  y: -100,
-                  opacity: 0,
-                  transition: { duration: 0.3 }
-                }}
+                initial={{ opacity: 0, y: 30, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -30, scale: 0.8 }}
                 transition={{ 
-                  duration: 0.5,
+                  duration: 0.6, 
+                  delay: index * 0.1,
                   ease: [0.4, 0, 0.2, 1]
                 }}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  zIndex: applications.length - index,
-                  transformStyle: 'preserve-3d'
+                whileHover={{ 
+                  y: -12,
+                  transition: { duration: 0.3, ease: "easeOut" }
                 }}
-                className="w-full max-w-sm cursor-pointer"
-                onClick={() => {
-                  if (isTopCard && canSelect) {
-                    // При клике на верхнюю карту - показываем её под низ
-                    setCurrentIndex((prev) => (prev + 1) % applications.length);
-                  }
-                }}
-                whileHover={isTopCard ? { 
-                  scale: 1.02,
-                  rotateY: 5,
-                  transition: { duration: 0.2 }
-                } : undefined}
+                className="perspective-1000"
               >
-                {/* 3D Card with gradient background */}
-                <div className="relative w-full h-[500px] bg-gradient-to-br from-background via-card to-accent/10 rounded-3xl shadow-2xl overflow-hidden border border-border/20 backdrop-blur-sm"
-                     style={{
-                       background: `linear-gradient(135deg, 
-                         hsl(var(--card)) 0%, 
-                         hsl(var(--background)) 50%, 
-                         hsl(var(--accent) / 0.1) 100%)`
-                     }}>
+                {/* 3D Card with gradient background like reference */}
+                <div className="card-3d group relative w-full max-w-xs mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
                   {/* Top gradient section */}
-                  <div className="relative h-32 bg-gradient-to-br from-primary/80 via-primary to-accent"
-                       style={{
-                         background: `linear-gradient(135deg, 
-                           hsl(var(--primary) / 0.8) 0%, 
-                           hsl(var(--primary)) 50%, 
-                           hsl(var(--accent)) 100%)`
-                       }}>
+                  <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600">
                     {/* Decorative gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-background/10 to-background/20" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
                   </div>
                   
                   {/* Avatar positioned to overlap sections - with higher z-index */}
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-16 z-10">
                     <motion.div
-                      whileHover={isTopCard ? { scale: 1.1, rotate: 5 } : undefined}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ duration: 0.2 }}
                       className="relative"
                     >
-                      <Avatar className="w-32 h-32 ring-4 ring-background shadow-xl">
+                      <Avatar className="w-32 h-32 ring-4 ring-white shadow-xl">
                         <AvatarImage 
                           src={application.profiles?.avatar_url || ''} 
                           alt={profileName}
                           className="object-cover"
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-muted to-muted-foreground text-background font-bold text-2xl">
+                        <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-2xl">
                           {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -469,20 +425,20 @@ export function JobApplicationsList({
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-background z-20"
+                          className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white z-20"
                         >
-                          <CheckCircle className="w-6 h-6 text-background" />
+                          <CheckCircle className="w-6 h-6 text-white" />
                         </motion.div>
                       )}
                     </motion.div>
                   </div>
                   
-                   {/* Bottom section */}
-                   <div className="relative bg-card px-6 pt-20 pb-8">
+                   {/* Bottom white section */}
+                   <div className="relative bg-white px-6 pt-20 pb-8">
                     {/* Name and title */}
                     <div className="text-center mb-6">
-                      <h4 className="font-bold text-xl text-foreground mb-1">{profileName}</h4>
-                      <p className="text-sm text-muted-foreground uppercase tracking-wide font-medium">
+                      <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
+                      <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
                         СПЕЦИАЛИСТ
                       </p>
                     </div>
@@ -490,94 +446,94 @@ export function JobApplicationsList({
                     {/* Professional info instead of social icons */}
                     <div className="space-y-4 mb-6">
                       {/* Experience/Bio */}
-                        <div className="text-center">
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {application.proProfile?.bio || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
-                          </p>
-                        </div>
-                        
-                        {/* Hourly rate if available */}
-                        {application.proProfile?.hourly_rate_cents && (
-                          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="w-4 h-4" />
-                            <span>Почасовая ставка: {formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
-                          </div>
-                        )}
-                        
-                        {/* Coverage radius */}
-                        {application.proProfile?.radius_km && (
-                          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                            <span>🗺️</span>
-                            <span>Радиус работы: {application.proProfile.radius_km} км</span>
-                          </div>
-                        )}
-                        
-                        {/* Response time if available */}
-                        {application.eta_slot && (
-                          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="w-4 h-4" />
-                            <span>Готов приступить: {application.eta_slot}</span>
-                          </div>
-                        )}
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {application.proProfile?.bio || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
+                        </p>
                       </div>
                       
-                      {/* Price section */}
-                      {application.price_cents && (
-                        <div className="text-center mb-6">
-                          <div className="text-3xl font-bold text-foreground">
-                            {formatPrice(application.price_cents)}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            Цена работы
-                          </div>
+                      {/* Hourly rate if available */}
+                      {application.proProfile?.hourly_rate_cents && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                          <Clock className="w-4 h-4" />
+                          <span>Почасовая ставка: {formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
                         </div>
                       )}
                       
-                      {/* Rating */}
-                      {application.rating && (
-                        <div className="flex justify-center items-center gap-2 mb-6">
-                          <div className="flex gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star 
-                                key={star} 
-                                className={`w-5 h-5 ${star <= application.rating!.avg_score ? 'text-primary fill-primary' : 'text-muted-foreground'}`} 
-                              />
-                            ))}
-                          </div>
-                          <span className="text-sm text-muted-foreground">
-                            ({application.rating.rating_count})
-                          </span>
+                      {/* Coverage radius */}
+                      {application.proProfile?.radius_km && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                          <span>🗺️</span>
+                          <span>Радиус работы: {application.proProfile.radius_km} км</span>
                         </div>
                       )}
+                      
+                      {/* Response time if available */}
+                      {application.eta_slot && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                          <Clock className="w-4 h-4" />
+                          <span>Готов приступить: {application.eta_slot}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Price section */}
+                    {application.price_cents && (
+                      <div className="text-center mb-6">
+                        <div className="text-3xl font-bold text-gray-900">
+                          {formatPrice(application.price_cents)}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Цена работы
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Rating */}
+                    {application.rating && (
+                      <div className="flex justify-center items-center gap-2 mb-6">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                              key={star} 
+                              className={`w-5 h-5 ${star <= application.rating!.avg_score ? 'text-purple-500 fill-purple-500' : 'text-gray-300'}`} 
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          ({application.rating.rating_count})
+                        </span>
+                      </div>
+                    )}
                     
                      {/* Portfolio and Action buttons */}
                      <div className="space-y-3">
-                        {/* Portfolio button */}
+                       {/* Portfolio button */}
+                        <Button
+                          onClick={() => handlePortfolioOpen(application)}
+                          variant="outline"
+                          className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Портфолио
+                        </Button>
+                       
+                       {/* Action button */}
+                       {canSelect && (
                          <Button
-                           onClick={() => handlePortfolioOpen(application)}
-                           variant="outline"
-                           className="w-full font-medium py-2 rounded-lg transition-all duration-200"
+                           onClick={() => handleSelectProfessional(application.pro_id)}
+                           disabled={selecting === application.pro_id}
+                           className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                          >
-                           <Eye className="w-4 h-4 mr-2" />
-                           Портфолио
+                           {selecting === application.pro_id ? 'Выбираем...' : 'Выбрать специалиста'}
                          </Button>
-                        
-                        {/* Action button */}
-                        {canSelect && (
-                          <Button
-                            onClick={() => handleSelectProfessional(application.pro_id)}
-                            disabled={selecting === application.pro_id}
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-                          >
-                            {selecting === application.pro_id ? 'Выбираем...' : 'Выбрать специалиста'}
-                          </Button>
-                        )}
-                        
-                        {isSelected && (
-                          <div className="w-full bg-green-100 text-green-800 font-semibold py-3 rounded-xl text-center">
-                            ✓ Выбран
-                          </div>
-                        )}
+                       )}
+                       
+                       {isSelected && (
+                         <div className="w-full bg-green-100 text-green-800 font-semibold py-3 rounded-xl text-center">
+                           ✓ Выбран
+                         </div>
+                       )}
                      </div>
                   </div>
                 </div>
