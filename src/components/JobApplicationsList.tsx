@@ -369,7 +369,7 @@ export function JobApplicationsList({
       </div>
       
       {/* Card Deck Container */}
-      <div className="relative w-full max-w-md mx-auto h-[600px] border border-dashed border-muted-foreground/20 rounded-lg">
+      <div className="relative w-full max-w-lg mx-auto h-[600px] border border-dashed border-muted-foreground/20 rounded-lg">
         <AnimatePresence mode="wait">
           {applications.map((application, index) => {
             const isSelected = selectedProId === application.pro_id;
