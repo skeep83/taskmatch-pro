@@ -6,6 +6,7 @@ import { Seo } from '@/components/Seo';
 import { JobApplicationsList } from '@/components/JobApplicationsList';
 import { JobResponseForm } from '@/components/JobResponseForm';
 import { PriceProposalForm } from '@/components/PriceProposalForm';
+import { JobStatusProgress } from '@/components/JobStatusProgress';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import interestedInJobImage from '@/assets/interested-in-job.png';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -69,6 +70,10 @@ const JobDetail = () => {
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [jobApplications, setJobApplications] = useState<any[]>([]);
   const [assignedPro, setAssignedPro] = useState<any>(null);
+  const [jobStatusData, setJobStatusData] = useState<{start_confirmed: boolean, end_confirmed: boolean}>({
+    start_confirmed: false,
+    end_confirmed: false
+  });
   const { formatPrice } = useCurrency();
 
   useEffect(() => {
@@ -117,6 +122,10 @@ const JobDetail = () => {
       if (error) throw error;
       
       setJob(data);
+      setJobStatusData({
+        start_confirmed: data.start_confirmed || false,
+        end_confirmed: data.end_confirmed || false
+      });
       await loadJobData();
       await loadClientData(data.client_id);
       if (data.pro_id) {
@@ -782,7 +791,20 @@ const JobDetail = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-8 mt-8">
+          <div className="space-y-8">
+            {/* Job Status Progress */}
+            <div className="card-surface p-6">
+              <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
+                <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                Статус выполнения
+              </h3>
+              <JobStatusProgress 
+                status={job.status as any}
+                startConfirmed={jobStatusData.start_confirmed}
+                endConfirmed={jobStatusData.end_confirmed}
+              />
+            </div>
+
             {/* Statistics Card */}
             <div className="card-surface p-6 mb-8">
               <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">

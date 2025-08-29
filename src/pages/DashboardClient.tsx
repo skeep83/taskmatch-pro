@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { ProTipsCarousel } from "@/components/ProTipsCarousel";
 import { 
   Briefcase, 
   User, 
@@ -494,18 +493,14 @@ export default function DashboardClient() {
 
             {/* Jobs Tab */}
             <TabsContent value="jobs">
-              <div className="space-y-6">
-                {/* Pro Tips Carousel */}
-                <ProTipsCarousel />
-                
-                <div className="card-surface p-8">
-                  <div className="flex flex-row items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold">Мои активные заказы</h2>
-                    <Button onClick={() => navigate("/job/new")}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Создать заказ
-                    </Button>
-                  </div>
+              <div className="card-surface p-8">
+                <div className="flex flex-row items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold">Мои заказы</h2>
+                  <Button onClick={() => navigate("/job/new")}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Создать заказ
+                  </Button>
+                </div>
                 {jobs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -586,7 +581,6 @@ export default function DashboardClient() {
                     </TableBody>
                   </Table>
                 )}
-                </div>
               </div>
             </TabsContent>
 
