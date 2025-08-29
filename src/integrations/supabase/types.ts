@@ -756,6 +756,7 @@ export type Database = {
           status: Database["public"]["Enums"]["job_status"]
           title: string | null
           updated_at: string
+          urgency: string
         }
         Insert: {
           budget_max_cents?: number | null
@@ -776,6 +777,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["job_status"]
           title?: string | null
           updated_at?: string
+          urgency?: string
         }
         Update: {
           budget_max_cents?: number | null
@@ -796,6 +798,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["job_status"]
           title?: string | null
           updated_at?: string
+          urgency?: string
         }
         Relationships: []
       }
