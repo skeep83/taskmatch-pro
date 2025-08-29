@@ -265,7 +265,7 @@ export const JobApplicationsList = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="relative z-50 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold text-foreground">
