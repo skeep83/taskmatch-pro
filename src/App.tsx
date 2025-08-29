@@ -28,6 +28,7 @@ import TenderDetail from "./pages/TenderDetail";
 import Catalog from "./pages/Catalog";
 import ProPublic from "./pages/ProPublic";
 import Feed from "./pages/Feed";
+import JobDetail from "./pages/JobDetail";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
@@ -57,6 +58,7 @@ const AppContent = () => {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/job/new" element={<JobNew />} />
           <Route path="/dashboard/client" element={<DashboardClient />} />
           <Route path="/dashboard/pro" element={<DashboardPro />} />
