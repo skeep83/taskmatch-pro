@@ -310,8 +310,10 @@ const JobDetail = () => {
                             src={photo.file_url}
                             alt={`Фото заказа ${index + 1}`}
                             bucket="evidence"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full"
+                            objectFit="cover"
                             enableZoom={true}
+                            containerClassName="w-full h-full"
                           />
                         </div>
                       </div>
