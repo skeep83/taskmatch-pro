@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedI18n } from "@/i18n/enhanced";
+import { useNotifications } from "@/hooks/useNotifications";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { UserMenu } from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ export const AppNavigation = () => {
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [currentRole, setCurrentRole] = useState<UserRole>('client');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -120,7 +122,7 @@ export const AppNavigation = () => {
       href: "/feed",
       icon: TrendingUp,
       variant: "ghost" as const,
-      badge: userRoles.includes('pro') ? "Новые" : undefined
+      badge: userRoles.includes('pro') ? (unreadCount > 0 ? unreadCount.toString() : undefined) : undefined
     }
   ];
 
@@ -129,7 +131,7 @@ export const AppNavigation = () => {
       title: "Сообщения",
       href: "/messages",
       icon: MessageCircle,
-      badge: "3"
+      badge: unreadCount > 0 ? unreadCount.toString() : undefined
     }
   ];
 
