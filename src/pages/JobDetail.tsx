@@ -242,147 +242,104 @@ const JobDetail = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-subtle">
+    <main className="container mx-auto py-8 px-4">
       <Seo 
         title={`Заказ: ${job.title}`} 
         description={job.description} 
         canonical={`/job/${job.id}`} 
       />
 
-      <div className="container mx-auto py-8 px-4">
-        {/* Header with glass morphism */}
-        <div className="glass-morphism rounded-2xl p-6 mb-8 border border-white/20 backdrop-blur-lg">
-          <div className="flex items-center gap-4 mb-4">
-            <Button variant="outline" onClick={() => navigate(-1)} className="bg-white/10 border-white/20 hover:bg-white/20">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Назад
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Назад
+        </Button>
+        <h1 className="text-2xl font-bold flex-1">Детали заказа</h1>
+        
+        {/* Edit and Delete buttons for job owner */}
+        {canEdit && (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleEditJob}>
+              <Edit className="w-4 h-4 mr-2" />
+              Редактировать
             </Button>
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                Детали заказа
-              </h1>
-              <p className="text-muted-foreground mt-1">Полная информация о заказе</p>
-            </div>
-            
-            {/* Edit and Delete buttons for job owner */}
-            {canEdit && (
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleEditJob} className="bg-white/10 border-white/20 hover:bg-white/20">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Редактировать
-                </Button>
-                <Button variant="destructive" onClick={handleDeleteJob} className="bg-red-500/10 border-red-500/20 hover:bg-red-500/20">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Удалить
-                </Button>
-              </div>
-            )}
+            <Button variant="destructive" onClick={handleDeleteJob}>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Удалить
+            </Button>
           </div>
-        </div>
+        )}
+      </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Job Details */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Main Job Info Card */}
-            <div className="glass-morphism rounded-2xl border border-white/20 backdrop-blur-lg overflow-hidden">
-              <div className="relative p-8">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full"></div>
-                
-                <div className="relative">
-                  <div className="flex items-start justify-between mb-6">
-                    <div>
-                      <h2 className="text-2xl font-bold mb-3">{job.title}</h2>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-full font-medium">
-                          {job.categories.label_ru}
-                        </span>
-                        <span>•</span>
-                        <span>{formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ru })}</span>
-                      </div>
-                    </div>
-                    {getStatusBadge(job.status)}
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <div className="w-1 h-6 bg-gradient-to-b from-primary to-primary-glow rounded-full"></div>
-                      Описание заказа
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap bg-muted/30 p-4 rounded-xl">
-                      {job.description}
-                    </p>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {(job.budget_min_cents || job.budget_max_cents) && (
-                      <div className="bg-green-500/10 p-4 rounded-xl border border-green-500/20">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="p-2 bg-green-500/20 rounded-lg">
-                            <Euro className="w-5 h-5 text-green-600" />
-                          </div>
-                          <span className="font-semibold text-green-700">Бюджет</span>
-                        </div>
-                        <div className="text-xl font-bold text-green-600">
-                          {job.budget_min_cents ? `от ${Math.round(job.budget_min_cents / 100)}₽` : ''}
-                          {job.budget_max_cents ? ` до ${Math.round(job.budget_max_cents / 100)}₽` : ''}
-                        </div>
-                      </div>
-                    )}
-
-                    {job.location_address && (
-                      <div className="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="p-2 bg-blue-500/20 rounded-lg">
-                            <MapPin className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <span className="font-semibold text-blue-700">Адрес</span>
-                        </div>
-                        <div className="text-blue-600 font-medium">
-                          {job.location_address}
-                        </div>
-                      </div>
-                    )}
-
-                    {job.scheduled_at && (
-                      <div className="bg-purple-500/10 p-4 rounded-xl border border-purple-500/20">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="p-2 bg-purple-500/20 rounded-lg">
-                            <Calendar className="w-5 h-5 text-purple-600" />
-                          </div>
-                          <span className="font-semibold text-purple-700">Дата и время</span>
-                        </div>
-                        <div className="text-purple-600 font-medium">
-                          {new Date(job.scheduled_at).toLocaleString('ru-RU')}
-                        </div>
-                      </div>
-                    )}
-
-                    {job.pro_id && (
-                      <div className="bg-orange-500/10 p-4 rounded-xl border border-orange-500/20">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="p-2 bg-orange-500/20 rounded-lg">
-                            <User className="w-5 h-5 text-orange-600" />
-                          </div>
-                          <span className="font-semibold text-orange-700">Специалист</span>
-                        </div>
-                        <div className="text-orange-600 font-medium">
-                          Назначен специалист
-                        </div>
-                      </div>
-                    )}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Job Details */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle className="text-xl mb-2">{job.title}</CardTitle>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>{job.categories.label_ru}</span>
+                    <span>•</span>
+                    <span>{formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ru })}</span>
                   </div>
                 </div>
+                {getStatusBadge(job.status)}
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-2">Описание</h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">{job.description}</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {(job.budget_min_cents || job.budget_max_cents) && (
+                  <div className="flex items-center gap-2">
+                    <Euro className="w-4 h-4 text-green-500" />
+                    <span className="font-medium">Бюджет:</span>
+                    <span>
+                      {job.budget_min_cents ? `от ${Math.round(job.budget_min_cents / 100)}₽` : ''}
+                      {job.budget_max_cents ? ` до ${Math.round(job.budget_max_cents / 100)}₽` : ''}
+                    </span>
+                  </div>
+                )}
+
+                {job.location_address && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-blue-500" />
+                    <span className="font-medium">Адрес:</span>
+                    <span>{job.location_address}</span>
+                  </div>
+                )}
+
+                {job.scheduled_at && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-purple-500" />
+                    <span className="font-medium">Запланировано:</span>
+                    <span>{new Date(job.scheduled_at).toLocaleString('ru-RU')}</span>
+                  </div>
+                )}
+
+                {job.pro_id && (
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-orange-500" />
+                    <span className="font-medium">Специалист:</span>
+                    <span>Назначен специалист</span>
+                  </div>
+                )}
               </div>
 
               {/* Job Photos */}
               {jobPhotos.length > 0 && (
-                <div className="border-t border-white/10 p-8">
-                  <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                    <div className="w-1 h-8 bg-gradient-to-b from-primary to-primary-glow rounded-full"></div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                    <div className="w-1 h-6 bg-primary rounded-full"></div>
                     Фотографии заказа
-                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                      {jobPhotos.length}
-                    </Badge>
+                    <Badge variant="secondary" className="ml-2">{jobPhotos.length}</Badge>
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     {jobPhotos.map((photo, index) => {
@@ -391,15 +348,16 @@ const JobDetail = () => {
                         <Dialog key={photo.id}>
                           <DialogTrigger asChild>
                             <div className="relative group cursor-pointer">
-                              <div className="aspect-square bg-muted/30 rounded-xl overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/25">
+                              <div className="aspect-square bg-muted rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md">
                                 <img
                                   src={imageUrl}
                                   alt={`Фото заказа ${index + 1}`}
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  className="w-full h-full object-cover"
+                                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-3">
-                                    <ZoomIn className="w-5 h-5 text-gray-700" />
+                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
+                                    <ZoomIn className="w-4 h-4 text-gray-700" />
                                   </div>
                                 </div>
                               </div>
@@ -418,135 +376,115 @@ const JobDetail = () => {
                   </div>
                 </div>
               )}
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Applications List for Job Owner */}
-            {isJobOwner && (
-              <div className="glass-morphism rounded-2xl border border-white/20 backdrop-blur-lg p-8">
-                <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-primary-glow rounded-full"></div>
-                  Отклики специалистов
-                </h3>
-                <JobApplicationsList 
-                  jobId={job.id}
-                  jobStatus={job.status}
-                  selectedProId={job.pro_id}
-                  onApplicationSelect={() => fetchJob()}
-                />
-              </div>
-            )}
+          {/* Applications List for Job Owner */}
+          {isJobOwner && (
+            <JobApplicationsList 
+              jobId={job.id}
+              jobStatus={job.status}
+              selectedProId={job.pro_id}
+              onApplicationSelect={() => fetchJob()}
+            />
+          )}
 
-            {/* Professional Action Buttons */}
-            {canApply && (
-              <div className="glass-morphism rounded-2xl border border-white/20 backdrop-blur-lg p-8">
-                <div className="text-center space-y-6">
-                  <div>
-                    <h3 className="text-2xl font-bold mb-3">Заинтересованы в заказе?</h3>
-                    <p className="text-muted-foreground">
-                      Предложите свою цену или сразу откликнитесь на заказ
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-4 justify-center">
+          {/* Professional Action Buttons */}
+          {canApply && (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <h3 className="text-lg font-semibold">Заинтересованы в заказе?</h3>
+                  <div className="flex flex-wrap gap-3 justify-center">
                     <Button 
                       onClick={() => setShowPriceProposal(true)}
-                      className="btn-hero px-8 py-3 text-lg"
-                      size="lg"
+                      className="btn-hero"
                     >
                       Предложить цену
                     </Button>
                     <Button 
                       onClick={() => setShowApplicationForm(true)}
                       variant="outline"
-                      className="border-primary/30 bg-white/10 hover:bg-primary/10 px-8 py-3 text-lg"
-                      size="lg"
+                      className="border-primary text-primary hover:bg-primary hover:text-white"
                     >
                       Откликнуться
                     </Button>
                   </div>
                 </div>
-              </div>
-            )}
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Application Form Modal */}
-            {showApplicationForm && (
-              <div className="glass-morphism rounded-2xl border border-white/20 backdrop-blur-lg p-8">
-                <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-primary-glow rounded-full"></div>
-                  Отклик на заказ
-                </h3>
-                <JobResponseForm
-                  jobId={job.id}
-                  jobTitle={job.title}
-                  budgetMinCents={job.budget_min_cents}
-                  budgetMaxCents={job.budget_max_cents}
-                  onApplicationSubmit={() => {
-                    setShowApplicationForm(false);
-                    loadJobData();
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Price Proposal Modal */}
-            {showPriceProposal && (
-              <div className="glass-morphism rounded-2xl border border-white/20 backdrop-blur-lg p-8">
-                <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-primary-glow rounded-full"></div>
-                  Предложение цены
-                </h3>
-                <PriceProposalForm
-                  jobId={job.id}
-                  jobTitle={job.title}
-                  budgetMinCents={job.budget_min_cents}
-                  budgetMaxCents={job.budget_max_cents}
-                  clientRating={clientRating}
-                  onProposalSubmit={() => {
-                    setShowPriceProposal(false);
-                    loadJobData();
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Job Statistics */}
-            <div className="glass-morphism rounded-2xl border border-white/20 backdrop-blur-lg p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <div className="w-1 h-6 bg-gradient-to-b from-primary to-primary-glow rounded-full"></div>
-                Статистика заказа
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Статус:</span>
-                  {getStatusBadge(job.status)}
-                </div>
-                
-                <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Создан:</span>
-                  <span className="text-sm font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Категория:</span>
-                  <span className="text-sm font-medium">{job.categories.label_ru}</span>
-                </div>
-              </div>
+          {/* Application Form Modal */}
+          {showApplicationForm && (
+            <div className="mt-8">
+              <JobResponseForm
+                jobId={job.id}
+                jobTitle={job.title}
+                budgetMinCents={job.budget_min_cents}
+                budgetMaxCents={job.budget_max_cents}
+                onApplicationSubmit={() => {
+                  setShowApplicationForm(false);
+                  // Refresh applications
+                  loadJobData();
+                }}
+              />
             </div>
+          )}
 
-            {/* Professional Status */}
-            {isProfessional && !canApply && job.status === 'new' && (
-              <div className="glass-morphism rounded-2xl border border-white/20 backdrop-blur-lg p-6">
-                <div className="text-center">
-                  <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-sm text-muted-foreground">
-                    {job.pro_id ? 'Заказ уже принят другим специалистом' : 'Вы уже откликнулись на этот заказ'}
-                  </p>
-                </div>
+          {/* Price Proposal Modal */}
+          {showPriceProposal && (
+            <div className="mt-8">
+              <PriceProposalForm
+                jobId={job.id}
+                jobTitle={job.title}
+                budgetMinCents={job.budget_min_cents}
+                budgetMaxCents={job.budget_max_cents}
+                clientRating={clientRating}
+                onProposalSubmit={() => {
+                  setShowPriceProposal(false);
+                  // Refresh page data
+                  loadJobData();
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Статистика</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Статус:</span>
+                {getStatusBadge(job.status)}
               </div>
-            )}
-          </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Создан:</span>
+                <span className="text-sm">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Категория:</span>
+                <span className="text-sm">{job.categories.label_ru}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {isProfessional && !canApply && job.status === 'new' && (
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <MessageSquare className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  {job.pro_id ? 'Заказ уже принят другим специалистом' : 'Вы уже откликнулись на этот заказ'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </main>
