@@ -724,7 +724,7 @@ export const JobApplicationsList = ({
         })
       ) : (
         // Для нескольких откликов используем вертикальную круговую карусель
-        <div className="relative w-full h-[600px] overflow-hidden">
+        <div className="relative w-full h-[600px] overflow-hidden flex items-center justify-center">
           <AnimatePresence mode="wait">
             {applications.map((application, index) => {
               const isActive = index === currentIndex;
@@ -780,7 +780,7 @@ export const JobApplicationsList = ({
               return (
                 <motion.div
                   key={application.id}
-                  className={`absolute inset-0 flex items-center justify-center w-full max-w-2xl ${!isActive ? 'cursor-pointer' : ''}`}
+                  className={`absolute ${!isActive ? 'cursor-pointer' : ''}`}
                   initial={{ y: 100, scale: 0.8, opacity: 0 }}
                   animate={{ 
                     y, 
@@ -803,7 +803,9 @@ export const JobApplicationsList = ({
                   style={{ zIndex }}
                   onClick={isActive ? undefined : nextCard}
                 >
-                  <Card className={`w-full transition-all shadow-lg ${isSelected ? 'ring-2 ring-primary' : ''} ${isActive ? 'shadow-2xl' : 'shadow-md'}`}>
+                  {/* Фиксированный контейнер для карточки */}
+                  <div className="w-[600px] h-[480px]">
+                    <Card className={`w-full h-full flex flex-col transition-all shadow-lg ${isSelected ? 'ring-2 ring-primary' : ''} ${isActive ? 'shadow-2xl' : 'shadow-md'}`}>
                     <CardHeader className="pb-3">
                       <div className="flex items-start gap-3">
                         <Avatar className="w-12 h-12 flex-shrink-0">
@@ -993,7 +995,8 @@ export const JobApplicationsList = ({
                         </div>
                       </CardContent>
                     )}
-                  </Card>
+                    </Card>
+                  </div>
                 </motion.div>
               );
             })}
