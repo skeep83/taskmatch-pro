@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Seo } from "@/components/Seo";
+import { SignatureGradient } from "@/components/SignatureGradient";
+import { FloatingCard } from "@/components/ui/floating-card";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, Calendar, Plus, X } from "lucide-react";
+import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, Calendar, Plus, X, Rocket } from "lucide-react";
 
 const JobNew = () => {
   const { t } = useEnhancedI18n();
@@ -195,67 +198,80 @@ const JobNew = () => {
   const getStepProgress = () => (step / 3) * 100;
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="relative min-h-screen overflow-hidden">
+      <SignatureGradient />
       <Seo title="Создать заказ — ServiceHub" description="Создать заказ" canonical="/job/new" />
       
-      <div className="container mx-auto py-8 px-6">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gradient mb-2">
-            Создать заказ
+      <div className="container mx-auto py-16 px-6 relative z-10">
+        {/* Hero Header */}
+        <div className="text-center mb-16 animate-fade-in">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+            <Rocket size={20} className="text-primary" />
+            <span className="text-sm font-medium text-primary">Быстрое создание заказа</span>
+          </div>
+          <h1 className="text-5xl lg:text-6xl font-display font-bold mb-6 leading-tight">
+            <span className="text-gradient animate-gradient-shift">Создать заказ</span>
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Найдите профессионального специалиста за несколько минут
           </p>
         </div>
 
-        {/* Progress */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium">Шаг {step} из 3</span>
-            <span className="text-sm text-muted-foreground">{Math.round(getStepProgress())}% завершено</span>
-          </div>
-          <Progress value={getStepProgress()} className="h-2" />
+        {/* Progress Indicator */}
+        <div className="max-w-2xl mx-auto mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <FloatingCard className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium">Шаг {step} из 3</span>
+              <span className="text-sm text-muted-foreground">{Math.round(getStepProgress())}% завершено</span>
+            </div>
+            <Progress value={getStepProgress()} className="h-3" />
+          </FloatingCard>
         </div>
 
-        {/* Main Form */}
-        <div className="max-w-2xl mx-auto">
-          <Card className="card-surface shadow-shield">
-            <CardHeader className="text-center pb-8">
-              <div className="shield-icon mx-auto mb-4">
-                {step === 1 && <CheckCircle className="w-6 h-6 text-primary" />}
-                {step === 2 && <Clock className="w-6 h-6 text-primary" />}
-                {step === 3 && <Camera className="w-6 h-6 text-primary" />}
+        {/* Main Form Card */}
+        <div className="max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '400ms' }}>
+          <FloatingCard className="overflow-hidden">
+            <CardHeader className="text-center pb-8 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 opacity-50" />
+              <div className="relative">
+                <div className="mx-auto mb-6 w-16 h-16 rounded-2xl bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-lg border border-white/20 flex items-center justify-center">
+                  {step === 1 && <CheckCircle className="w-8 h-8 text-primary" />}
+                  {step === 2 && <Clock className="w-8 h-8 text-primary" />}
+                  {step === 3 && <Camera className="w-8 h-8 text-primary" />}
+                </div>
+                <CardTitle className="text-3xl font-display font-bold mb-3">
+                  {step === 1 && "Детали услуги"}
+                  {step === 2 && "Бюджет и время"}
+                  {step === 3 && "Фотографии (опционально)"}
+                </CardTitle>
+                <p className="text-muted-foreground text-lg">
+                  {step === 1 && "Опишите что нужно сделать"}
+                  {step === 2 && "Укажите бюджет и удобное время"}
+                  {step === 3 && "Добавьте фото для лучшего понимания задачи"}
+                </p>
               </div>
-              <CardTitle className="text-2xl">
-                {step === 1 && "Детали услуги"}
-                {step === 2 && "Бюджет и время"}
-                {step === 3 && "Фотографии (опционально)"}
-              </CardTitle>
-              <p className="text-muted-foreground mt-2">
-                {step === 1 && "Опишите что нужно сделать"}
-                {step === 2 && "Укажите бюджет и удобное время"}
-                {step === 3 && "Добавьте фото для лучшего понимания задачи"}
-              </p>
             </CardHeader>
 
             <CardContent className="space-y-8">
               <form onSubmit={onSubmit} className="space-y-8">
                 {/* Step 1: Service Details */}
                 {step === 1 && (
-                  <div className="space-y-6 animate-fade-in-up">
-                    <div className="space-y-3">
-                      <Label htmlFor="category_id" className="text-base font-medium">Категория услуги *</Label>
+                  <div className="space-y-8 animate-fade-in">
+                    <div className="space-y-4">
+                      <Label htmlFor="category_id" className="text-lg font-semibold flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-primary" />
+                        Категория услуги *
+                      </Label>
                       <Select 
                         value={formData.category_id || presetCategory} 
                         onValueChange={(value) => updateFormData('category_id', value)}
                       >
-                        <SelectTrigger className="h-12 rounded-2xl border-primary/20 focus-shield">
-                          <SelectValue placeholder="Выберите категорию" />
+                        <SelectTrigger className="h-14 text-lg rounded-2xl border-2 border-primary/20 bg-white dark:bg-white/5 hover:border-primary/40 focus:border-primary transition-all">
+                          <SelectValue placeholder="Выберите категорию услуги" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-2xl shadow-medium">
+                        <SelectContent className="rounded-2xl shadow-2xl border-2">
                           {categories.map(cat => (
-                            <SelectItem key={cat.id} value={cat.id} className="rounded-xl">
+                            <SelectItem key={cat.id} value={cat.id} className="rounded-xl text-lg py-3">
                               {cat.icon} {cat.name}
                             </SelectItem>
                           ))}
@@ -263,179 +279,243 @@ const JobNew = () => {
                       </Select>
                     </div>
 
-                    <div className="space-y-3">
-                      <Label htmlFor="urgency" className="text-base font-medium">Приоритет</Label>
+                    <div className="space-y-4">
+                      <Label htmlFor="urgency" className="text-lg font-semibold flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-accent" />
+                        Приоритет выполнения
+                      </Label>
                       <Select value={formData.urgency} onValueChange={(value) => updateFormData('urgency', value)}>
-                        <SelectTrigger className="h-12 rounded-2xl border-primary/20 focus-shield">
+                        <SelectTrigger className="h-14 text-lg rounded-2xl border-2 border-primary/20 bg-white dark:bg-white/5 hover:border-primary/40 focus:border-primary transition-all">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="rounded-2xl shadow-medium">
-                          <SelectItem value="normal" className="rounded-xl">Обычный</SelectItem>
-                          <SelectItem value="urgent" className="rounded-xl">Срочно (+30%)</SelectItem>
-                          <SelectItem value="same_day" className="rounded-xl">В тот же день (+50%)</SelectItem>
+                        <SelectContent className="rounded-2xl shadow-2xl border-2">
+                          <SelectItem value="normal" className="rounded-xl text-lg py-3">🕒 Обычный приоритет</SelectItem>
+                          <SelectItem value="urgent" className="rounded-xl text-lg py-3">⚡ Срочно (+30% к стоимости)</SelectItem>
+                          <SelectItem value="same_day" className="rounded-xl text-lg py-3">🚀 В тот же день (+50% к стоимости)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div className="space-y-3">
-                      <Label htmlFor="description" className="text-base font-medium">Описание задачи *</Label>
+                    <div className="space-y-4">
+                      <Label htmlFor="description" className="text-lg font-semibold flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        Подробное описание задачи *
+                      </Label>
                       <Textarea
                         id="description"
                         value={formData.description}
                         onChange={(e) => updateFormData('description', e.target.value)}
-                        placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
-                        rows={4}
-                        className="rounded-2xl border-primary/20 focus-shield resize-none"
+                        placeholder="Детально опишите что нужно сделать: объем работ, материалы, особые требования, адрес выполнения..."
+                        rows={5}
+                        className="text-lg rounded-2xl border-2 border-primary/20 bg-white dark:bg-white/5 hover:border-primary/40 focus:border-primary transition-all resize-none"
                         required
                       />
-                      <p className="text-sm text-muted-foreground">
-                        💡 Чем подробнее описание, тем точнее будут предложения специалистов
-                      </p>
+                      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
+                        <p className="text-sm text-primary flex items-center gap-2">
+                          <Shield className="w-4 h-4" />
+                          <strong>Совет:</strong> Чем подробнее описание, тем точнее будут предложения специалистов
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-3">
-                      <Badge variant="secondary" className="status-info text-sm py-2 px-4">
-                        <Zap className="w-4 h-4 mr-2" />
-                        Мгновенные отклики
-                      </Badge>
-                      <Badge variant="secondary" className="status-success text-sm py-2 px-4">
-                        <Shield className="w-4 h-4 mr-2" />
-                        Защита эскроу
-                      </Badge>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-white dark:bg-white/5 border border-primary/20 rounded-2xl p-4 flex items-center gap-3">
+                        <Zap className="w-6 h-6 text-blue-500" />
+                        <div>
+                          <div className="font-semibold text-sm">Мгновенные отклики</div>
+                          <div className="text-xs text-muted-foreground">Ответ в течение 5 минут</div>
+                        </div>
+                      </div>
+                      <div className="bg-white dark:bg-white/5 border border-primary/20 rounded-2xl p-4 flex items-center gap-3">
+                        <Shield className="w-6 h-6 text-green-500" />
+                        <div>
+                          <div className="font-semibold text-sm">Защита эскроу</div>
+                          <div className="text-xs text-muted-foreground">100% гарантия безопасности</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Step 2: Budget & Schedule */}
                 {step === 2 && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="budget_min" className="flex items-center gap-2">
-                          <Euro className="w-4 h-4 text-green-500" />
-                          Бюджет от ($)
-                        </Label>
-                        <Input
-                          id="budget_min"
-                          type="number"
-                          value={formData.budget_min}
-                          onChange={(e) => updateFormData('budget_min', e.target.value)}
-                          placeholder="100"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="budget_max">до ($)</Label>
-                        <Input
-                          id="budget_max"
-                          type="number"
-                          value={formData.budget_max}
-                          onChange={(e) => updateFormData('budget_max', e.target.value)}
-                          placeholder="500"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="date" className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-blue-500" />
-                          Дата
-                        </Label>
-                        <Input
-                          id="date"
-                          type="date"
-                          value={formData.date}
-                          onChange={(e) => updateFormData('date', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="time" className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-blue-500" />
-                          Время
-                        </Label>
-                        <Input
-                          id="time"
-                          type="time"
-                          value={formData.time}
-                          onChange={(e) => updateFormData('time', e.target.value)}
-                        />
+                  <div className="space-y-8 animate-fade-in">
+                    <div className="space-y-6">
+                      <h3 className="text-xl font-semibold flex items-center gap-2">
+                        <Euro className="w-6 h-6 text-green-500" />
+                        Планируемый бюджет
+                      </h3>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <Label htmlFor="budget_min" className="text-lg font-medium">Бюджет от ($)</Label>
+                          <Input
+                            id="budget_min"
+                            type="number"
+                            value={formData.budget_min}
+                            onChange={(e) => updateFormData('budget_min', e.target.value)}
+                            placeholder="100"
+                            className="h-14 text-lg rounded-2xl border-2 border-primary/20 bg-white dark:bg-white/5 hover:border-primary/40 focus:border-primary transition-all"
+                          />
+                        </div>
+                        <div className="space-y-3">
+                          <Label htmlFor="budget_max" className="text-lg font-medium">до ($)</Label>
+                          <Input
+                            id="budget_max"
+                            type="number"
+                            value={formData.budget_max}
+                            onChange={(e) => updateFormData('budget_max', e.target.value)}
+                            placeholder="500"
+                            className="h-14 text-lg rounded-2xl border-2 border-primary/20 bg-white dark:bg-white/5 hover:border-primary/40 focus:border-primary transition-all"
+                          />
+                        </div>
                       </div>
                     </div>
 
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        💡 <strong>Совет:</strong> Указание бюджета и времени поможет специалистам лучше подготовиться и дать более точную оценку.
-                      </p>
+                    <div className="space-y-6">
+                      <h3 className="text-xl font-semibold flex items-center gap-2">
+                        <Calendar className="w-6 h-6 text-blue-500" />
+                        Желаемые дата и время
+                      </h3>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <Label htmlFor="date" className="text-lg font-medium">Дата выполнения</Label>
+                          <Input
+                            id="date"
+                            type="date"
+                            value={formData.date}
+                            onChange={(e) => updateFormData('date', e.target.value)}
+                            className="h-14 text-lg rounded-2xl border-2 border-primary/20 bg-white dark:bg-white/5 hover:border-primary/40 focus:border-primary transition-all"
+                          />
+                        </div>
+                        <div className="space-y-3">
+                          <Label htmlFor="time" className="text-lg font-medium">Время начала</Label>
+                          <Input
+                            id="time"
+                            type="time"
+                            value={formData.time}
+                            onChange={(e) => updateFormData('time', e.target.value)}
+                            className="h-14 text-lg rounded-2xl border-2 border-primary/20 bg-white dark:bg-white/5 hover:border-primary/40 focus:border-primary transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 border border-primary/20 rounded-2xl p-6">
+                      <div className="flex items-start gap-3">
+                        <Shield className="w-6 h-6 text-primary mt-1" />
+                        <div>
+                          <h4 className="font-semibold text-primary mb-2">Гибкое планирование</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Указание бюджета и времени поможет специалистам лучше подготовиться и дать более точную оценку. 
+                            Окончательные условия обсуждаются с выбранным исполнителем.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Step 3: Photos */}
                 {step === 3 && (
-                  <div className="space-y-6">
+                  <div className="space-y-8 animate-fade-in">
+                    <div className="text-center space-y-4">
+                      <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-xl border border-white/20 flex items-center justify-center">
+                        <Camera className="w-10 h-10 text-primary" />
+                      </div>
+                      <h3 className="text-2xl font-semibold">Добавьте фотографии</h3>
+                      <p className="text-lg text-muted-foreground max-w-md mx-auto">
+                        Фотографии помогут специалистам лучше понять объем работ и дать точную оценку
+                      </p>
+                    </div>
+
                     <div
-                      className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
-                        dragActive ? 'border-primary bg-primary/5' : 'border-muted'
+                      className={`border-2 border-dashed rounded-3xl p-12 text-center transition-all duration-300 ${
+                        dragActive 
+                          ? 'border-primary bg-primary/10 scale-105' 
+                          : 'border-primary/30 bg-white dark:bg-white/5 hover:border-primary/50 hover:bg-primary/5'
                       }`}
                       onDragEnter={handleDrag}
                       onDragLeave={handleDrag}
                       onDragOver={handleDrag}
                       onDrop={handleDrop}
                     >
-                      <AnimatedIcon icon={Camera} className="w-12 h-12 text-primary mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Добавьте фотографии</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Перетащите фото сюда или выберите файлы (до 8 фото)
-                      </p>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleFileInput}
-                        className="hidden"
-                        id="photo-upload"
-                      />
-                      <Button type="button" variant="outline" asChild>
-                        <label htmlFor="photo-upload" className="cursor-pointer">
-                          <Upload className="w-4 h-4 mr-2" />
-                          Выбрать файлы
-                        </label>
-                      </Button>
+                      <div className="space-y-6">
+                        <AnimatedIcon icon={Camera} className="w-16 h-16 text-primary mx-auto" />
+                        <div>
+                          <h4 className="text-xl font-semibold mb-2">Перетащите изображения сюда</h4>
+                          <p className="text-muted-foreground mb-6">
+                            или нажмите кнопку для выбора файлов (до 8 фотографий)
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleFileInput}
+                          className="hidden"
+                          id="photo-upload"
+                        />
+                        <Button type="button" size="lg" className="rounded-2xl" asChild>
+                          <label htmlFor="photo-upload" className="cursor-pointer">
+                            <Upload className="w-5 h-5 mr-3" />
+                            Выбрать фотографии
+                          </label>
+                        </Button>
+                      </div>
                     </div>
 
                     {uploadedFiles.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {uploadedFiles.map((file, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={`Upload ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg border"
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => removeFile(index)}
-                              className="absolute -top-2 -right-2 w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        ))}
+                      <div className="space-y-4">
+                        <h4 className="text-lg font-semibold">Загруженные фотографии ({uploadedFiles.length}/8)</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {uploadedFiles.map((file, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Upload ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-2xl border-2 border-primary/20 shadow-lg transition-transform group-hover:scale-105"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => removeFile(index)}
+                                className="absolute -top-3 -right-3 w-8 h-8 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
+
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-primary/20 rounded-2xl p-6">
+                      <div className="flex items-start gap-3">
+                        <Camera className="w-6 h-6 text-amber-600 mt-1" />
+                        <div>
+                          <h4 className="font-semibold text-amber-800 dark:text-amber-200 mb-2">Рекомендации по фото</h4>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• Сфотографируйте проблемную область с разных ракурсов</li>
+                            <li>• Покажите общий вид помещения или объекта</li>
+                            <li>• Включите детали, которые могут повлиять на работу</li>
+                            <li>• Избегайте размытых или темных снимков</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between pt-8 border-t border-border/50">
+                <div className="flex justify-between pt-10 mt-10 border-t-2 border-primary/10">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={prevStep}
                     disabled={step === 1}
-                    className="btn-shield-outline"
+                    size="lg"
+                    className="rounded-2xl border-2 hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
                   >
                     Назад
                   </Button>
@@ -445,26 +525,36 @@ const JobNew = () => {
                       type="button"
                       onClick={nextStep}
                       disabled={step === 1 && (!formData.category_id || !formData.description)}
-                      className="btn-shield"
+                      size="lg"
+                      className="rounded-2xl hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100 bg-gradient-to-r from-primary to-accent"
                     >
                       Далее
+                      <Rocket className="w-4 h-4 ml-2" />
                     </Button>
                   ) : (
-                    <Button type="submit" disabled={loading} className="btn-shield">
+                    <Button 
+                      type="submit" 
+                      disabled={loading} 
+                      size="lg"
+                      className="rounded-2xl hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100 bg-gradient-to-r from-primary to-accent"
+                    >
                       {loading ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                          Создание...
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3" />
+                          Создание заказа...
                         </>
                       ) : (
-                        "Создать заказ"
+                        <>
+                          <CheckCircle className="w-5 h-5 mr-3" />
+                          Создать заказ
+                        </>
                       )}
                     </Button>
                   )}
                 </div>
               </form>
             </CardContent>
-          </Card>
+          </FloatingCard>
         </div>
       </div>
     </main>
