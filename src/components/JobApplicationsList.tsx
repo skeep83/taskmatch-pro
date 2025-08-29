@@ -234,7 +234,7 @@ export function JobApplicationsList({
         <div className="card-surface p-6">
           <JobStatusProgress 
             status={jobStatus as any}
-            startConfirmed={false} // You can pass actual values if available
+            startConfirmed={false}
             endConfirmed={false}
           />
         </div>

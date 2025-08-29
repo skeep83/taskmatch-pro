@@ -37,7 +37,7 @@ interface Job {
   id: string;
   title: string;
   description: string;
-  status: string;
+  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'cancelled';
   budget_min_cents?: number;
   budget_max_cents?: number;
   location_address?: string;
@@ -799,7 +799,7 @@ const JobDetail = () => {
                 Статус выполнения
               </h3>
               <JobStatusProgress 
-                status={job.status as any}
+                status={job.status}
                 startConfirmed={jobStatusData.start_confirmed}
                 endConfirmed={jobStatusData.end_confirmed}
               />

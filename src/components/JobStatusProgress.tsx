@@ -46,6 +46,8 @@ export function JobStatusProgress({
   endConfirmed = false, 
   className = "" 
 }: JobStatusProgressProps) {
+  console.log('JobStatusProgress render:', { status, startConfirmed, endConfirmed });
+  
   const statusInfo = getStatusInfo(status);
   const progressValue = getProgressValue(status);
   const currentStepIndex = statusSteps.findIndex(step => step.key === status);
