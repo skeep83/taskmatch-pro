@@ -151,12 +151,44 @@ const JobEdit = () => {
 
       if (error) throw error;
 
-      // Delete removed photos
+      // Delete removed photos from storage and database
       if (deletedPhotoIds.length > 0) {
-        await supabase
+        console.log('Deleting photos:', deletedPhotoIds);
+        
+        // First get the file paths of photos to delete
+        const { data: photosToDelete } = await supabase
+          .from('job_photos')
+          .select('file_url')
+          .in('id', deletedPhotoIds);
+        
+        // Delete from storage
+        if (photosToDelete && photosToDelete.length > 0) {
+          const bucket = supabase.storage.from('evidence');
+          for (const photo of photosToDelete) {
+            try {
+              const { error: delErr } = await bucket.remove([photo.file_url]);
+              if (delErr) {
+                console.error('Storage delete error:', delErr);
+              } else {
+                console.log('Deleted from storage:', photo.file_url);
+              }
+            } catch (e) {
+              console.error('Failed to delete from storage:', e);
+            }
+          }
+        }
+        
+        // Delete from database
+        const { error: dbDelErr } = await supabase
           .from('job_photos')
           .delete()
           .in('id', deletedPhotoIds);
+          
+        if (dbDelErr) {
+          console.error('Database delete error:', dbDelErr);
+        } else {
+          console.log('Deleted from database, count:', deletedPhotoIds.length);
+        }
       }
 
       // Upload new photos
