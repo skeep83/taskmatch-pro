@@ -49,6 +49,7 @@ export const useSoundSettings = () => {
       case 'job_match':
       case 'job_update':
       case 'price_proposal':
+      case 'job_application':
         return settings.jobSound;
       case 'payment':
         return settings.paymentSound;

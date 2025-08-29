@@ -45,6 +45,8 @@ export const NotificationCenter = () => {
         return '🎯';
       case 'price_proposal':
         return '💸';
+      case 'job_application':
+        return '👋';
       case 'job_update':
         return '📋';
       case 'payment':

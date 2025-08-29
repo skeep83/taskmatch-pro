@@ -108,7 +108,7 @@ class NotificationSounds {
   }
 
   // Play different sounds for different notification types
-  async playNotification(type: 'message' | 'job_match' | 'job_update' | 'payment' | 'rating' | 'system' | 'default' = 'default') {
+  async playNotification(type: 'message' | 'job_match' | 'job_update' | 'payment' | 'rating' | 'system' | 'price_proposal' | 'job_application' | 'default' = 'default') {
     switch (type) {
       case 'message':
         await this.playSimpleBeep(600, 300, 0.4); // Lower tone for messages
@@ -116,6 +116,13 @@ class NotificationSounds {
       case 'job_match':
       case 'job_update':
         await this.playSimpleBeep(1000, 400, 0.5); // Higher tone for job matches/updates
+        break;
+      case 'price_proposal':
+        await this.playSimpleBeep(900, 250, 0.5); // Medium tone for price proposals
+        setTimeout(() => this.playSimpleBeep(1100, 200, 0.3), 100); // Double beep
+        break;
+      case 'job_application':
+        await this.playSimpleBeep(750, 350, 0.4); // Pleasant tone for applications
         break;
       case 'payment':
         await this.playSimpleBeep(800, 200, 0.6); // Medium tone for payments
