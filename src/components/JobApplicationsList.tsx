@@ -23,6 +23,7 @@ interface JobApplication {
     first_name?: string;
     last_name?: string;
     full_name?: string;
+    avatar_url?: string;
   };
 }
 
@@ -55,7 +56,7 @@ export const JobApplicationsList = ({
         .from('job_applications')
         .select(`
           *,
-          profiles!inner(first_name, last_name, full_name)
+          profiles!inner(first_name, last_name, full_name, avatar_url)
         `)
         .eq('job_id', jobId)
         .order('created_at', { ascending: false });
@@ -77,7 +78,7 @@ export const JobApplicationsList = ({
         for (const proposal of priceProposals) {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('first_name, last_name, full_name')
+            .select('first_name, last_name, full_name, avatar_url')
             .eq('id', proposal.pro_id)
             .single();
           
@@ -180,14 +181,15 @@ export const JobApplicationsList = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="w-12 h-12">
+                    <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
                     <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <h4 className="font-semibold flex items-center gap-2">
-                      {displayName}
-                      {isSelected && <CheckCircle className="w-4 h-4 text-green-500" />}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold flex items-center gap-2 truncate">
+                      <span className="truncate">{displayName}</span>
+                      {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
                     </h4>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">Специалист</Badge>

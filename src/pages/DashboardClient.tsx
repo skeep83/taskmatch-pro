@@ -116,7 +116,7 @@ export default function DashboardClient() {
       // Load user profile
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
-        .select("first_name, last_name, full_name")
+        .select("first_name, last_name, full_name, avatar_url")
         .eq("id", user.id)
         .single();
       

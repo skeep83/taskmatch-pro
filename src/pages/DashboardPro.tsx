@@ -294,7 +294,7 @@ const DashboardPro = () => {
           {/* Quick Actions */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
             <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
-              <Link to="/pro/profile" className="flex flex-col items-center gap-2">
+              <Link to="/profile/settings" className="flex flex-col items-center gap-2">
                 <UserCog className="h-10 w-10 text-primary" />
                 <span className="text-sm font-medium">Профиль</span>
               </Link>
@@ -356,7 +356,7 @@ const DashboardPro = () => {
                       <Briefcase className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
                       <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
                       <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
-                      <Link to="/pro/profile" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg">
+                      <Link to="/profile/settings" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg">
                         Настроить профиль
                       </Link>
                     </div>

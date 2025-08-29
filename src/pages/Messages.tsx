@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield } from "lucide-react";
@@ -59,7 +60,7 @@ const Messages = () => {
         if (userIds.size > 0) {
           const { data: profilesData } = await (supabase as any)
             .from("profiles")
-            .select("id, full_name, first_name, last_name")
+            .select("id, full_name, first_name, last_name, avatar_url")
             .in("id", Array.from(userIds));
           
           const profilesMap: Record<string, any> = {};
@@ -205,8 +206,16 @@ const Messages = () => {
                   const otherProfile = profiles[otherUserId];
                   const displayName = otherProfile?.full_name || 
                                      (otherProfile?.first_name && otherProfile?.last_name ? 
-                                       `${otherProfile.first_name} ${otherProfile.last_name}` : 
-                                       'Пользователь');
+                                        `${otherProfile.first_name} ${otherProfile.last_name}` : 
+                                        'Пользователь');
+                  
+                  const initials = displayName
+                    .split(' ')
+                    .filter(n => n.length > 0)
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
                   const jobNumber = String(c.job_id || c.tender_id || c.id).slice(0, 8);
 
                   return (
@@ -217,23 +226,26 @@ const Messages = () => {
                       }`}
                       onClick={() => navigate(`/messages/${c.id}`)}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                          {displayName.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm truncate">
-                            {displayName}
-                          </div>
-                          <div className="text-xs text-muted-foreground truncate">
-                            Заказ #{jobNumber}
-                          </div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
+                       <div className="flex items-center gap-3">
+                         <Avatar className="w-10 h-10">
+                           <AvatarImage src={otherProfile?.avatar_url || ''} alt={displayName} />
+                           <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold text-sm">
+                             {initials}
+                           </AvatarFallback>
+                         </Avatar>
+                         <div className="flex-1 min-w-0">
+                           <div className="font-medium text-sm truncate">
+                             {displayName}
+                           </div>
+                           <div className="text-xs text-muted-foreground truncate">
+                             Заказ #{jobNumber}
+                           </div>
+                           <div className="text-xs text-muted-foreground flex items-center gap-1">
+                             <Clock className="w-3 h-3" />
+                             {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}
+                           </div>
+                         </div>
+                       </div>
                     </FloatingCard>
                   );
                 })}
@@ -253,34 +265,54 @@ const Messages = () => {
               ) : (
                 <>
                   {/* Chat Header */}
-                  <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                        {String(selectedChat?.id || id).slice(0, 2).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="font-medium">
-                          {selectedChat ? (() => {
-                            const otherUserId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
-                            const otherProfile = profiles[otherUserId];
-                            const displayName = otherProfile?.full_name || 
-                                               (otherProfile?.first_name && otherProfile?.last_name ? 
-                                                 `${otherProfile.first_name} ${otherProfile.last_name}` : 
-                                                 'Пользователь');
-                            return displayName;
-                          })() : 'Чат'}
-                        </div>
-                        {selectedChat && (
-                          <div className="text-xs text-muted-foreground">
-                            Заказ #{String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}
-                          </div>
-                        )}
-                        <div className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
-                          {otherTyping ? 'Печатает…' : (otherOnline ? 'В сети' : 'Не в сети')}
-                        </div>
-                      </div>
-                    </div>
+                   <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                     <div className="flex items-center gap-3">
+                       {selectedChat ? (() => {
+                         const otherUserId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
+                         const otherProfile = profiles[otherUserId];
+                         const displayName = otherProfile?.full_name || 
+                                            (otherProfile?.first_name && otherProfile?.last_name ? 
+                                              `${otherProfile.first_name} ${otherProfile.last_name}` : 
+                                              'Пользователь');
+                         const initials = displayName
+                           .split(' ')
+                           .filter(n => n.length > 0)
+                           .map(n => n[0])
+                           .join('')
+                           .toUpperCase()
+                           .slice(0, 2);
+                         
+                         return (
+                           <>
+                             <Avatar className="w-10 h-10">
+                               <AvatarImage src={otherProfile?.avatar_url || ''} alt={displayName} />
+                               <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold">
+                                 {initials}
+                               </AvatarFallback>
+                             </Avatar>
+                             <div>
+                               <div className="font-medium">{displayName}</div>
+                               <div className="text-xs text-muted-foreground">
+                                 Заказ #{String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}
+                               </div>
+                               <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                 <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
+                                 {otherTyping ? 'Печатает…' : (otherOnline ? 'В сети' : 'Не в сети')}
+                               </div>
+                             </div>
+                           </>
+                         );
+                       })() : (
+                         <>
+                           <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                             {String(id).slice(0, 2).toUpperCase()}
+                           </div>
+                           <div>
+                             <div className="font-medium">Чат</div>
+                           </div>
+                         </>
+                       )}
+                     </div>
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm">
                         <Video className="w-4 h-4" />
