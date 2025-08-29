@@ -224,8 +224,9 @@ export function JobApplicationsList({
                 )
               `)
               .eq('pro_id', app.pro_id)
-              .order('created_at', { ascending: false })
-              .limit(3);
+              .order('created_at', { ascending: false });
+
+            console.log('📸 Portfolio data for pro:', app.pro_id, portfolioData);
 
             return {
               ...app,
