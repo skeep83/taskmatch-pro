@@ -88,11 +88,15 @@ export const JobApplicationsList = ({
       const priceProposalsWithProfiles = [];
       if (priceProposals && priceProposals.length > 0) {
         for (const proposal of priceProposals) {
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('first_name, last_name, full_name, avatar_url')
             .eq('id', proposal.pro_id)
-            .single();
+            .maybeSingle();
+          
+          if (profileError) {
+            console.error('Error loading profile for', proposal.pro_id, profileError);
+          }
           
           priceProposalsWithProfiles.push({
             ...proposal,
@@ -110,23 +114,59 @@ export const JobApplicationsList = ({
       // Загружаем рейтинг и портфолио для каждого специалиста
       const enhancedApplications = [];
       for (const app of allApplications) {
+        // Загружаем данные профиля если они не загружены
+        let profileData = app.profiles;
+        if (!profileData) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, full_name, avatar_url')
+            .eq('id', app.pro_id)
+            .maybeSingle();
+          
+          if (profileError) {
+            console.error('Error loading profile for', app.pro_id, profileError);
+          }
+          profileData = profile;
+        }
+
+        // Загружаем дополнительные данные профиля (био и другие детали)
+        const { data: proProfile, error: proProfileError } = await supabase
+          .from('pro_profiles')
+          .select('bio, hourly_rate_cents, fixed_price_cents, radius_km')
+          .eq('user_id', app.pro_id)
+          .maybeSingle();
+        
+        if (proProfileError) {
+          console.error('Error loading pro profile for', app.pro_id, proProfileError);
+        }
+
         // Загружаем рейтинг
-        const { data: ratingData } = await supabase
+        const { data: ratingData, error: ratingError } = await supabase
           .from('pro_rating_stats')
           .select('avg_score, rating_count')
           .eq('pro_id', app.pro_id)
           .maybeSingle();
 
+        if (ratingError) {
+          console.error('Error loading rating for', app.pro_id, ratingError);
+        }
+
         // Загружаем портфолио (первые 3 работы)
-        const { data: portfolioData } = await supabase
+        const { data: portfolioData, error: portfolioError } = await supabase
           .from('portfolio_items')
           .select('id, image_url, title')
           .eq('pro_id', app.pro_id)
           .order('created_at', { ascending: false })
           .limit(3);
 
+        if (portfolioError) {
+          console.error('Error loading portfolio for', app.pro_id, portfolioError);
+        }
+
         enhancedApplications.push({
           ...app,
+          profiles: profileData,
+          proProfile: proProfile,
           rating: ratingData ? {
             avg_score: Number(ratingData.avg_score || 0),
             rating_count: ratingData.rating_count || 0
