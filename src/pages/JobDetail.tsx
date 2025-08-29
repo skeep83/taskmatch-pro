@@ -685,11 +685,18 @@ const JobDetail = () => {
                   
                   {/* Central Image */}
                   <div className="flex justify-center mb-6">
-                    <img 
-                      src={interestedInJobImage} 
-                      alt="Заинтересованы в заказе" 
-                      className="w-32 h-32 object-contain"
-                    />
+                    <div className="w-32 h-32 bg-muted/20 rounded-lg flex items-center justify-center">
+                      <img 
+                        src={interestedInJobImage} 
+                        alt="Заинтересованы в заказе" 
+                        className="w-28 h-28 object-contain"
+                        onError={(e) => {
+                          console.log('Image failed to load:', e);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        onLoad={() => console.log('Image loaded successfully')}
+                      />
+                    </div>
                   </div>
                   
                   {/* Buttons at bottom */}
