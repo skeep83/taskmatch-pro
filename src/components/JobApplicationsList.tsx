@@ -71,6 +71,8 @@ export function JobApplicationsList({
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
+  const [selectedPortfolio, setSelectedPortfolio] = useState<JobApplication | null>(null);
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
 
@@ -274,6 +276,11 @@ export function JobApplicationsList({
     } finally {
       setSelecting(null);
     }
+  };
+
+  const handlePortfolioOpen = (application: JobApplication) => {
+    setSelectedPortfolio(application);
+    setPortfolioModalOpen(true);
   };
 
   if (loading) {
@@ -502,14 +509,14 @@ export function JobApplicationsList({
                      {/* Portfolio and Action buttons */}
                      <div className="space-y-3">
                        {/* Portfolio button */}
-                       <Button
-                         onClick={() => window.open(`/pro/${application.pro_id}`, '_blank')}
-                         variant="outline"
-                         className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
-                       >
-                         <Eye className="w-4 h-4 mr-2" />
-                         Портфолио
-                       </Button>
+                        <Button
+                          onClick={() => handlePortfolioOpen(application)}
+                          variant="outline"
+                          className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Портфолио
+                        </Button>
                        
                        {/* Action button */}
                        {canSelect && (
@@ -535,6 +542,119 @@ export function JobApplicationsList({
           })}
         </AnimatePresence>
       </div>
+
+      {/* Portfolio Modal */}
+      <Dialog open={portfolioModalOpen} onOpenChange={setPortfolioModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage 
+                  src={selectedPortfolio?.profiles?.avatar_url || ''} 
+                  alt={selectedPortfolio?.profiles?.full_name || 'Специалист'}
+                />
+                <AvatarFallback>
+                  {selectedPortfolio?.profiles?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'С'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <span className="text-xl">Портфолио {selectedPortfolio?.profiles?.full_name || 'специалиста'}</span>
+                <p className="text-sm text-muted-foreground font-normal">
+                  {selectedPortfolio?.proProfile?.bio || 'Опытный специалист'}
+                </p>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-6">
+            {selectedPortfolio?.portfolio && selectedPortfolio.portfolio.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {selectedPortfolio.portfolio.map((item) => (
+                  <div key={item.id} className="space-y-3">
+                     <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
+                       {item.image_url ? (
+                         <OptimizedImage
+                           src={item.image_url}
+                           alt={item.title || 'Работа из портфолио'}
+                           width={400}
+                           height={225}
+                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                         />
+                       ) : (
+                         <div className="w-full h-full flex items-center justify-center">
+                           <Image className="w-12 h-12 text-gray-400" />
+                         </div>
+                       )}
+                     </div>
+                    {item.title && (
+                      <h4 className="font-semibold text-sm">{item.title}</h4>
+                    )}
+                    
+                    {/* Additional media from portfolio_media */}
+                    {item.portfolio_media && item.portfolio_media.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2">
+                        {item.portfolio_media
+                          .sort((a, b) => a.display_order - b.display_order)
+                          .slice(0, 4)
+                          .map((media) => (
+                             <div key={media.id} className="relative aspect-square rounded overflow-hidden bg-gray-100">
+                               {media.file_type.startsWith('image/') ? (
+                                 <OptimizedImage
+                                   src={media.file_url}
+                                   alt={media.file_name || 'Дополнительное фото'}
+                                   width={200}
+                                   height={200}
+                                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                                 />
+                               ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                                  <FileText className="w-6 h-6 text-gray-400" />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Image className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">Портфолио пока пусто</h3>
+                <p className="text-gray-500">
+                  Специалист еще не добавил работы в свое портфолио
+                </p>
+              </div>
+            )}
+          </div>
+          
+          {/* Portfolio stats */}
+          {selectedPortfolio && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center gap-4">
+                  <span>Работ в портфолио: {selectedPortfolio.portfolio?.length || 0}</span>
+                  {selectedPortfolio.rating && (
+                    <span className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                      {selectedPortfolio.rating.avg_score.toFixed(1)} ({selectedPortfolio.rating.rating_count} отзывов)
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(`/pro/${selectedPortfolio.pro_id}`, '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Полный профиль
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
