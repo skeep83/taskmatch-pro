@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Loader2, AlertCircle, ZoomIn } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 interface OptimizedImageProps {
   src: string;
@@ -17,6 +18,7 @@ interface OptimizedImageProps {
   fallbackSrc?: string;
   enableZoom?: boolean;
   loading?: 'lazy' | 'eager';
+  bucket?: string;
   onLoad?: () => void;
   onError?: () => void;
 }
@@ -35,11 +37,36 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   fallbackSrc,
   enableZoom = false,
   loading = 'lazy',
+  bucket,
   onLoad,
   onError,
 }) => {
   const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [imageSrc, setImageSrc] = useState(src);
+
+  // Convert Supabase storage path to public URL
+  const publicUrl = useMemo(() => {
+    // If it's already a full URL, return as is
+    if (src.startsWith('http')) {
+      return src;
+    }
+    
+    // If it's a storage path, convert to public URL
+    if (bucket) {
+      return supabase.storage.from(bucket).getPublicUrl(src).data.publicUrl;
+    }
+    
+    // Try to detect bucket from path
+    const pathParts = src.split('/');
+    if (pathParts.length >= 2) {
+      const detectedBucket = pathParts[0];
+      const filePath = pathParts.slice(1).join('/');
+      return supabase.storage.from(detectedBucket).getPublicUrl(filePath).data.publicUrl;
+    }
+    
+    // Fallback - assume it's in evidence bucket
+    return supabase.storage.from('evidence').getPublicUrl(src).data.publicUrl;
+  }, [src, bucket]);
 
   const handleLoad = useCallback(() => {
     setImageState('loaded');
@@ -55,22 +82,6 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     }
     onError?.();
   }, [fallbackSrc, imageSrc, onError]);
-
-  // Generate responsive image URLs for different screen sizes
-  const generateSrcSet = (baseSrc: string) => {
-    if (!baseSrc.includes('supabase')) return '';
-    
-    const sizes = [320, 640, 768, 1024, 1280, 1536];
-    return sizes
-      .map(size => `${baseSrc}?width=${size}&quality=${quality} ${size}w`)
-      .join(', ');
-  };
-
-  const optimizedSrc = imageSrc.includes('supabase') 
-    ? `${imageSrc}?width=${width || 800}&quality=${quality}`
-    : imageSrc;
-
-  const srcSet = generateSrcSet(imageSrc);
 
   const imageElement = (
     <div className={cn(
@@ -91,11 +102,10 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       )}
 
       <img
-        src={optimizedSrc}
+        src={publicUrl}
         alt={alt}
         width={width}
         height={height}
-        srcSet={srcSet}
         sizes={sizes || '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'}
         loading={priority ? 'eager' : loading}
         decoding="async"
@@ -131,7 +141,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         </DialogTrigger>
         <DialogContent className="max-w-4xl w-full">
           <img
-            src={imageSrc}
+            src={publicUrl}
             alt={alt}
             className="w-full h-auto max-h-[80vh] object-contain"
           />
