@@ -7,6 +7,7 @@ import { JobApplicationsList } from '@/components/JobApplicationsList';
 import { JobResponseForm } from '@/components/JobResponseForm';
 import { PriceProposalForm } from '@/components/PriceProposalForm';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
+import interestedInJobImage from '@/assets/interested-in-job.png';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -677,11 +678,21 @@ const JobDetail = () => {
             {/* Professional Action Buttons */}
             {canApply && (
               <Card className="transition-all">
-                <CardContent className="pt-6">
-                  <h3 className="text-lg font-semibold mb-4">
+                <CardContent className="pt-6 pb-6 text-center">
+                  <h3 className="text-lg font-semibold mb-6">
                     Заинтересованы в заказе?
                   </h3>
                   
+                  {/* Central Image */}
+                  <div className="flex justify-center mb-6">
+                    <img 
+                      src={interestedInJobImage} 
+                      alt="Заинтересованы в заказе" 
+                      className="w-32 h-32 object-contain"
+                    />
+                  </div>
+                  
+                  {/* Buttons at bottom */}
                   <div className="flex gap-2">
                     <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
                       <DialogTrigger asChild>
