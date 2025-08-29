@@ -398,11 +398,19 @@ export default function DashboardClient() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate(`/job/${job.id}`)}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
                           {job.pro_id && (
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate("/messages")}
+                            >
                               <MessageSquare className="h-4 w-4" />
                             </Button>
                           )}
@@ -463,11 +471,19 @@ export default function DashboardClient() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => navigate(`/job/${job.id}`)}
+                              >
                                 <Eye className="h-4 w-4" />
                               </Button>
                               {job.pro_id && (
-                                <Button variant="outline" size="sm">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => navigate("/messages")}
+                                >
                                   <MessageSquare className="h-4 w-4" />
                                 </Button>
                               )}
