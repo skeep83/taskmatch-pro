@@ -14,6 +14,7 @@ import { ru } from 'date-fns/locale';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Link } from 'react-router-dom';
+import { JobStatusProgress } from '@/components/JobStatusProgress';
 
 interface JobApplication {
   id: string;
@@ -48,6 +49,7 @@ interface JobApplication {
       file_url: string;
       file_type: string;
       display_order: number;
+      file_name?: string;
     }>;
   }>;
 }
@@ -56,267 +58,139 @@ interface JobApplicationsListProps {
   jobId: string;
   jobStatus: string;
   selectedProId?: string;
-  onApplicationSelect?: (applicationId: string) => void;
+  onApplicationSelect: () => void;
 }
 
-// Массив полезных советов для клиентов
-const helpfulTips = [
-  {
-    id: 'rating-review',
-    icon: Star,
-    gradient: 'from-yellow-400 via-orange-500 to-red-500',
-    title: 'Оставьте отзыв и рейтинг',
-    subtitle: 'Обязательно после завершения',
-    content: 'После завершения работ обязательно оставьте честный отзыв и рейтинг специалисту. Это поможет другим клиентам и повысит качество сервиса.',
-    action: 'Узнать больше'
-  },
-  {
-    id: 'quality-control',
-    icon: Eye,
-    gradient: 'from-blue-400 via-purple-500 to-pink-500',
-    title: 'Контролируйте качество',
-    subtitle: 'Проверьте результат работы',
-    content: 'Внимательно проверьте выполненную работу перед её подтверждением. Убедитесь, что всё соответствует договорённостям.',
-    action: 'Советы по контролю'
-  },
-  {
-    id: 'documentation',
-    icon: FileText,
-    gradient: 'from-green-400 via-teal-500 to-blue-500',
-    title: 'Сохраните документы',
-    subtitle: 'Чеки, акты, гарантии',
-    content: 'Сохраните все документы: чеки, акты выполненных работ, гарантийные талоны. Они понадобятся в случае рекламаций.',
-    action: 'Что сохранить'
-  },
-  {
-    id: 'communication',
-    icon: MessageSquare,
-    gradient: 'from-purple-400 via-pink-500 to-red-500',
-    title: 'Общайтесь в чате',
-    subtitle: 'Все договорённости письменно',
-    content: 'Ведите переписку в чате платформы. Это защитит ваши интересы и поможет в решении спорных вопросов.',
-    action: 'Открыть чат'
-  },
-  {
-    id: 'safety',
-    icon: Shield,
-    gradient: 'from-emerald-400 via-green-500 to-teal-500',
-    title: 'Соблюдайте безопасность',
-    subtitle: 'Ваша безопасность важна',
-    content: 'Убедитесь, что специалист соблюдает технику безопасности и использует средства защиты при необходимости.',
-    action: 'Правила безопасности'
-  },
-  {
-    id: 'payment-protection',
-    icon: CreditCard,
-    gradient: 'from-indigo-400 via-blue-500 to-purple-500',
-    title: 'Защищённые платежи',
-    subtitle: 'Эскроу гарантирует безопасность',
-    content: 'Ваши средства защищены системой эскроу. Оплата специалисту происходит только после подтверждения выполнения работ.',
-    action: 'Как работает эскроу'
-  },
-  {
-    id: 'repeat-orders',
-    icon: RotateCcw,
-    gradient: 'from-pink-400 via-rose-500 to-red-500',
-    title: 'Повторные заказы',
-    subtitle: 'Заказывайте снова у проверенных',
-    content: 'Если специалист вас устроил, сохраните его в избранное и заказывайте услуги повторно со скидками.',
-    action: 'Добавить в избранное'
-  },
-  {
-    id: 'support',
-    icon: HelpCircle,
-    gradient: 'from-cyan-400 via-blue-500 to-indigo-500',
-    title: 'Служба поддержки',
-    subtitle: 'Мы всегда поможем',
-    content: 'При возникновении любых вопросов или проблем обращайтесь в службу поддержки. Мы работаем 24/7.',
-    action: 'Связаться с поддержкой'
-  },
-  {
-    id: 'warranty',
-    icon: Award,
-    gradient: 'from-orange-400 via-red-500 to-pink-500',
-    title: 'Гарантийные обязательства',
-    subtitle: 'Гарантия на выполненные работы',
-    content: 'Уточните сроки гарантии у специалиста. В случае проблем в гарантийный период работы будут исправлены бесплатно.',
-    action: 'Условия гарантии'
-  }
-];
-
-export const JobApplicationsList = ({ 
+export function JobApplicationsList({ 
   jobId, 
   jobStatus, 
-  selectedProId,
+  selectedProId, 
   onApplicationSelect 
-}: JobApplicationsListProps) => {
+}: JobApplicationsListProps) {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { toast } = useToast();
   const { formatPrice } = useCurrency();
+  const { toast } = useToast();
 
   useEffect(() => {
-    fetchApplications();
+    if (jobId) {
+      fetchApplications();
+    }
   }, [jobId]);
-
-  // Сброс индекса при смене режима отображения
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [selectedProId]);
 
   const fetchApplications = async () => {
     try {
-      // Получаем обычные отклики
-      const { data: regularApplications, error: appError } = await supabase
+      setLoading(true);
+      
+      // Fetch job applications with profiles and additional data
+      const { data: applicationsData, error: applicationsError } = await supabase
         .from('job_applications')
         .select(`
           *,
-          profiles!inner(first_name, last_name, full_name, avatar_url)
+          profiles:pro_id (
+            first_name,
+            last_name,
+            full_name,
+            avatar_url
+          )
         `)
         .eq('job_id', jobId)
         .order('created_at', { ascending: false });
 
-      if (appError) throw appError;
-
-      // Получаем предложения цены отдельно
-      const { data: priceProposals, error: priceError } = await supabase
-        .from('job_price_proposals')
-        .select('*')
-        .eq('job_id', jobId)
-        .order('created_at', { ascending: false });
-
-      if (priceError) throw priceError;
-
-      // Для каждого предложения цены загружаем профиль, рейтинг и портфолио
-      const priceProposalsWithProfiles = [];
-      if (priceProposals && priceProposals.length > 0) {
-        for (const proposal of priceProposals) {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('first_name, last_name, full_name, avatar_url')
-            .eq('id', proposal.pro_id)
-            .maybeSingle();
-          
-          if (profileError) {
-            console.error('Error loading profile for', proposal.pro_id, profileError);
-          }
-          
-          priceProposalsWithProfiles.push({
-            ...proposal,
-            profiles: profile
-          });
-        }
+      if (applicationsError) {
+        console.error('Error fetching applications:', applicationsError);
+        return;
       }
 
-      // Дополняем данные рейтингом и портфолио для всех откликов
-      const allApplications = [
-        ...(regularApplications || []),
-        ...priceProposalsWithProfiles
-      ];
-
-      // Загружаем рейтинг и портфолио для каждого специалиста
-      const enhancedApplications = [];
-      for (const app of allApplications) {
-        // Загружаем данные профиля если они не загружены
-        let profileData = app.profiles;
-        if (!profileData) {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('first_name, last_name, full_name, avatar_url')
-            .eq('id', app.pro_id)
-            .maybeSingle();
-          
-          if (profileError) {
-            console.error('Error loading profile for', app.pro_id, profileError);
-          }
-          profileData = profile;
-        }
-
-        // Загружаем дополнительные данные профиля (био и другие детали)
-        const { data: proProfile, error: proProfileError } = await supabase
-          .from('pro_profiles')
-          .select('bio, hourly_rate_cents, fixed_price_cents, radius_km')
-          .eq('user_id', app.pro_id)
-          .maybeSingle();
-        
-        if (proProfileError) {
-          console.error('Error loading pro profile for', app.pro_id, proProfileError);
-        }
-
-        // Загружаем рейтинг
-        const { data: ratingData, error: ratingError } = await supabase
-          .from('pro_rating_stats')
-          .select('avg_score, rating_count')
-          .eq('pro_id', app.pro_id)
-          .maybeSingle();
-
-        if (ratingError) {
-          console.error('Error loading rating for', app.pro_id, ratingError);
-        }
-
-        // Загружаем портфолио (первые 3 работы) с медиа
-        const { data: portfolioData, error: portfolioError } = await supabase
-          .from('portfolio_items')
-          .select(`
-            id, image_url, title,
-            portfolio_media (
-              id, file_url, file_type, display_order
-            )
-          `)
-          .eq('pro_id', app.pro_id)
-          .order('created_at', { ascending: false })
-          .limit(3);
-
-        if (portfolioError) {
-          console.error('Error loading portfolio for', app.pro_id, portfolioError);
-        }
-
-        enhancedApplications.push({
-          ...app,
-          profiles: profileData,
-          proProfile: proProfile,
-          rating: ratingData ? {
-            avg_score: Number(ratingData.avg_score || 0),
-            rating_count: ratingData.rating_count || 0
-          } : { avg_score: 0, rating_count: 0 },
-          portfolio: portfolioData || []
-        });
+      if (!applicationsData || applicationsData.length === 0) {
+        setApplications([]);
+        return;
       }
+
+      // Fetch additional data for each professional
+      const enhancedApplications = await Promise.all(
+        applicationsData.map(async (app) => {
+          try {
+            // Fetch pro profile
+            const { data: proProfile } = await supabase
+              .from('pro_profiles')
+              .select('*')
+              .eq('user_id', app.pro_id)
+              .maybeSingle();
+
+            // Fetch ratings
+            const { data: ratings } = await supabase
+              .from('ratings')
+              .select('score')
+              .eq('to_user_id', app.pro_id);
+
+            let rating = null;
+            if (ratings && ratings.length > 0) {
+              const avg_score = ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length;
+              rating = { avg_score, rating_count: ratings.length };
+            }
+
+            // Fetch portfolio
+            const { data: portfolioData } = await supabase
+              .from('portfolio_items')
+              .select(`
+                id,
+                title,
+                image_url,
+                portfolio_media (
+                  id,
+                  file_url,
+                  file_type,
+                  display_order,
+                  file_name
+                )
+              `)
+              .eq('pro_id', app.pro_id)
+              .order('created_at', { ascending: false })
+              .limit(3);
+
+            return {
+              ...app,
+              proProfile,
+              rating,
+              portfolio: portfolioData || []
+            };
+          } catch (error) {
+            console.error('Error fetching pro data:', error);
+            return app;
+          }
+        })
+      );
 
       setApplications(enhancedApplications);
     } catch (error) {
-      console.error('Error fetching applications:', error);
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось загрузить отклики',
-        variant: 'destructive'
-      });
+      console.error('Error in fetchApplications:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectApplication = async (applicationId: string) => {
-    setSelecting(applicationId);
+  const handleSelectProfessional = async (proId: string) => {
     try {
-      const { error } = await supabase.functions.invoke('job-application-select', {
-        body: { applicationId, jobId }
-      });
+      setSelecting(proId);
+      
+      const { error } = await supabase
+        .from('jobs')
+        .update({ pro_id: proId, status: 'accepted' })
+        .eq('id', jobId);
 
       if (error) throw error;
 
       toast({
         title: 'Специалист выбран',
-        description: 'Мы уведомили специалиста о выборе'
+        description: 'Специалист был успешно назначен на заказ'
       });
-
-      if (onApplicationSelect) {
-        onApplicationSelect(applicationId);
-      }
+      
+      onApplicationSelect();
     } catch (error: any) {
-      console.error('Error selecting application:', error);
+      console.error('Error selecting professional:', error);
       toast({
         title: 'Ошибка',
         description: error.message || 'Не удалось выбрать специалиста',
@@ -325,17 +199,6 @@ export const JobApplicationsList = ({
     } finally {
       setSelecting(null);
     }
-  };
-
-  // Carousel navigation functions - циклическая прокрутка
-  const nextCard = () => {
-    const totalItems = selectedProId ? helpfulTips.length : applications.length;
-    setCurrentIndex((prev) => (prev + 1) % totalItems);
-  };
-
-  const prevCard = () => {
-    const totalItems = selectedProId ? helpfulTips.length : applications.length;
-    setCurrentIndex((prev) => (prev - 1 + totalItems) % totalItems);
   };
 
   if (loading) {
@@ -356,165 +219,62 @@ export const JobApplicationsList = ({
     );
   }
 
-  // Если специалист назначен, показываем советы
+  // Если специалист назначен, показываем статус выполнения
   if (selectedProId) {
     return (
-      <div className="relative z-50 space-y-6">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-semibold text-foreground">
-            Полезные советы и рекомендации
+            Специалист назначен
           </h3>
         </div>
         
-        {/* Carousel Container */}
-        <div className="relative py-8 px-4 h-[700px]">
-          {/* Cards Stack */}
-          <div className="relative w-full h-full perspective-1000">
-            {helpfulTips.map((tip, index) => {
-              const IconComponent = tip.icon;
-              
-              // Calculate card position
-              const offset = index - currentIndex;
-              const isActive = index === currentIndex;
-              const isPrevious = offset < 0;
-              const isNext = offset > 0;
-
-              return (
-                <motion.div
-                  key={tip.id}
-                  className="absolute inset-0 w-full perspective-1000"
-                  initial={false}
-                  animate={{
-                    zIndex: isPrevious ? 1 : isActive ? 50 : 10 + (5 - Math.abs(offset)),
-                    y: isPrevious ? 30 : isNext ? offset * -20 : 0,
-                    scale: isPrevious ? 0.95 : isActive ? 1 : 1 - (Math.abs(offset) * 0.05),
-                    rotateX: isPrevious ? 5 : isNext ? offset * -2 : 0,
-                    opacity: isPrevious ? 0.5 : isActive ? 1 : Math.max(0.7 - (Math.abs(offset) * 0.2), 0.3)
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    ease: [0.25, 0.46, 0.45, 0.94]
-                  }}
-                  style={{
-                    transformStyle: 'preserve-3d'
-                  }}
-                >
-                  <div 
-                    className="group relative overflow-hidden rounded-3xl card-3d bg-white"
-                    style={{
-                      transformStyle: 'preserve-3d',
-                      boxShadow: `
-                        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                        0 15px 35px -5px rgba(0, 0, 0, 0.15),
-                        0 0 0 1px rgba(255, 255, 255, 0.08),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                        inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-                      `
-                    }}
-                  >
-                    {/* Gradient Header with enhanced 3D effect */}
-                    <div className={`relative h-40 bg-gradient-to-br ${tip.gradient} overflow-hidden`}>
-                      {/* Additional depth layer */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                      
-                      {/* Icon with enhanced shadow */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-white/20 rounded-full blur-sm scale-110"></div>
-                          <div className="relative w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-4 ring-white shadow-2xl z-10">
-                            <IconComponent className="w-12 h-12 text-white" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  
-                    {/* White content area */}
-                    <div className="p-6 space-y-4">
-                      {/* Title and subtitle */}
-                      <div className="text-center space-y-2">
-                        <h3 className="text-xl font-bold text-gray-900">{tip.title}</h3>
-                        <p className="text-sm text-gray-500 uppercase tracking-wide">
-                          {tip.subtitle}
-                        </p>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="text-center px-4">
-                        <p className="text-gray-600 leading-relaxed">
-                          {tip.content}
-                        </p>
-                      </div>
-                      
-                      {/* Action button */}
-                      <div className="flex justify-center pt-4">
-                        <Button variant="outline" className="w-full">
-                          <BookOpen className="w-4 h-4 mr-2" />
-                          {tip.action}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-          
-          {/* Navigation Controls */}
-          {helpfulTips.length > 1 && (
-            <>
-              {/* Arrow Navigation */}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={prevCard}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={nextCard}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </>
-          )}
+        {/* Job Status Progress */}
+        <div className="card-surface p-6">
+          <JobStatusProgress 
+            status={jobStatus as any}
+            startConfirmed={false} // You can pass actual values if available
+            endConfirmed={false}
+          />
         </div>
         
-        {/* Bottom Navigation */}
-        {helpfulTips.length > 1 && (
-          <div className="flex flex-col items-center gap-4">
-            {/* Dots Navigation */}
-            <div className="flex gap-2">
-              {helpfulTips.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentIndex 
-                      ? 'bg-primary scale-125' 
-                      : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                />
-              ))}
+        {/* Tips for working with professional */}
+        <div className="card-surface p-6">
+          <h4 className="text-lg font-semibold mb-4">Советы по работе со специалистом</h4>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-sm text-muted-foreground">
+                Обсудите все детали работы в чате перед началом выполнения
+              </p>
             </div>
-            
-            {/* Counter */}
-            <div className="text-sm text-muted-foreground">
-              {currentIndex + 1} из {helpfulTips.length}
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-sm text-muted-foreground">
+                Проверяйте прогресс работ через статус выполнения
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-sm text-muted-foreground">
+                Подтверждайте каждый этап только после проверки качества
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-sm text-muted-foreground">
+                Оставьте отзыв после завершения работ
+              </p>
             </div>
           </div>
-        )}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative z-50 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold text-foreground">
@@ -522,284 +282,121 @@ export const JobApplicationsList = ({
         </h3>
       </div>
       
-      {/* Carousel Container */}
-      <div className="relative py-8 px-4 h-[700px]">
-        {/* Cards Stack */}
-        <div className="relative w-full h-full perspective-1000">
-          {applications.map((application, index) => {
-            const isSelected = selectedProId === application.pro_id;
-            const canSelect = jobStatus === 'new' && !selectedProId;
-            
-            // Формируем имя специалиста
-            const profileName = application.profiles?.full_name || 
-              (application.profiles?.first_name && application.profiles?.last_name 
-                ? `${application.profiles.first_name} ${application.profiles.last_name}` 
-                : null);
-            const displayName = profileName || 'Новый специалист';
-            const initials = profileName 
-              ? profileName.split(' ').map(n => n[0]).join('').toUpperCase()
-              : 'НС';
+      {/* Applications List */}
+      <div className="space-y-4">
+        {applications.map((application, index) => {
+          const isSelected = selectedProId === application.pro_id;
+          const canSelect = jobStatus === 'new' && !selectedProId;
+          
+          // Формируем имя специалиста
+          const profileName = application.profiles?.full_name || 
+            (application.profiles?.first_name && application.profiles?.last_name 
+              ? `${application.profiles.first_name} ${application.profiles.last_name}` 
+              : 'Специалист');
 
-            // Calculate card position
-            const offset = index - currentIndex;
-            const isActive = index === currentIndex;
-            const isPrevious = offset < 0;
-            const isNext = offset > 0;
-
-            return (
-              <motion.div
-                key={application.id}
-                className="absolute inset-0 w-full perspective-1000"
-                initial={false}
-                animate={{
-                  zIndex: isPrevious ? 1 : isActive ? 50 : 10 + (5 - Math.abs(offset)),
-                  y: isPrevious ? 30 : isNext ? offset * -20 : 0,
-                  scale: isPrevious ? 0.95 : isActive ? 1 : 1 - (Math.abs(offset) * 0.05),
-                  rotateX: isPrevious ? 5 : isNext ? offset * -2 : 0,
-                  opacity: isPrevious ? 0.5 : isActive ? 1 : Math.max(0.7 - (Math.abs(offset) * 0.2), 0.3)
-                }}
-                transition={{
-                  duration: 0.6,
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
-                style={{
-                  transformStyle: 'preserve-3d'
-                }}
-              >
-                <div 
-                  className={`group relative overflow-hidden rounded-3xl card-3d bg-white ${
-                    isSelected ? 'ring-4 ring-primary ring-opacity-50' : ''
-                  }`}
-                  style={{
-                    transformStyle: 'preserve-3d',
-                    boxShadow: `
-                      0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                      0 15px 35px -5px rgba(0, 0, 0, 0.15),
-                      0 0 0 1px rgba(255, 255, 255, 0.08),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                      inset 0 -1px 0 rgba(0, 0, 0, 0.05)
-                    `
-                  }}
-                >
-                  {/* Gradient Header with enhanced 3D effect */}
-                  <div className="relative h-40 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 overflow-hidden">
-                    {/* Additional depth layer */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                    
-                    {/* Avatar with enhanced shadow */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-white/20 rounded-full blur-sm scale-110"></div>
-                        <Avatar className="relative w-24 h-24 ring-4 ring-white shadow-2xl z-10">
-                          <AvatarImage 
-                            src={application.profiles?.avatar_url || ''} 
-                            alt={displayName}
-                          />
-                          <AvatarFallback className="text-xl font-bold bg-white text-gray-800 shadow-inner">
-                            {initials}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-                    </div>
-                    
-                    {/* Profile link icon */}
-                    <Link
-                      to={`/pro/${application.pro_id}`}
-                      className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
-                    >
-                      <ExternalLink className="h-5 w-5" />
-                    </Link>
-                    
-                    {/* Selected badge */}
-                    {isSelected && (
-                      <div className="absolute top-4 left-4">
-                        <CheckCircle className="w-6 h-6 text-white" />
-                      </div>
-                    )}
-                  </div>
-                
-                  {/* White content area */}
-                  <div className="p-6 space-y-4">
-                    {/* Name and bio */}
-                    <div className="text-center space-y-2">
-                      <h3 className="text-xl font-bold text-gray-900">{displayName}</h3>
-                      <p className="text-sm text-gray-500 uppercase tracking-wide">
-                        {application.proProfile?.bio ? application.proProfile.bio.substring(0, 50) + '...' : 'Специалист'}
-                      </p>
-                    </div>
-                    
-                    {/* Rating */}
-                    <div className="flex items-center justify-center gap-2">
-                      {application.rating && application.rating.rating_count > 0 ? (
-                        <>
-                          <StarRating
-                            rating={application.rating.avg_score}
-                            readonly
-                            size="sm"
-                          />
-                          <span className="text-sm text-gray-500">
-                            ({application.rating.rating_count})
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-sm text-gray-500">Новый специалист</span>
-                      )}
-                    </div>
-                    
-                    {/* Price - prominent display */}
-                    <div className="text-center">
-                      <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        {formatPrice(application.price_cents)}
-                      </div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        {formatDistanceToNow(new Date(application.created_at), { 
-                          addSuffix: true, 
-                          locale: ru 
-                        })}
-                      </div>
-                    </div>
-                    
-                    {/* ETA and warranty */}
-                    <div className="flex justify-center gap-6 text-sm">
-                      {application.eta_slot && (
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4 text-blue-500" />
-                          <span>{application.eta_slot}</span>
+          return (
+            <Card key={application.id} className={`transition-all duration-300 hover:shadow-lg ${
+              isSelected ? 'ring-2 ring-primary bg-primary/5' : ''
+            }`}>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage 
+                      src={application.profiles?.avatar_url || ''} 
+                      alt={profileName} 
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                      {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-lg">{profileName}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary">Специалист</Badge>
+                          {isSelected && (
+                            <Badge variant="default" className="bg-primary text-white">
+                              Выбран
+                            </Badge>
+                          )}
                         </div>
-                      )}
-                      {application.warranty_days && application.warranty_days > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Shield className="w-4 h-4 text-green-500" />
-                          <span>{application.warranty_days} дн.</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Actions */}
-                    <div className="flex gap-2 pt-4">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <User className="w-4 h-4 mr-1" />
-                            Профиль
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
-                              <Avatar className="w-8 h-8">
-                                <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
-                                  {initials}
-                                </AvatarFallback>
-                              </Avatar>
-                              {displayName}
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            {application.rating && (
-                              <div className="flex items-center gap-2">
-                                <StarRating 
-                                  rating={application.rating.avg_score} 
-                                  size="md" 
-                                  showValue 
-                                  showCount 
-                                  count={application.rating.rating_count}
-                                />
-                              </div>
-                            )}
-                            {application.proProfile?.bio && (
-                              <div>
-                                <h4 className="font-medium mb-1">О специалисте</h4>
-                                <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
-                              </div>
-                            )}
-                            <div className="flex justify-center">
-                              <Link to={`/pro/${application.pro_id}`} target="_blank">
-                                <Button variant="outline" size="sm">
-                                  <ExternalLink className="w-4 h-4 mr-1" />
-                                  Полный профиль
-                                </Button>
-                              </Link>
-                            </div>
+                      </div>
+                      {application.price_cents && (
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">
+                            {formatPrice(application.price_cents)}
                           </div>
-                        </DialogContent>
-                      </Dialog>
+                          <div className="text-sm text-muted-foreground">
+                            Предложенная цена
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
+                    {application.note && (
+                      <p className="text-muted-foreground text-sm">
+                        {application.note}
+                      </p>
+                    )}
+
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>
+                        Откликнулся: {new Date(application.created_at).toLocaleDateString('ru-RU')}
+                      </span>
+                      {application.eta_slot && (
+                        <span>ETA: {application.eta_slot}</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open(`/pro/${application.pro_id}`, '_blank')}
+                        >
+                          <User className="w-4 h-4 mr-1" />
+                          Профиль
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open(`/messages?user=${application.pro_id}`, '_blank')}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-1" />
+                          Написать
+                        </Button>
+                      </div>
+                      
                       {canSelect && (
                         <Button
-                          onClick={() => handleSelectApplication(application.id)}
-                          disabled={selecting === application.id}
-                          className="flex-1"
+                          onClick={() => handleSelectProfessional(application.pro_id)}
+                          disabled={selecting === application.pro_id}
+                          className="min-w-[120px]"
                         >
-                          {selecting === application.id ? 'Выбираю...' : 'Выбрать'}
+                          {selecting === application.pro_id ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              Выбираем...
+                            </div>
+                          ) : (
+                            <>
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              Выбрать
+                            </>
+                          )}
                         </Button>
                       )}
                     </div>
-
-                    {isSelected && (
-                      <div className="pt-2">
-                        <Badge variant="default" className="w-full justify-center">
-                          ✓ Выбранный специалист
-                        </Badge>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
-        </div>
-        
-        {/* Navigation Controls */}
-        {applications.length > 1 && (
-          <>
-            {/* Arrow Navigation */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={prevCard}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={nextCard}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </>
-        )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
-      
-      {/* Bottom Navigation */}
-      {applications.length > 1 && (
-        <div className="flex flex-col items-center gap-4">
-          {/* Dots Navigation */}
-          <div className="flex gap-2">
-            {applications.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentIndex 
-                    ? 'bg-primary scale-125' 
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-              />
-            ))}
-          </div>
-          
-          {/* Counter */}
-          <div className="text-sm text-muted-foreground">
-            {currentIndex + 1} из {applications.length}
-          </div>
-        </div>
-      )}
     </div>
   );
-};
+}
