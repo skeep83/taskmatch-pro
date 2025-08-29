@@ -6,14 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { AvatarUpload } from "@/components/AvatarUpload";
 import { 
   User, 
   ArrowLeft, 
   Save,
   Phone,
   MapPin,
-  Globe
+  Globe,
+  Settings,
+  Briefcase
 } from "lucide-react";
 
 interface Profile {
@@ -25,6 +30,14 @@ interface Profile {
   city?: string;
   country?: string;
   locale?: string;
+  avatar_url?: string;
+}
+
+interface ProProfile {
+  bio?: string;
+  radius_km?: number;
+  hourly_rate_cents?: number | '';
+  fixed_price_cents?: number | '';
 }
 
 export default function ProfileSettings() {
@@ -41,8 +54,19 @@ export default function ProfileSettings() {
     phone: '',
     city: '',
     country: '',
-    locale: 'ru'
+    locale: 'ru',
+    avatar_url: ''
   });
+  const [proProfile, setProProfile] = useState<ProProfile>({
+    bio: '',
+    radius_km: 10,
+    hourly_rate_cents: '',
+    fixed_price_cents: ''
+  });
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [showProSettings, setShowProSettings] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -58,6 +82,8 @@ export default function ProfileSettings() {
       }
 
       setUser(user);
+      await loadUserRoles(user.id);
+      await loadCategories();
       await loadProfile(user.id);
     } catch (error: any) {
       console.error('Auth error:', error);
@@ -92,8 +118,14 @@ export default function ProfileSettings() {
           phone: data.phone || '',
           city: data.city || '',
           country: data.country || '',
-          locale: data.locale || 'ru'
+          locale: data.locale || 'ru',
+          avatar_url: data.avatar_url || ''
         });
+      }
+
+      // Load pro profile if user is a pro
+      if (userRoles.includes('pro')) {
+        await loadProProfile(userId);
       }
     } catch (error: any) {
       console.error('Error loading profile:', error);
@@ -105,6 +137,72 @@ export default function ProfileSettings() {
     }
   };
 
+  const loadUserRoles = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      const roles = (data || []).map(r => r.role);
+      setUserRoles(roles);
+      setShowProSettings(roles.includes('pro'));
+    } catch (error: any) {
+      console.error('Error loading user roles:', error);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('service_categories')
+        .select('id, name, name_ro')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error: any) {
+      console.error('Error loading categories:', error);
+    }
+  };
+
+  const loadProProfile = async (userId: string) => {
+    try {
+      // Load pro profile
+      const { data: proData, error: proError } = await supabase
+        .from('pro_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (proError) throw proError;
+
+      if (proData) {
+        setProProfile({
+          bio: proData.bio || '',
+          radius_km: proData.radius_km || 10,
+          hourly_rate_cents: proData.hourly_rate_cents || '',
+          fixed_price_cents: proData.fixed_price_cents || ''
+        });
+      }
+
+      // Load selected categories
+      const { data: catData, error: catError } = await supabase
+        .from('pro_categories')
+        .select('category_id')
+        .eq('user_id', userId);
+
+      if (catError) throw catError;
+
+      setSelectedCategories((catData || []).map(c => c.category_id));
+    } catch (error: any) {
+      console.error('Error loading pro profile:', error);
+    }
+  };
+
   const handleSave = async () => {
     if (!user) return;
     
@@ -113,7 +211,8 @@ export default function ProfileSettings() {
       // Update full_name based on first_name and last_name
       const fullName = `${profile.first_name?.trim() || ''} ${profile.last_name?.trim() || ''}`.trim();
       
-      const { error } = await supabase
+      // Update basic profile
+      const { error: profileError } = await supabase
         .from("profiles")
         .upsert({
           id: user.id,
@@ -126,7 +225,12 @@ export default function ProfileSettings() {
           locale: profile.locale || 'ru'
         });
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Update pro profile if user is a pro
+      if (showProSettings) {
+        await saveProProfile();
+      }
 
       toast({
         title: "Профиль обновлен",
@@ -144,10 +248,87 @@ export default function ProfileSettings() {
     }
   };
 
+  const saveProProfile = async () => {
+    if (!user) return;
+
+    // Upsert pro profile
+    const payload: any = { 
+      user_id: user.id, 
+      bio: proProfile.bio, 
+      radius_km: proProfile.radius_km || 10 
+    };
+    
+    if (proProfile.hourly_rate_cents !== '') {
+      payload.hourly_rate_cents = Number(proProfile.hourly_rate_cents);
+    }
+    
+    if (proProfile.fixed_price_cents !== '') {
+      payload.fixed_price_cents = Number(proProfile.fixed_price_cents);
+    }
+
+    const { error: proError } = await supabase
+      .from('pro_profiles')
+      .upsert(payload, { onConflict: 'user_id' });
+
+    if (proError) throw proError;
+
+    // Sync categories
+    const { data: existing } = await supabase
+      .from('pro_categories')
+      .select('category_id')
+      .eq('user_id', user.id);
+
+    const existingIds = new Set((existing || []).map(x => String(x.category_id)));
+    const toAdd = selectedCategories
+      .filter(id => !existingIds.has(id))
+      .map(id => ({ user_id: user.id, category_id: id }));
+    const toRemove = [...existingIds].filter((id: string) => !selectedCategories.includes(id));
+
+    if (toAdd.length > 0) {
+      const { error } = await supabase
+        .from('pro_categories')
+        .insert(toAdd);
+      
+      if (error) throw error;
+    }
+
+    if (toRemove.length > 0) {
+      const { error } = await supabase
+        .from('pro_categories')
+        .delete()
+        .eq('user_id', user.id)
+        .in('category_id', toRemove);
+      
+      if (error) throw error;
+    }
+  };
+
   const updateProfile = (field: keyof Profile, value: string) => {
     setProfile(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const updateProProfile = (field: keyof ProProfile, value: any) => {
+    setProProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryId) 
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  const handleAvatarUpdate = (url: string | null) => {
+    setProfile(prev => ({
+      ...prev,
+      avatar_url: url || ''
     }));
   };
 
@@ -187,6 +368,20 @@ export default function ProfileSettings() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Profile Form */}
             <div className="lg:col-span-2 space-y-8">
+              {/* Avatar */}
+              <div className="card-surface p-8 text-center">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center justify-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                  Фото профиля
+                </h2>
+                <AvatarUpload
+                  userId={user.id}
+                  currentAvatarUrl={profile.avatar_url}
+                  userName={`${profile.first_name} ${profile.last_name}`.trim()}
+                  onAvatarUpdate={handleAvatarUpdate}
+                />
+              </div>
+
               {/* Basic Information */}
               <div className="card-surface p-8">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
@@ -272,6 +467,88 @@ export default function ProfileSettings() {
                   </div>
                 </div>
               </div>
+
+              {/* Professional Settings */}
+              {showProSettings && (
+                <div className="card-surface p-8">
+                  <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                    <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                    <Briefcase className="w-6 h-6 text-primary" />
+                    Настройки специалиста
+                  </h2>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">О себе</Label>
+                      <Textarea
+                        id="bio"
+                        placeholder="Расскажите о своем опыте и услугах..."
+                        value={proProfile.bio}
+                        onChange={(e) => updateProProfile('bio', e.target.value)}
+                        className="min-h-[120px]"
+                      />
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="radius">Радиус работы (км)</Label>
+                        <Input
+                          id="radius"
+                          type="number"
+                          min="1"
+                          value={proProfile.radius_km}
+                          onChange={(e) => updateProProfile('radius_km', Number(e.target.value))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="hourly">Ставка (¢/час)</Label>
+                        <Input
+                          id="hourly"
+                          type="number"
+                          min="0"
+                          value={proProfile.hourly_rate_cents}
+                          onChange={(e) => updateProProfile('hourly_rate_cents', e.target.value === '' ? '' : Number(e.target.value))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="fixed">Фикс. цена (¢)</Label>
+                        <Input
+                          id="fixed"
+                          type="number"
+                          min="0"
+                          value={proProfile.fixed_price_cents}
+                          onChange={(e) => updateProProfile('fixed_price_cents', e.target.value === '' ? '' : Number(e.target.value))}
+                        />
+                      </div>
+                    </div>
+
+                    {categories.length > 0 && (
+                      <div className="space-y-3">
+                        <Label>Категории услуг</Label>
+                        <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto p-3 border rounded-md">
+                          {categories.map((category) => (
+                            <div key={category.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`category-${category.id}`}
+                                checked={selectedCategories.includes(category.id)}
+                                onCheckedChange={() => toggleCategory(category.id)}
+                              />
+                              <Label 
+                                htmlFor={`category-${category.id}`}
+                                className="text-sm cursor-pointer flex-1"
+                              >
+                                {category.name || category.name_ro}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Save Button */}
               <div className="card-surface p-6">

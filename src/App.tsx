@@ -20,7 +20,7 @@ import DashboardPro from "./pages/DashboardPro";
 import DashboardBusiness from "./pages/DashboardBusiness";
 import Messages from "./pages/Messages";
 import Kyc from "./pages/Kyc";
-import ProProfile from "./pages/ProProfile";
+
 import ProSchedule from "./pages/ProSchedule";
 import ProPortfolio from "./pages/ProPortfolio";
 import TendersList from "./pages/TendersList";
@@ -71,7 +71,7 @@ const AppContent = () => {
           <Route path="/messages/:id" element={<Messages />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
           <Route path="/kyc" element={<Kyc />} />
-          <Route path="/pro/profile" element={<ProProfile />} />
+          <Route path="/pro/profile" element={<Navigate to="/profile/settings" replace />} />
           <Route path="/pro/schedule" element={<ProSchedule />} />
           <Route path="/portfolio" element={<ProPortfolio />} />
           <Route path="/tenders" element={<TendersList />} />
