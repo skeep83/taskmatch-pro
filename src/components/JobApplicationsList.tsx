@@ -388,7 +388,7 @@ export function JobApplicationsList({
                 className="perspective-1000"
               >
                 {/* 3D Card with gradient background like reference */}
-                <div className="card-3d group relative w-full max-w-sm mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
+                <div className="card-3d group relative w-full max-w-xs mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
                   {/* Top gradient section (like in reference) */}
                   <div className="relative h-36 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 overflow-hidden">
                     {/* Decorative gradient overlay */}
