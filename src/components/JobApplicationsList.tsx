@@ -502,16 +502,14 @@ export function JobApplicationsList({
                      {/* Portfolio and Action buttons */}
                      <div className="space-y-3">
                        {/* Portfolio button */}
-                       {application.portfolio && application.portfolio.length > 0 && (
-                         <Button
-                           onClick={() => window.open(`/pro-portfolio/${application.pro_id}`, '_blank')}
-                           variant="outline"
-                           className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
-                         >
-                           <Eye className="w-4 h-4 mr-2" />
-                           Портфолио ({application.portfolio.length})
-                         </Button>
-                       )}
+                       <Button
+                         onClick={() => window.open(`/pro-portfolio/${application.pro_id}`, '_blank')}
+                         variant="outline"
+                         className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
+                       >
+                         <Eye className="w-4 h-4 mr-2" />
+                         Портфолио
+                       </Button>
                        
                        {/* Action button */}
                        {canSelect && (
