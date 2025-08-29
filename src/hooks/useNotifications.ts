@@ -38,7 +38,13 @@ export const useNotifications = () => {
       if (error) throw error;
 
       setNotifications(data || []);
-      setUnreadCount(data?.filter(n => !n.is_read).length || 0);
+      const newUnreadCount = data?.filter(n => !n.is_read).length || 0;
+      console.log('📧 Fetched notifications:', {
+        total: data?.length || 0,
+        unread: newUnreadCount,
+        notifications: data?.map(n => ({ id: n.id, type: n.type, title: n.title, is_read: n.is_read }))
+      });
+      setUnreadCount(newUnreadCount);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       toast({

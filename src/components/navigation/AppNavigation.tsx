@@ -44,6 +44,8 @@ export const AppNavigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { unreadCount } = useNotifications();
 
+  console.log('🔔 AppNavigation unreadCount:', unreadCount);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const isAuth = !!session?.user;

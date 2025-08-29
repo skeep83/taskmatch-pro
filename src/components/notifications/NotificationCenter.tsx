@@ -18,6 +18,13 @@ export const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showSoundSettings, setShowSoundSettings] = useState(false);
 
+  console.log('🔔 NotificationCenter render:', { 
+    unreadCount, 
+    notificationsLength: notifications.length, 
+    loading,
+    hasUnread: notifications.some(n => !n.is_read)
+  });
+
   const handleNotificationClick = (notification: any) => {
     if (!notification.is_read) {
       markAsRead(notification.id);
