@@ -364,9 +364,9 @@ export function JobApplicationsList({
         </h3>
       </div>
       
-      {/* Applications List - 3D Cards */}
-      <div className="flex flex-wrap gap-8 justify-center">
-        <AnimatePresence>
+      {/* Card Deck Container */}
+      <div className="relative w-full max-w-md mx-auto h-[600px]">
+        <AnimatePresence mode="wait">
           {applications.map((application, index) => {
             const isSelected = selectedProId === application.pro_id;
             const canSelect = jobStatus === 'new' && !selectedProId;
@@ -377,25 +377,23 @@ export function JobApplicationsList({
                 ? `${application.profiles.first_name} ${application.profiles.last_name}` 
                 : 'Специалист');
 
+            // Only show current card
+            if (index !== currentIndex) return null;
+
             return (
               <motion.div
                 key={application.id}
-                initial={{ opacity: 0, y: 30, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -30, scale: 0.8 }}
+                initial={{ opacity: 0, x: 100, rotateY: 15 }}
+                animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                exit={{ opacity: 0, x: -100, rotateY: -15 }}
                 transition={{ 
-                  duration: 0.6, 
-                  delay: index * 0.1,
+                  duration: 0.4, 
                   ease: [0.4, 0, 0.2, 1]
                 }}
-                whileHover={{ 
-                  y: -12,
-                  transition: { duration: 0.3, ease: "easeOut" }
-                }}
-                className="perspective-1000"
+                className="absolute inset-0 perspective-1000"
               >
                 {/* 3D Card with gradient background like reference */}
-                <div className="card-3d group relative w-full max-w-xs mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
+                <div className="card-3d group relative w-full h-full bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
                   {/* Top gradient section */}
                   <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600">
                     {/* Decorative gradient overlay */}
@@ -541,6 +539,43 @@ export function JobApplicationsList({
             );
           })}
         </AnimatePresence>
+        
+        {/* Navigation */}
+        {applications.length > 1 && (
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentIndex((prev) => (prev - 1 + applications.length) % applications.length)}
+              className="w-10 h-10 rounded-full p-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            
+            <div className="flex gap-2">
+              {applications.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                    index === currentIndex 
+                      ? 'bg-primary scale-125' 
+                      : 'bg-muted hover:bg-muted-foreground/20'
+                  }`}
+                />
+              ))}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentIndex((prev) => (prev + 1) % applications.length)}
+              className="w-10 h-10 rounded-full p-0"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Portfolio Modal */}
