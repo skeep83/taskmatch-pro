@@ -685,13 +685,14 @@ const JobDetail = () => {
                   <Dialog open={showPriceProposal} onOpenChange={setShowPriceProposal}>
                     <DialogTrigger asChild>
                       <Button 
-                        className="btn-hero h-14 text-lg font-semibold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                        size="lg"
+                        className="h-14 text-lg font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
                       >
                         <DollarSign className="w-5 h-5" />
                         Предложить цену
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                       <PriceProposalForm
                         jobId={job.id}
                         jobTitle={job.title}
@@ -709,14 +710,15 @@ const JobDetail = () => {
                   <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
                     <DialogTrigger asChild>
                       <Button 
+                        size="lg"
                         variant="outline"
-                        className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-lg"
+                        className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
                       >
                         <User className="w-5 h-5" />
                         Откликнуться
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                       <JobResponseForm
                         jobId={job.id}
                         jobTitle={job.title}
