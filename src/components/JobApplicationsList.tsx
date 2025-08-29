@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Button } from '@/components/ui/button';
@@ -8,8 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
-import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink, Image, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink, Image, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
@@ -69,6 +69,7 @@ export const JobApplicationsList = ({
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
 
@@ -418,6 +419,15 @@ export const JobApplicationsList = ({
     );
   };
 
+  // Carousel navigation functions
+  const nextCard = () => {
+    setCurrentIndex((prev) => (prev + 1) % applications.length);
+  };
+
+  const prevCard = () => {
+    setCurrentIndex((prev) => (prev - 1 + applications.length) % applications.length);
+  };
+
   if (loading) {
     return <div className="text-center py-8">Загрузка откликов...</div>;
   }
@@ -438,9 +448,34 @@ export const JobApplicationsList = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4">
-        Отклики специалистов ({applications.length})
-      </h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold">
+          Отклики специалистов ({applications.length})
+        </h3>
+        {applications.length > 1 && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={prevCard}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-muted-foreground px-2">
+              {currentIndex + 1} / {applications.length}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={nextCard}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
       
       {applications.length === 1 ? (
         // Для одного отклика показываем как обычно
@@ -688,10 +723,14 @@ export const JobApplicationsList = ({
         );
         })
       ) : (
-        // Для нескольких откликов используем карусель
-        <Carousel className="w-full">
-          <CarouselContent className="-ml-4">
-            {applications.map((application) => {
+        // Для нескольких откликов используем вертикальную круговую карусель
+        <div className="relative w-full h-[600px] overflow-hidden">
+          <AnimatePresence mode="wait">
+            {applications.map((application, index) => {
+              const isActive = index === currentIndex;
+              const isNext = index === (currentIndex + 1) % applications.length;
+              const isPrev = index === (currentIndex - 1 + applications.length) % applications.length;
+              
               const isSelected = selectedProId === application.pro_id;
               const canSelect = jobStatus === 'new' && !selectedProId;
               
@@ -704,10 +743,67 @@ export const JobApplicationsList = ({
               const initials = profileName 
                 ? profileName.split(' ').map(n => n[0]).join('').toUpperCase()
                 : 'НС';
+
+              // Определяем позицию и анимацию для каждой карты
+              let y = 0;
+              let scale = 0.8;
+              let opacity = 0.3;
+              let zIndex = 1;
+              let rotateY = 0;
+
+              if (isActive) {
+                y = 0;
+                scale = 1;
+                opacity = 1;
+                zIndex = 10;
+                rotateY = 0;
+              } else if (isNext) {
+                y = 50;
+                scale = 0.9;
+                opacity = 0.7;
+                zIndex = 5;
+                rotateY = -5;
+              } else if (isPrev) {
+                y = -50;
+                scale = 0.9;
+                opacity = 0.7;
+                zIndex = 5;
+                rotateY = 5;
+              } else {
+                y = index < currentIndex ? -100 : 100;
+                scale = 0.8;
+                opacity = 0.3;
+                zIndex = 1;
+                rotateY = index < currentIndex ? 10 : -10;
+              }
               
               return (
-                <CarouselItem key={application.id} className="pl-4 basis-full lg:basis-4/5">
-                  <Card className={`transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
+                <motion.div
+                  key={application.id}
+                  className={`absolute inset-0 flex items-center justify-center w-full max-w-2xl ${!isActive ? 'cursor-pointer' : ''}`}
+                  initial={{ y: 100, scale: 0.8, opacity: 0 }}
+                  animate={{ 
+                    y, 
+                    scale, 
+                    opacity,
+                    rotateY,
+                    transition: { 
+                      type: "spring", 
+                      stiffness: 300, 
+                      damping: 30,
+                      duration: 0.5
+                    }
+                  }}
+                  exit={{ 
+                    y: -100, 
+                    scale: 0.8, 
+                    opacity: 0,
+                    transition: { duration: 0.3 }
+                  }}
+                  style={{ zIndex }}
+                  onClick={isActive ? undefined : nextCard}
+                >
+                  <Card className={`w-full transition-all shadow-lg ${isSelected ? 'ring-2 ring-primary' : ''} ${isActive ? 'shadow-2xl' : 'shadow-md'}`}>
                     <CardHeader className="pb-3">
                       <div className="flex items-start gap-3">
                         <Avatar className="w-12 h-12 flex-shrink-0">
@@ -769,140 +865,152 @@ export const JobApplicationsList = ({
                       </div>
                     </CardHeader>
 
-                    <CardContent className="pt-0 space-y-3">
-                      {/* Note */}
-                      {application.note && (
-                        <div className="p-3 bg-muted rounded-lg">
-                          <p className="text-sm font-medium mb-1">Комментарий к отклику:</p>
-                          <p className="text-sm">{application.note}</p>
-                        </div>
-                      )}
-
-                      {/* Portfolio */}
-                      {application.portfolio && application.portfolio.length > 0 && (
-                        <div>
-                          <p className="text-sm font-medium mb-2">Портфолио:</p>
-                          {application.portfolio.map((item) => {
-                            const mediaItems = item.portfolio_media && item.portfolio_media.length > 0 
-                              ? item.portfolio_media.sort((a, b) => a.display_order - b.display_order)
-                              : [{ file_url: item.image_url, file_type: 'image', display_order: 0 }];
-                            
-                            return (
-                              <PortfolioCarousel 
-                                key={item.id}
-                                media={mediaItems}
-                                title={item.title || `Работы ${displayName}`}
-                              />
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* Bio */}
-                      {application.proProfile?.bio && (
-                        <div>
-                          <p className="text-sm font-medium mb-1">О специалисте:</p>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {application.proProfile.bio}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Actions */}
-                      <div className="flex gap-2 pt-2">
-                        {/* Profile Dialog */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" className="flex-1">
-                              <User className="w-4 h-4 mr-1" />
-                              Профиль
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Профиль специалиста</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-3">
-                                <Avatar className="w-16 h-16">
-                                  <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
-                                    {initials}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <h3 className="text-lg font-semibold">{displayName}</h3>
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant="secondary">Специалист</Badge>
-                                    {application.rating && application.rating.rating_count > 0 ? (
-                                      <div className="flex items-center gap-1">
-                                        <StarRating rating={application.rating.avg_score} size="sm" readonly />
-                                        <span className="text-sm text-muted-foreground">
-                                          ({application.rating.rating_count} отзывов)
-                                        </span>
-                                      </div>
-                                    ) : (
-                                      <span className="text-sm text-muted-foreground">Новый специалист</span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {application.proProfile?.bio && (
-                                <div>
-                                  <h4 className="font-medium mb-2">О специалисте</h4>
-                                  <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
-                                </div>
-                              )}
-                              
-                              {/* Service Info */}
-                              <div className="grid grid-cols-2 gap-4 text-sm">
-                                {application.proProfile?.radius_km && (
-                                  <div>
-                                    <span className="font-medium">Радиус работы:</span>
-                                    <span className="ml-1">{application.proProfile.radius_km} км</span>
-                                  </div>
-                                )}
-                                {application.proProfile?.hourly_rate_cents && (
-                                  <div>
-                                    <span className="font-medium">Почасовая ставка:</span>
-                                    <span className="ml-1">{formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
-                                  </div>
-                                )}
-                              </div>
-                              
-                              <div className="flex gap-2">
-                                <Button asChild variant="outline" className="flex-1">
-                                  <Link to={`/pro/${application.pro_id}`}>
-                                    <ExternalLink className="w-4 h-4 mr-1" />
-                                    Полный профиль
-                                  </Link>
-                                </Button>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-
-                        {/* Select Button */}
-                        {canSelect && (
-                          <Button 
-                            onClick={() => handleSelectApplication(application.id)}
-                            disabled={selecting === application.id}
-                            className="flex-1"
-                          >
-                            {selecting === application.id ? 'Выбираем...' : 'Выбрать'}
-                          </Button>
+                    {isActive && (
+                      <CardContent className="pt-0 space-y-3">
+                        {/* Note */}
+                        {application.note && (
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-sm font-medium mb-1">Комментарий к отклику:</p>
+                            <p className="text-sm">{application.note}</p>
+                          </div>
                         )}
-                      </div>
-                    </CardContent>
+
+                        {/* Portfolio */}
+                        {application.portfolio && application.portfolio.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Портфолио:</p>
+                            {application.portfolio.map((item) => {
+                              const mediaItems = item.portfolio_media && item.portfolio_media.length > 0 
+                                ? item.portfolio_media.sort((a, b) => a.display_order - b.display_order)
+                                : [{ file_url: item.image_url, file_type: 'image', display_order: 0 }];
+                              
+                              return (
+                                <PortfolioCarousel 
+                                  key={item.id}
+                                  media={mediaItems}
+                                  title={item.title || `Работы ${displayName}`}
+                                />
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Bio */}
+                        {application.proProfile?.bio && (
+                          <div>
+                            <p className="text-sm font-medium mb-1">О специалисте:</p>
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {application.proProfile.bio}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex gap-2 pt-2">
+                          {/* Profile Dialog */}
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" className="flex-1">
+                                <User className="w-4 h-4 mr-1" />
+                                Профиль
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Профиль специалиста</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                  <Avatar className="w-16 h-16">
+                                    <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
+                                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                                      {initials}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <h3 className="text-lg font-semibold">{displayName}</h3>
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant="secondary">Специалист</Badge>
+                                      {application.rating && application.rating.rating_count > 0 ? (
+                                        <div className="flex items-center gap-1">
+                                          <StarRating rating={application.rating.avg_score} size="sm" readonly />
+                                          <span className="text-sm text-muted-foreground">
+                                            ({application.rating.rating_count} отзывов)
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <span className="text-sm text-muted-foreground">Новый специалист</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {application.proProfile?.bio && (
+                                  <div>
+                                    <h4 className="font-medium mb-2">О специалисте</h4>
+                                    <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
+                                  </div>
+                                )}
+                                
+                                {/* Service Info */}
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                  {application.proProfile?.radius_km && (
+                                    <div>
+                                      <span className="font-medium">Радиус работы:</span>
+                                      <span className="ml-1">{application.proProfile.radius_km} км</span>
+                                    </div>
+                                  )}
+                                  {application.proProfile?.hourly_rate_cents && (
+                                    <div>
+                                      <span className="font-medium">Почасовая ставка:</span>
+                                      <span className="ml-1">{formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                  <Button asChild variant="outline" className="flex-1">
+                                    <Link to={`/pro/${application.pro_id}`}>
+                                      <ExternalLink className="w-4 h-4 mr-1" />
+                                      Полный профиль
+                                    </Link>
+                                  </Button>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+
+                          {/* Select Button */}
+                          {canSelect && (
+                            <Button 
+                              onClick={() => handleSelectApplication(application.id)}
+                              disabled={selecting === application.id}
+                              className="flex-1"
+                            >
+                              {selecting === application.id ? 'Выбираем...' : 'Выбрать'}
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    )}
                   </Card>
-                </CarouselItem>
+                </motion.div>
               );
             })}
-          </CarouselContent>
-          <CarouselPrevious className="hidden lg:flex" />
-          <CarouselNext className="hidden lg:flex" />
-        </Carousel>
+          </AnimatePresence>
+
+          {/* Центральная кнопка для переключения */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={nextCard}
+              className="rounded-full bg-background/80 backdrop-blur-sm border-2 h-10 w-10 p-0"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );
