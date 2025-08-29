@@ -18,16 +18,6 @@ interface JobApplication {
   warranty_days?: number;
   created_at: string;
   pro_id: string;
-  profiles: {
-    first_name: string;
-    last_name: string;
-    avatar_url?: string;
-    city?: string;
-  };
-  pro_rating_stats?: {
-    avg_score: number;
-    rating_count: number;
-  };
 }
 
 interface JobApplicationsListProps {
@@ -57,9 +47,7 @@ export const JobApplicationsList = ({
       const { data, error } = await supabase
         .from('job_applications')
         .select(`
-          *,
-          profiles!pro_id(first_name, last_name, avatar_url, city),
-          pro_rating_stats!pro_id(avg_score, rating_count)
+          *
         `)
         .eq('job_id', jobId)
         .order('created_at', { ascending: false });
@@ -132,7 +120,6 @@ export const JobApplicationsList = ({
       </h3>
       
       {applications.map((application) => {
-        const proName = `${application.profiles.first_name} ${application.profiles.last_name}`.trim();
         const isSelected = selectedProId === application.pro_id;
         const canSelect = jobStatus === 'new' && !selectedProId;
         
@@ -142,32 +129,15 @@ export const JobApplicationsList = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="w-12 h-12">
-                    <AvatarImage src={application.profiles.avatar_url} />
-                    <AvatarFallback>
-                      {proName.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
+                    <AvatarFallback>Про</AvatarFallback>
                   </Avatar>
                   <div>
                     <h4 className="font-semibold flex items-center gap-2">
-                      {proName}
+                      Специалист
                       {isSelected && <CheckCircle className="w-4 h-4 text-green-500" />}
                     </h4>
                     <div className="flex items-center gap-2">
-                      {application.pro_rating_stats ? (
-                        <div className="flex items-center gap-1">
-                          <StarRating rating={application.pro_rating_stats.avg_score} size="sm" />
-                          <span className="text-sm text-muted-foreground">
-                            ({application.pro_rating_stats.rating_count})
-                          </span>
-                        </div>
-                      ) : (
-                        <Badge variant="secondary">Новый специалист</Badge>
-                      )}
-                      {application.profiles.city && (
-                        <span className="text-sm text-muted-foreground">
-                          • {application.profiles.city}
-                        </span>
-                      )}
+                      <Badge variant="secondary">Новый специалист</Badge>
                     </div>
                   </div>
                 </div>
