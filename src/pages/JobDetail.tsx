@@ -789,26 +789,26 @@ const JobDetail = () => {
 
                         {assignedPro.portfolio && assignedPro.portfolio.length > 0 && (
                           <div className="mt-3">
-                            <p className="text-sm font-medium text-muted-foreground mb-2">Примеры работ:</p>
-                            <div className="flex gap-2">
+                            <p className="text-sm font-medium text-muted-foreground mb-3">Примеры работ:</p>
+                            <div className="flex gap-3">
                               {assignedPro.portfolio.slice(0, 3).map((item: any) => {
                                 const firstMedia = item.portfolio_media?.[0];
                                 if (!firstMedia) return null;
                                 
                                 const imageUrl = firstMedia.file_url;
                                 return (
-                                  <div key={item.id} className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
+                                  <div key={item.id} className="w-20 h-20 rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                                     <img
                                       src={imageUrl}
                                       alt={item.title}
-                                      className="w-full h-full object-cover"
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                                     />
                                   </div>
                                 );
                               })}
                               {assignedPro.portfolio.length > 3 && (
-                                <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
-                                  <span className="text-xs text-muted-foreground font-medium">
+                                <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center shadow-sm">
+                                  <span className="text-sm text-muted-foreground font-medium">
                                     +{assignedPro.portfolio.length - 3}
                                   </span>
                                 </div>
