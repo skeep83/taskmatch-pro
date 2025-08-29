@@ -80,7 +80,6 @@ const JobDetail = () => {
   };
 
   const fetchJob = async () => {
-    console.log('Fetching job with ID:', jobId);
     try {
       const { data, error } = await supabase
         .from('jobs')
@@ -91,23 +90,11 @@ const JobDetail = () => {
         .eq('id', jobId)
         .single();
 
-      console.log('Job query result:', { data, error });
-
-      if (error) {
-        console.error('Supabase error details:', error);
-        throw error;
-      }
+      if (error) throw error;
       
-      console.log('Job loaded successfully:', data);
       setJob(data);
     } catch (error: any) {
       console.error('Error fetching job:', error);
-      console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      });
       toast({
         title: 'Ошибка',
         description: `Не удалось загрузить заказ: ${error.message}`,
