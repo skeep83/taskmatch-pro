@@ -503,7 +503,7 @@ export function JobApplicationsList({
                      <div className="space-y-3">
                        {/* Portfolio button */}
                        <Button
-                         onClick={() => window.open(`/pro-portfolio/${application.pro_id}`, '_blank')}
+                         onClick={() => window.open(`/pro/${application.pro_id}`, '_blank')}
                          variant="outline"
                          className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
                        >
