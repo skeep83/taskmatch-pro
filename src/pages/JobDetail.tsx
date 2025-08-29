@@ -928,7 +928,7 @@ const JobDetail = () => {
                               rating={rating}
                               readonly={false}
                               size="lg"
-                              className="justify-center [&>*]:transition-all [&>*]:duration-300 [&>*]:hover:drop-shadow-lg [&>*]:hover:brightness-125"
+                              className="justify-center [&>*]:transition-all [&>*]:duration-300 [&>*]:hover:drop-shadow-lg [&>*]:hover:brightness-125 [&>svg]:w-12 [&>svg]:h-12"
                               onRatingChange={setRating}
                             />
                           </div>
