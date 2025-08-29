@@ -114,15 +114,11 @@ export default function DashboardClient() {
   const loadUserData = async () => {
     try {
       // Load user profile
-      console.log('Loading profile for user:', user.id);
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("first_name, last_name, full_name")
         .eq("id", user.id)
         .single();
-      
-      console.log('Profile data loaded:', profileData);
-      console.log('Profile error:', profileError);
       
       setUserProfile(profileData);
 
@@ -281,15 +277,12 @@ export default function DashboardClient() {
             Кабинет клиента
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Добро пожаловать, {(() => {
-              console.log('User profile in render:', userProfile);
-              const displayName = userProfile?.full_name || 
-                (userProfile?.first_name && userProfile?.last_name 
-                  ? `${userProfile.first_name} ${userProfile.last_name}` 
-                  : user?.email);
-              console.log('Display name:', displayName);
-              return displayName;
-            })()}
+            Добро пожаловать, {
+              userProfile?.full_name || 
+              (userProfile?.first_name && userProfile?.last_name 
+                ? `${userProfile.first_name} ${userProfile.last_name}` 
+                : user?.email)
+            }
           </p>
         </div>
 
