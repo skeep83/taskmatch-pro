@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useCurrency } from '@/hooks/useCurrency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -68,6 +69,7 @@ export const JobApplicationsList = ({
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState<string | null>(null);
   const { toast } = useToast();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     fetchApplications();
@@ -486,7 +488,7 @@ export const JobApplicationsList = ({
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-primary">
-                    {Math.round(application.price_cents / 100)} ₽
+                    {formatPrice(application.price_cents)}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {formatDistanceToNow(new Date(application.created_at), { 
@@ -585,13 +587,13 @@ export const JobApplicationsList = ({
                           <div>
                             <h4 className="font-medium mb-1">Тарифы</h4>
                             <div className="text-sm text-muted-foreground">
-                              {application.proProfile.hourly_rate_cents && (
-                                <span>Почасовая: {Math.round(application.proProfile.hourly_rate_cents / 100)} ₽/час</span>
-                              )}
+                               {application.proProfile.hourly_rate_cents && (
+                                 <span>Почасовая: {formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
+                               )}
                               {application.proProfile.hourly_rate_cents && application.proProfile.fixed_price_cents && ' • '}
-                              {application.proProfile.fixed_price_cents && (
-                                <span>Фиксированная: {Math.round(application.proProfile.fixed_price_cents / 100)} ₽</span>
-                              )}
+                               {application.proProfile.fixed_price_cents && (
+                                 <span>Фиксированная: {formatPrice(application.proProfile.fixed_price_cents)}</span>
+                               )}
                             </div>
                           </div>
                         )}

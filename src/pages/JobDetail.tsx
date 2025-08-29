@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useCurrency } from '@/hooks/useCurrency';
 import { Seo } from '@/components/Seo';
 import { JobApplicationsList } from '@/components/JobApplicationsList';
 import { JobResponseForm } from '@/components/JobResponseForm';
@@ -65,6 +66,7 @@ const JobDetail = () => {
   const [clientProfile, setClientProfile] = useState<any>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [jobApplications, setJobApplications] = useState<any[]>([]);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     if (jobId) {
@@ -389,8 +391,13 @@ const JobDetail = () => {
                       <span className="font-semibold text-lg">Бюджет</span>
                     </div>
                     <p className="text-2xl font-bold text-success">
-                      {job.budget_min_cents ? `от ${Math.round(job.budget_min_cents / 100)}₽` : ''}
-                      {job.budget_max_cents ? ` до ${Math.round(job.budget_max_cents / 100)}₽` : ''}
+                      {job.budget_min_cents && job.budget_max_cents
+                        ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
+                        : job.budget_min_cents
+                        ? `от ${formatPrice(job.budget_min_cents)}`
+                        : job.budget_max_cents
+                        ? `до ${formatPrice(job.budget_max_cents)}`
+                        : 'Договорная'}
                     </p>
                   </div>
                 )}

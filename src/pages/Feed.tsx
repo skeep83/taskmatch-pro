@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
@@ -12,6 +13,7 @@ import feedImage from "@/assets/feed-jobs.jpg";
 export default function Feed() {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
+  const { formatPrice } = useCurrency();
   const [jobs, setJobs] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -182,7 +184,13 @@ export default function Feed() {
                     <div className="flex items-center gap-2">
                       <Euro className="w-4 h-4 text-green-500" />
                       <span className="text-sm">
-                        {(job.budget_min_cents / 100).toFixed(0)}-{(job.budget_max_cents / 100).toFixed(0)} ₽
+                        {job.budget_min_cents && job.budget_max_cents
+                          ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
+                          : job.budget_min_cents
+                          ? `от ${formatPrice(job.budget_min_cents)}`
+                          : job.budget_max_cents
+                          ? `до ${formatPrice(job.budget_max_cents)}`
+                          : 'Договорная'}
                       </span>
                     </div>
                   )}

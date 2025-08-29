@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useCurrency } from '@/hooks/useCurrency';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +31,7 @@ export const JobResponseForm = ({
     warrantyDays: '7'
   });
   const [loading, setLoading] = useState(false);
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
 
   const budgetMin = budgetMinCents ? Math.round(budgetMinCents / 100) : null;
@@ -124,7 +126,7 @@ export const JobResponseForm = ({
               type="number"
               min="1"
               step="1"
-              placeholder="Введите цену в рублях"
+              placeholder="Введите цену"
               value={formData.price}
               onChange={(e) => handleInputChange('price', e.target.value)}
               required

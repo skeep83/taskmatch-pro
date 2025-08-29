@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { StarRating } from "@/components/ui/star-rating";
 import { MediaViewer } from "@/components/media";
+import { useCurrency } from "@/hooks/useCurrency";
 
 const ProPublic = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ const ProPublic = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [rating, setRating] = useState<{ avg_score: number; rating_count: number }>({ avg_score: 0, rating_count: 0 });
   const [portfolio, setPortfolio] = useState<any[]>([]);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     (async () => {
@@ -117,7 +119,7 @@ const ProPublic = () => {
                     count={rating.rating_count}
                   />
                 </div>
-                <p className="text-sm mt-2">Ставки: {profile.hourly_rate_cents ? `${Math.round(profile.hourly_rate_cents/100)} ₽/ч` : 'по договоренности'}{profile.fixed_price_cents ? ` • фикс. ${Math.round(profile.fixed_price_cents/100)} ₽` : ''}</p>
+                <p className="text-sm mt-2">Ставки: {profile.hourly_rate_cents ? `${formatPrice(profile.hourly_rate_cents)}/ч` : 'по договоренности'}{profile.fixed_price_cents ? ` • фикс. ${formatPrice(profile.fixed_price_cents)}` : ''}</p>
                 <p className="text-sm mt-4 whitespace-pre-wrap">{profile.bio || 'Описание отсутствует'}</p>
               </div>
             </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
 import { Link } from "react-router-dom";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
@@ -15,6 +16,7 @@ const TendersList = () => {
   const { toast } = useToast();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     (async () => {
@@ -155,7 +157,7 @@ const TendersList = () => {
                           <div className="flex items-center gap-2">
                             <Euro className="w-4 h-4 text-green-500" />
                             <span className="text-sm">
-                              Бюджет до {(tender.budget_max_cents / 100).toLocaleString()} ₽
+                              Бюджет до {formatPrice(tender.budget_max_cents)}
                             </span>
                           </div>
                         )}

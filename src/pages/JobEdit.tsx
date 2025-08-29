@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useCurrency } from '@/hooks/useCurrency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ const JobEdit = () => {
   const { toast } = useToast();
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
+  const { formatPrice } = useCurrency();
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -386,7 +388,7 @@ const JobEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Бюджет от (₽)</label>
+                  <label className="block text-sm font-medium mb-2">Бюджет от</label>
                   <input
                     name="budget_min"
                     type="number"
@@ -397,7 +399,7 @@ const JobEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Бюджет до (₽)</label>
+                  <label className="block text-sm font-medium mb-2">Бюджет до</label>
                   <input
                     name="budget_max"
                     type="number"

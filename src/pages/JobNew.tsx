@@ -313,7 +313,7 @@ const JobNew = () => {
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2">
                           <Euro className="w-4 h-4 text-green-500" />
-                          Бюджет от (₽)
+                          Бюджет от
                         </label>
                         <input 
                           name="budget_min" 
@@ -323,7 +323,7 @@ const JobNew = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3">до (₽)</label>
+                        <label className="block text-sm font-medium mb-3">до</label>
                         <input 
                           name="budget_max" 
                           type="number" 

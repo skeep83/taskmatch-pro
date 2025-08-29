@@ -614,7 +614,7 @@ export default function DashboardClient() {
                         <Shield className="h-6 w-6 text-primary" />
                         <h3 className="text-lg font-semibold">Basic</h3>
                       </div>
-                      <div className="text-2xl font-bold mb-2">₽99 <span className="text-sm font-normal">/мес</span></div>
+                      <div className="text-2xl font-bold mb-2">99 <span className="text-sm font-normal">/мес</span></div>
                       <ul className="space-y-2 text-sm">
                         <li>• Приоритетная поддержка</li>
                         <li>• Скидка 5% на заказы</li>
@@ -628,7 +628,7 @@ export default function DashboardClient() {
                         <h3 className="text-lg font-semibold">Plus</h3>
                         <Badge>Популярный</Badge>
                       </div>
-                      <div className="text-2xl font-bold mb-2">₽199 <span className="text-sm font-normal">/мес</span></div>
+                      <div className="text-2xl font-bold mb-2">199 <span className="text-sm font-normal">/мес</span></div>
                       <ul className="space-y-2 text-sm mb-4">
                         <li>• Все из Basic</li>
                         <li>• Скидка 10% на заказы</li>
@@ -643,7 +643,7 @@ export default function DashboardClient() {
                         <Zap className="h-6 w-6 text-primary" />
                         <h3 className="text-lg font-semibold">Max</h3>
                       </div>
-                      <div className="text-2xl font-bold mb-2">₽399 <span className="text-sm font-normal">/мес</span></div>
+                      <div className="text-2xl font-bold mb-2">399 <span className="text-sm font-normal">/мес</span></div>
                       <ul className="space-y-2 text-sm">
                         <li>• Все из Plus</li>
                         <li>• Скидка 15% на заказы</li>
@@ -691,7 +691,7 @@ export default function DashboardClient() {
                       </div>
                       <div className="flex justify-between">
                         <span>Заработано:</span>
-                        <span className="font-semibold">₽0</span>
+                        <span className="font-semibold">0</span>
                       </div>
                     </div>
                   </div>
