@@ -336,6 +336,20 @@ const JobDetail = () => {
 
       if (error) throw error;
 
+      // Send notification to client
+      await supabase.functions.invoke('notifications-send', {
+        body: {
+          user_id: job.client_id,
+          type: 'job_update',
+          title: 'Работа начата',
+          title_ro: 'Lucrul a început',
+          message: `Специалист начал выполнение работы: ${job.title}`,
+          message_ro: `Specialistul a început să lucreze: ${job.title}`,
+          data: { job_id: job.id, status: 'in_progress' },
+          channels: ['push']
+        }
+      });
+
       toast({
         title: 'Работа начата',
         description: 'Статус заказа изменен на "В работе"'
@@ -372,6 +386,20 @@ const JobDetail = () => {
         .eq('id', jobId);
 
       if (error) throw error;
+
+      // Send notification to client
+      await supabase.functions.invoke('notifications-send', {
+        body: {
+          user_id: job.client_id,
+          type: 'job_update',
+          title: 'Работа завершена',
+          title_ro: 'Lucrul este terminat',
+          message: `Специалист завершил работу: ${job.title}`,
+          message_ro: `Specialistul a terminat lucrul: ${job.title}`,
+          data: { job_id: job.id, status: 'done' },
+          channels: ['push']
+        }
+      });
 
       toast({
         title: 'Работа завершена',
