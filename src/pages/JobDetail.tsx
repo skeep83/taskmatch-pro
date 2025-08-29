@@ -19,7 +19,8 @@ import {
   MessageSquare,
   Star,
   Edit,
-  Trash2
+  Trash2,
+  ZoomIn
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -295,20 +296,31 @@ const JobDetail = () => {
 
               {/* Job Photos */}
               {jobPhotos.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-2">Фотографии заказа</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                     {jobPhotos.map((photo, index) => (
-                       <div key={photo.id} className="aspect-square rounded-lg overflow-hidden">
-                         <OptimizedImage
-                           src={photo.file_url}
-                           alt={`Фото заказа ${index + 1}`}
-                           bucket="evidence"
-                           className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
-                           enableZoom={true}
-                         />
-                       </div>
-                     ))}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                    <div className="w-1 h-6 bg-primary rounded-full"></div>
+                    Фотографии заказа
+                    <Badge variant="secondary" className="ml-2">{jobPhotos.length}</Badge>
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {jobPhotos.map((photo, index) => (
+                      <div key={photo.id} className="group relative">
+                        <div className="aspect-square rounded-lg overflow-hidden border border-border/50 bg-muted/30 hover:border-primary/50 transition-colors">
+                          <OptimizedImage
+                            src={photo.file_url}
+                            alt={`Фото заказа ${index + 1}`}
+                            bucket="evidence"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            enableZoom={true}
+                          />
+                        </div>
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
+                            <ZoomIn className="w-4 h-4 text-gray-700" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
