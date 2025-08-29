@@ -543,51 +543,51 @@ export function JobApplicationsList({
             );
           })}
         </AnimatePresence>
-        
-        {/* Navigation - Always show if there are applications */}
-        {applications.length > 0 && (
-          <div className="flex items-center justify-center gap-4 mt-8 p-4 bg-muted/50 rounded-xl">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentIndex((prev) => (prev - 1 + applications.length) % applications.length)}
-              className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
-              disabled={applications.length <= 1}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
-            
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-muted-foreground">
-                {currentIndex + 1} из {applications.length}
-              </span>
-              <div className="flex gap-2">
-                {applications.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentIndex(index)}
-                    className={`w-4 h-4 rounded-full transition-all duration-300 border-2 ${
-                      index === currentIndex 
-                        ? 'bg-primary border-primary scale-125 shadow-lg' 
-                        : 'bg-transparent border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/20'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentIndex((prev) => (prev + 1) % applications.length)}
-              className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
-              disabled={applications.length <= 1}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </Button>
-          </div>
-        )}
       </div>
+
+      {/* Navigation - Outside of card container */}
+      {applications.length > 0 && (
+        <div className="flex items-center justify-center gap-4 p-4 bg-card rounded-xl border shadow-sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentIndex((prev) => (prev - 1 + applications.length) % applications.length)}
+            className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
+            disabled={applications.length <= 1}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-muted-foreground">
+              {currentIndex + 1} из {applications.length}
+            </span>
+            <div className="flex gap-2">
+              {applications.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-4 h-4 rounded-full transition-all duration-300 border-2 ${
+                    index === currentIndex 
+                      ? 'bg-primary border-primary scale-125 shadow-lg' 
+                      : 'bg-transparent border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/20'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentIndex((prev) => (prev + 1) % applications.length)}
+            className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
+            disabled={applications.length <= 1}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </Button>
+        </div>
+      )}
 
       {/* Portfolio Modal */}
       <Dialog open={portfolioModalOpen} onOpenChange={setPortfolioModalOpen}>
