@@ -39,7 +39,7 @@ interface Job {
     label_ru: string;
     label_ro: string;
   };
-  profiles?: {
+  pro_profile?: {
     first_name: string;
     last_name: string;
     avatar_url?: string;
@@ -91,7 +91,7 @@ const JobDetail = () => {
         .select(`
           *,
           categories!inner(key, label_ru, label_ro),
-          profiles!pro_id(first_name, last_name, avatar_url)
+          pro_profile:profiles!pro_id(first_name, last_name, avatar_url)
         `)
         .eq('id', jobId)
         .single();
@@ -205,11 +205,11 @@ const JobDetail = () => {
                   </div>
                 )}
 
-                {job.profiles && (
+                {job.pro_profile && (
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-orange-500" />
                     <span className="font-medium">Специалист:</span>
-                    <span>{job.profiles.first_name} {job.profiles.last_name}</span>
+                    <span>{job.pro_profile.first_name} {job.pro_profile.last_name}</span>
                   </div>
                 )}
               </div>
