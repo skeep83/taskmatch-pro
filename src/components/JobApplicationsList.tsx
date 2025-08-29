@@ -304,10 +304,10 @@ export const JobApplicationsList = ({
                 initial={false}
                 animate={{
                   zIndex: isPrevious ? 1 : isActive ? 50 : 10 + (5 - Math.abs(offset)),
-                  y: isPrevious ? 100 : isNext ? offset * -20 : 0,
+                  y: isPrevious ? 30 : isNext ? offset * -20 : 0,
                   scale: isPrevious ? 0.95 : isActive ? 1 : 1 - (Math.abs(offset) * 0.05),
-                  rotateX: isPrevious ? 10 : isNext ? offset * -2 : 0,
-                  opacity: isPrevious ? 0.3 : isActive ? 1 : Math.max(0.7 - (Math.abs(offset) * 0.2), 0.3)
+                  rotateX: isPrevious ? 5 : isNext ? offset * -2 : 0,
+                  opacity: isPrevious ? 0.5 : isActive ? 1 : Math.max(0.7 - (Math.abs(offset) * 0.2), 0.3)
                 }}
                 transition={{
                   duration: 0.6,
