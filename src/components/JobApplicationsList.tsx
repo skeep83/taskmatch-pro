@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -449,7 +448,7 @@ export const JobApplicationsList = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold">
+        <h3 className="text-xl font-semibold text-foreground">
           Отклики специалистов ({applications.length})
         </h3>
         {applications.length > 1 && (
@@ -477,9 +476,7 @@ export const JobApplicationsList = ({
         )}
       </div>
       
-      {applications.length === 1 ? (
-        // Для одного отклика показываем как обычно
-        applications.map((application) => {
+      {applications.map((application) => {
         const isSelected = selectedProId === application.pro_id;
         const canSelect = jobStatus === 'new' && !selectedProId;
         
@@ -494,524 +491,170 @@ export const JobApplicationsList = ({
           : 'НС';
         
         return (
-          <Card key={application.id} className={`transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
-            <CardHeader className="pb-3">
-              <div className="flex items-start gap-3">
-                <Avatar className="w-12 h-12 flex-shrink-0">
-                  <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+          <div key={application.id} className={`relative overflow-hidden rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white ${
+            isSelected ? 'ring-2 ring-primary' : ''
+          }`}>
+            {/* Gradient Header */}
+            <div className="relative h-40 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400">
+              {/* Avatar in center */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Avatar className="w-20 h-20 ring-4 ring-white shadow-lg">
+                  <AvatarImage 
+                    src={application.profiles?.avatar_url || ''} 
+                    alt={displayName}
+                  />
+                  <AvatarFallback className="text-xl font-bold bg-white text-gray-800">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="min-w-0 flex-1">
-                      <h4 className="font-semibold flex items-center gap-2 mb-1">
-                        <span className="truncate">{displayName}</span>
-                        {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
-                      </h4>
-                       <div className="flex items-center gap-2">
-                         <Badge variant="secondary" className="text-xs">Специалист</Badge>
-                         {application.rating && application.rating.rating_count > 0 ? (
-                           <StarRating 
-                             rating={application.rating.avg_score} 
-                             size="sm" 
-                             showValue={false}
-                             readonly 
-                           />
-                         ) : (
-                           <span className="text-xs text-muted-foreground">Новый специалист</span>
-                         )}
-                       </div>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="text-xl font-bold text-primary whitespace-nowrap">
-                        {formatPrice(application.price_cents)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(application.created_at), { 
-                          addSuffix: true, 
-                          locale: ru 
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-3 text-sm">
-                    {application.eta_slot && (
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                        <span className="truncate">Время: {application.eta_slot}</span>
-                      </div>
-                    )}
-                    {application.warranty_days && application.warranty_days > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Shield className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        <span className="whitespace-nowrap">Гарантия: {application.warranty_days} дн.</span>
-                      </div>
-                    )}
-                  </div>
+              </div>
+              
+              {/* Profile link icon */}
+              <Link
+                to={`/pro/${application.pro_id}`}
+                className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+              >
+                <ExternalLink className="h-5 w-5" />
+              </Link>
+              
+              {/* Selected badge */}
+              {isSelected && (
+                <div className="absolute top-4 left-4">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+              )}
+            </div>
+            
+            {/* White content area */}
+            <div className="p-6 space-y-4">
+              {/* Name and bio */}
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-bold text-gray-900">{displayName}</h3>
+                <p className="text-sm text-gray-500 uppercase tracking-wide">
+                  {application.proProfile?.bio ? application.proProfile.bio.substring(0, 50) + '...' : 'Специалист'}
+                </p>
+              </div>
+              
+              {/* Rating */}
+              <div className="flex items-center justify-center gap-2">
+                {application.rating && application.rating.rating_count > 0 ? (
+                  <>
+                    <StarRating
+                      rating={application.rating.avg_score}
+                      readonly
+                      size="sm"
+                    />
+                    <span className="text-sm text-gray-500">
+                      ({application.rating.rating_count})
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-sm text-gray-500">Новый специалист</span>
+                )}
+              </div>
+              
+              {/* Price - prominent display */}
+              <div className="text-center">
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  {formatPrice(application.price_cents)}
+                </div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {formatDistanceToNow(new Date(application.created_at), { 
+                    addSuffix: true, 
+                    locale: ru 
+                  })}
                 </div>
               </div>
-            </CardHeader>
-            
-            <CardContent className="pt-0 space-y-3">
-                {application.note && (
-                  <div className="p-3 bg-muted rounded-lg">
-                    <p className="text-sm font-medium mb-1">Комментарий к отклику:</p>
-                    <p className="text-sm">{application.note}</p>
+              
+              {/* ETA and warranty */}
+              <div className="flex justify-center gap-6 text-sm">
+                {application.eta_slot && (
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4 text-blue-500" />
+                    <span>{application.eta_slot}</span>
                   </div>
                 )}
-
-                {application.portfolio && application.portfolio.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium mb-2">Портфолио:</p>
-                    <PortfolioCarousel 
-                      media={application.portfolio.flatMap(item => [
-                        ...(item.portfolio_media || []).sort((a, b) => a.display_order - b.display_order),
-                        ...(item.image_url ? [{ file_url: item.image_url, file_type: 'image/jpeg' }] : [])
-                      ])}
-                      title={`Работы ${displayName}`}
-                    />
+                {application.warranty_days && application.warranty_days > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Shield className="w-4 h-4 text-green-500" />
+                    <span>{application.warranty_days} дн.</span>
                   </div>
                 )}
-
-                {application.proProfile?.bio && (
-                  <div>
-                    <p className="text-sm font-medium mb-1">О специалисте:</p>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {application.proProfile.bio}
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex gap-2 pt-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <User className="w-4 h-4 mr-1" />
-                        Профиль
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
-                              {initials}
-                            </AvatarFallback>
-                          </Avatar>
-                          {displayName}
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        {application.rating && (
-                          <div className="flex items-center gap-2">
-                            <StarRating 
-                              rating={application.rating.avg_score} 
-                              size="md" 
-                              showValue 
-                              showCount 
-                              count={application.rating.rating_count}
-                            />
-                          </div>
-                        )}
-                        {application.proProfile?.bio && (
-                          <div>
-                            <h4 className="font-medium mb-1">О специалисте</h4>
-                            <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
-                          </div>
-                        )}
-                        {application.proProfile && (application.proProfile.hourly_rate_cents || application.proProfile.fixed_price_cents) && (
-                          <div>
-                            <h4 className="font-medium mb-1">Тарифы</h4>
-                            <div className="text-sm text-muted-foreground">
-                               {application.proProfile.hourly_rate_cents && (
-                                 <span>Почасовая: {formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
-                               )}
-                              {application.proProfile.hourly_rate_cents && application.proProfile.fixed_price_cents && ' • '}
-                               {application.proProfile.fixed_price_cents && (
-                                 <span>Фиксированная: {formatPrice(application.proProfile.fixed_price_cents)}</span>
-                               )}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {application.proProfile && (
-                          <div className="space-y-2">
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              {application.proProfile.hourly_rate_cents && (
-                                <div>
-                                  <span className="text-muted-foreground">Почасовая ставка:</span>
-                                  <div className="font-medium">${(application.proProfile.hourly_rate_cents / 100).toFixed(2)}/час</div>
-                                </div>
-                              )}
-                              {application.proProfile.fixed_price_cents && (
-                                <div>
-                                  <span className="text-muted-foreground">Фиксированная ставка:</span>
-                                  <div className="font-medium">${(application.proProfile.fixed_price_cents / 100).toFixed(2)}</div>
-                                </div>
-                              )}
-                              <div>
-                                <span className="text-muted-foreground">Радиус работы:</span>
-                                <div className="font-medium">{application.proProfile.radius_km || 10} км</div>
-                              </div>
-                            </div>
-                            {application.proProfile.bio && (
-                              <div>
-                                <span className="text-sm text-muted-foreground">О себе:</span>
-                                <p className="text-sm mt-1 p-2 bg-muted/50 rounded">{application.proProfile.bio}</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        
-                        {application.portfolio && application.portfolio.length > 0 && (
-                          <div>
-                            <h4 className="font-medium mb-2">Портфолио</h4>
-                            <div className="grid grid-cols-3 gap-2">
-                              {application.portfolio.map((item) => (
-                                <div key={item.id}>
-                                  <PortfolioCarousel 
-                                    media={item.portfolio_media || (item.image_url ? [{ image_url: item.image_url, file_type: 'image' }] : [])}
-                                    title={item.title || 'Работа'}
-                                  />
-                                  {item.title && (
-                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                                      {item.title}
-                                    </p>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-center">
-                          <Link to={`/pro/${application.pro_id}`} target="_blank">
-                            <Button variant="outline" size="sm">
-                              <ExternalLink className="w-4 h-4 mr-1" />
-                              Полный профиль
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
-                  {canSelect && (
-                    <Button
-                      onClick={() => handleSelectApplication(application.id)}
-                      disabled={selecting === application.id}
-                      className="flex-1"
-                    >
-                      {selecting === application.id ? 'Выбираю...' : 'Выбрать'}
+              </div>
+              
+              {/* Actions */}
+              <div className="flex gap-2 pt-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <User className="w-4 h-4 mr-1" />
+                      Профиль
                     </Button>
-                  )}
-                </div>
-
-                 {isSelected && (
-                   <div className="pt-2">
-                     <Badge variant="default" className="w-full justify-center">
-                       ✓ Выбранный специалист
-                     </Badge>
-                   </div>
-                 )}
-            </CardContent>
-          </Card>
-        );
-        })
-      ) : (
-        // Для нескольких откликов используем вертикальную круговую карусель
-        <div className="relative w-full h-[600px] overflow-hidden">
-          <AnimatePresence mode="wait">
-            {applications.map((application, index) => {
-              const isActive = index === currentIndex;
-              const isNext = index === (currentIndex + 1) % applications.length;
-              const isPrev = index === (currentIndex - 1 + applications.length) % applications.length;
-              
-              const isSelected = selectedProId === application.pro_id;
-              const canSelect = jobStatus === 'new' && !selectedProId;
-              
-              // Формируем имя специалиста
-              const profileName = application.profiles?.full_name || 
-                (application.profiles?.first_name && application.profiles?.last_name 
-                  ? `${application.profiles.first_name} ${application.profiles.last_name}` 
-                  : null);
-              const displayName = profileName || 'Новый специалист';
-              const initials = profileName 
-                ? profileName.split(' ').map(n => n[0]).join('').toUpperCase()
-                : 'НС';
-
-              // Определяем позицию и анимацию для каждой карты
-              let y = 0;
-              let scale = 0.8;
-              let opacity = 0.3;
-              let zIndex = 1;
-              let rotateY = 0;
-
-              if (isActive) {
-                y = 0;
-                scale = 1;
-                opacity = 1;
-                zIndex = 10;
-                rotateY = 0;
-              } else if (isNext) {
-                y = 50;
-                scale = 0.9;
-                opacity = 0.7;
-                zIndex = 5;
-                rotateY = -5;
-              } else if (isPrev) {
-                y = -50;
-                scale = 0.9;
-                opacity = 0.7;
-                zIndex = 5;
-                rotateY = 5;
-              } else {
-                y = index < currentIndex ? -100 : 100;
-                scale = 0.8;
-                opacity = 0.3;
-                zIndex = 1;
-                rotateY = index < currentIndex ? 10 : -10;
-              }
-              
-              return (
-                <motion.div
-                  key={application.id}
-                  className={`absolute inset-0 flex items-center justify-center w-full max-w-2xl ${!isActive ? 'cursor-pointer' : ''}`}
-                  initial={{ y: 100, scale: 0.8, opacity: 0 }}
-                  animate={{ 
-                    y, 
-                    scale, 
-                    opacity,
-                    rotateY,
-                    transition: { 
-                      type: "spring", 
-                      stiffness: 300, 
-                      damping: 30,
-                      duration: 0.5
-                    }
-                  }}
-                  exit={{ 
-                    y: -100, 
-                    scale: 0.8, 
-                    opacity: 0,
-                    transition: { duration: 0.3 }
-                  }}
-                  style={{ zIndex }}
-                  onClick={isActive ? undefined : nextCard}
-                >
-                  <Card className={`w-full transition-all shadow-lg ${isSelected ? 'ring-2 ring-primary' : ''} ${isActive ? 'shadow-2xl' : 'shadow-md'}`}>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start gap-3">
-                        <Avatar className="w-12 h-12 flex-shrink-0">
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Avatar className="w-8 h-8">
                           <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-3 mb-2">
-                            <div className="min-w-0 flex-1">
-                              <h4 className="font-semibold flex items-center gap-2 mb-1">
-                                <span className="truncate">{displayName}</span>
-                                {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
-                              </h4>
-                               <div className="flex items-center gap-2">
-                                 <Badge variant="secondary" className="text-xs">Специалист</Badge>
-                                 {application.rating && application.rating.rating_count > 0 ? (
-                                   <StarRating 
-                                     rating={application.rating.avg_score} 
-                                     size="sm" 
-                                     readonly 
-                                     className="flex-shrink-0" 
-                                   />
-                                 ) : (
-                                   <span className="text-xs text-muted-foreground">Новый специалист</span>
-                                 )}
-                               </div>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                              <div className="text-xl font-bold text-primary whitespace-nowrap">
-                                {formatPrice(application.price_cents)}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {formatDistanceToNow(new Date(application.created_at), { 
-                                  addSuffix: true, 
-                                  locale: ru 
-                                })}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* ETA и гарантия */}
-                          <div className="flex flex-wrap gap-3 text-sm">
-                            {application.eta_slot && (
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                                <span className="truncate">Время: {application.eta_slot}</span>
-                              </div>
-                            )}
-                            {application.warranty_days && (
-                              <div className="flex items-center gap-1">
-                                <Shield className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                <span className="whitespace-nowrap">Гарантия: {application.warranty_days} дн.</span>
-                              </div>
-                            )}
-                          </div>
+                        {displayName}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {application.rating && (
+                        <div className="flex items-center gap-2">
+                          <StarRating 
+                            rating={application.rating.avg_score} 
+                            size="md" 
+                            showValue 
+                            showCount 
+                            count={application.rating.rating_count}
+                          />
                         </div>
+                      )}
+                      {application.proProfile?.bio && (
+                        <div>
+                          <h4 className="font-medium mb-1">О специалисте</h4>
+                          <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
+                        </div>
+                      )}
+                      <div className="flex justify-center">
+                        <Link to={`/pro/${application.pro_id}`} target="_blank">
+                          <Button variant="outline" size="sm">
+                            <ExternalLink className="w-4 h-4 mr-1" />
+                            Полный профиль
+                          </Button>
+                        </Link>
                       </div>
-                    </CardHeader>
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
-                    {isActive && (
-                      <CardContent className="pt-0 space-y-3">
-                        {/* Note */}
-                        {application.note && (
-                          <div className="p-3 bg-muted rounded-lg">
-                            <p className="text-sm font-medium mb-1">Комментарий к отклику:</p>
-                            <p className="text-sm">{application.note}</p>
-                          </div>
-                        )}
+                {canSelect && (
+                  <Button
+                    onClick={() => handleSelectApplication(application.id)}
+                    disabled={selecting === application.id}
+                    className="flex-1"
+                  >
+                    {selecting === application.id ? 'Выбираю...' : 'Выбрать'}
+                  </Button>
+                )}
+              </div>
 
-                        {/* Portfolio */}
-                        {application.portfolio && application.portfolio.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium mb-2">Портфолио:</p>
-                            {application.portfolio.map((item) => {
-                              const mediaItems = item.portfolio_media && item.portfolio_media.length > 0 
-                                ? item.portfolio_media.sort((a, b) => a.display_order - b.display_order)
-                                : [{ file_url: item.image_url, file_type: 'image', display_order: 0 }];
-                              
-                              return (
-                                <PortfolioCarousel 
-                                  key={item.id}
-                                  media={mediaItems}
-                                  title={item.title || `Работы ${displayName}`}
-                                />
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        {/* Bio */}
-                        {application.proProfile?.bio && (
-                          <div>
-                            <p className="text-sm font-medium mb-1">О специалисте:</p>
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                              {application.proProfile.bio}
-                            </p>
-                          </div>
-                        )}
-
-                        {/* Actions */}
-                        <div className="flex gap-2 pt-2">
-                          {/* Profile Dialog */}
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" className="flex-1">
-                                <User className="w-4 h-4 mr-1" />
-                                Профиль
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                              <DialogHeader>
-                                <DialogTitle>Профиль специалиста</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                  <Avatar className="w-16 h-16">
-                                    <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
-                                      {initials}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <h3 className="text-lg font-semibold">{displayName}</h3>
-                                    <div className="flex items-center gap-2">
-                                      <Badge variant="secondary">Специалист</Badge>
-                                      {application.rating && application.rating.rating_count > 0 ? (
-                                        <div className="flex items-center gap-1">
-                                          <StarRating rating={application.rating.avg_score} size="sm" readonly />
-                                          <span className="text-sm text-muted-foreground">
-                                            ({application.rating.rating_count} отзывов)
-                                          </span>
-                                        </div>
-                                      ) : (
-                                        <span className="text-sm text-muted-foreground">Новый специалист</span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                {application.proProfile?.bio && (
-                                  <div>
-                                    <h4 className="font-medium mb-2">О специалисте</h4>
-                                    <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
-                                  </div>
-                                )}
-                                
-                                {/* Service Info */}
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  {application.proProfile?.radius_km && (
-                                    <div>
-                                      <span className="font-medium">Радиус работы:</span>
-                                      <span className="ml-1">{application.proProfile.radius_km} км</span>
-                                    </div>
-                                  )}
-                                  {application.proProfile?.hourly_rate_cents && (
-                                    <div>
-                                      <span className="font-medium">Почасовая ставка:</span>
-                                      <span className="ml-1">{formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
-                                    </div>
-                                  )}
-                                </div>
-                                
-                                <div className="flex gap-2">
-                                  <Button asChild variant="outline" className="flex-1">
-                                    <Link to={`/pro/${application.pro_id}`}>
-                                      <ExternalLink className="w-4 h-4 mr-1" />
-                                      Полный профиль
-                                    </Link>
-                                  </Button>
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-
-                          {/* Select Button */}
-                          {canSelect && (
-                            <Button 
-                              onClick={() => handleSelectApplication(application.id)}
-                              disabled={selecting === application.id}
-                              className="flex-1"
-                            >
-                              {selecting === application.id ? 'Выбираем...' : 'Выбрать'}
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    )}
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-
-          {/* Центральная кнопка для переключения */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={nextCard}
-              className="rounded-full bg-background/80 backdrop-blur-sm border-2 h-10 w-10 p-0"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
+              {isSelected && (
+                <div className="pt-2">
+                  <Badge variant="default" className="w-full justify-center">
+                    ✓ Выбранный специалист
+                  </Badge>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })}
     </div>
   );
 };
