@@ -217,7 +217,16 @@ const JobNew = () => {
       </section>
 
       {/* Form Section */}
-      <section className="container mx-auto px-4 py-12">
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+            {t("job.new.title")}
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            {t("job.new.subtitle")}
+          </p>
+        </div>
+
         <div className="max-w-4xl mx-auto">
           {/* Progress Steps */}
           <div className="flex items-center justify-center mb-8">
@@ -237,7 +246,7 @@ const JobNew = () => {
             </div>
           </div>
 
-          <GlassMorphism className="p-8">
+          <div className="card-surface p-8">
             <form className="space-y-8" onSubmit={onSubmit}>
               
               {/* Step 1: Service Details */}
@@ -248,7 +257,7 @@ const JobNew = () => {
                 </h2>
                 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <FloatingCard className="p-6">
+                  <div className="card-surface p-6">
                     <label className="block text-sm font-medium mb-3">Категория услуги</label>
                     <select 
                       name="category_id" 
@@ -259,19 +268,19 @@ const JobNew = () => {
                       <option value="" disabled>Выберите категорию</option>
                       {categoryOptions}
                     </select>
-                  </FloatingCard>
+                  </div>
 
-                  <FloatingCard className="p-6">
+                  <div className="card-surface p-6">
                     <label className="block text-sm font-medium mb-3">Приоритет</label>
                     <select name="urgency" className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all">
                       <option value="normal">Обычный</option>
                       <option value="urgent">Срочно (+30%)</option>
                       <option value="same_day">В тот же день (+50%)</option>
                     </select>
-                  </FloatingCard>
+                  </div>
                 </div>
 
-                <FloatingCard className="p-6">
+                <div className="card-surface p-6">
                   <label className="block text-sm font-medium mb-3">Описание задачи</label>
                   <textarea 
                     name="description"
@@ -283,7 +292,7 @@ const JobNew = () => {
                   <p className="text-xs text-muted-foreground mt-2">
                     Чем подробнее описание, тем точнее будут предложения специалистов
                   </p>
-                </FloatingCard>
+                </div>
               </div>
 
               {/* Step 2: Budget & Schedule */}
@@ -294,7 +303,7 @@ const JobNew = () => {
                 </h2>
                 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <FloatingCard className="p-6">
+                  <div className="card-surface p-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2">
@@ -318,9 +327,9 @@ const JobNew = () => {
                         />
                       </div>
                     </div>
-                  </FloatingCard>
+                  </div>
 
-                  <FloatingCard className="p-6">
+                  <div className="card-surface p-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2">
@@ -342,7 +351,7 @@ const JobNew = () => {
                         />
                       </div>
                     </div>
-                  </FloatingCard>
+                  </div>
                 </div>
               </div>
 
@@ -353,7 +362,7 @@ const JobNew = () => {
                   Фотографии задачи
                 </h2>
                 
-                <FloatingCard className="p-6">
+                <div className="card-surface p-6">
                   <div
                     className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
                       dragActive ? 'border-primary bg-primary/5' : 'border-white/20'
@@ -377,7 +386,7 @@ const JobNew = () => {
                       id="photo-upload"
                       name="photos"
                     />
-                    <label htmlFor="photo-upload" className="btn-hero inline-flex items-center gap-2">
+                    <label htmlFor="photo-upload" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg inline-flex items-center gap-2">
                       <Upload className="w-4 h-4" />
                       Выбрать файлы
                     </label>
@@ -403,20 +412,20 @@ const JobNew = () => {
                       ))}
                     </div>
                   )}
-                </FloatingCard>
+                </div>
               </div>
 
               {/* Submit */}
               <div className="flex justify-between items-center pt-8 border-t border-white/10">
-                <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>
+                <button type="button" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg" onClick={() => navigate(-1)}>
                   Отмена
                 </button>
-                <button type="submit" className="btn-hero px-8" disabled={loading}>
+                <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg" disabled={loading}>
                   {loading ? 'Создаем заказ...' : 'Создать заказ'}
                 </button>
               </div>
             </form>
-          </GlassMorphism>
+          </div>
         </div>
       </section>
     </main>
