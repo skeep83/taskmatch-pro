@@ -679,53 +679,23 @@ const JobDetail = () => {
             {canApply && (
               <Card className="transition-all">
                 <CardContent className="pt-6 pb-6">
-                  {!showApplicationForm && !showPriceProposal ? (
+                  {!showPriceProposal ? (
                     <>
                       <h3 className="text-lg font-semibold mb-4 text-center">
                         Заинтересованы в заказе?
                       </h3>
                       
-                      {/* Buttons */}
-                      <div className="flex gap-2">
+                      {/* Single Button */}
+                      <div className="flex justify-center">
                         <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex-1"
-                          onClick={() => setShowApplicationForm(true)}
+                          className="flex-1 max-w-xs"
+                          onClick={() => setShowPriceProposal(true)}
                         >
                           <User className="w-4 h-4 mr-1" />
                           Откликнуться
                         </Button>
-                        
-                        <Button 
-                          className="flex-1"
-                          onClick={() => setShowPriceProposal(true)}
-                        >
-                          <DollarSign className="w-4 h-4 mr-1" />
-                          Предложить цену
-                        </Button>
                       </div>
                     </>
-                  ) : showApplicationForm ? (
-                    <div>
-                      <JobResponseForm
-                        jobId={job.id}
-                        jobTitle={job.title}
-                        budgetMinCents={job.budget_min_cents}
-                        budgetMaxCents={job.budget_max_cents}
-                        onApplicationSubmit={() => {
-                          setShowApplicationForm(false);
-                          loadJobData();
-                        }}
-                      />
-                      <Button 
-                        variant="outline" 
-                        className="mt-4 w-full"
-                        onClick={() => setShowApplicationForm(false)}
-                      >
-                        Отмена
-                      </Button>
-                    </div>
                   ) : (
                     <div>
                       <PriceProposalForm
