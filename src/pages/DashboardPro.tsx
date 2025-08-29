@@ -18,7 +18,6 @@ import dashboardPro from "@/assets/dashboard-pro.jpg";
 import proWorkspace from "@/assets/pro-workspace.jpg";
 import jobManagement from "@/assets/job-management.jpg";
 import kycVerification from "@/assets/kyc-verification.jpg";
-import { ProTipsCarousel } from "@/components/ProTipsCarousel";
 
 const DashboardPro = () => {
   const { t } = useEnhancedI18n();
@@ -420,8 +419,7 @@ const DashboardPro = () => {
                   {myActiveJobs.length === 0 && (
                     <div className="text-center py-12">
                       <Clock className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
-                      <p className="text-muted-foreground mb-6">У вас нет активных заказов</p>
-                      <ProTipsCarousel />
+                      <p className="text-muted-foreground">У вас нет активных заказов</p>
                     </div>
                   )}
 
@@ -430,14 +428,6 @@ const DashboardPro = () => {
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <h3 className="font-semibold mb-2">{job.description || 'Заказ'}</h3>
-                          {job.status === 'accepted' && (
-                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-full mb-2">
-                              <CheckCircle className="h-4 w-4 text-green-600" />
-                              <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                                Ваша кандидатура принята
-                              </span>
-                            </div>
-                          )}
                           <div className="text-sm text-muted-foreground mb-2">
                             Статус: {job.status === 'accepted' ? 'Принят' : job.status === 'in_progress' ? 'В работе' : 'Выполнен'}
                           </div>
@@ -467,12 +457,6 @@ const DashboardPro = () => {
                       </div>
                     </div>
                   ))}
-                  
-                  {myActiveJobs.length > 0 && (
-                    <div className="mt-6">
-                      <ProTipsCarousel />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
