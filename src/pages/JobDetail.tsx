@@ -322,12 +322,12 @@ const JobDetail = () => {
                 Информация о заказчике
               </h3>
               <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16">
+                <Avatar className="w-12 h-12">
                   <AvatarImage 
                     src={clientProfile.avatar_url || ''} 
                     alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
                   />
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                     {clientProfile.full_name 
                       ? clientProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
                       : (clientProfile.first_name && clientProfile.last_name 
@@ -336,24 +336,22 @@ const JobDetail = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h4 className="text-lg font-semibold">
+                  <h4 className="font-semibold">
                     {clientProfile.full_name || 
                      (clientProfile.first_name && clientProfile.last_name 
                        ? `${clientProfile.first_name} ${clientProfile.last_name}` 
                        : 'Клиент')}
                   </h4>
-                  {clientRating && clientRating.count > 0 && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <StarRating 
-                        rating={clientRating.average} 
-                        size="sm" 
-                        showValue 
-                        showCount 
-                        count={clientRating.count}
-                      />
-                    </div>
-                  )}
-                  {(!clientRating || clientRating.count === 0) && (
+                  {clientRating && clientRating.count > 0 ? (
+                    <StarRating 
+                      rating={clientRating.average} 
+                      size="sm" 
+                      showValue 
+                      showCount 
+                      count={clientRating.count}
+                      className="mt-1"
+                    />
+                  ) : (
                     <p className="text-sm text-muted-foreground mt-1">Новый клиент</p>
                   )}
                 </div>
