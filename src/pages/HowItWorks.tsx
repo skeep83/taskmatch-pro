@@ -160,7 +160,7 @@ const HowItWorks = () => {
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
             <div className="card-surface p-6 rounded-full">
-              <NeumorphicIcon icon={Sparkles} size={72} variant="square" className="text-primary" />
+              <Sparkles size={72} className="text-primary" />
             </div>
           </div>
           
@@ -195,12 +195,9 @@ const HowItWorks = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <div key={index} className="card-surface p-6 text-center">
-              <NeumorphicIcon 
-                icon={stat.icon} 
+              <stat.icon 
                 size={48} 
-                variant="square"
                 className="mx-auto mb-3 text-primary"
-                delayMs={index * 100}
               />
               <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
@@ -241,12 +238,9 @@ const HowItWorks = () => {
                   <div className="relative mb-8">
                     <div className={`relative w-20 h-20 mx-auto rounded-full bg-gradient-to-r ${step.gradient} p-0.5`}>
                       <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                        <NeumorphicIcon 
-                          icon={step.icon} 
+                        <step.icon 
                           size={48}
-                          variant="square"
                           className="text-foreground"
-                          delayMs={index * 200}
                         />
                       </div>
                     </div>
@@ -295,12 +289,9 @@ const HowItWorks = () => {
               >
                 <div className="mb-6">
                   <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} shadow-lg`}>
-                    <NeumorphicIcon 
-                      icon={feature.icon} 
+                    <feature.icon 
                       size={56}
-                      variant="square"
                       className="text-white"
-                      delayMs={index * 150}
                     />
                   </div>
                 </div>
