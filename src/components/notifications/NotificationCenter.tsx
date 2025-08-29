@@ -28,9 +28,15 @@ export const NotificationCenter = () => {
       window.location.href = `/job/${notification.data.job_id}`;
     } else if (notification.type === 'price_proposal' && notification.data?.job_id) {
       window.location.href = `/job/${notification.data.job_id}`;
-    } else if (notification.type === 'message' && notification.data?.chat_id) {
-      // Navigate to chat with the sender
-      window.location.href = `/messages?chat=${notification.data.chat_id}`;
+    } else if (notification.type === 'job_application' && notification.data?.job_id) {
+      window.location.href = `/job/${notification.data.job_id}`;
+    } else if (notification.type === 'message' && notification.data?.message_id) {
+      // Navigate to messages with specific parameters
+      if (notification.data?.job_id) {
+        window.location.href = `/messages?job=${notification.data.job_id}`;
+      } else {
+        window.location.href = `/messages`;
+      }
     } else if (notification.type === 'job_update' && notification.data?.job_id) {
       window.location.href = `/job/${notification.data.job_id}`;
     }
