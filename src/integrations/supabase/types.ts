@@ -371,6 +371,41 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_sessions: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          id: string
+          job_id: string | null
+          last_message_at: string | null
+          pro_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          id?: string
+          job_id?: string | null
+          last_message_at?: string | null
+          pro_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          job_id?: string | null
+          last_message_at?: string | null
+          pro_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_sessions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chats: {
         Row: {
           client_id: string
