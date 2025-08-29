@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
-import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink, Image, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
+import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink, Image, ChevronLeft, ChevronRight, RotateCcw, Star, FileText, Eye, Users, Phone, CreditCard, HelpCircle, TrendingUp, Award, BookOpen } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
@@ -59,6 +59,91 @@ interface JobApplicationsListProps {
   onApplicationSelect?: (applicationId: string) => void;
 }
 
+// Массив полезных советов для клиентов
+const helpfulTips = [
+  {
+    id: 'rating-review',
+    icon: Star,
+    gradient: 'from-yellow-400 via-orange-500 to-red-500',
+    title: 'Оставьте отзыв и рейтинг',
+    subtitle: 'Обязательно после завершения',
+    content: 'После завершения работ обязательно оставьте честный отзыв и рейтинг специалисту. Это поможет другим клиентам и повысит качество сервиса.',
+    action: 'Узнать больше'
+  },
+  {
+    id: 'quality-control',
+    icon: Eye,
+    gradient: 'from-blue-400 via-purple-500 to-pink-500',
+    title: 'Контролируйте качество',
+    subtitle: 'Проверьте результат работы',
+    content: 'Внимательно проверьте выполненную работу перед её подтверждением. Убедитесь, что всё соответствует договорённостям.',
+    action: 'Советы по контролю'
+  },
+  {
+    id: 'documentation',
+    icon: FileText,
+    gradient: 'from-green-400 via-teal-500 to-blue-500',
+    title: 'Сохраните документы',
+    subtitle: 'Чеки, акты, гарантии',
+    content: 'Сохраните все документы: чеки, акты выполненных работ, гарантийные талоны. Они понадобятся в случае рекламаций.',
+    action: 'Что сохранить'
+  },
+  {
+    id: 'communication',
+    icon: MessageSquare,
+    gradient: 'from-purple-400 via-pink-500 to-red-500',
+    title: 'Общайтесь в чате',
+    subtitle: 'Все договорённости письменно',
+    content: 'Ведите переписку в чате платформы. Это защитит ваши интересы и поможет в решении спорных вопросов.',
+    action: 'Открыть чат'
+  },
+  {
+    id: 'safety',
+    icon: Shield,
+    gradient: 'from-emerald-400 via-green-500 to-teal-500',
+    title: 'Соблюдайте безопасность',
+    subtitle: 'Ваша безопасность важна',
+    content: 'Убедитесь, что специалист соблюдает технику безопасности и использует средства защиты при необходимости.',
+    action: 'Правила безопасности'
+  },
+  {
+    id: 'payment-protection',
+    icon: CreditCard,
+    gradient: 'from-indigo-400 via-blue-500 to-purple-500',
+    title: 'Защищённые платежи',
+    subtitle: 'Эскроу гарантирует безопасность',
+    content: 'Ваши средства защищены системой эскроу. Оплата специалисту происходит только после подтверждения выполнения работ.',
+    action: 'Как работает эскроу'
+  },
+  {
+    id: 'repeat-orders',
+    icon: RotateCcw,
+    gradient: 'from-pink-400 via-rose-500 to-red-500',
+    title: 'Повторные заказы',
+    subtitle: 'Заказывайте снова у проверенных',
+    content: 'Если специалист вас устроил, сохраните его в избранное и заказывайте услуги повторно со скидками.',
+    action: 'Добавить в избранное'
+  },
+  {
+    id: 'support',
+    icon: HelpCircle,
+    gradient: 'from-cyan-400 via-blue-500 to-indigo-500',
+    title: 'Служба поддержки',
+    subtitle: 'Мы всегда поможем',
+    content: 'При возникновении любых вопросов или проблем обращайтесь в службу поддержки. Мы работаем 24/7.',
+    action: 'Связаться с поддержкой'
+  },
+  {
+    id: 'warranty',
+    icon: Award,
+    gradient: 'from-orange-400 via-red-500 to-pink-500',
+    title: 'Гарантийные обязательства',
+    subtitle: 'Гарантия на выполненные работы',
+    content: 'Уточните сроки гарантии у специалиста. В случае проблем в гарантийный период работы будут исправлены бесплатно.',
+    action: 'Условия гарантии'
+  }
+];
+
 export const JobApplicationsList = ({ 
   jobId, 
   jobStatus, 
@@ -75,6 +160,11 @@ export const JobApplicationsList = ({
   useEffect(() => {
     fetchApplications();
   }, [jobId]);
+
+  // Сброс индекса при смене режима отображения
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [selectedProId]);
 
   const fetchApplications = async () => {
     try {
@@ -239,11 +329,13 @@ export const JobApplicationsList = ({
 
   // Carousel navigation functions - циклическая прокрутка
   const nextCard = () => {
-    setCurrentIndex((prev) => (prev + 1) % applications.length);
+    const totalItems = selectedProId ? helpfulTips.length : applications.length;
+    setCurrentIndex((prev) => (prev + 1) % totalItems);
   };
 
   const prevCard = () => {
-    setCurrentIndex((prev) => (prev - 1 + applications.length) % applications.length);
+    const totalItems = selectedProId ? helpfulTips.length : applications.length;
+    setCurrentIndex((prev) => (prev - 1 + totalItems) % totalItems);
   };
 
   if (loading) {
@@ -261,6 +353,163 @@ export const JobApplicationsList = ({
           </p>
         </CardContent>
       </Card>
+    );
+  }
+
+  // Если специалист назначен, показываем советы
+  if (selectedProId) {
+    return (
+      <div className="relative z-50 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-foreground">
+            Полезные советы и рекомендации
+          </h3>
+        </div>
+        
+        {/* Carousel Container */}
+        <div className="relative py-8 px-4 h-[700px]">
+          {/* Cards Stack */}
+          <div className="relative w-full h-full perspective-1000">
+            {helpfulTips.map((tip, index) => {
+              const IconComponent = tip.icon;
+              
+              // Calculate card position
+              const offset = index - currentIndex;
+              const isActive = index === currentIndex;
+              const isPrevious = offset < 0;
+              const isNext = offset > 0;
+
+              return (
+                <motion.div
+                  key={tip.id}
+                  className="absolute inset-0 w-full perspective-1000"
+                  initial={false}
+                  animate={{
+                    zIndex: isPrevious ? 1 : isActive ? 50 : 10 + (5 - Math.abs(offset)),
+                    y: isPrevious ? 30 : isNext ? offset * -20 : 0,
+                    scale: isPrevious ? 0.95 : isActive ? 1 : 1 - (Math.abs(offset) * 0.05),
+                    rotateX: isPrevious ? 5 : isNext ? offset * -2 : 0,
+                    opacity: isPrevious ? 0.5 : isActive ? 1 : Math.max(0.7 - (Math.abs(offset) * 0.2), 0.3)
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                  }}
+                  style={{
+                    transformStyle: 'preserve-3d'
+                  }}
+                >
+                  <div 
+                    className="group relative overflow-hidden rounded-3xl card-3d bg-white"
+                    style={{
+                      transformStyle: 'preserve-3d',
+                      boxShadow: `
+                        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                        0 15px 35px -5px rgba(0, 0, 0, 0.15),
+                        0 0 0 1px rgba(255, 255, 255, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                        inset 0 -1px 0 rgba(0, 0, 0, 0.05)
+                      `
+                    }}
+                  >
+                    {/* Gradient Header with enhanced 3D effect */}
+                    <div className={`relative h-40 bg-gradient-to-br ${tip.gradient} overflow-hidden`}>
+                      {/* Additional depth layer */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                      
+                      {/* Icon with enhanced shadow */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-white/20 rounded-full blur-sm scale-110"></div>
+                          <div className="relative w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-4 ring-white shadow-2xl z-10">
+                            <IconComponent className="w-12 h-12 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  
+                    {/* White content area */}
+                    <div className="p-6 space-y-4">
+                      {/* Title and subtitle */}
+                      <div className="text-center space-y-2">
+                        <h3 className="text-xl font-bold text-gray-900">{tip.title}</h3>
+                        <p className="text-sm text-gray-500 uppercase tracking-wide">
+                          {tip.subtitle}
+                        </p>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="text-center px-4">
+                        <p className="text-gray-600 leading-relaxed">
+                          {tip.content}
+                        </p>
+                      </div>
+                      
+                      {/* Action button */}
+                      <div className="flex justify-center pt-4">
+                        <Button variant="outline" className="w-full">
+                          <BookOpen className="w-4 h-4 mr-2" />
+                          {tip.action}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+          
+          {/* Navigation Controls */}
+          {helpfulTips.length > 1 && (
+            <>
+              {/* Arrow Navigation */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={prevCard}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={nextCard}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
+        
+        {/* Bottom Navigation */}
+        {helpfulTips.length > 1 && (
+          <div className="flex flex-col items-center gap-4">
+            {/* Dots Navigation */}
+            <div className="flex gap-2">
+              {helpfulTips.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentIndex 
+                      ? 'bg-primary scale-125' 
+                      : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                />
+              ))}
+            </div>
+            
+            {/* Counter */}
+            <div className="text-sm text-muted-foreground">
+              {currentIndex + 1} из {helpfulTips.length}
+            </div>
+          </div>
+        )}
+      </div>
     );
   }
 
