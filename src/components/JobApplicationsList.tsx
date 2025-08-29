@@ -472,17 +472,19 @@ export const JobApplicationsList = ({
                         <span className="truncate">{displayName}</span>
                         {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
                       </h4>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">Специалист</Badge>
-                        {application.rating && application.rating.rating_count > 0 && (
-                          <StarRating 
-                            rating={application.rating.avg_score} 
-                            size="sm" 
-                            showValue={false}
-                            readonly 
-                          />
-                        )}
-                      </div>
+                       <div className="flex items-center gap-2">
+                         <Badge variant="secondary" className="text-xs">Специалист</Badge>
+                         {application.rating && application.rating.rating_count > 0 ? (
+                           <StarRating 
+                             rating={application.rating.avg_score} 
+                             size="sm" 
+                             showValue={false}
+                             readonly 
+                           />
+                         ) : (
+                           <span className="text-xs text-muted-foreground">Новый специалист</span>
+                         )}
+                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <div className="text-xl font-bold text-primary whitespace-nowrap">
