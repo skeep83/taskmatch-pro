@@ -303,21 +303,21 @@ const JobDetail = () => {
                     <Badge variant="secondary" className="ml-2">{jobPhotos.length}</Badge>
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {jobPhotos.map((photo, index) => (
-                      <div key={photo.id} className="relative group">
-                        <div className="aspect-square bg-muted rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md">
-                          <OptimizedImage
-                            src={photo.file_url}
-                            alt={`Фото заказа ${index + 1}`}
-                            bucket="evidence"
-                            className="w-full h-full"
-                            objectFit="cover"
-                            enableZoom={true}
-                            containerClassName="w-full h-full"
-                          />
+                    {jobPhotos.map((photo, index) => {
+                      const imageUrl = supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl;
+                      return (
+                        <div key={photo.id} className="relative group cursor-pointer">
+                          <div className="aspect-square bg-muted rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md">
+                            <img
+                              src={imageUrl}
+                              alt={`Фото заказа ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
