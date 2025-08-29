@@ -80,6 +80,45 @@ export function JobApplicationsList({
     }
   }, [jobId]);
 
+  // Real-time subscription for job applications
+  useEffect(() => {
+    if (!jobId) return;
+
+    const channel = supabase
+      .channel(`job-applications-${jobId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'job_applications',
+          filter: `job_id=eq.${jobId}`
+        },
+        (payload) => {
+          console.log('New job application received:', payload);
+          fetchApplications(); // Refresh applications list
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'job_price_proposals',
+          filter: `job_id=eq.${jobId}`
+        },
+        (payload) => {
+          console.log('New price proposal received:', payload);
+          fetchApplications(); // Refresh applications list
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [jobId]);
+
   const fetchApplications = async () => {
     try {
       setLoading(true);
