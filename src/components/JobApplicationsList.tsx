@@ -383,6 +383,26 @@ export const JobApplicationsList = ({
                             />
                           </div>
                         )}
+                        {application.proProfile?.bio && (
+                          <div>
+                            <h4 className="font-medium mb-1">О специалисте</h4>
+                            <p className="text-sm text-muted-foreground">{application.proProfile.bio}</p>
+                          </div>
+                        )}
+                        {application.proProfile && (application.proProfile.hourly_rate_cents || application.proProfile.fixed_price_cents) && (
+                          <div>
+                            <h4 className="font-medium mb-1">Тарифы</h4>
+                            <div className="text-sm text-muted-foreground">
+                              {application.proProfile.hourly_rate_cents && (
+                                <span>Почасовая: {Math.round(application.proProfile.hourly_rate_cents / 100)} ₽/час</span>
+                              )}
+                              {application.proProfile.hourly_rate_cents && application.proProfile.fixed_price_cents && ' • '}
+                              {application.proProfile.fixed_price_cents && (
+                                <span>Фиксированная: {Math.round(application.proProfile.fixed_price_cents / 100)} ₽</span>
+                              )}
+                            </div>
+                          </div>
+                        )}
                         
                         {application.proProfile && (
                           <div className="space-y-2">
