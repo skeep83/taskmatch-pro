@@ -338,24 +338,27 @@ const JobDetail = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <span>{clientProfile.full_name || 
-                     (clientProfile.first_name && clientProfile.last_name 
-                       ? `${clientProfile.first_name} ${clientProfile.last_name}` 
-                       : 'Клиент')}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-semibold">
+                      {clientProfile.full_name || 
+                       (clientProfile.first_name && clientProfile.last_name 
+                         ? `${clientProfile.first_name} ${clientProfile.last_name}` 
+                         : 'Клиент')}
+                    </h4>
                     <Badge variant="secondary" className="text-xs">Клиент</Badge>
-                    {clientRating && clientRating.count > 0 && (
+                  </div>
+                  <div>
+                    {clientRating && clientRating.count > 0 ? (
                       <StarRating 
                         rating={clientRating.average} 
                         size="sm" 
                         showValue={false}
                         readonly 
                       />
+                    ) : (
+                      <p className="text-xs text-muted-foreground">Новый клиент</p>
                     )}
-                  </h4>
-                  {(!clientRating || clientRating.count === 0) && (
-                    <p className="text-xs text-muted-foreground mt-1">Новый клиент</p>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
