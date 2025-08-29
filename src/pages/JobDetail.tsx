@@ -678,72 +678,76 @@ const JobDetail = () => {
             {/* Professional Action Buttons */}
             {canApply && (
               <Card className="transition-all">
-                <CardContent className="pt-6 pb-6 text-center">
-                  <h3 className="text-lg font-semibold mb-6">
-                    Заинтересованы в заказе?
-                  </h3>
-                  
-                  {/* Central Image */}
-                  <div className="flex justify-center mb-6">
-                    <div className="w-32 h-32 bg-muted/20 rounded-lg flex items-center justify-center">
-                      <img 
-                        src={interestedInJobImage} 
-                        alt="Заинтересованы в заказе" 
-                        className="w-28 h-28 object-contain"
-                        onError={(e) => {
-                          console.log('Image failed to load:', e);
-                          e.currentTarget.style.display = 'none';
-                        }}
-                        onLoad={() => console.log('Image loaded successfully')}
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Buttons at bottom */}
-                  <div className="flex gap-2">
-                    <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="flex-1">
+                <CardContent className="pt-6 pb-6">
+                  {!showApplicationForm && !showPriceProposal ? (
+                    <>
+                      <h3 className="text-lg font-semibold mb-4 text-center">
+                        Заинтересованы в заказе?
+                      </h3>
+                      
+                      {/* Buttons */}
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => setShowApplicationForm(true)}
+                        >
                           <User className="w-4 h-4 mr-1" />
                           Откликнуться
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <JobResponseForm
-                          jobId={job.id}
-                          jobTitle={job.title}
-                          budgetMinCents={job.budget_min_cents}
-                          budgetMaxCents={job.budget_max_cents}
-                          onApplicationSubmit={() => {
-                            setShowApplicationForm(false);
-                            loadJobData();
-                          }}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                    
-                    <Dialog open={showPriceProposal} onOpenChange={setShowPriceProposal}>
-                      <DialogTrigger asChild>
-                        <Button className="flex-1">
+                        
+                        <Button 
+                          className="flex-1"
+                          onClick={() => setShowPriceProposal(true)}
+                        >
                           <DollarSign className="w-4 h-4 mr-1" />
                           Предложить цену
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <PriceProposalForm
-                          jobId={job.id}
-                          jobTitle={job.title}
-                          budgetMinCents={job.budget_min_cents}
-                          budgetMaxCents={job.budget_max_cents}
-                          clientRating={clientRating}
-                          onProposalSubmit={() => {
-                            setShowPriceProposal(false);
-                            loadJobData();
-                          }}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  </div>
+                      </div>
+                    </>
+                  ) : showApplicationForm ? (
+                    <div>
+                      <JobResponseForm
+                        jobId={job.id}
+                        jobTitle={job.title}
+                        budgetMinCents={job.budget_min_cents}
+                        budgetMaxCents={job.budget_max_cents}
+                        onApplicationSubmit={() => {
+                          setShowApplicationForm(false);
+                          loadJobData();
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        className="mt-4 w-full"
+                        onClick={() => setShowApplicationForm(false)}
+                      >
+                        Отмена
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <PriceProposalForm
+                        jobId={job.id}
+                        jobTitle={job.title}
+                        budgetMinCents={job.budget_min_cents}
+                        budgetMaxCents={job.budget_max_cents}
+                        clientRating={clientRating}
+                        onProposalSubmit={() => {
+                          setShowPriceProposal(false);
+                          loadJobData();
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        className="mt-4 w-full"
+                        onClick={() => setShowPriceProposal(false)}
+                      >
+                        Отмена
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
