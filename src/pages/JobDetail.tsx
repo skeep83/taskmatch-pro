@@ -8,6 +8,7 @@ import { OptimizedImage } from '@/components/media/OptimizedImage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -306,16 +307,32 @@ const JobDetail = () => {
                     {jobPhotos.map((photo, index) => {
                       const imageUrl = supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl;
                       return (
-                        <div key={photo.id} className="relative group cursor-pointer">
-                          <div className="aspect-square bg-muted rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md">
+                        <Dialog key={photo.id}>
+                          <DialogTrigger asChild>
+                            <div className="relative group cursor-pointer">
+                              <div className="aspect-square bg-muted rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md">
+                                <img
+                                  src={imageUrl}
+                                  alt={`Фото заказа ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
+                                    <ZoomIn className="w-4 h-4 text-gray-700" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl w-full p-2">
                             <img
                               src={imageUrl}
                               alt={`Фото заказа ${index + 1}`}
-                              className="w-full h-full object-cover"
-                              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
                             />
-                          </div>
-                        </div>
+                          </DialogContent>
+                        </Dialog>
                       );
                     })}
                   </div>
