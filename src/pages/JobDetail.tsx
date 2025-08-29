@@ -886,16 +886,17 @@ const JobDetail = () => {
 
             {/* Sidebar */}
             <div className="lg:col-span-1 space-y-8">
-              {/* Job Status and Statistics Combined */}
-              <div className="card-surface p-6 relative z-10">
-                <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
-                  <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                  Статус и статистика заказа
-                </h3>
-                
-                {/* Job Status Progress */}
-                <div className="mb-8">
-                  <h4 className="text-lg font-medium mb-4 text-muted-foreground">Прогресс выполнения</h4>
+              {/* Job Status and Statistics Combined - Only show when professional is assigned */}
+              {job.pro_id && (
+                <div className="card-surface p-6 relative z-10">
+                  <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
+                    <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                    Статус и статистика заказа
+                  </h3>
+                  
+                  {/* Job Status Progress */}
+                  <div className="mb-8">
+                    <h4 className="text-lg font-medium mb-4 text-muted-foreground">Прогресс выполнения</h4>
                   <JobStatusProgress 
                     status={job.status}
                     startConfirmed={jobStatusData.start_confirmed}
@@ -995,10 +996,11 @@ const JobDetail = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+                </div>
+              )}
 
-              {/* Applications List for Job Owner */}
-              {isJobOwner && (
+              {/* Applications List for Job Owner - Only show when NO professional is assigned */}
+              {isJobOwner && !job.pro_id && (
                 <div className="card-surface p-8 relative z-20">
                   <JobApplicationsList 
                     jobId={job.id}
