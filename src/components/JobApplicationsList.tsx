@@ -123,34 +123,59 @@ export function JobApplicationsList({
     try {
       setLoading(true);
       
-      // Fetch job applications with profiles and additional data
-      const { data: applicationsData, error: applicationsError } = await supabase
-        .from('job_applications')
-        .select(`
-          *,
-          profiles:pro_id (
-            first_name,
-            last_name,
-            full_name,
-            avatar_url
-          )
-        `)
-        .eq('job_id', jobId)
-        .order('created_at', { ascending: false });
+      // Fetch both job applications and price proposals
+      const [applicationsResponse, proposalsResponse] = await Promise.all([
+        supabase
+          .from('job_applications')
+          .select(`
+            *,
+            profiles:pro_id (
+              first_name,
+              last_name,
+              full_name,
+              avatar_url
+            )
+          `)
+          .eq('job_id', jobId)
+          .order('created_at', { ascending: false }),
+        
+        supabase
+          .from('job_price_proposals')
+          .select(`
+            *,
+            profiles:pro_id (
+              first_name,
+              last_name,
+              full_name,
+              avatar_url
+            )
+          `)
+          .eq('job_id', jobId)
+          .order('created_at', { ascending: false })
+      ]);
 
-      if (applicationsError) {
-        console.error('Error fetching applications:', applicationsError);
-        return;
+      if (applicationsResponse.error) {
+        console.error('Error fetching applications:', applicationsResponse.error);
+      }
+      
+      if (proposalsResponse.error) {
+        console.error('Error fetching proposals:', proposalsResponse.error);
       }
 
-      if (!applicationsData || applicationsData.length === 0) {
+      // Combine and normalize data from both sources
+      const allApplications = [
+        ...(applicationsResponse.data || []),
+        ...(proposalsResponse.data || [])
+      ];
+
+      if (!allApplications || allApplications.length === 0) {
         setApplications([]);
         return;
       }
 
       // Fetch additional data for each professional
       const enhancedApplications = await Promise.all(
-        applicationsData.map(async (app) => {
+        allApplications.map(async (app) => {
           try {
             // Fetch pro profile
             const { data: proProfile } = await supabase
