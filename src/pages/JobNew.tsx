@@ -3,12 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
-import { FloatingCard } from "@/components/ui/floating-card";
-import { GlassMorphism } from "@/components/ui/glass-morphism";
-import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle } from "lucide-react";
-import jobImage from "@/assets/services-hero.jpg";
+import { Progress } from "@/components/ui/progress";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, Calendar, Plus, X } from "lucide-react";
 
 const JobNew = () => {
   const { t } = useEnhancedI18n();
@@ -20,18 +24,31 @@ const JobNew = () => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    category_id: '',
+    description: '',
+    urgency: 'normal',
+    budget_min: '',
+    budget_max: '',
+    date: '',
+    time: ''
+  });
 
   useEffect(() => {
     (async () => {
       try {
         const { supabase } = await import("@/integrations/supabase/client");
         const { data, error } = await (supabase as any)
-          .from("service_categories")
-          .select("id,name,name_ro,icon")
-          .eq('is_active', true)
-          .order("name");
+          .from("categories")
+          .select("id,key,label_ru,label_ro")
+          .order("label_ru");
         if (error) throw error;
-        setCategories(data || []);
+        setCategories(data?.map((cat: any) => ({
+          id: cat.id,
+          name: cat.label_ru || cat.key,
+          name_ro: cat.label_ro,
+          icon: "🔧"
+        })) || []);
       } catch (e) {
         console.error(e);
       }
@@ -43,21 +60,14 @@ const JobNew = () => {
   const presetCategory = params.get("category_id") || "";
   const presetProId = params.get("pro_id") || "";
 
-  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const category_id = String(fd.get("category_id") || "");
-    const description = String(fd.get("description") || "");
-    const urgency = String(fd.get("urgency") || "normal");
-    const budget_min = Number(fd.get("budget_min") || 0);
-    const budget_max = Number(fd.get("budget_max") || 0);
-    const date = String(fd.get("date") || "");
-    const time = String(fd.get("time") || "");
-
-    if (!category_id || !description) {
-      toast({ title: t("auth.error.fields"), description: t("job.new.error.required"), variant: "destructive" });
+    
+    if (!formData.category_id || !formData.description) {
+      toast({ title: "Ошибка", description: "Заполните обязательные поля", variant: "destructive" });
       return;
     }
+
     setLoading(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
@@ -76,16 +86,18 @@ const JobNew = () => {
         .eq("owner_id", userId)
         .maybeSingle();
 
-      const scheduled_at = date && time ? new Date(`${date}T${time}:00Z`).toISOString() : null;
+      const scheduled_at = formData.date && formData.time ? 
+        new Date(`${formData.date}T${formData.time}:00Z`).toISOString() : null;
+      
       const insertPayload: any = {
         client_id: userId,
-        category_id,
-        title: description.substring(0, 100),
-        description,
-        budget_min_cents: isFinite(budget_min) ? Math.round(budget_min * 100) : null,
-        budget_max_cents: isFinite(budget_max) ? Math.round(budget_max * 100) : null,
+        category_id: formData.category_id,
+        title: formData.description.substring(0, 100),
+        description: formData.description,
+        budget_min_cents: formData.budget_min ? Math.round(parseFloat(formData.budget_min) * 100) : null,
+        budget_max_cents: formData.budget_max ? Math.round(parseFloat(formData.budget_max) * 100) : null,
         scheduled_at,
-        urgency
+        urgency: formData.urgency
       };
       
       if (presetProId) insertPayload.pro_id = presetProId;
@@ -109,7 +121,7 @@ const JobNew = () => {
 
       // Upload photos to private bucket and link to job
       if (created?.id && uploadedFiles.length) {
-        const bucket = (supabase as any).storage.from('evidence');
+        const bucket = supabase.storage.from('evidence');
         for (let i = 0; i < Math.min(uploadedFiles.length, 8); i++) {
           const file = uploadedFiles[i];
           try {
@@ -117,7 +129,7 @@ const JobNew = () => {
             const path = `job/${created.id}/${Date.now()}-${i}.${ext}`;
             const { error: upErr } = await bucket.upload(path, file, { upsert: true, contentType: file.type || 'image/jpeg' });
             if (upErr) throw upErr;
-            const { error: insErr } = await (supabase as any)
+            const { error: insErr } = await supabase
               .from('job_photos')
               .insert({ job_id: created.id, file_url: path });
             if (insErr) throw insErr;
@@ -129,12 +141,11 @@ const JobNew = () => {
 
       // Trigger smart matching to find nearby professionals
       try {
-        await (supabase as any).functions.invoke('job-smart-match', {
+        await supabase.functions.invoke('job-smart-match', {
           body: { jobId: created.id }
         });
       } catch (matchError) {
         console.warn('Smart matching failed:', matchError);
-        // Continue even if matching fails
       }
 
       toast({ title: "Заказ создан", description: "Мы нашли специалистов в вашем районе и отправили им уведомления" });
@@ -147,11 +158,9 @@ const JobNew = () => {
     }
   };
 
-  const categoryOptions = useMemo(() => categories.map(c => (
-    <option key={c.id} value={c.id}>
-      {c.icon && `${c.icon} `}{c.name}
-    </option>
-  )), [categories]);
+  const updateFormData = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -180,245 +189,279 @@ const JobNew = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 3));
+  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+
+  const getStepProgress = () => (step / 3) * 100;
+
   return (
-    <main className="min-h-screen">
-      <Seo title={`${t('app.name')} — Инстант‑бронирование`} description="Создать заказ" canonical="/job/new" />
+    <main className="min-h-screen bg-background">
+      <Seo title="Создать заказ — ServiceHub" description="Создать заказ" canonical="/job/new" />
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={jobImage} alt="Job Creation" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-orange-600/80" />
+      <div className="container mx-auto py-8 px-6">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-gradient mb-2">
+            Создать заказ
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Найдите профессионального специалиста за несколько минут
+          </p>
         </div>
-        <div className="relative container mx-auto px-4 py-24">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-              {t("job.new.title")}
-            </h1>
-            <p className="text-xl text-white/90 mb-8">
-              {t("job.new.subtitle")}
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
-                <div className="flex items-center gap-2 text-white">
-                  <AnimatedIcon icon={Zap} className="text-yellow-300" />
-                  <span>Мгновенные отклики</span>
-                </div>
-              </FloatingCard>
-              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
-                <div className="flex items-center gap-2 text-white">
-                  <AnimatedIcon icon={Shield} className="text-green-300" />
-                  <span>Защита эскроу</span>
-                </div>
-              </FloatingCard>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Form Section */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center space-x-4">
-              {[1, 2, 3].map((stepNum) => (
-                <div key={stepNum} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                    stepNum <= step ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {stepNum <= step ? <CheckCircle className="w-5 h-5" /> : stepNum}
+        {/* Progress */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium">Шаг {step} из 3</span>
+            <span className="text-sm text-muted-foreground">{Math.round(getStepProgress())}% завершено</span>
+          </div>
+          <Progress value={getStepProgress()} className="h-2" />
+        </div>
+
+        {/* Main Form */}
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {step === 1 && (
+                  <>
+                    <span className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">1</span>
+                    Детали услуги
+                  </>
+                )}
+                {step === 2 && (
+                  <>
+                    <span className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">2</span>
+                    Бюджет и время
+                  </>
+                )}
+                {step === 3 && (
+                  <>
+                    <span className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">3</span>
+                    Фотографии (опционально)
+                  </>
+                )}
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <form onSubmit={onSubmit} className="space-y-6">
+                {/* Step 1: Service Details */}
+                {step === 1 && (
+                  <div className="space-y-6">
+                    <div>
+                      <Label htmlFor="category_id">Категория услуги *</Label>
+                      <Select 
+                        value={formData.category_id || presetCategory} 
+                        onValueChange={(value) => updateFormData('category_id', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите категорию" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map(cat => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.icon} {cat.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="urgency">Приоритет</Label>
+                      <Select value={formData.urgency} onValueChange={(value) => updateFormData('urgency', value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Обычный</SelectItem>
+                          <SelectItem value="urgent">Срочно (+30%)</SelectItem>
+                          <SelectItem value="same_day">В тот же день (+50%)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="description">Описание задачи *</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => updateFormData('description', e.target.value)}
+                        placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
+                        rows={4}
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Чем подробнее описание, тем точнее будут предложения специалистов
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Zap className="w-3 h-3" />
+                        Мгновенные отклики
+                      </Badge>
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Shield className="w-3 h-3" />
+                        Защита эскроу
+                      </Badge>
+                    </div>
                   </div>
-                  {stepNum < 3 && <div className={`w-16 h-1 mx-2 transition-all ${
-                    stepNum < step ? 'bg-primary' : 'bg-muted'
-                  }`} />}
-                </div>
-              ))}
-            </div>
-          </div>
+                )}
 
-          <GlassMorphism className="p-8">
-            <form className="space-y-8" onSubmit={onSubmit}>
-              
-              {/* Step 1: Service Details */}
-              <div className="space-y-6">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">1</span>
-                  Детали услуги
-                </h2>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FloatingCard className="p-6">
-                    <label className="block text-sm font-medium mb-3">Категория услуги</label>
-                    <select 
-                      name="category_id" 
-                      defaultValue={presetCategory}
-                      className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all" 
-                      required
-                    >
-                      <option value="" disabled>Выберите категорию</option>
-                      {categoryOptions}
-                    </select>
-                  </FloatingCard>
-
-                  <FloatingCard className="p-6">
-                    <label className="block text-sm font-medium mb-3">Приоритет</label>
-                    <select name="urgency" className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all">
-                      <option value="normal">Обычный</option>
-                      <option value="urgent">Срочно (+30%)</option>
-                      <option value="same_day">В тот же день (+50%)</option>
-                    </select>
-                  </FloatingCard>
-                </div>
-
-                <FloatingCard className="p-6">
-                  <label className="block text-sm font-medium mb-3">Описание задачи</label>
-                  <textarea 
-                    name="description"
-                    className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all" 
-                    rows={4}
-                    placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Чем подробнее описание, тем точнее будут предложения специалистов
-                  </p>
-                </FloatingCard>
-              </div>
-
-              {/* Step 2: Budget & Schedule */}
-              <div className="space-y-6 pt-8 border-t border-white/10">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">2</span>
-                  Бюджет и расписание
-                </h2>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FloatingCard className="p-6">
+                {/* Step 2: Budget & Schedule */}
+                {step === 2 && (
+                  <div className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-3 flex items-center gap-2">
+                        <Label htmlFor="budget_min" className="flex items-center gap-2">
                           <Euro className="w-4 h-4 text-green-500" />
-                          Бюджет от (₽)
-                        </label>
-                        <input 
-                          name="budget_min" 
-                          type="number" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
-                          placeholder="1000"
+                          Бюджет от ($)
+                        </Label>
+                        <Input
+                          id="budget_min"
+                          type="number"
+                          value={formData.budget_min}
+                          onChange={(e) => updateFormData('budget_min', e.target.value)}
+                          placeholder="100"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3">до (₽)</label>
-                        <input 
-                          name="budget_max" 
-                          type="number" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
-                          placeholder="5000"
+                        <Label htmlFor="budget_max">до ($)</Label>
+                        <Input
+                          id="budget_max"
+                          type="number"
+                          value={formData.budget_max}
+                          onChange={(e) => updateFormData('budget_max', e.target.value)}
+                          placeholder="500"
                         />
                       </div>
                     </div>
-                  </FloatingCard>
 
-                  <FloatingCard className="p-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-3 flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-blue-500" />
+                        <Label htmlFor="date" className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-blue-500" />
                           Дата
-                        </label>
-                        <input 
-                          name="date" 
-                          type="date" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
+                        </Label>
+                        <Input
+                          id="date"
+                          type="date"
+                          value={formData.date}
+                          onChange={(e) => updateFormData('date', e.target.value)}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3">Время</label>
-                        <input 
-                          name="time" 
-                          type="time" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
+                        <Label htmlFor="time" className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-blue-500" />
+                          Время
+                        </Label>
+                        <Input
+                          id="time"
+                          type="time"
+                          value={formData.time}
+                          onChange={(e) => updateFormData('time', e.target.value)}
                         />
                       </div>
                     </div>
-                  </FloatingCard>
-                </div>
-              </div>
 
-              {/* Step 3: Photos */}
-              <div className="space-y-6 pt-8 border-t border-white/10">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">3</span>
-                  Фотографии задачи
-                </h2>
-                
-                <FloatingCard className="p-6">
-                  <div
-                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
-                      dragActive ? 'border-primary bg-primary/5' : 'border-white/20'
-                    }`}
-                    onDragEnter={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                  >
-                    <AnimatedIcon icon={Camera} className="w-12 h-12 text-primary mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Добавьте фотографии</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Перетащите фото сюда или выберите файлы
-                    </p>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleFileInput}
-                      className="hidden"
-                      id="photo-upload"
-                      name="photos"
-                    />
-                    <label htmlFor="photo-upload" className="btn-hero inline-flex items-center gap-2">
-                      <Upload className="w-4 h-4" />
-                      Выбрать файлы
-                    </label>
-                  </div>
-
-                  {uploadedFiles.length > 0 && (
-                    <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {uploadedFiles.map((file, index) => (
-                        <div key={index} className="relative group">
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Upload ${index + 1}`}
-                            className="w-full h-20 object-cover rounded-lg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeFile(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        💡 <strong>Совет:</strong> Указание бюджета и времени поможет специалистам лучше подготовиться и дать более точную оценку.
+                      </p>
                     </div>
-                  )}
-                </FloatingCard>
-              </div>
+                  </div>
+                )}
 
-              {/* Submit */}
-              <div className="flex justify-between items-center pt-8 border-t border-white/10">
-                <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>
-                  Отмена
-                </button>
-                <button type="submit" className="btn-hero px-8" disabled={loading}>
-                  {loading ? 'Создаем заказ...' : 'Создать заказ'}
-                </button>
-              </div>
-            </form>
-          </GlassMorphism>
+                {/* Step 3: Photos */}
+                {step === 3 && (
+                  <div className="space-y-6">
+                    <div
+                      className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+                        dragActive ? 'border-primary bg-primary/5' : 'border-muted'
+                      }`}
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                    >
+                      <AnimatedIcon icon={Camera} className="w-12 h-12 text-primary mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">Добавьте фотографии</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Перетащите фото сюда или выберите файлы (до 8 фото)
+                      </p>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleFileInput}
+                        className="hidden"
+                        id="photo-upload"
+                      />
+                      <Button type="button" variant="outline" asChild>
+                        <label htmlFor="photo-upload" className="cursor-pointer">
+                          <Upload className="w-4 h-4 mr-2" />
+                          Выбрать файлы
+                        </label>
+                      </Button>
+                    </div>
+
+                    {uploadedFiles.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {uploadedFiles.map((file, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => removeFile(index)}
+                              className="absolute -top-2 -right-2 w-6 h-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between pt-6 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={prevStep}
+                    disabled={step === 1}
+                  >
+                    Назад
+                  </Button>
+
+                  {step < 3 ? (
+                    <Button
+                      type="button"
+                      onClick={nextStep}
+                      disabled={step === 1 && (!formData.category_id || !formData.description)}
+                    >
+                      Далее
+                    </Button>
+                  ) : (
+                    <Button type="submit" disabled={loading}>
+                      {loading ? "Создание..." : "Создать заказ"}
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
-      </section>
+      </div>
     </main>
   );
 };
