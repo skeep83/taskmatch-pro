@@ -545,20 +545,20 @@ export function JobApplicationsList({
         </AnimatePresence>
       </div>
 
-      {/* Navigation - Outside of card container */}
+      {/* Navigation */}
       {applications.length > 0 && (
-        <div className="flex items-center justify-center gap-4 p-4 bg-card rounded-xl border shadow-sm">
+        <div className="flex items-center justify-center gap-6 py-4">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => setCurrentIndex((prev) => (prev - 1 + applications.length) % applications.length)}
-            className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
+            className="w-10 h-10 rounded-full p-0 hover:bg-muted"
             disabled={applications.length <= 1}
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-muted-foreground">
               {currentIndex + 1} из {applications.length}
             </span>
@@ -567,10 +567,10 @@ export function JobApplicationsList({
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-4 h-4 rounded-full transition-all duration-300 border-2 ${
+                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
                     index === currentIndex 
-                      ? 'bg-primary border-primary scale-125 shadow-lg' 
-                      : 'bg-transparent border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/20'
+                      ? 'bg-primary scale-125' 
+                      : 'bg-muted hover:bg-muted-foreground/30'
                   }`}
                 />
               ))}
@@ -578,10 +578,10 @@ export function JobApplicationsList({
           </div>
           
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => setCurrentIndex((prev) => (prev + 1) % applications.length)}
-            className="w-12 h-12 rounded-full p-0 shadow-lg hover:shadow-xl transition-all"
+            className="w-10 h-10 rounded-full p-0 hover:bg-muted"
             disabled={applications.length <= 1}
           >
             <ChevronRight className="w-5 h-5" />
