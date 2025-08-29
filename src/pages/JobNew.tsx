@@ -25,13 +25,18 @@ const JobNew = () => {
     (async () => {
       try {
         const { supabase } = await import("@/integrations/supabase/client");
-        const { data, error } = await (supabase as any)
-          .from("service_categories")
-          .select("id,name,name_ro,icon")
-          .eq('is_active', true)
-          .order("name");
+        const { data, error } = await supabase
+          .from("categories")
+          .select("id,key,label_ru,label_ro")
+          .order("label_ru");
         if (error) throw error;
-        setCategories(data || []);
+        const mappedData = data?.map(cat => ({
+          id: cat.id,
+          name: cat.label_ru || cat.key,
+          name_ro: cat.label_ro,
+          icon: cat.key
+        })) || [];
+        setCategories(mappedData);
       } catch (e) {
         console.error(e);
       }

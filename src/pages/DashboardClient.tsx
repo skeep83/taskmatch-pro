@@ -123,7 +123,7 @@ export default function DashboardClient() {
           scheduled_at,
           urgency,
           pro_id,
-          categories:category_id (
+          categories!inner (
             label_ru
           )
         `)
