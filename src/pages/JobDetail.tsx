@@ -506,7 +506,7 @@ const JobDetail = () => {
                   
                   <div className="border border-border/50 rounded-lg p-4">
                     <div className="flex items-start gap-4">
-                      <Avatar className="w-16 h-16">
+                      <Avatar className="w-20 h-20">
                         <AvatarImage 
                           src={assignedPro.profile?.avatar_url || ''} 
                           alt={assignedPro.profile?.full_name || `${assignedPro.profile?.first_name} ${assignedPro.profile?.last_name}` || 'Специалист'} 
