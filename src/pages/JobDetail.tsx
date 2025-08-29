@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Seo } from '@/components/Seo';
 import { JobApplicationsList } from '@/components/JobApplicationsList';
 import { JobResponseForm } from '@/components/JobResponseForm';
+import { PriceProposalForm } from '@/components/PriceProposalForm';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +57,11 @@ const JobDetail = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [showPriceProposal, setShowPriceProposal] = useState(false);
+  const [clientRating, setClientRating] = useState<{average: number, count: number} | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [jobApplications, setJobApplications] = useState<any[]>([]);
 
   useEffect(() => {
     if (jobId) {
@@ -79,6 +85,7 @@ const JobDetail = () => {
         
         if (roles && roles.length > 0) {
           const rolesList = roles.map(r => r.role);
+          setUserRoles(rolesList);
           if (rolesList.includes('pro')) setUserRole('pro');
           else if (rolesList.includes('client')) setUserRole('client');
         }
@@ -102,6 +109,7 @@ const JobDetail = () => {
       if (error) throw error;
       
       setJob(data);
+      await loadJobData();
     } catch (error: any) {
       console.error('Error fetching job:', error);
       toast({
@@ -112,6 +120,36 @@ const JobDetail = () => {
       navigate('/dashboard');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadJobData = async () => {
+    if (!jobId) return;
+
+    try {
+      // Load job applications
+      const { data: applicationsData } = await supabase
+        .from('job_applications')
+        .select('*')
+        .eq('job_id', jobId)
+        .order('created_at', { ascending: false });
+
+      setJobApplications(applicationsData || []);
+
+      // Load client rating if user is a pro and we have job data
+      if (userRoles.includes('pro') && job?.client_id) {
+        const { data: clientRatings } = await supabase
+          .from('ratings')
+          .select('score')
+          .eq('to_user_id', job.client_id);
+        
+        if (clientRatings && clientRatings.length > 0) {
+          const average = clientRatings.reduce((sum, r) => sum + r.score, 0) / clientRatings.length;
+          setClientRating({ average, count: clientRatings.length });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading job data:', error);
     }
   };
 
@@ -351,20 +389,65 @@ const JobDetail = () => {
             />
           )}
 
-          {/* Response Form for Professionals */}
+          {/* Professional Action Buttons */}
           {canApply && (
-            <JobResponseForm
-              jobId={job.id}
-              jobTitle={job.title}
-              budgetMinCents={job.budget_min_cents}
-              budgetMaxCents={job.budget_max_cents}
-              onApplicationSubmit={() => {
-                toast({
-                  title: 'Отклик отправлен',
-                  description: 'Клиент увидит ваше предложение'
-                });
-              }}
-            />
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <h3 className="text-lg font-semibold">Заинтересованы в заказе?</h3>
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    <Button 
+                      onClick={() => setShowPriceProposal(true)}
+                      className="btn-hero"
+                    >
+                      Предложить цену
+                    </Button>
+                    <Button 
+                      onClick={() => setShowApplicationForm(true)}
+                      variant="outline"
+                      className="border-primary text-primary hover:bg-primary hover:text-white"
+                    >
+                      Откликнуться
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Application Form Modal */}
+          {showApplicationForm && (
+            <div className="mt-8">
+              <JobResponseForm
+                jobId={job.id}
+                jobTitle={job.title}
+                budgetMinCents={job.budget_min_cents}
+                budgetMaxCents={job.budget_max_cents}
+                onApplicationSubmit={() => {
+                  setShowApplicationForm(false);
+                  // Refresh applications
+                  loadJobData();
+                }}
+              />
+            </div>
+          )}
+
+          {/* Price Proposal Modal */}
+          {showPriceProposal && (
+            <div className="mt-8">
+              <PriceProposalForm
+                jobId={job.id}
+                jobTitle={job.title}
+                budgetMinCents={job.budget_min_cents}
+                budgetMaxCents={job.budget_max_cents}
+                clientRating={clientRating}
+                onProposalSubmit={() => {
+                  setShowPriceProposal(false);
+                  // Refresh page data
+                  loadJobData();
+                }}
+              />
+            </div>
           )}
         </div>
 

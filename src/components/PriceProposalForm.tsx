@@ -33,7 +33,7 @@ export const PriceProposalForm = ({
   onProposalSubmit
 }: PriceProposalFormProps) => {
   const { toast } = useToast();
-  const { formatPrice, parsePriceInput } = useCurrency();
+  const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     price: '',
@@ -56,7 +56,8 @@ export const PriceProposalForm = ({
     setLoading(true);
 
     try {
-      const priceCents = parsePriceInput(formData.price);
+      // Convert price to cents (assuming input is in main currency unit)
+      const priceCents = Math.round(parseFloat(formData.price) * 100);
       
       if (!priceCents || priceCents <= 0) {
         toast({

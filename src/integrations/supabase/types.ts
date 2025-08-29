@@ -751,6 +751,53 @@ export type Database = {
         }
         Relationships: []
       }
+      job_price_proposals: {
+        Row: {
+          created_at: string | null
+          eta_slot: string | null
+          id: string
+          job_id: string
+          note: string | null
+          price_cents: number
+          pro_id: string
+          status: string | null
+          updated_at: string | null
+          warranty_days: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          eta_slot?: string | null
+          id?: string
+          job_id: string
+          note?: string | null
+          price_cents: number
+          pro_id: string
+          status?: string | null
+          updated_at?: string | null
+          warranty_days?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          eta_slot?: string | null
+          id?: string
+          job_id?: string
+          note?: string | null
+          price_cents?: number
+          pro_id?: string
+          status?: string | null
+          updated_at?: string | null
+          warranty_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_price_proposals_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           budget_max_cents: number | null

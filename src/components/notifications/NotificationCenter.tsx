@@ -26,6 +26,8 @@ export const NotificationCenter = () => {
     // Handle navigation based on notification type
     if (notification.type === 'job_match' && notification.data?.job_id) {
       window.location.href = `/job/${notification.data.job_id}`;
+    } else if (notification.type === 'price_proposal' && notification.data?.job_id) {
+      window.location.href = `/job/${notification.data.job_id}`;
     } else if (notification.type === 'message' && notification.data?.chat_id) {
       // Navigate to chat with the sender
       window.location.href = `/messages?chat=${notification.data.chat_id}`;
@@ -41,6 +43,8 @@ export const NotificationCenter = () => {
     switch (type) {
       case 'job_match':
         return '🎯';
+      case 'price_proposal':
+        return '💸';
       case 'job_update':
         return '📋';
       case 'payment':
@@ -63,7 +67,7 @@ export const NotificationCenter = () => {
           {unreadCount > 0 ? (
             <BellRing className="h-5 w-5 text-red-500 animate-pulse" />
           ) : (
-            <Bell className="h-5 w-5 text-slate-500" />
+            <Bell className="h-5 w-5" />
           )}
           {unreadCount > 0 && (
             <Badge
