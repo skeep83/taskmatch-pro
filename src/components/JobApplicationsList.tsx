@@ -395,8 +395,8 @@ export function JobApplicationsList({
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
                   </div>
                   
-                  {/* Avatar positioned to overlap sections */}
-                  <div className="absolute left-1/2 transform -translate-x-1/2 top-24">
+                  {/* Avatar positioned to overlap sections - with higher z-index */}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-24 z-10">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ duration: 0.2 }}
@@ -418,7 +418,7 @@ export function JobApplicationsList({
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white"
+                          className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white z-20"
                         >
                           <CheckCircle className="w-4 h-4 text-white" />
                         </motion.div>
@@ -436,26 +436,39 @@ export function JobApplicationsList({
                       </p>
                     </div>
                     
-                    {/* Social icons row */}
-                    <div className="flex justify-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <User className="w-5 h-5 text-gray-600" />
+                    {/* Professional info instead of social icons */}
+                    <div className="space-y-4 mb-6">
+                      {/* Experience/Bio */}
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {application.proProfile?.bio || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
+                        </p>
                       </div>
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <Phone className="w-5 h-5 text-gray-600" />
-                      </div>
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <MessageSquare className="w-5 h-5 text-gray-600" />
-                      </div>
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <Star className="w-5 h-5 text-gray-600" />
-                      </div>
+                      
+                      {/* Hourly rate if available */}
+                      {application.proProfile?.hourly_rate_cents && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                          <Clock className="w-4 h-4" />
+                          <span>Почасовая ставка: {formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
+                        </div>
+                      )}
+                      
+                      {/* Coverage radius */}
+                      {application.proProfile?.radius_km && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                          <span>🗺️</span>
+                          <span>Радиус работы: {application.proProfile.radius_km} км</span>
+                        </div>
+                      )}
+                      
+                      {/* Response time if available */}
+                      {application.eta_slot && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                          <Clock className="w-4 h-4" />
+                          <span>Готов приступить: {application.eta_slot}</span>
+                        </div>
+                      )}
                     </div>
-                    
-                    {/* Description text */}
-                    <p className="text-center text-sm text-gray-600 mb-6 leading-relaxed min-h-[4rem] flex items-center justify-center">
-                      {application.proProfile?.bio?.substring(0, 80) || 'Огромный стаж работы. Разбираюсь во многом что касается'}
-                    </p>
                     
                     {/* Price section */}
                     {application.price_cents && (
