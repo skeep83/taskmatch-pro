@@ -593,147 +593,133 @@ export function JobApplicationsList({
         </div>
       )}
 
-      {/* Portfolio Modal - Simple Implementation */}
-      {portfolioModalOpen && selectedPortfolio && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-          onClick={() => setPortfolioModalOpen(false)}
-        >
-          <div 
-            className="bg-white rounded-lg max-w-6xl max-h-[90vh] overflow-y-auto p-6 w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10">
-                  <AvatarImage 
-                    src={selectedPortfolio?.profiles?.avatar_url || ''} 
-                    alt={selectedPortfolio?.profiles?.full_name || 'Специалист'}
-                  />
-                  <AvatarFallback>
-                    {selectedPortfolio?.profiles?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'С'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h2 className="text-xl font-semibold">Портфолио {selectedPortfolio?.profiles?.full_name || 'специалиста'}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedPortfolio?.proProfile?.bio || 'Опытный специалист'}
-                  </p>
-                </div>
+      {/* Portfolio Modal */}
+      <Dialog open={portfolioModalOpen} onOpenChange={setPortfolioModalOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-6">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage 
+                  src={selectedPortfolio?.profiles?.avatar_url || ''} 
+                  alt={selectedPortfolio?.profiles?.full_name || 'Специалист'}
+                />
+                <AvatarFallback>
+                  {selectedPortfolio?.profiles?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'С'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <span className="text-xl">Портфолио {selectedPortfolio?.profiles?.full_name || 'специалиста'}</span>
+                <p className="text-sm text-muted-foreground font-normal">
+                  {selectedPortfolio?.proProfile?.bio || 'Опытный специалист'}
+                </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPortfolioModalOpen(false)}
-                className="shrink-0"
-              >
-                ✕ Закрыть
-              </Button>
-            </div>
-            
-            {/* Portfolio Content */}
-            <div>
-              {selectedPortfolio?.portfolio && selectedPortfolio.portfolio.length > 0 ? (
-                <div className="space-y-8">
-                  {selectedPortfolio.portfolio.map((item) => {
-                    // Собираем все изображения: основное + дополнительные
-                    const allImages = [];
-                    
-                    // Добавляем основное изображение, если есть
-                    if (item.image_url) {
-                      allImages.push({
-                        id: `main-${item.id}`,
-                        url: item.image_url,
-                        title: item.title || 'Основное фото',
-                        isMain: true
-                      });
-                    }
-                    
-                    // Добавляем дополнительные изображения
-                    if (item.portfolio_media) {
-                      item.portfolio_media
-                        .filter(media => media.file_type.startsWith('image/'))
-                        .sort((a, b) => a.display_order - b.display_order)
-                        .forEach(media => {
-                          allImages.push({
-                            id: media.id,
-                            url: media.file_url,
-                            title: media.file_name || 'Дополнительное фото',
-                            isMain: false
-                          });
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-6">
+            {selectedPortfolio?.portfolio && selectedPortfolio.portfolio.length > 0 ? (
+              <div className="space-y-8">
+                {selectedPortfolio.portfolio.map((item) => {
+                  console.log('🖼️ Processing portfolio item:', item);
+                  
+                  // Собираем все изображения: основное + дополнительные
+                  const allImages = [];
+                  
+                  // Добавляем основное изображение, если есть
+                  if (item.image_url) {
+                    allImages.push({
+                      id: `main-${item.id}`,
+                      url: item.image_url,
+                      title: item.title || 'Основное фото',
+                      isMain: true
+                    });
+                  }
+                  
+                  // Добавляем дополнительные изображения
+                  if (item.portfolio_media) {
+                    item.portfolio_media
+                      .filter(media => media.file_type.startsWith('image/'))
+                      .sort((a, b) => a.display_order - b.display_order)
+                      .forEach(media => {
+                        allImages.push({
+                          id: media.id,
+                          url: media.file_url,
+                          title: media.file_name || 'Дополнительное фото',
+                          isMain: false
                         });
-                    }
+                      });
+                  }
 
-                    return (
-                      <div key={item.id} className="space-y-4">
-                        {item.title && (
-                          <h3 className="text-lg font-semibold border-b pb-2">{item.title}</h3>
-                        )}
-                        
-                        {allImages.length > 0 && (
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {allImages.map((image) => (
-                              <div key={image.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group cursor-pointer">
-                                <OptimizedImage
-                                  src={image.url}
-                                  alt={image.title}
-                                  width={300}
-                                  height={300}
-                                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                />
-                                {image.isMain && (
-                                  <div className="absolute top-2 left-2 bg-primary/80 text-primary-foreground text-xs px-2 py-1 rounded">
-                                    Главное
-                                  </div>
-                                )}
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <Image className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-600 mb-2">Портфолио пока пусто</h3>
-                  <p className="text-gray-500">
-                    Специалист еще не добавил работы в свое портфолио
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            {/* Portfolio stats */}
-            {selectedPortfolio && (
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <div className="flex items-center gap-4">
-                    <span>Работ в портфолио: {selectedPortfolio.portfolio?.length || 0}</span>
-                    {selectedPortfolio.rating && (
-                      <span className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                        {selectedPortfolio.rating.avg_score.toFixed(1)} ({selectedPortfolio.rating.rating_count} отзывов)
-                      </span>
-                    )}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(`/pro/${selectedPortfolio.pro_id}`, '_blank')}
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Полный профиль
-                  </Button>
-                </div>
+                  console.log('🎨 All images for item:', allImages);
+
+                  return (
+                    <div key={item.id} className="space-y-4">
+                      {item.title && (
+                        <h3 className="text-lg font-semibold border-b pb-2">{item.title}</h3>
+                      )}
+                      
+                      {allImages.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {allImages.map((image) => (
+                            <div key={image.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group cursor-pointer">
+                              <OptimizedImage
+                                src={image.url}
+                                alt={image.title}
+                                width={300}
+                                height={300}
+                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                              />
+                              {image.isMain && (
+                                <div className="absolute top-2 left-2 bg-primary/80 text-primary-foreground text-xs px-2 py-1 rounded">
+                                  Главное
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Image className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">Портфолио пока пусто</h3>
+                <p className="text-gray-500">
+                  Специалист еще не добавил работы в свое портфолио
+                </p>
               </div>
             )}
           </div>
-        </div>
-      )}
+          
+          {/* Portfolio stats */}
+          {selectedPortfolio && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center gap-4">
+                  <span>Работ в портфолио: {selectedPortfolio.portfolio?.length || 0}</span>
+                  {selectedPortfolio.rating && (
+                    <span className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                      {selectedPortfolio.rating.avg_score.toFixed(1)} ({selectedPortfolio.rating.rating_count} отзывов)
+                    </span>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(`/pro/${selectedPortfolio.pro_id}`, '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Полный профиль
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
