@@ -388,26 +388,26 @@ export function JobApplicationsList({
                 className="perspective-1000"
               >
                 {/* 3D Card with gradient background like reference */}
-                <div className="card-3d group relative w-full max-w-sm mx-auto">
+                <div className="card-3d group relative w-full max-w-sm mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
                   {/* Top gradient section (like in reference) */}
-                  <div className="relative h-40 rounded-t-3xl bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 overflow-hidden">
+                  <div className="relative h-36 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 overflow-hidden">
                     {/* Decorative gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
                     
                     {/* Avatar in center top */}
-                    <div className="absolute inset-x-0 top-8 flex justify-center">
+                    <div className="absolute inset-x-0 -bottom-10 flex justify-center">
                       <motion.div
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         transition={{ duration: 0.2 }}
                         className="relative"
                       >
-                        <Avatar className="w-20 h-20 ring-4 ring-white/30 shadow-2xl">
+                        <Avatar className="w-20 h-20 ring-4 ring-white shadow-2xl">
                           <AvatarImage 
                             src={application.profiles?.avatar_url || ''} 
                             alt={profileName}
                             className="object-cover"
                           />
-                          <AvatarFallback className="bg-white/20 text-white font-bold text-xl backdrop-blur-sm">
+                          <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-xl">
                             {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -427,34 +427,34 @@ export function JobApplicationsList({
                   </div>
                   
                   {/* Bottom white section (like in reference) */}
-                  <div className="relative bg-white rounded-b-3xl px-6 py-8 shadow-2xl">
+                  <div className="relative bg-white px-6 pt-12 pb-8">
                     {/* Name and title */}
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
-                      <p className="text-sm text-gray-500 uppercase tracking-wide">
-                        {application.proProfile?.bio?.substring(0, 30) || 'Специалист'}
+                      <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
+                        Специалист
                       </p>
                     </div>
                     
                     {/* Social icons row (like in reference) */}
-                    <div className="flex justify-center gap-4 mb-6">
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <User className="w-4 h-4 text-gray-600" />
+                    <div className="flex justify-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
+                        <User className="w-5 h-5 text-gray-600" />
                       </div>
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <Phone className="w-4 h-4 text-gray-600" />
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
+                        <Phone className="w-5 h-5 text-gray-600" />
                       </div>
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <MessageSquare className="w-4 h-4 text-gray-600" />
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
+                        <MessageSquare className="w-5 h-5 text-gray-600" />
                       </div>
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
-                        <Star className="w-4 h-4 text-gray-600" />
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
+                        <Star className="w-5 h-5 text-gray-600" />
                       </div>
                     </div>
                     
                     {/* Description text */}
-                    <p className="text-center text-sm text-gray-600 mb-6 leading-relaxed">
-                      {application.proProfile?.bio || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
+                    <p className="text-center text-sm text-gray-600 mb-6 leading-relaxed min-h-[3rem] flex items-center justify-center">
+                      {application.proProfile?.bio?.substring(0, 50) || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
                     </p>
                     
                     {/* Price section */}
@@ -480,21 +480,23 @@ export function JobApplicationsList({
                     )}
                     
                     {/* Action button */}
-                    {canSelect && (
-                      <Button
-                        onClick={() => handleSelectProfessional(application.pro_id)}
-                        disabled={selecting === application.pro_id}
-                        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-                      >
-                        {selecting === application.pro_id ? 'Выбираем...' : 'Выбрать специалиста'}
-                      </Button>
-                    )}
-                    
-                    {isSelected && (
-                      <div className="w-full bg-green-100 text-green-800 font-semibold py-3 rounded-xl text-center">
-                        ✓ Выбран
-                      </div>
-                    )}
+                    <div className="mt-6">
+                      {canSelect && (
+                        <Button
+                          onClick={() => handleSelectProfessional(application.pro_id)}
+                          disabled={selecting === application.pro_id}
+                          className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                        >
+                          {selecting === application.pro_id ? 'Выбираем...' : 'Выбрать специалиста'}
+                        </Button>
+                      )}
+                      
+                      {isSelected && (
+                        <div className="w-full bg-green-100 text-green-800 font-semibold py-3 rounded-xl text-center">
+                          ✓ Выбран
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
