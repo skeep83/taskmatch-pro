@@ -686,9 +686,9 @@ const JobDetail = () => {
                     <DialogTrigger asChild>
                       <Button 
                         size="lg"
-                        className="h-14 text-lg font-semibold bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
+                        className="h-12 text-base font-medium flex items-center justify-center gap-2"
                       >
-                        <DollarSign className="w-5 h-5" />
+                        <DollarSign className="w-4 h-4" />
                         Предложить цену
                       </Button>
                     </DialogTrigger>
@@ -712,9 +712,9 @@ const JobDetail = () => {
                       <Button 
                         size="lg"
                         variant="outline"
-                        className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
+                        className="h-12 text-base font-medium flex items-center justify-center gap-2"
                       >
-                        <User className="w-5 h-5" />
+                        <User className="w-4 h-4" />
                         Откликнуться
                       </Button>
                     </DialogTrigger>
