@@ -615,54 +615,66 @@ export function JobApplicationsList({
           
           <div className="mt-6">
             {selectedPortfolio?.portfolio && selectedPortfolio.portfolio.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {selectedPortfolio.portfolio.map((item) => (
-                  <div key={item.id} className="space-y-3">
-                     <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-                       {item.image_url ? (
-                         <OptimizedImage
-                           src={item.image_url}
-                           alt={item.title || 'Работа из портфолио'}
-                           width={400}
-                           height={225}
-                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                         />
-                       ) : (
-                         <div className="w-full h-full flex items-center justify-center">
-                           <Image className="w-12 h-12 text-gray-400" />
-                         </div>
-                       )}
-                     </div>
-                    {item.title && (
-                      <h4 className="font-semibold text-sm">{item.title}</h4>
-                    )}
-                    
-                     {/* Additional media from portfolio_media */}
-                     {item.portfolio_media && item.portfolio_media.length > 0 && (
-                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                         {item.portfolio_media
-                           .sort((a, b) => a.display_order - b.display_order)
-                           .map((media) => (
-                              <div key={media.id} className="relative aspect-square rounded overflow-hidden bg-gray-100">
-                                {media.file_type.startsWith('image/') ? (
-                                  <OptimizedImage
-                                    src={media.file_url}
-                                    alt={media.file_name || 'Дополнительное фото'}
-                                    width={200}
-                                    height={200}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                                  />
-                                ) : (
-                                 <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                                   <FileText className="w-6 h-6 text-gray-400" />
-                                 </div>
-                               )}
-                             </div>
-                           ))}
-                       </div>
-                     )}
-                  </div>
-                ))}
+              <div className="space-y-8">
+                {selectedPortfolio.portfolio.map((item) => {
+                  // Собираем все изображения: основное + дополнительные
+                  const allImages = [];
+                  
+                  // Добавляем основное изображение, если есть
+                  if (item.image_url) {
+                    allImages.push({
+                      id: `main-${item.id}`,
+                      url: item.image_url,
+                      title: item.title || 'Основное фото',
+                      isMain: true
+                    });
+                  }
+                  
+                  // Добавляем дополнительные изображения
+                  if (item.portfolio_media) {
+                    item.portfolio_media
+                      .filter(media => media.file_type.startsWith('image/'))
+                      .sort((a, b) => a.display_order - b.display_order)
+                      .forEach(media => {
+                        allImages.push({
+                          id: media.id,
+                          url: media.file_url,
+                          title: media.file_name || 'Дополнительное фото',
+                          isMain: false
+                        });
+                      });
+                  }
+
+                  return (
+                    <div key={item.id} className="space-y-4">
+                      {item.title && (
+                        <h3 className="text-lg font-semibold border-b pb-2">{item.title}</h3>
+                      )}
+                      
+                      {allImages.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {allImages.map((image) => (
+                            <div key={image.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group">
+                              <OptimizedImage
+                                src={image.url}
+                                alt={image.title}
+                                width={300}
+                                height={300}
+                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                              />
+                              {image.isMain && (
+                                <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                                  Главное
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-12">
