@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Upload, Plus, Image, Trash2, X, Camera, Film, FileImage, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -173,6 +174,8 @@ const ProPortfolio = () => {
   // Portfolio Carousel Component
   const PortfolioCarousel = ({ media, title }: { media: any[], title: string }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalIndex, setModalIndex] = useState(0);
     
     if (!media || media.length === 0) {
       return (
@@ -184,12 +187,24 @@ const ProPortfolio = () => {
 
     if (media.length === 1) {
       return (
-        <MediaViewer
-          src={media[0].file_url}
-          alt={title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          enableZoom
-        />
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <div className="w-full h-full cursor-zoom-in">
+              <MediaViewer
+                src={media[0].file_url}
+                alt={title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl w-full p-2">
+            <MediaViewer
+              src={media[0].file_url}
+              alt={title}
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+            />
+          </DialogContent>
+        </Dialog>
       );
     }
 
@@ -201,56 +216,129 @@ const ProPortfolio = () => {
       setCurrentIndex((prev) => (prev - 1 + media.length) % media.length);
     };
 
-    return (
-      <div className="relative w-full h-full">
-        <MediaViewer
-          src={media[currentIndex]?.file_url}
-          alt={`${title} - ${currentIndex + 1}`}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          enableZoom
-        />
-        
-        {/* Navigation Arrows */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-8 w-8 p-0 backdrop-blur-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            prevImage();
-          }}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-8 w-8 p-0 backdrop-blur-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            nextImage();
-          }}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+    const nextModalImage = () => {
+      setModalIndex((prev) => (prev + 1) % media.length);
+    };
 
-        {/* Dots Indicator */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {media.map((_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentIndex ? 'bg-white' : 'bg-white/50'
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentIndex(index);
-              }}
+    const prevModalImage = () => {
+      setModalIndex((prev) => (prev - 1 + media.length) % media.length);
+    };
+
+    const openModal = (index: number) => {
+      setModalIndex(index);
+      setIsModalOpen(true);
+    };
+
+    return (
+      <>
+        <div className="relative w-full h-full">
+          <div 
+            className="w-full h-full cursor-zoom-in"
+            onClick={() => openModal(currentIndex)}
+          >
+            <MediaViewer
+              src={media[currentIndex]?.file_url}
+              alt={`${title} - ${currentIndex + 1}`}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
-          ))}
+          </div>
+          
+          {/* Navigation Arrows */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-8 w-8 p-0 backdrop-blur-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              prevImage();
+            }}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-8 w-8 p-0 backdrop-blur-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              nextImage();
+            }}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+
+          {/* Dots Indicator */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {media.map((_, index) => (
+              <button
+                key={index}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  index === currentIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentIndex(index);
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+
+        {/* Full Size Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="max-w-6xl w-full p-2">
+            <div className="relative">
+              <MediaViewer
+                src={media[modalIndex]?.file_url}
+                alt={`${title} - ${modalIndex + 1}`}
+                className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+              />
+              
+              {/* Modal Navigation */}
+              {media.length > 1 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-10 w-10 p-0 backdrop-blur-sm rounded-full"
+                    onClick={prevModalImage}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-10 w-10 p-0 backdrop-blur-sm rounded-full"
+                    onClick={nextModalImage}
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+
+                  {/* Modal Counter */}
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
+                    {modalIndex + 1} / {media.length}
+                  </div>
+
+                  {/* Modal Dots */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {media.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`w-3 h-3 rounded-full transition-colors ${
+                          index === modalIndex ? 'bg-white' : 'bg-white/50'
+                        }`}
+                        onClick={() => setModalIndex(index)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   };
 
