@@ -61,51 +61,53 @@ export default function DashboardBusiness() {
 
   return (
     <main className="min-h-screen">
-      <div className="container mx-auto py-8 px-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gradient mb-2">
+      {/* Header Section */}
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Бизнес-панель
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Управление корпоративным аккаунтом
           </p>
         </div>
 
         {/* Main Content with Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Обзор</span>
-            </TabsTrigger>
-            <TabsTrigger value="company" className="flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Компания</span>
-            </TabsTrigger>
-            <TabsTrigger value="employees" className="flex items-center gap-2">
-              <UserPlus className="h-4 w-4" />
-              <span className="hidden sm:inline">Команда</span>
-            </TabsTrigger>
-            <TabsTrigger value="jobs" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden sm:inline">Заказы</span>
-            </TabsTrigger>
-            <TabsTrigger value="invoices" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Инвойсы</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Аналитика</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="max-w-7xl mx-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <div className="card-surface p-2 rounded-2xl">
+              <TabsList className="grid w-full grid-cols-6 bg-transparent">
+                <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <BarChart3 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Обзор</span>
+                </TabsTrigger>
+                <TabsTrigger value="company" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Building2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Компания</span>
+                </TabsTrigger>
+                <TabsTrigger value="employees" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <UserPlus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Команда</span>
+                </TabsTrigger>
+                <TabsTrigger value="jobs" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Briefcase className="h-4 w-4" />
+                  <span className="hidden sm:inline">Заказы</span>
+                </TabsTrigger>
+                <TabsTrigger value="invoices" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">Инвойсы</span>
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <BarChart3 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Аналитика</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          <TabsContent value="overview" className="space-y-6">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardContent className="pt-6">
+            <TabsContent value="overview" className="space-y-8">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Общие расходы</p>
@@ -113,11 +115,9 @@ export default function DashboardBusiness() {
                     </div>
                     <BarChart3 className="h-8 w-8 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardContent className="pt-6">
+                <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Сотрудников</p>
@@ -125,11 +125,9 @@ export default function DashboardBusiness() {
                     </div>
                     <Users className="h-8 w-8 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardContent className="pt-6">
+                <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Заказов</p>
@@ -137,17 +135,15 @@ export default function DashboardBusiness() {
                     </div>
                     <Briefcase className="h-8 w-8 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => navigate("/job/new")}
-              >
-                <CardContent className="pt-6">
+              {/* Quick Actions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => navigate("/job/new")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={Building2} className="h-8 w-8 text-primary" />
                     <div>
@@ -155,14 +151,12 @@ export default function DashboardBusiness() {
                       <p className="text-sm text-muted-foreground">Для компании</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => setActiveTab("employees")}
-              >
-                <CardContent className="pt-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => setActiveTab("employees")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={UserPlus} className="h-8 w-8 text-primary" />
                     <div>
@@ -170,14 +164,12 @@ export default function DashboardBusiness() {
                       <p className="text-sm text-muted-foreground">Расширить команду</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => setActiveTab("invoices")}
-              >
-                <CardContent className="pt-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => setActiveTab("invoices")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={FileText} className="h-8 w-8 text-primary" />
                     <div>
@@ -185,14 +177,12 @@ export default function DashboardBusiness() {
                       <p className="text-sm text-muted-foreground">Финансы</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card 
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                onClick={() => setActiveTab("analytics")}
-              >
-                <CardContent className="pt-6">
+                <div 
+                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                  onClick={() => setActiveTab("analytics")}
+                >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={BarChart3} className="h-8 w-8 text-primary" />
                     <div>
@@ -200,50 +190,46 @@ export default function DashboardBusiness() {
                       <p className="text-sm text-muted-foreground">Аналитика</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
 
-            {/* Welcome Message */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Добро пожаловать в ServiceHub Business!</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
+              {/* Welcome Message */}
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-4">Добро пожаловать в ServiceHub Business!</h2>
+                <p className="text-muted-foreground mb-6">
                   Управляйте заказами компании, контролируйте расходы и координируйте команду в одном месте.
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <p className="text-sm"><strong>1.</strong> Настройте данные компании во вкладке "Компания"</p>
                   <p className="text-sm"><strong>2.</strong> Добавьте сотрудников во вкладке "Команда"</p>
                   <p className="text-sm"><strong>3.</strong> Создавайте заказы и отслеживайте прогресс</p>
                   <p className="text-sm"><strong>4.</strong> Контролируйте финансы через инвойсы и аналитику</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          <TabsContent value="company">
-            <BusinessAccountForm />
-          </TabsContent>
+            <TabsContent value="company">
+              <BusinessAccountForm />
+            </TabsContent>
 
-          <TabsContent value="employees">
-            <BusinessMembers />
-          </TabsContent>
+            <TabsContent value="employees">
+              <BusinessMembers />
+            </TabsContent>
 
-          <TabsContent value="jobs">
-            <BusinessJobs />
-          </TabsContent>
+            <TabsContent value="jobs">
+              <BusinessJobs />
+            </TabsContent>
 
-          <TabsContent value="invoices">
-            <BusinessInvoices />
-          </TabsContent>
+            <TabsContent value="invoices">
+              <BusinessInvoices />
+            </TabsContent>
 
-          <TabsContent value="analytics">
-            <BusinessAnalytics />
-          </TabsContent>
-        </Tabs>
-      </div>
+            <TabsContent value="analytics">
+              <BusinessAnalytics />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </section>
     </main>
   );
 }
