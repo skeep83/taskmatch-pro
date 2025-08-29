@@ -142,13 +142,16 @@ export function JobApplicationsList({
         supabase
           .from('job_price_proposals')
           .select(`
-            *,
-            profiles:pro_id (
-              first_name,
-              last_name,
-              full_name,
-              avatar_url
-            )
+            id,
+            job_id,
+            pro_id,
+            price_cents,
+            warranty_days,
+            eta_slot,
+            note,
+            status,
+            created_at,
+            updated_at
           `)
           .eq('job_id', jobId)
           .order('created_at', { ascending: false })
@@ -177,6 +180,13 @@ export function JobApplicationsList({
       const enhancedApplications = await Promise.all(
         allApplications.map(async (app) => {
           try {
+            // Fetch profiles data (since proposals don't include it)
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('first_name, last_name, full_name, avatar_url')
+              .eq('id', app.pro_id)
+              .maybeSingle();
+
             // Fetch pro profile
             const { data: proProfile } = await supabase
               .from('pro_profiles')
@@ -217,6 +227,7 @@ export function JobApplicationsList({
 
             return {
               ...app,
+              profiles: profileData,
               proProfile,
               rating,
               portfolio: portfolioData || []
