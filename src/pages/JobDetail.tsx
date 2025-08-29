@@ -47,7 +47,7 @@ interface Job {
 }
 
 const JobDetail = () => {
-  const { jobId } = useParams<{ jobId: string }>();
+  const { id: jobId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [job, setJob] = useState<Job | null>(null);
