@@ -183,7 +183,8 @@ const JobEdit = () => {
             
             const { error: insErr, data: insertData } = await supabase
               .from('job_photos')
-              .insert({ job_id: jobId, file_url: path });
+              .insert({ job_id: jobId, file_url: path })
+              .select();
             if (insErr) {
               console.error('Insert error:', insErr);
               throw insErr;
@@ -194,6 +195,9 @@ const JobEdit = () => {
           }
         }
       }
+
+      // Refresh photos after upload
+      await fetchJobPhotos();
 
       toast({
         title: 'Заказ обновлен',
