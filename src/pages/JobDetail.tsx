@@ -355,20 +355,20 @@ const JobDetail = () => {
 
               {/* Job Photos */}
               {jobPhotos.length > 0 && (
-                <div className="card-surface p-8">
+                <div className="card-surface pt-8 px-8 pb-0 overflow-hidden">
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                     <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Фотографии заказа
                     <Badge variant="secondary" className="ml-3 text-lg px-3 py-1">{jobPhotos.length}</Badge>
                   </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 -mx-8 -mb-0">
                     {jobPhotos.map((photo, index) => {
                       const imageUrl = supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl;
                       return (
                         <Dialog key={photo.id}>
                           <DialogTrigger asChild>
-                            <div className="relative group cursor-pointer">
-                              <div className="aspect-square card-surface rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:scale-105">
+                            <div className="relative group cursor-pointer p-2">
+                              <div className="aspect-square rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105">
                                 <img
                                   src={imageUrl}
                                   alt={`Фото заказа ${index + 1}`}
