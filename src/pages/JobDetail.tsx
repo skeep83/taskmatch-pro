@@ -676,63 +676,65 @@ const JobDetail = () => {
 
             {/* Professional Action Buttons */}
             {canApply && (
-              <div className="card-surface p-8">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                  Заинтересованы в заказе?
-                </h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <Dialog open={showPriceProposal} onOpenChange={setShowPriceProposal}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        size="lg"
-                        className="h-12 text-base font-medium flex items-center justify-center gap-2"
-                      >
-                        <DollarSign className="w-4 h-4" />
-                        Предложить цену
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                      <PriceProposalForm
-                        jobId={job.id}
-                        jobTitle={job.title}
-                        budgetMinCents={job.budget_min_cents}
-                        budgetMaxCents={job.budget_max_cents}
-                        clientRating={clientRating}
-                        onProposalSubmit={() => {
-                          setShowPriceProposal(false);
-                          loadJobData();
-                        }}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                  
-                  <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        size="lg"
-                        variant="outline"
-                        className="h-12 text-base font-medium flex items-center justify-center gap-2"
-                      >
-                        <User className="w-4 h-4" />
-                        Откликнуться
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                      <JobResponseForm
-                        jobId={job.id}
-                        jobTitle={job.title}
-                        budgetMinCents={job.budget_min_cents}
-                        budgetMaxCents={job.budget_max_cents}
-                        onApplicationSubmit={() => {
-                          setShowApplicationForm(false);
-                          loadJobData();
-                        }}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
+              <Card className="transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl font-semibold flex items-center gap-3">
+                    <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                    Заинтересованы в заказе?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Dialog open={showPriceProposal} onOpenChange={setShowPriceProposal}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          className="flex-1"
+                        >
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          Предложить цену
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <PriceProposalForm
+                          jobId={job.id}
+                          jobTitle={job.title}
+                          budgetMinCents={job.budget_min_cents}
+                          budgetMaxCents={job.budget_max_cents}
+                          clientRating={clientRating}
+                          onProposalSubmit={() => {
+                            setShowPriceProposal(false);
+                            loadJobData();
+                          }}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          <User className="w-4 h-4 mr-1" />
+                          Откликнуться
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <JobResponseForm
+                          jobId={job.id}
+                          jobTitle={job.title}
+                          budgetMinCents={job.budget_min_cents}
+                          budgetMaxCents={job.budget_max_cents}
+                          onApplicationSubmit={() => {
+                            setShowApplicationForm(false);
+                            loadJobData();
+                          }}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
 
