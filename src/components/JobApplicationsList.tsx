@@ -237,7 +237,7 @@ export const JobApplicationsList = ({
     }
   };
 
-  // Carousel navigation functions
+  // Carousel navigation functions - циклическая прокрутка
   const nextCard = () => {
     setCurrentIndex((prev) => (prev + 1) % applications.length);
   };
@@ -511,7 +511,6 @@ export const JobApplicationsList = ({
               size="icon"
               onClick={prevCard}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
-              disabled={currentIndex === 0}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -521,7 +520,6 @@ export const JobApplicationsList = ({
               size="icon"
               onClick={nextCard}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white"
-              disabled={currentIndex === applications.length - 1}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
