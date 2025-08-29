@@ -389,54 +389,54 @@ export function JobApplicationsList({
               >
                 {/* 3D Card with gradient background like reference */}
                 <div className="card-3d group relative w-full max-w-xs mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
-                  {/* Top gradient section (like in reference) */}
-                  <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 overflow-hidden">
+                  {/* Top gradient section */}
+                  <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600">
                     {/* Decorative gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
-                    
-                    {/* Avatar positioned to overlap sections */}
-                    <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-8">
-                      <motion.div
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        transition={{ duration: 0.2 }}
-                        className="relative"
-                      >
-                        <Avatar className="w-16 h-16 ring-4 ring-white shadow-xl">
-                          <AvatarImage 
-                            src={application.profiles?.avatar_url || ''} 
-                            alt={profileName}
-                            className="object-cover"
-                          />
-                          <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-lg">
-                            {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        
-                        {/* Status indicator */}
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white"
-                          >
-                            <CheckCircle className="w-4 h-4 text-white" />
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    </div>
                   </div>
                   
-                  {/* Bottom white section (like in reference) */}
+                  {/* Avatar positioned to overlap sections */}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-24">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                      className="relative"
+                    >
+                      <Avatar className="w-16 h-16 ring-4 ring-white shadow-xl">
+                        <AvatarImage 
+                          src={application.profiles?.avatar_url || ''} 
+                          alt={profileName}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-lg">
+                          {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      {/* Status indicator */}
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white"
+                        >
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  </div>
+                  
+                  {/* Bottom white section */}
                   <div className="relative bg-white px-6 pt-12 pb-8">
                     {/* Name and title */}
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
                       <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
-                        Специалист
+                        СПЕЦИАЛИСТ
                       </p>
                     </div>
                     
-                    {/* Social icons row (like in reference) */}
+                    {/* Social icons row */}
                     <div className="flex justify-center gap-3 mb-6">
                       <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
                         <User className="w-5 h-5 text-gray-600" />
@@ -453,14 +453,14 @@ export function JobApplicationsList({
                     </div>
                     
                     {/* Description text */}
-                    <p className="text-center text-sm text-gray-600 mb-6 leading-relaxed min-h-[3rem] flex items-center justify-center">
-                      {application.proProfile?.bio?.substring(0, 50) || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
+                    <p className="text-center text-sm text-gray-600 mb-6 leading-relaxed min-h-[4rem] flex items-center justify-center">
+                      {application.proProfile?.bio?.substring(0, 80) || 'Огромный стаж работы. Разбираюсь во многом что касается'}
                     </p>
                     
                     {/* Price section */}
                     {application.price_cents && (
                       <div className="text-center mb-6">
-                        <div className="text-2xl font-bold text-gray-900">
+                        <div className="text-3xl font-bold text-gray-900">
                           {formatPrice(application.price_cents)}
                         </div>
                         <div className="text-sm text-gray-500">
@@ -472,7 +472,14 @@ export function JobApplicationsList({
                     {/* Rating */}
                     {application.rating && (
                       <div className="flex justify-center items-center gap-2 mb-6">
-                        <StarRating rating={application.rating.avg_score} size="sm" />
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                              key={star} 
+                              className={`w-5 h-5 ${star <= application.rating!.avg_score ? 'text-purple-500 fill-purple-500' : 'text-gray-300'}`} 
+                            />
+                          ))}
+                        </div>
                         <span className="text-sm text-gray-600">
                           ({application.rating.rating_count})
                         </span>
