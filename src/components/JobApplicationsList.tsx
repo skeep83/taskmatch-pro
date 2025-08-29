@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -61,22 +62,36 @@ export const JobApplicationsList = ({
 
       if (appError) throw appError;
 
-      // Получаем предложения цены
+      // Получаем предложения цены отдельно
       const { data: priceProposals, error: priceError } = await supabase
         .from('job_price_proposals')
-        .select(`
-          *,
-          profiles!inner(first_name, last_name, full_name)
-        `)
+        .select('*')
         .eq('job_id', jobId)
         .order('created_at', { ascending: false });
 
       if (priceError) throw priceError;
 
+      // Для каждого предложения цены загружаем профиль отдельно
+      const priceProposalsWithProfiles = [];
+      if (priceProposals && priceProposals.length > 0) {
+        for (const proposal of priceProposals) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, full_name')
+            .eq('id', proposal.pro_id)
+            .single();
+          
+          priceProposalsWithProfiles.push({
+            ...proposal,
+            profiles: profile
+          });
+        }
+      }
+
       // Объединяем оба типа откликов
       const allApplications = [
         ...(regularApplications || []),
-        ...(priceProposals || [])
+        ...priceProposalsWithProfiles
       ];
 
       setApplications(allApplications);
