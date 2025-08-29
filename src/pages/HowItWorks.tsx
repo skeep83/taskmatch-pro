@@ -148,8 +148,7 @@ const HowItWorks = () => {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      <SignatureGradient />
+    <main className="min-h-screen">
       <Seo 
         title="Как это работает — ServiceHub" 
         description="Узнайте, как использовать ServiceHub для поиска специалистов и выполнения заказов. Простой и безопасный способ решить любые задачи."
@@ -157,63 +156,50 @@ const HowItWorks = () => {
       />
       
       {/* Hero Section */}
-      <section className="relative container mx-auto pt-20 pb-32">
-        <div className="absolute inset-0 opacity-10">
-          <img 
-            src={servicesHero} 
-            alt="ServiceHub" 
-            className="w-full h-full object-cover rounded-3xl"
-          />
-        </div>
-        
-        <div className="relative text-center mb-20 animate-fade-in">
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-lg opacity-30 animate-pulse"></div>
-              <GlassMorphism className="relative p-6 rounded-full">
-                <NeumorphicIcon icon={Sparkles} size={72} variant="square" className="text-primary" />
-              </GlassMorphism>
+            <div className="card-surface p-6 rounded-full">
+              <NeumorphicIcon icon={Sparkles} size={72} variant="square" className="text-primary" />
             </div>
           </div>
           
-          <h1 className="text-7xl md:text-8xl font-display font-bold text-gradient mb-8 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-display font-bold text-gradient mb-8 leading-tight">
             Как работает<br />
             <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               ServiceHub
             </span>
           </h1>
           
-          <p className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-10">
+          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-10">
             Революционная платформа для поиска профессионалов. 
             <br className="hidden md:block" />
             Простой, быстрый и безопасный способ решить любые задачи.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link to="/catalog" className="group btn-hero text-xl px-10 py-5 relative overflow-hidden">
-              <span className="relative z-10 flex items-center gap-3">
-                <Search size={24} />
-                Найти специалиста
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </span>
+            <Link to="/catalog" className="bg-primary text-white hover:bg-primary/90 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
+              <Search size={24} />
+              Найти специалиста
+              <ArrowRight size={20} />
             </Link>
             
-            <button className="group btn-ghost text-xl px-10 py-5 flex items-center gap-3">
-              <Play size={20} className="group-hover:scale-110 transition-transform" />
+            <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
+              <Play size={20} />
               Смотреть видео
             </button>
           </div>
         </div>
         
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <div key={index} className="card-surface p-6 text-center">
               <NeumorphicIcon 
                 icon={stat.icon} 
                 size={48} 
                 variant="square"
-                className="mx-auto mb-3"
+                className="mx-auto mb-3 text-primary"
                 delayMs={index * 100}
               />
               <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
@@ -224,13 +210,13 @@ const HowItWorks = () => {
       </section>
 
       {/* How It Works Steps */}
-      <section className="container mx-auto pb-32">
-        <div className="text-center mb-20">
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
             <Target size={20} />
             Простые шаги
           </div>
-          <h2 className="text-5xl font-display font-bold mb-6 text-gradient">
+          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Всего 4 простых шага
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -238,10 +224,7 @@ const HowItWorks = () => {
           </p>
         </div>
         
-        <div className="relative">
-          {/* Connection Lines */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent transform -translate-y-1/2"></div>
-          
+        <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="relative">
@@ -256,7 +239,6 @@ const HowItWorks = () => {
                   
                   {/* Icon with Gradient Background */}
                   <div className="relative mb-8">
-                    <div className={`absolute inset-0 bg-gradient-to-r ${step.gradient} rounded-full blur-lg opacity-20 animate-pulse`}></div>
                     <div className={`relative w-20 h-20 mx-auto rounded-full bg-gradient-to-r ${step.gradient} p-0.5`}>
                       <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
                         <NeumorphicIcon 
@@ -289,13 +271,13 @@ const HowItWorks = () => {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto pb-32">
-        <div className="text-center mb-20">
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary/10 text-secondary font-medium mb-6">
             <Heart size={20} />
             Наши преимущества
           </div>
-          <h2 className="text-5xl font-display font-bold mb-6 text-gradient">
+          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Почему выбирают ServiceHub
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -303,59 +285,61 @@ const HowItWorks = () => {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <div 
-              key={index}
-              className="card-surface group p-8 text-center transition-all duration-500 relative overflow-hidden"
-              style={{ animationDelay: `${index * 150}ms` }}
-            >
-              {/* Background Image */}
-              <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
-                <img 
-                  src={feature.image} 
-                  alt={feature.title}
-                  className="w-full h-full object-cover rounded-2xl"
-                />
-              </div>
-              
-              {/* Background Gradient Overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-10 group-hover:opacity-20 transition-opacity rounded-2xl`}></div>
-              
-              <div className="relative z-10">
-                <div className="mb-6">
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} bg-opacity-20 backdrop-blur-sm`}>
-                    <NeumorphicIcon 
-                      icon={feature.icon} 
-                      size={56}
-                      variant="square"
-                      className="text-white drop-shadow-lg"
-                      delayMs={index * 150}
-                    />
-                  </div>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="card-surface group p-8 text-center transition-all duration-500 relative overflow-hidden"
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
+                {/* Background Image */}
+                <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
+                  <img 
+                    src={feature.image} 
+                    alt={feature.title}
+                    className="w-full h-full object-cover rounded-2xl"
+                  />
                 </div>
                 
-                <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-lg">{feature.title}</h3>
-                <p className="text-white/90 leading-relaxed mb-4 drop-shadow">
-                  {feature.description}
-                </p>
-                <div className="text-sm font-semibold text-white drop-shadow-lg bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
-                  {feature.stats}
+                {/* Background Gradient Overlay */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-10 group-hover:opacity-20 transition-opacity rounded-2xl`}></div>
+                
+                <div className="relative z-10">
+                  <div className="mb-6">
+                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} bg-opacity-20 backdrop-blur-sm`}>
+                      <NeumorphicIcon 
+                        icon={feature.icon} 
+                        size={56}
+                        variant="square"
+                        className="text-white drop-shadow-lg"
+                        delayMs={index * 150}
+                      />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-lg">{feature.title}</h3>
+                  <p className="text-white/90 leading-relaxed mb-4 drop-shadow">
+                    {feature.description}
+                  </p>
+                  <div className="text-sm font-semibold text-white drop-shadow-lg bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
+                    {feature.stats}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="container mx-auto pb-32">
-        <div className="text-center mb-20">
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent/10 text-accent font-medium mb-6">
             <Eye size={20} />
             Часто задаваемые вопросы
           </div>
-          <h2 className="text-5xl font-display font-bold mb-6 text-gradient">
+          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Ответы на ваши вопросы
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -398,7 +382,7 @@ const HowItWorks = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto pb-20">
+      <section className="container mx-auto py-20 px-6">
         <div className="card-surface relative p-16 text-center max-w-6xl mx-auto overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"></div>
           
@@ -432,14 +416,12 @@ const HowItWorks = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
-              <Link to="/catalog" className="group btn-hero text-xl px-10 py-5 relative overflow-hidden">
-                <span className="relative z-10 flex items-center gap-3">
-                  <Search size={24} />
-                  Найти специалиста
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </span>
+              <Link to="/catalog" className="bg-primary text-white hover:bg-primary/90 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
+                <Search size={24} />
+                Найти специалиста
+                <ArrowRight size={20} />
               </Link>
-              <Link to="/auth" className="btn-ghost text-xl px-10 py-5 flex items-center gap-3">
+              <Link to="/auth" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
                 <Users size={24} />
                 Стать исполнителем
               </Link>
