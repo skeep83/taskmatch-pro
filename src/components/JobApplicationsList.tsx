@@ -346,120 +346,169 @@ export function JobApplicationsList({
         </h3>
       </div>
       
-      {/* Applications List */}
+      {/* Applications List - 3D Cards */}
       <div className="space-y-4">
-        {applications.map((application, index) => {
-          const isSelected = selectedProId === application.pro_id;
-          const canSelect = jobStatus === 'new' && !selectedProId;
-          
-          // Формируем имя специалиста
-          const profileName = application.profiles?.full_name || 
-            (application.profiles?.first_name && application.profiles?.last_name 
-              ? `${application.profiles.first_name} ${application.profiles.last_name}` 
-              : 'Специалист');
+        <AnimatePresence>
+          {applications.map((application, index) => {
+            const isSelected = selectedProId === application.pro_id;
+            const canSelect = jobStatus === 'new' && !selectedProId;
+            
+            // Формируем имя специалиста
+            const profileName = application.profiles?.full_name || 
+              (application.profiles?.first_name && application.profiles?.last_name 
+                ? `${application.profiles.first_name} ${application.profiles.last_name}` 
+                : 'Специалист');
 
-          return (
-            <Card key={application.id} className={`transition-all duration-300 hover:shadow-lg ${
-              isSelected ? 'ring-2 ring-primary bg-primary/5' : ''
-            }`}>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage 
-                      src={application.profiles?.avatar_url || ''} 
-                      alt={profileName} 
-                    />
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
-                      {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-semibold text-lg">{profileName}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary">Специалист</Badge>
-                          {isSelected && (
-                            <Badge variant="default" className="bg-primary text-white">
-                              Выбран
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      {application.price_cents && (
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">
-                            {formatPrice(application.price_cents)}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            Предложенная цена
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {application.note && (
-                      <p className="text-muted-foreground text-sm">
-                        {application.note}
-                      </p>
-                    )}
-
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>
-                        Откликнулся: {new Date(application.created_at).toLocaleDateString('ru-RU')}
-                      </span>
-                      {application.eta_slot && (
-                        <span>ETA: {application.eta_slot}</span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => window.open(`/pro/${application.pro_id}`, '_blank')}
-                        >
-                          <User className="w-4 h-4 mr-1" />
-                          Профиль
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => window.open(`/messages?user=${application.pro_id}`, '_blank')}
-                        >
-                          <MessageSquare className="w-4 h-4 mr-1" />
-                          Написать
-                        </Button>
-                      </div>
+            return (
+              <motion.div
+                key={application.id}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: index * 0.1,
+                  ease: "easeOut"
+                }}
+                className="hover-scale"
+              >
+                <Card className={`transition-all duration-300 hover:shadow-xl ${
+                  isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:shadow-lg'
+                } perspective-1000`}>
+                  <CardContent className="p-6 transform-gpu transition-transform duration-300 hover:rotateX-1">
+                    <div className="flex items-start gap-4">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Avatar className="w-16 h-16 ring-2 ring-primary/20">
+                          <AvatarImage 
+                            src={application.profiles?.avatar_url || ''} 
+                            alt={profileName} 
+                          />
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                            {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </motion.div>
                       
-                      {canSelect && (
-                        <Button
-                          onClick={() => handleSelectProfessional(application.pro_id)}
-                          disabled={selecting === application.pro_id}
-                          className="min-w-[120px]"
-                        >
-                          {selecting === application.pro_id ? (
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              Выбираем...
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-semibold text-lg">{profileName}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="secondary">Специалист</Badge>
+                              {isSelected && (
+                                <Badge variant="default" className="bg-primary text-white animate-pulse">
+                                  Выбран
+                                </Badge>
+                              )}
                             </div>
-                          ) : (
-                            <>
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              Выбрать
-                            </>
+                          </div>
+                          {application.price_cents && (
+                            <motion.div 
+                              className="text-right"
+                              whileHover={{ scale: 1.02 }}
+                            >
+                              <div className="text-2xl font-bold text-primary">
+                                {formatPrice(application.price_cents)}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Предложенная цена
+                              </div>
+                            </motion.div>
                           )}
-                        </Button>
-                      )}
+                        </div>
+
+                        {application.rating && application.rating.rating_count > 0 && (
+                          <div className="flex items-center gap-2">
+                            <StarRating 
+                              rating={application.rating.avg_score} 
+                              size="sm" 
+                              showValue={false}
+                              readonly 
+                            />
+                            <span className="text-sm text-muted-foreground">
+                              ({application.rating.rating_count} отзыв{application.rating.rating_count === 1 ? '' : application.rating.rating_count < 5 ? 'а' : 'ов'})
+                            </span>
+                          </div>
+                        )}
+
+                        {application.note && (
+                          <p className="text-muted-foreground text-sm bg-muted/50 p-3 rounded-lg">
+                            {application.note}
+                          </p>
+                        )}
+
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>
+                            Откликнулся: {new Date(application.created_at).toLocaleDateString('ru-RU')}
+                          </span>
+                          {application.eta_slot && (
+                            <span>ETA: {application.eta_slot}</span>
+                          )}
+                          {application.warranty_days && (
+                            <span>Гарантия: {application.warranty_days} дней</span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2">
+                          <div className="flex gap-2">
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => window.open(`/pro/${application.pro_id}`, '_blank')}
+                              >
+                                <User className="w-4 h-4 mr-1" />
+                                Профиль
+                              </Button>
+                            </motion.div>
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => window.open(`/messages?user=${application.pro_id}`, '_blank')}
+                              >
+                                <MessageSquare className="w-4 h-4 mr-1" />
+                                Написать
+                              </Button>
+                            </motion.div>
+                          </div>
+                          
+                          {canSelect && (
+                            <motion.div 
+                              whileHover={{ scale: 1.05 }} 
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <Button
+                                onClick={() => handleSelectProfessional(application.pro_id)}
+                                disabled={selecting === application.pro_id}
+                                className="min-w-[120px] bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                              >
+                                {selecting === application.pro_id ? (
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    Выбираем...
+                                  </div>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="w-4 h-4 mr-2" />
+                                    Выбрать
+                                  </>
+                                )}
+                              </Button>
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
     </div>
   );
