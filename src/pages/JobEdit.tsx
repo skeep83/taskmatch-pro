@@ -161,24 +161,36 @@ const JobEdit = () => {
 
       // Upload new photos
       if (uploadedFiles.length > 0) {
+        console.log('Starting photo upload, files count:', uploadedFiles.length);
         const bucket = supabase.storage.from('evidence');
         for (let i = 0; i < Math.min(uploadedFiles.length, 8); i++) {
           const file = uploadedFiles[i];
           try {
+            console.log('Uploading file:', file.name);
             const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
             const path = `job/${jobId}/${Date.now()}-${i}.${ext}`;
-            const { error: upErr } = await bucket.upload(path, file, { 
+            console.log('Upload path:', path);
+            
+            const { error: upErr, data: uploadData } = await bucket.upload(path, file, { 
               upsert: true, 
               contentType: file.type || 'image/jpeg' 
             });
-            if (upErr) throw upErr;
+            if (upErr) {
+              console.error('Upload error:', upErr);
+              throw upErr;
+            }
+            console.log('Upload successful:', uploadData);
             
-            const { error: insErr } = await supabase
+            const { error: insErr, data: insertData } = await supabase
               .from('job_photos')
               .insert({ job_id: jobId, file_url: path });
-            if (insErr) throw insErr;
+            if (insErr) {
+              console.error('Insert error:', insErr);
+              throw insErr;
+            }
+            console.log('Insert successful:', insertData);
           } catch (e) {
-            console.warn('Photo upload failed', e);
+            console.error('Photo upload failed', e);
           }
         }
       }
