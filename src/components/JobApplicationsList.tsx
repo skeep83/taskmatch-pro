@@ -44,7 +44,8 @@ export const JobApplicationsList = ({
 
   const fetchApplications = async () => {
     try {
-      const { data, error } = await supabase
+      // Получаем обычные отклики
+      const { data: regularApplications, error: appError } = await supabase
         .from('job_applications')
         .select(`
           *
@@ -52,8 +53,26 @@ export const JobApplicationsList = ({
         .eq('job_id', jobId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setApplications(data || []);
+      if (appError) throw appError;
+
+      // Получаем предложения цены
+      const { data: priceProposals, error: priceError } = await supabase
+        .from('job_price_proposals')
+        .select(`
+          *
+        `)
+        .eq('job_id', jobId)
+        .order('created_at', { ascending: false });
+
+      if (priceError) throw priceError;
+
+      // Объединяем оба типа откликов
+      const allApplications = [
+        ...(regularApplications || []),
+        ...(priceProposals || [])
+      ];
+
+      setApplications(allApplications);
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast({

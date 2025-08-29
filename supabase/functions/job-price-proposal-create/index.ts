@@ -159,12 +159,12 @@ serve(async (req) => {
     // Send notification to job owner about price proposal
     const { error: notificationError } = await supabase.functions.invoke('notifications-send', {
       body: {
-        userId: job.client_id,
+        user_id: job.client_id,
         type: 'price_proposal',
         title: 'Новое предложение цены',
         message: `${proName} предложил выполнить заказ "${job.title || job.description}" за ${(priceCents / 100).toFixed(0)} лей`,
-        titleRo: 'Ofertă nouă de preț',
-        messageRo: `${proName} a propus să execute comanda "${job.title || job.description}" pentru ${(priceCents / 100).toFixed(0)} lei`,
+        title_ro: 'Ofertă nouă de preț',
+        message_ro: `${proName} a propus să execute comanda "${job.title || job.description}" pentru ${(priceCents / 100).toFixed(0)} lei`,
         data: {
           job_id: jobId,
           pro_id: user.id,
