@@ -18,7 +18,6 @@ import dashboardPro from "@/assets/dashboard-pro.jpg";
 import proWorkspace from "@/assets/pro-workspace.jpg";
 import jobManagement from "@/assets/job-management.jpg";
 import kycVerification from "@/assets/kyc-verification.jpg";
-import { ProTipsCarousel } from "@/components/ProTipsCarousel";
 
 const DashboardPro = () => {
   const { t } = useEnhancedI18n();
@@ -37,7 +36,6 @@ const DashboardPro = () => {
   const [completedJobs, setCompletedJobs] = useState<number>(0);
   const [responseTime, setResponseTime] = useState<string>('< 1 час');
   const [tenders, setTenders] = useState<any[]>([]);
-  const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
   useEffect(() => {
     initializeDashboard();
@@ -430,15 +428,6 @@ const DashboardPro = () => {
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <h3 className="font-semibold mb-2">{job.description || 'Заказ'}</h3>
-                          
-                          {/* Явная пометка о принятии кандидатуры */}
-                          <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg mb-3">
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                            <span className="font-medium text-green-700 dark:text-green-400">
-                              Ваша кандидатура принята
-                            </span>
-                          </div>
-                          
                           <div className="text-sm text-muted-foreground mb-2">
                             Статус: {job.status === 'accepted' ? 'Принят' : job.status === 'in_progress' ? 'В работе' : 'Выполнен'}
                           </div>
@@ -533,14 +522,24 @@ const DashboardPro = () => {
                 </div>
               </div>
 
-              {/* Professional Tips 3D Cards */}
+              {/* Quick Tips */}
               <div className="card-surface p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <Zap className="h-8 w-8 text-primary" />
-                  <h3 className="font-bold">Советы специалисту</h3>
+                  <h3 className="font-bold">Советы</h3>
                 </div>
                 
-                <ProTipsCarousel currentIndex={currentTipIndex} onIndexChange={setCurrentTipIndex} />
+                <div className="space-y-3 text-sm">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                    <p className="font-medium mb-1">Быстрые отклики</p>
+                    <p className="text-muted-foreground">Отвечайте на заказы в течение 30 минут для повышения рейтинга</p>
+                  </div>
+                  
+                  <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                    <p className="font-medium mb-1">Качественные фото</p>
+                    <p className="text-muted-foreground">Добавьте фото работ в портфолио для привлечения клиентов</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
