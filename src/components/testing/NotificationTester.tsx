@@ -13,38 +13,59 @@ export const NotificationTester = () => {
 
   const testNotifications = [
     {
-      type: 'message' as const,
-      icon: MessageSquare,
-      title: 'Тест сообщения',
-      message: 'Это тестовое уведомление о новом сообщении в чате',
+      type: 'job_match' as const,
+      icon: Briefcase,
+      title: 'Новый заказ рядом с вами!',
+      message: 'Найден новый заказ "Ремонт крана" в категории Сантехника',
+      color: 'text-green-600'
+    },
+    {
+      type: 'job_application' as const,
+      icon: Briefcase,
+      title: 'Новый отклик на ваш заказ',
+      message: 'Специалист Иван Петров откликнулся на заказ "Ремонт крана"',
+      color: 'text-purple-600'
+    },
+    {
+      type: 'price_proposal' as const,
+      icon: DollarSign,
+      title: 'Новое предложение цены',
+      message: 'Специалист Мария Попова предложила цену за заказ "Уборка квартиры"',
+      color: 'text-yellow-600'
+    },
+    {
+      type: 'job_update' as const,
+      icon: Briefcase,
+      title: 'Заказ принят',
+      message: 'Ваш заказ "Ремонт крана" был принят специалистом',
       color: 'text-blue-600'
     },
     {
-      type: 'job_match' as const,
-      icon: Briefcase,
-      title: 'Тест заказа',
-      message: 'Найден новый заказ в вашем районе - сантехнические работы',
-      color: 'text-green-600'
+      type: 'message' as const,
+      icon: MessageSquare,
+      title: 'Новое сообщение',
+      message: 'Сообщение от Анна Иванова: Когда можете приступить к работе?',
+      color: 'text-blue-600'
     },
     {
       type: 'payment' as const,
       icon: DollarSign,
-      title: 'Тест платежа',
+      title: 'Получена оплата',
       message: 'Получена оплата 150 лей за выполненный заказ',
-      color: 'text-purple-600'
+      color: 'text-green-600'
     },
     {
       type: 'rating' as const,
       icon: Star,
-      title: 'Тест рейтинга',
+      title: 'Новая оценка',
       message: 'Вы получили новую оценку 5 звезд от клиента',
       color: 'text-yellow-600'
     },
     {
       type: 'system' as const,
       icon: SettingsIcon,
-      title: 'Тест системы',
-      message: 'Ваш профиль был успешно обновлен администратором',
+      title: 'Системное уведомление',
+      message: 'Ваш профиль был успешно обновлен',
       color: 'text-gray-600'
     }
   ];

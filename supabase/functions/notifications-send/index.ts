@@ -8,7 +8,7 @@ const corsHeaders = {
 
 interface NotificationRequest {
   user_id: string;
-  type: 'job_match' | 'job_update' | 'payment' | 'message' | 'rating' | 'system' | 'price_proposal';
+  type: 'job_match' | 'job_update' | 'payment' | 'message' | 'rating' | 'system' | 'price_proposal' | 'job_application';
   title: string;
   title_ro?: string;
   message: string;
