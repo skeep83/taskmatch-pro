@@ -298,15 +298,23 @@ const JobDetail = () => {
                 <div>
                   <h3 className="font-semibold mb-2">Фотографии заказа</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {jobPhotos.map((photo, index) => (
-                      <div key={photo.id} className="aspect-square rounded-lg overflow-hidden">
-                        <OptimizedImage
-                          src={photo.file_url}
-                          alt={`Фото заказа ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
-                        />
-                      </div>
-                    ))}
+                     {jobPhotos.map((photo, index) => {
+                       const imageUrl = supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl;
+                       console.log('Photo URL:', imageUrl);
+                       return (
+                         <div key={photo.id} className="aspect-square rounded-lg overflow-hidden">
+                           <img
+                             src={imageUrl}
+                             alt={`Фото заказа ${index + 1}`}
+                             className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                             onError={(e) => {
+                               console.error('Image load error:', e);
+                               console.error('Failed to load:', imageUrl);
+                             }}
+                           />
+                         </div>
+                       );
+                     })}
                   </div>
                 </div>
               )}
