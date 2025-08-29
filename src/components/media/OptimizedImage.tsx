@@ -135,15 +135,18 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <button className="w-full text-left cursor-zoom-in">
+          <button 
+            className="w-full text-left cursor-zoom-in block"
+            onClick={() => console.log('Image clicked for zoom')}
+          >
             {imageElement}
           </button>
         </DialogTrigger>
-        <DialogContent className="max-w-4xl w-full">
+        <DialogContent className="max-w-4xl w-full p-2">
           <img
             src={publicUrl}
             alt={alt}
-            className="w-full h-auto max-h-[80vh] object-contain"
+            className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
           />
         </DialogContent>
       </Dialog>
