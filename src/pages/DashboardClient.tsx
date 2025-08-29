@@ -67,6 +67,7 @@ export default function DashboardClient() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [stats, setStats] = useState({
@@ -112,6 +113,15 @@ export default function DashboardClient() {
 
   const loadUserData = async () => {
     try {
+      // Load user profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, full_name")
+        .eq("id", user.id)
+        .single();
+      
+      setUserProfile(profileData);
+
       // Load user jobs
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")
@@ -267,7 +277,12 @@ export default function DashboardClient() {
             Кабинет клиента
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Добро пожаловать, {user?.email}
+            Добро пожаловать, {
+              userProfile?.full_name || 
+              (userProfile?.first_name && userProfile?.last_name 
+                ? `${userProfile.first_name} ${userProfile.last_name}` 
+                : user?.email)
+            }
           </p>
         </div>
 

@@ -18,6 +18,11 @@ interface JobApplication {
   warranty_days?: number;
   created_at: string;
   pro_id: string;
+  profiles?: {
+    first_name?: string;
+    last_name?: string;
+    full_name?: string;
+  };
 }
 
 interface JobApplicationsListProps {
@@ -48,7 +53,8 @@ export const JobApplicationsList = ({
       const { data: regularApplications, error: appError } = await supabase
         .from('job_applications')
         .select(`
-          *
+          *,
+          profiles!inner(first_name, last_name, full_name)
         `)
         .eq('job_id', jobId)
         .order('created_at', { ascending: false });
@@ -59,7 +65,8 @@ export const JobApplicationsList = ({
       const { data: priceProposals, error: priceError } = await supabase
         .from('job_price_proposals')
         .select(`
-          *
+          *,
+          profiles!inner(first_name, last_name, full_name)
         `)
         .eq('job_id', jobId)
         .order('created_at', { ascending: false });
@@ -142,21 +149,33 @@ export const JobApplicationsList = ({
         const isSelected = selectedProId === application.pro_id;
         const canSelect = jobStatus === 'new' && !selectedProId;
         
+        // Формируем имя специалиста
+        const profileName = application.profiles?.full_name || 
+          (application.profiles?.first_name && application.profiles?.last_name 
+            ? `${application.profiles.first_name} ${application.profiles.last_name}` 
+            : null);
+        const displayName = profileName || 'Новый специалист';
+        const initials = profileName 
+          ? profileName.split(' ').map(n => n[0]).join('').toUpperCase()
+          : 'НС';
+        
         return (
           <Card key={application.id} className={`transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}>
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="w-12 h-12">
-                    <AvatarFallback>Про</AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                      {initials}
+                    </AvatarFallback>
                   </Avatar>
                   <div>
                     <h4 className="font-semibold flex items-center gap-2">
-                      Специалист
+                      {displayName}
                       {isSelected && <CheckCircle className="w-4 h-4 text-green-500" />}
                     </h4>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary">Новый специалист</Badge>
+                      <Badge variant="secondary">Специалист</Badge>
                     </div>
                   </div>
                 </div>

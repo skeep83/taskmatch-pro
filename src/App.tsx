@@ -42,6 +42,7 @@ import AdminContent from "./pages/admin/Content";
 import AdminSettings from "./pages/admin/Settings";
 import AdminTesting from "./pages/admin/Testing";
 import AdminCurrencies from "./pages/admin/Currencies";
+import ProfileSettings from "./pages/ProfileSettings";
 import HowItWorks from "./pages/HowItWorks";
 import PageTransition from "./components/PageTransition";
 
@@ -68,6 +69,7 @@ const AppContent = () => {
           <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/messages/:id" element={<Messages />} />
+          <Route path="/profile/settings" element={<ProfileSettings />} />
           <Route path="/kyc" element={<Kyc />} />
           <Route path="/pro/profile" element={<ProProfile />} />
           <Route path="/pro/schedule" element={<ProSchedule />} />

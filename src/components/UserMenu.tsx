@@ -92,9 +92,14 @@ export const UserMenu = () => {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => navigate('/pro/profile')} className="cursor-pointer">
+        <DropdownMenuItem onClick={() => navigate('/profile/settings')} className="cursor-pointer">
           <Settings className="h-4 w-4 mr-2" />
-          Настройки
+          Настройки профиля
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem onClick={() => navigate('/pro/profile')} className="cursor-pointer">
+          <Briefcase className="h-4 w-4 mr-2" />
+          Профиль специалиста
         </DropdownMenuItem>
         
         <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
