@@ -131,7 +131,7 @@ serve(async (req) => {
         pro_id: application.pro_id,
         amount_cents: application.price_cents,
         status: 'held',
-        currency: 'rub'
+        currency: 'MDL'
       });
 
     if (escrowError) {
@@ -141,19 +141,25 @@ serve(async (req) => {
     // Send notification to selected professional
     const proName = `${application.profiles?.first_name || ''} ${application.profiles?.last_name || ''}`.trim() || 'Специалист';
     
-    await supabase.from('notifications').insert({
+    const { error: notificationError } = await supabase.from('notifications').insert({
       user_id: application.pro_id,
       type: 'job_accepted',
       title: 'Ваше предложение принято!',
       title_ro: 'Oferta dvs. a fost acceptată!',
-      message: `Клиент выбрал ваше предложение на "${job.title}" за ${Math.round(application.price_cents / 100)}₽`,
-      message_ro: `Clientul a ales oferta dvs. pentru "${job.title}" pentru ${Math.round(application.price_cents / 100)}₽`,
+      message: `Клиент выбрал ваше предложение на "${job.title}" за ${Math.round(application.price_cents / 100)} Lei`,
+      message_ro: `Clientul a ales oferta dvs. pentru "${job.title}" pentru ${Math.round(application.price_cents / 100)} Lei`,
       data: {
         job_id: jobId,
         application_id: applicationId,
         price_cents: application.price_cents
       }
     });
+
+    if (notificationError) {
+      console.error('Failed to create notification:', notificationError);
+    } else {
+      console.log(`Notification sent to professional ${application.pro_id}`);
+    }
 
     // Send notifications to other professionals that they were not selected
     // Check both tables for other applications

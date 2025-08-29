@@ -46,6 +46,8 @@ export const NotificationCenter = () => {
       }
     } else if (notification.type === 'job_update' && notification.data?.job_id) {
       window.location.href = `/job/${notification.data.job_id}`;
+    } else if (notification.type === 'job_accepted' && notification.data?.job_id) {
+      window.location.href = `/job/${notification.data.job_id}`;
     }
     
     // Close the popover after navigation
@@ -60,6 +62,8 @@ export const NotificationCenter = () => {
         return '💸';
       case 'job_application':
         return '👋';
+      case 'job_accepted':
+        return '✅';
       case 'job_update':
         return '📋';
       case 'payment':
