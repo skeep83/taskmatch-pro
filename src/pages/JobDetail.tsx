@@ -684,22 +684,55 @@ const JobDetail = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Button 
                     onClick={() => setShowPriceProposal(true)}
-                    size="lg"
-                    className="h-14 text-lg font-semibold bg-gradient-to-r from-primary to-accent text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    className="btn-hero h-14 text-lg font-semibold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    <DollarSign className="w-5 h-5 mr-2" />
+                    <DollarSign className="w-5 h-5" />
                     Предложить цену
                   </Button>
                   <Button 
                     onClick={() => setShowApplicationForm(true)}
                     variant="outline"
-                    size="lg"
-                    className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-lg"
                   >
-                    <User className="w-5 h-5 mr-2" />
+                    <User className="w-5 h-5" />
                     Откликнуться
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {/* Application Form Modal */}
+            {showApplicationForm && (
+              <div className="card-surface p-8">
+                <JobResponseForm
+                  jobId={job.id}
+                  jobTitle={job.title}
+                  budgetMinCents={job.budget_min_cents}
+                  budgetMaxCents={job.budget_max_cents}
+                  onApplicationSubmit={() => {
+                    setShowApplicationForm(false);
+                    // Refresh applications
+                    loadJobData();
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Price Proposal Modal */}
+            {showPriceProposal && (
+              <div className="card-surface p-8">
+                <PriceProposalForm
+                  jobId={job.id}
+                  jobTitle={job.title}
+                  budgetMinCents={job.budget_min_cents}
+                  budgetMaxCents={job.budget_max_cents}
+                  clientRating={clientRating}
+                  onProposalSubmit={() => {
+                    setShowPriceProposal(false);
+                    // Refresh page data
+                    loadJobData();
+                  }}
+                />
               </div>
             )}
           </div>
@@ -710,61 +743,38 @@ const JobDetail = () => {
             <div className="card-surface p-6 mb-8">
               <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                Статистика платформы
+                Статистика заказа
               </h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Активных заказов</span>
-                  <span className="font-semibold">1,247</span>
+                <div className="flex items-center justify-between py-3 border-b border-border/50">
+                  <span className="text-muted-foreground">Статус:</span>
+                  {getStatusBadge(job.status)}
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Специалистов онлайн</span>
-                  <span className="font-semibold">856</span>
+                
+                <div className="flex items-center justify-between py-3 border-b border-border/50">
+                  <span className="text-muted-foreground">Создан:</span>
+                  <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Выполнено сегодня</span>
-                  <span className="font-semibold">342</span>
+
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-muted-foreground">Категория:</span>
+                  <span className="font-medium">{job.categories.label_ru}</span>
                 </div>
               </div>
             </div>
+
+            {/* Professional Status Card */}
+            {isProfessional && !canApply && job.status === 'new' && (
+              <div className="card-surface p-6 text-center">
+                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <p className="text-muted-foreground">
+                  {job.pro_id ? 'Заказ уже принят другим специалистом' : 'Вы уже откликнулись на этот заказ'}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
-
-      {/* Application Form Dialog */}
-      <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <JobResponseForm
-            jobId={job.id}
-            jobTitle={job.title}
-            budgetMinCents={job.budget_min_cents}
-            budgetMaxCents={job.budget_max_cents}
-            onApplicationSubmit={() => {
-              setShowApplicationForm(false);
-              // Refresh applications
-              loadJobData();
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Price Proposal Dialog */}
-      <Dialog open={showPriceProposal} onOpenChange={setShowPriceProposal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <PriceProposalForm
-            jobId={job.id}
-            jobTitle={job.title}
-            budgetMinCents={job.budget_min_cents}
-            budgetMaxCents={job.budget_max_cents}
-            clientRating={clientRating}
-            onProposalSubmit={() => {
-              setShowPriceProposal(false);
-              // Refresh page data
-              loadJobData();
-            }}
-          />
-        </DialogContent>
-      </Dialog>
     </main>
   );
 };
