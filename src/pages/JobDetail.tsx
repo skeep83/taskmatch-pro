@@ -795,7 +795,7 @@ const JobDetail = () => {
                                 const firstMedia = item.portfolio_media?.[0];
                                 if (!firstMedia) return null;
                                 
-                                const imageUrl = supabase.storage.from('portfolio').getPublicUrl(firstMedia.file_url).data.publicUrl;
+                                const imageUrl = firstMedia.file_url;
                                 return (
                                   <div key={item.id} className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
                                     <img
