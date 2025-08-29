@@ -29,6 +29,7 @@ import Catalog from "./pages/Catalog";
 import ProPublic from "./pages/ProPublic";
 import Feed from "./pages/Feed";
 import JobDetail from "./pages/JobDetail";
+import JobEdit from "./pages/JobEdit";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
@@ -59,6 +60,7 @@ const AppContent = () => {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/job/:id" element={<JobDetail />} />
+          <Route path="/job/:id/edit" element={<JobEdit />} />
           <Route path="/job/new" element={<JobNew />} />
           <Route path="/dashboard/client" element={<DashboardClient />} />
           <Route path="/dashboard/pro" element={<DashboardPro />} />

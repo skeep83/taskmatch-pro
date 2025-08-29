@@ -17,7 +17,9 @@ import {
   User, 
   Calendar,
   MessageSquare,
-  Star
+  Star,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -48,6 +50,7 @@ const JobDetail = () => {
   const { toast } = useToast();
   const [job, setJob] = useState<Job | null>(null);
   const [jobPhotos, setJobPhotos] = useState<any[]>([]);
+  const [hasPayment, setHasPayment] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -56,6 +59,7 @@ const JobDetail = () => {
     if (jobId) {
       fetchJob();
       fetchJobPhotos();
+      checkPaymentStatus();
       getCurrentUser();
     }
   }, [jobId]);
@@ -124,6 +128,53 @@ const JobDetail = () => {
     }
   };
 
+  const checkPaymentStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('escrows')
+        .select('id')
+        .eq('job_id', jobId)
+        .maybeSingle();
+
+      if (error) throw error;
+      setHasPayment(!!data);
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+    }
+  };
+
+  const handleEditJob = () => {
+    navigate(`/job/${jobId}/edit`);
+  };
+
+  const handleDeleteJob = async () => {
+    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Заказ удален',
+        description: 'Заказ был успешно удален'
+      });
+      navigate('/dashboard/client');
+    } catch (error: any) {
+      console.error('Error deleting job:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось удалить заказ: ${error.message}`,
+        variant: 'destructive'
+      });
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusMap = {
       new: { label: 'Новый', variant: 'default' as const },
@@ -138,6 +189,7 @@ const JobDetail = () => {
   };
 
   const isJobOwner = currentUser && job && currentUser.id === job.client_id;
+  const canEdit = isJobOwner && !hasPayment && job?.status === 'new';
   const isProfessional = userRole === 'pro' && job?.status === 'new';
   const canApply = isProfessional && !job?.pro_id && currentUser?.id !== job?.client_id;
 
@@ -163,7 +215,21 @@ const JobDetail = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Назад
         </Button>
-        <h1 className="text-2xl font-bold">Детали заказа</h1>
+        <h1 className="text-2xl font-bold flex-1">Детали заказа</h1>
+        
+        {/* Edit and Delete buttons for job owner */}
+        {canEdit && (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleEditJob}>
+              <Edit className="w-4 h-4 mr-2" />
+              Редактировать
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteJob}>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Удалить
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">

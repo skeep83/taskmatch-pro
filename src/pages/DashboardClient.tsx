@@ -34,7 +34,9 @@ import {
   AlertCircle,
   PlayCircle,
   XCircle,
-  Zap
+  Zap,
+  Edit,
+  Trash2
 } from "lucide-react";
 
 interface Job {
@@ -156,6 +158,40 @@ export default function DashboardClient() {
 
     } catch (error: any) {
       console.error('Failed to load user data:', error);
+    }
+  };
+
+  const canEditJob = (job: Job) => {
+    return job.status === 'new' && !job.urgency; // Simple check - можно расширить логикой проверки эскроу
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Заказ удален',
+        description: 'Заказ был успешно удален'
+      });
+      
+      // Обновляем список заказов
+      loadUserData();
+    } catch (error: any) {
+      console.error('Error deleting job:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось удалить заказ: ${error.message}`,
+        variant: 'destructive'
+      });
     }
   };
 
@@ -405,6 +441,24 @@ export default function DashboardClient() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
+                          {canEditJob(job) && (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => navigate(`/job/${job.id}/edit`)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => handleDeleteJob(job.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
                           {job.pro_id && (
                             <Button 
                               variant="outline" 
@@ -478,6 +532,24 @@ export default function DashboardClient() {
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
+                              {canEditJob(job) && (
+                                <>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => navigate(`/job/${job.id}/edit`)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="destructive" 
+                                    size="sm"
+                                    onClick={() => handleDeleteJob(job.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              )}
                               {job.pro_id && (
                                 <Button 
                                   variant="outline" 
