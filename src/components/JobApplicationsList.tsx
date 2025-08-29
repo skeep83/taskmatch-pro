@@ -274,9 +274,9 @@ export const JobApplicationsList = ({
       </div>
       
       {/* Carousel Container */}
-      <div className="relative">
+      <div className="relative py-8 px-4">
         {/* Cards Container */}
-        <div className="overflow-hidden rounded-3xl">
+        <div className="relative">
           <motion.div 
             className="flex transition-transform duration-500 ease-out"
             animate={{
