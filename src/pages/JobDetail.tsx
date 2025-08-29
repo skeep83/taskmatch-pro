@@ -886,91 +886,97 @@ const JobDetail = () => {
                   />
                 </div>
 
-                {/* Statistics */}
+                {/* Rating Section - Appears first when job is done and user can rate */}
                 {canRate ? (
-                  <div>
-                    <h4 className="text-lg font-medium mb-6 text-center">Оцените выполнение услуги специалистом</h4>
+                  <div className="mb-8">
+                    <h4 className="text-lg font-medium mb-6 text-center text-primary animate-pulse">Оцените выполнение услуги специалистом</h4>
                     
                     {/* Professional Avatar and Info */}
                     {proProfile && (
                       <div className="flex flex-col items-center mb-6">
-                        <Avatar className="w-20 h-20 mb-4">
-                          <AvatarImage 
-                            src={proProfile.avatar_url || ''} 
-                            alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
-                          />
-                          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xl">
-                            {proProfile.full_name 
-                              ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
-                              : (proProfile.first_name && proProfile.last_name 
-                                ? `${proProfile.first_name[0]}${proProfile.last_name[0]}`.toUpperCase()
-                                : 'С')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <h5 className="font-semibold text-lg">
+                        <div className="relative">
+                          <Avatar className="w-32 h-32 mb-4 animate-bounce border-4 border-primary/20 shadow-lg shadow-primary/20">
+                            <AvatarImage 
+                              src={proProfile.avatar_url || ''} 
+                              alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
+                            />
+                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-2xl">
+                              {proProfile.full_name 
+                                ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                                : (proProfile.first_name && proProfile.last_name 
+                                  ? `${proProfile.first_name[0]}${proProfile.last_name[0]}`.toUpperCase()
+                                  : 'С')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -inset-2 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 animate-pulse"></div>
+                        </div>
+                        <h5 className="font-bold text-xl text-center mb-2">
                           {proProfile.full_name || 
                            (proProfile.first_name && proProfile.last_name 
                              ? `${proProfile.first_name} ${proProfile.last_name}` 
                              : 'Специалист')}
                         </h5>
-                        <Badge variant="secondary" className="mt-1">Специалист</Badge>
+                        <Badge variant="default" className="animate-pulse bg-gradient-to-r from-primary to-accent text-white">Специалист</Badge>
                       </div>
                     )}
 
                     {/* Rating Section */}
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground mb-4">Поставьте оценку от 1 до 5 звезд</p>
-                        <StarRating
-                          rating={rating}
-                          readonly={false}
-                          size="lg"
-                          className="justify-center"
-                          onRatingChange={setRating}
-                        />
+                        <p className="text-sm text-muted-foreground mb-6 font-medium">Поставьте оценку от 1 до 5 звезд</p>
+                        <div className="transform hover:scale-110 transition-transform duration-300">
+                          <StarRating
+                            rating={rating}
+                            readonly={false}
+                            size="lg"
+                            className="justify-center star-rating-animated"
+                            onRatingChange={setRating}
+                          />
+                        </div>
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Комментарий (необязательно)</label>
+                        <label className="text-sm font-medium mb-3 block">Комментарий (необязательно)</label>
                         <Textarea
                           placeholder="Расскажите о качестве выполненной работы..."
                           value={ratingComment}
                           onChange={(e) => setRatingComment(e.target.value)}
-                          className="min-h-[100px]"
+                          className="min-h-[120px] transition-all duration-300 focus:scale-[1.02]"
                         />
                       </div>
 
                       <Button 
                         onClick={handleSubmitRating}
                         disabled={rating === 0}
-                        className="w-full"
+                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold py-3 transform hover:scale-105 transition-all duration-300 shadow-lg"
                       >
-                        <Send className="w-4 h-4 mr-2" />
+                        <Send className="w-5 h-5 mr-2" />
                         Отправить оценку
                       </Button>
                     </div>
                   </div>
-                ) : (
-                  <div>
-                    <h4 className="text-lg font-medium mb-4 text-muted-foreground">Информация о заказе</h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between py-3 border-b border-border/50">
-                        <span className="text-muted-foreground">Статус:</span>
-                        {getStatusBadge(job.status)}
-                      </div>
-                      
-                      <div className="flex items-center justify-between py-3 border-b border-border/50">
-                        <span className="text-muted-foreground">Создан:</span>
-                        <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
-                      </div>
+                ) : null}
 
-                      <div className="flex items-center justify-between py-3">
-                        <span className="text-muted-foreground">Категория:</span>
-                        <span className="font-medium">{job.categories.label_ru}</span>
-                      </div>
+                {/* Statistics - Always shown, but moved below rating when rating is available */}
+                <div>
+                  <h4 className="text-lg font-medium mb-4 text-muted-foreground">Информация о заказе</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-border/50">
+                      <span className="text-muted-foreground">Статус:</span>
+                      {getStatusBadge(job.status)}
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-3 border-b border-border/50">
+                      <span className="text-muted-foreground">Создан:</span>
+                      <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-muted-foreground">Категория:</span>
+                      <span className="font-medium">{job.categories.label_ru}</span>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Applications List for Job Owner */}
