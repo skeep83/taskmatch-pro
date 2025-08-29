@@ -61,8 +61,12 @@ serve(async (req) => {
       throw new Error('Job not found or you are not authorized to modify it');
     }
 
-    // Get application details
-    const { data: application, error: appError } = await supabase
+    // Get application details - check both job_applications and job_price_proposals
+    let application = null;
+    let applicationError = null;
+
+    // First try job_applications table
+    const { data: jobApp, error: jobAppError } = await supabase
       .from('job_applications')
       .select(`
         *,
@@ -70,9 +74,37 @@ serve(async (req) => {
       `)
       .eq('id', applicationId)
       .eq('job_id', jobId)
-      .single();
+      .maybeSingle();
 
-    if (appError || !application) {
+    if (jobApp) {
+      application = jobApp;
+    } else {
+      // Try job_price_proposals table
+      const { data: priceProposal, error: priceError } = await supabase
+        .from('job_price_proposals')
+        .select('*')
+        .eq('id', applicationId)
+        .eq('job_id', jobId)
+        .maybeSingle();
+
+      if (priceProposal) {
+        // Get profile data separately for price proposals
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, avatar_url')
+          .eq('id', priceProposal.pro_id)
+          .maybeSingle();
+
+        application = {
+          ...priceProposal,
+          profiles: profile
+        };
+      } else {
+        applicationError = priceError || jobAppError;
+      }
+    }
+
+    if (!application) {
       throw new Error('Application not found');
     }
 
@@ -124,15 +156,31 @@ serve(async (req) => {
     });
 
     // Send notifications to other professionals that they were not selected
-    const { data: otherApplications } = await supabase
+    // Check both tables for other applications
+    const { data: otherJobApplications } = await supabase
       .from('job_applications')
       .select('pro_id')
       .eq('job_id', jobId)
       .neq('id', applicationId);
 
-    if (otherApplications && otherApplications.length > 0) {
-      const notifications = otherApplications.map(app => ({
-        user_id: app.pro_id,
+    const { data: otherPriceProposals } = await supabase
+      .from('job_price_proposals')
+      .select('pro_id')
+      .eq('job_id', jobId)
+      .neq('id', applicationId);
+
+    const allOtherApplications = [
+      ...(otherJobApplications || []),
+      ...(otherPriceProposals || [])
+    ];
+
+    // Remove duplicates and exclude the selected professional
+    const uniqueProIds = [...new Set(allOtherApplications.map(app => app.pro_id))]
+      .filter(proId => proId !== application.pro_id);
+
+    if (uniqueProIds.length > 0) {
+      const notifications = uniqueProIds.map(proId => ({
+        user_id: proId,
         type: 'job_application_declined',
         title: 'Заказ отдан другому специалисту',
         title_ro: 'Comanda a fost dată unui alt specialist',
