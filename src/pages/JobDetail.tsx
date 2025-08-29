@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -26,7 +27,8 @@ import {
   Edit,
   Trash2,
   ZoomIn,
-  DollarSign
+  DollarSign,
+  Send
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
@@ -65,6 +67,11 @@ const JobDetail = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [showPriceProposal, setShowPriceProposal] = useState(false);
+  const [showMediaViewer, setShowMediaViewer] = useState(false);
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
+  const [rating, setRating] = useState(0);
+  const [ratingComment, setRatingComment] = useState('');
+  const [proProfile, setProProfile] = useState<any>(null);
   const [clientRating, setClientRating] = useState<{average: number, count: number} | null>(null);
   const [clientProfile, setClientProfile] = useState<any>(null);
   const [userRoles, setUserRoles] = useState<string[]>([]);
@@ -130,6 +137,7 @@ const JobDetail = () => {
       await loadClientData(data.client_id);
       if (data.pro_id) {
         await loadAssignedProfessional(data.pro_id);
+        await loadProProfile(data.pro_id);
       }
     } catch (error: any) {
       console.error('Error fetching job:', error);
@@ -253,6 +261,20 @@ const JobDetail = () => {
     }
   };
 
+  const loadProProfile = async (proId: string) => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, full_name, avatar_url')
+        .eq('id', proId)
+        .maybeSingle();
+      
+      setProProfile(profile);
+    } catch (error) {
+      console.error('Error loading pro profile:', error);
+    }
+  };
+
   const fetchJobPhotos = async () => {
     try {
       const { data, error } = await supabase
@@ -337,7 +359,7 @@ const JobDetail = () => {
       if (error) throw error;
 
       // Send notification to client
-      await supabase.functions.invoke('notifications-send', {
+      const { error: notifyError } = await supabase.functions.invoke('notifications-send', {
         body: {
           user_id: job.client_id,
           type: 'job_update',
@@ -349,6 +371,10 @@ const JobDetail = () => {
           channels: ['push']
         }
       });
+      
+      if (notifyError) {
+        console.error('Error sending notification:', notifyError);
+      }
 
       toast({
         title: 'Работа начата',
@@ -388,7 +414,7 @@ const JobDetail = () => {
       if (error) throw error;
 
       // Send notification to client
-      await supabase.functions.invoke('notifications-send', {
+      const { error: notifyError } = await supabase.functions.invoke('notifications-send', {
         body: {
           user_id: job.client_id,
           type: 'job_update',
@@ -400,6 +426,10 @@ const JobDetail = () => {
           channels: ['push']
         }
       });
+      
+      if (notifyError) {
+        console.error('Error sending notification:', notifyError);
+      }
 
       toast({
         title: 'Работа завершена',
@@ -412,6 +442,66 @@ const JobDetail = () => {
       toast({
         title: 'Ошибка',
         description: `Не удалось обновить статус: ${error.message}`,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleSubmitRating = async () => {
+    if (!job || !currentUser || !job.pro_id || rating === 0) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пожалуйста, выберите оценку',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      // Insert rating
+      const { error } = await supabase
+        .from('ratings')
+        .insert({
+          job_id: job.id,
+          from_user_id: currentUser.id,
+          to_user_id: job.pro_id,
+          score: rating,
+          comment: ratingComment || null
+        });
+
+      if (error) throw error;
+
+      // Send notification to specialist
+      const { error: notifyError } = await supabase.functions.invoke('notifications-send', {
+        body: {
+          user_id: job.pro_id,
+          type: 'rating',
+          title: 'Новая оценка',
+          title_ro: 'Evaluare nouă',
+          message: `Вы получили оценку ${rating} звезд за работу: ${job.title}`,
+          message_ro: `Ați primit o evaluare de ${rating} stele pentru lucrarea: ${job.title}`,
+          data: { job_id: job.id, rating, comment: ratingComment },
+          channels: ['push']
+        }
+      });
+      
+      if (notifyError) {
+        console.error('Error sending rating notification:', notifyError);
+      }
+
+      toast({
+        title: 'Оценка отправлена',
+        description: 'Спасибо за вашу оценку!'
+      });
+      
+      setRating(0);
+      setRatingComment('');
+      await fetchJob();
+    } catch (error: any) {
+      console.error('Error submitting rating:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось отправить оценку: ${error.message}`,
         variant: 'destructive'
       });
     }
@@ -437,6 +527,7 @@ const JobDetail = () => {
   const isAssignedPro = currentUser && job && currentUser.id === job.pro_id;
   const canStartWork = isAssignedPro && job?.status === 'accepted' && !jobStatusData.start_confirmed;
   const canCompleteWork = isAssignedPro && job?.status === 'in_progress' && jobStatusData.start_confirmed && !jobStatusData.end_confirmed;
+  const canRate = isJobOwner && job?.status === 'done';
 
   if (loading) {
     return <div className="container mx-auto py-8">Загрузка...</div>;
@@ -796,25 +887,90 @@ const JobDetail = () => {
                 </div>
 
                 {/* Statistics */}
-                <div>
-                  <h4 className="text-lg font-medium mb-4 text-muted-foreground">Информация о заказе</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b border-border/50">
-                      <span className="text-muted-foreground">Статус:</span>
-                      {getStatusBadge(job.status)}
-                    </div>
+                {canRate ? (
+                  <div>
+                    <h4 className="text-lg font-medium mb-6 text-center">Оцените выполнение услуги специалистом</h4>
                     
-                    <div className="flex items-center justify-between py-3 border-b border-border/50">
-                      <span className="text-muted-foreground">Создан:</span>
-                      <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
-                    </div>
+                    {/* Professional Avatar and Info */}
+                    {proProfile && (
+                      <div className="flex flex-col items-center mb-6">
+                        <Avatar className="w-20 h-20 mb-4">
+                          <AvatarImage 
+                            src={proProfile.avatar_url || ''} 
+                            alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
+                          />
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xl">
+                            {proProfile.full_name 
+                              ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                              : (proProfile.first_name && proProfile.last_name 
+                                ? `${proProfile.first_name[0]}${proProfile.last_name[0]}`.toUpperCase()
+                                : 'С')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h5 className="font-semibold text-lg">
+                          {proProfile.full_name || 
+                           (proProfile.first_name && proProfile.last_name 
+                             ? `${proProfile.first_name} ${proProfile.last_name}` 
+                             : 'Специалист')}
+                        </h5>
+                        <Badge variant="secondary" className="mt-1">Специалист</Badge>
+                      </div>
+                    )}
 
-                    <div className="flex items-center justify-between py-3">
-                      <span className="text-muted-foreground">Категория:</span>
-                      <span className="font-medium">{job.categories.label_ru}</span>
+                    {/* Rating Section */}
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground mb-4">Поставьте оценку от 1 до 5 звезд</p>
+                        <StarRating
+                          rating={rating}
+                          readonly={false}
+                          size="lg"
+                          className="justify-center"
+                          onRatingChange={setRating}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Комментарий (необязательно)</label>
+                        <Textarea
+                          placeholder="Расскажите о качестве выполненной работы..."
+                          value={ratingComment}
+                          onChange={(e) => setRatingComment(e.target.value)}
+                          className="min-h-[100px]"
+                        />
+                      </div>
+
+                      <Button 
+                        onClick={handleSubmitRating}
+                        disabled={rating === 0}
+                        className="w-full"
+                      >
+                        <Send className="w-4 h-4 mr-2" />
+                        Отправить оценку
+                      </Button>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div>
+                    <h4 className="text-lg font-medium mb-4 text-muted-foreground">Информация о заказе</h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between py-3 border-b border-border/50">
+                        <span className="text-muted-foreground">Статус:</span>
+                        {getStatusBadge(job.status)}
+                      </div>
+                      
+                      <div className="flex items-center justify-between py-3 border-b border-border/50">
+                        <span className="text-muted-foreground">Создан:</span>
+                        <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between py-3">
+                        <span className="text-muted-foreground">Категория:</span>
+                        <span className="font-medium">{job.categories.label_ru}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Applications List for Job Owner */}
