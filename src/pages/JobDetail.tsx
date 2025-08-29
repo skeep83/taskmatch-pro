@@ -682,57 +682,54 @@ const JobDetail = () => {
                   Заинтересованы в заказе?
                 </h2>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <Button 
-                    onClick={() => setShowPriceProposal(true)}
-                    className="btn-hero h-14 text-lg font-semibold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <DollarSign className="w-5 h-5" />
-                    Предложить цену
-                  </Button>
-                  <Button 
-                    onClick={() => setShowApplicationForm(true)}
-                    variant="outline"
-                    className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-lg"
-                  >
-                    <User className="w-5 h-5" />
-                    Откликнуться
-                  </Button>
+                  <Dialog open={showPriceProposal} onOpenChange={setShowPriceProposal}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        className="btn-hero h-14 text-lg font-semibold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
+                        <DollarSign className="w-5 h-5" />
+                        Предложить цену
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <PriceProposalForm
+                        jobId={job.id}
+                        jobTitle={job.title}
+                        budgetMinCents={job.budget_min_cents}
+                        budgetMaxCents={job.budget_max_cents}
+                        clientRating={clientRating}
+                        onProposalSubmit={() => {
+                          setShowPriceProposal(false);
+                          loadJobData();
+                        }}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                  
+                  <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline"
+                        className="h-14 text-lg font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-lg"
+                      >
+                        <User className="w-5 h-5" />
+                        Откликнуться
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <JobResponseForm
+                        jobId={job.id}
+                        jobTitle={job.title}
+                        budgetMinCents={job.budget_min_cents}
+                        budgetMaxCents={job.budget_max_cents}
+                        onApplicationSubmit={() => {
+                          setShowApplicationForm(false);
+                          loadJobData();
+                        }}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </div>
-              </div>
-            )}
-
-            {/* Application Form Modal */}
-            {showApplicationForm && (
-              <div className="card-surface p-8">
-                <JobResponseForm
-                  jobId={job.id}
-                  jobTitle={job.title}
-                  budgetMinCents={job.budget_min_cents}
-                  budgetMaxCents={job.budget_max_cents}
-                  onApplicationSubmit={() => {
-                    setShowApplicationForm(false);
-                    // Refresh applications
-                    loadJobData();
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Price Proposal Modal */}
-            {showPriceProposal && (
-              <div className="card-surface p-8">
-                <PriceProposalForm
-                  jobId={job.id}
-                  jobTitle={job.title}
-                  budgetMinCents={job.budget_min_cents}
-                  budgetMaxCents={job.budget_max_cents}
-                  clientRating={clientRating}
-                  onProposalSubmit={() => {
-                    setShowPriceProposal(false);
-                    // Refresh page data
-                    loadJobData();
-                  }}
-                />
               </div>
             )}
           </div>
