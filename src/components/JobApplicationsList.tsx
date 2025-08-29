@@ -73,6 +73,8 @@ export function JobApplicationsList({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
   const [selectedPortfolio, setSelectedPortfolio] = useState<JobApplication | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [allPortfolioImages, setAllPortfolioImages] = useState<any[]>([]);
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
 
@@ -281,10 +283,43 @@ export function JobApplicationsList({
 
   const handlePortfolioOpen = (application: JobApplication) => {
     console.log('🖼️ Opening portfolio for:', application.pro_id, application);
-    console.log('🎭 Modal state before:', { portfolioModalOpen, selectedPortfolio: !!selectedPortfolio });
+    
+    // Собираем все изображения из портфолио
+    const images: any[] = [];
+    application.portfolio?.forEach(item => {
+      // Добавляем основное изображение
+      if (item.image_url) {
+        images.push({
+          id: `main-${item.id}`,
+          url: item.image_url,
+          title: item.title || 'Основное фото',
+          description: `Работа: ${item.title || 'Без названия'}`,
+          isMain: true
+        });
+      }
+      
+      // Добавляем дополнительные изображения
+      if (item.portfolio_media) {
+        item.portfolio_media
+          .filter(media => media.file_type === 'image' || media.file_type.startsWith('image/'))
+          .sort((a, b) => a.display_order - b.display_order)
+          .forEach(media => {
+            images.push({
+              id: media.id,
+              url: media.file_url,
+              title: media.file_name || 'Дополнительное фото',
+              description: `Работа: ${item.title || 'Без названия'}`,
+              isMain: false
+            });
+          });
+      }
+    });
+    
+    console.log('🎨 All portfolio images:', images);
+    setAllPortfolioImages(images);
+    setCurrentImageIndex(0);
     setSelectedPortfolio(application);
     setPortfolioModalOpen(true);
-    console.log('🎭 Modal state after:', { portfolioModalOpen: true, selectedPortfolio: !!application });
   };
 
   if (loading) {
@@ -617,93 +652,130 @@ export function JobApplicationsList({
           </DialogHeader>
           
           <div className="mt-6">
-            {selectedPortfolio?.portfolio && selectedPortfolio.portfolio.length > 0 ? (
-              <div className="space-y-8">
-                {selectedPortfolio.portfolio.map((item) => {
-                  console.log('🖼️ Processing portfolio item:', item);
-                  
-                  // Собираем все изображения: основное + дополнительные
-                  const allImages = [];
-                  
-                  // Добавляем основное изображение, если есть
-                  if (item.image_url) {
-                    allImages.push({
-                      id: `main-${item.id}`,
-                      url: item.image_url,
-                      title: item.title || 'Основное фото',
-                      isMain: true
-                    });
-                  }
-                  
-                  // Добавляем дополнительные изображения
-                  if (item.portfolio_media) {
-                    console.log('🔍 Processing portfolio_media:', item.portfolio_media);
-                    item.portfolio_media
-                      .filter(media => {
-                        console.log('📁 Media file_type:', media.file_type);
-                        return media.file_type === 'image' || media.file_type.startsWith('image/');
-                      })
-                      .sort((a, b) => a.display_order - b.display_order)
-                      .forEach(media => {
-                        console.log('✅ Adding media to images:', media);
-                        allImages.push({
-                          id: media.id,
-                          url: media.file_url,
-                          title: media.file_name || 'Дополнительное фото',
-                          isMain: false
-                        });
-                      });
-                  }
-
-                  console.log('🎨 All images for item:', allImages);
-
-                  return (
-                    <div key={item.id} className="space-y-4">
-                      {item.title && (
-                        <h3 className="text-lg font-semibold border-b pb-2">{item.title}</h3>
-                      )}
-                      
-                      {allImages.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {allImages.map((image) => (
-                            <motion.div 
-                              key={image.id} 
-                              className="relative rounded-xl overflow-hidden bg-muted group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300"
-                              whileHover={{ scale: 1.02 }}
-                              transition={{ duration: 0.2 }}
-                              onClick={() => window.open(image.url, '_blank')}
-                            >
-                              <div className="aspect-[4/3] relative">
-                                <OptimizedImage
-                                  src={image.url}
-                                  alt={image.title}
-                                  width={600}
-                                  height={450}
-                                  className="w-full h-full object-cover"
-                                />
-                                {image.isMain && (
-                                  <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-sm px-3 py-1 rounded-lg font-medium shadow-lg">
-                                    Главное фото
-                                  </div>
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                <div className="absolute bottom-3 left-3 right-3 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                  <p className="text-sm font-medium truncate">{image.title}</p>
-                                  <p className="text-xs opacity-80">Нажмите для увеличения</p>
-                                </div>
-                                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                  <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                                    <ExternalLink className="w-4 h-4 text-white" />
-                                  </div>
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </div>
-                      )}
+            {allPortfolioImages.length > 0 ? (
+              <div className="space-y-6">
+                {/* Main Image Display */}
+                <div className="relative">
+                  <motion.div 
+                    key={currentImageIndex}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-muted shadow-2xl"
+                  >
+                    <OptimizedImage
+                      src={allPortfolioImages[currentImageIndex]?.url}
+                      alt={allPortfolioImages[currentImageIndex]?.title}
+                      width={800}
+                      height={500}
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {/* Image info overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+                      <div className="text-white">
+                        <h4 className="text-lg font-semibold mb-1">
+                          {allPortfolioImages[currentImageIndex]?.title}
+                        </h4>
+                        <p className="text-sm opacity-90">
+                          {allPortfolioImages[currentImageIndex]?.description}
+                        </p>
+                        {allPortfolioImages[currentImageIndex]?.isMain && (
+                          <div className="inline-flex items-center gap-2 mt-2 bg-primary/20 text-primary-foreground px-3 py-1 rounded-lg text-sm">
+                            <Star className="w-4 h-4" />
+                            Главное фото
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  );
-                })}
+
+                    {/* Navigation arrows */}
+                    {allPortfolioImages.length > 1 && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCurrentImageIndex((prev) => (prev - 1 + allPortfolioImages.length) % allPortfolioImages.length)}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 border-0"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCurrentImageIndex((prev) => (prev + 1) % allPortfolioImages.length)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 border-0"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </Button>
+                      </>
+                    )}
+
+                    {/* Image counter */}
+                    {allPortfolioImages.length > 1 && (
+                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm font-medium">
+                        {currentImageIndex + 1} / {allPortfolioImages.length}
+                      </div>
+                    )}
+
+                    {/* Full screen button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.open(allPortfolioImages[currentImageIndex]?.url, '_blank')}
+                      className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 border-0"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </motion.div>
+                </div>
+
+                {/* Thumbnail Navigation */}
+                {allPortfolioImages.length > 1 && (
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted">
+                    {allPortfolioImages.map((image, index) => (
+                      <motion.button
+                        key={image.id}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                          index === currentImageIndex 
+                            ? 'border-primary shadow-lg scale-105' 
+                            : 'border-transparent hover:border-muted-foreground/50'
+                        }`}
+                        whileHover={{ scale: index === currentImageIndex ? 1.05 : 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <OptimizedImage
+                          src={image.url}
+                          alt={image.title}
+                          width={80}
+                          height={80}
+                          className="w-full h-full object-cover"
+                        />
+                        {image.isMain && (
+                          <div className="absolute top-1 left-1 w-2 h-2 bg-primary rounded-full" />
+                        )}
+                        {index === currentImageIndex && (
+                          <div className="absolute inset-0 bg-primary/20" />
+                        )}
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Quick actions */}
+                <div className="flex items-center justify-center gap-4 pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(allPortfolioImages[currentImageIndex]?.url, '_blank')}
+                    className="flex items-center gap-2"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Открыть в полном размере
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="text-center py-12">
