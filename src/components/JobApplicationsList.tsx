@@ -448,44 +448,28 @@ export const JobApplicationsList = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h3 className="text-2xl font-bold text-foreground">
-            Отклики специалистов
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            {applications.length} {applications.length === 1 ? 'специалист откликнулся' : 'специалистов откликнулись'} на ваш заказ
-          </p>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold">
+          Отклики специалистов ({applications.length})
+        </h3>
         {applications.length > 1 && (
-          <div className="flex items-center gap-3 bg-card/50 backdrop-blur-sm rounded-full px-4 py-2 border shadow-sm">
+          <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={prevCard}
-              className="h-8 w-8 p-0 rounded-full hover:bg-primary/10 transition-all duration-200"
+              className="h-8 w-8 p-0"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-primary">
-                {currentIndex + 1}
-              </span>
-              <div className="w-8 h-0.5 bg-border relative">
-                <div 
-                  className="absolute left-0 top-0 h-full bg-primary rounded-full transition-all duration-300"
-                  style={{ width: `${((currentIndex + 1) / applications.length) * 100}%` }}
-                />
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {applications.length}
-              </span>
-            </div>
+            <span className="text-sm text-muted-foreground px-2">
+              {currentIndex + 1} / {applications.length}
+            </span>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={nextCard}
-              className="h-8 w-8 p-0 rounded-full hover:bg-primary/10 transition-all duration-200"
+              className="h-8 w-8 p-0"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -740,10 +724,7 @@ export const JobApplicationsList = ({
         })
       ) : (
         // Для нескольких откликов используем вертикальную круговую карусель
-        <div className="relative w-full h-[700px] perspective-1000">
-          {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background/50 pointer-events-none rounded-3xl" />
-          
+        <div className="relative w-full h-[600px] overflow-hidden">
           <AnimatePresence mode="wait">
             {applications.map((application, index) => {
               const isActive = index === currentIndex;
@@ -765,100 +746,81 @@ export const JobApplicationsList = ({
 
               // Определяем позицию и анимацию для каждой карты
               let y = 0;
-              let scale = 0.85;
-              let opacity = 0.4;
+              let scale = 0.8;
+              let opacity = 0.3;
               let zIndex = 1;
-              let rotateX = 0;
-              let blur = 4;
-              let brightness = 0.7;
+              let rotateY = 0;
 
               if (isActive) {
                 y = 0;
                 scale = 1;
                 opacity = 1;
-                zIndex = 20;
-                rotateX = 0;
-                blur = 0;
-                brightness = 1;
+                zIndex = 10;
+                rotateY = 0;
               } else if (isNext) {
-                y = 80;
-                scale = 0.92;
-                opacity = 0.8;
-                zIndex = 15;
-                rotateX = -8;
-                blur = 1;
-                brightness = 0.9;
-              } else if (isPrev) {
-                y = -80;
-                scale = 0.92;
-                opacity = 0.8;
-                zIndex = 15;
-                rotateX = 8;
-                blur = 1;
-                brightness = 0.9;
-              } else {
-                y = index < currentIndex ? -150 : 150;
-                scale = 0.85;
-                opacity = 0.4;
+                y = 50;
+                scale = 0.9;
+                opacity = 0.7;
                 zIndex = 5;
-                rotateX = index < currentIndex ? 15 : -15;
-                blur = 4;
-                brightness = 0.7;
+                rotateY = -5;
+              } else if (isPrev) {
+                y = -50;
+                scale = 0.9;
+                opacity = 0.7;
+                zIndex = 5;
+                rotateY = 5;
+              } else {
+                y = index < currentIndex ? -100 : 100;
+                scale = 0.8;
+                opacity = 0.3;
+                zIndex = 1;
+                rotateY = index < currentIndex ? 10 : -10;
               }
-               
+              
               return (
                 <motion.div
                   key={application.id}
-                  className={`absolute inset-x-0 flex items-center justify-center ${!isActive ? 'cursor-pointer' : ''}`}
-                  initial={{ y: 200, scale: 0.8, opacity: 0, rotateX: -20 }}
+                  className={`absolute inset-0 flex items-center justify-center w-full max-w-2xl ${!isActive ? 'cursor-pointer' : ''}`}
+                  initial={{ y: 100, scale: 0.8, opacity: 0 }}
                   animate={{ 
                     y, 
                     scale, 
                     opacity,
-                    rotateX,
-                    filter: `blur(${blur}px) brightness(${brightness})`,
+                    rotateY,
                     transition: { 
                       type: "spring", 
-                      stiffness: 400, 
-                      damping: 35,
-                      duration: 0.6
+                      stiffness: 300, 
+                      damping: 30,
+                      duration: 0.5
                     }
                   }}
                   exit={{ 
-                    y: -200, 
+                    y: -100, 
                     scale: 0.8, 
                     opacity: 0,
-                    rotateX: 20,
-                    transition: { duration: 0.4 }
+                    transition: { duration: 0.3 }
                   }}
                   style={{ zIndex }}
                   onClick={isActive ? undefined : nextCard}
                 >
-                  <Card className={`w-full max-w-2xl mx-auto transition-all duration-300 ${
-                    isSelected ? 'ring-2 ring-primary shadow-xl shadow-primary/20' : 
-                    isActive ? 'shadow-2xl shadow-black/10' : 'shadow-lg'
-                  } ${isActive ? 'bg-gradient-to-br from-card to-card/95' : 'bg-card/90'} backdrop-blur-sm border-0`}>
-                    <CardHeader className="pb-4 bg-gradient-to-r from-muted/30 to-transparent">
-                      <div className="flex items-start gap-4">
-                        <Avatar className="w-16 h-16 flex-shrink-0 ring-2 ring-primary/20 ring-offset-2">
+                  <Card className={`w-full transition-all shadow-lg ${isSelected ? 'ring-2 ring-primary' : ''} ${isActive ? 'shadow-2xl' : 'shadow-md'}`}>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="w-12 h-12 flex-shrink-0">
                           <AvatarImage src={application.profiles?.avatar_url || ''} alt={displayName} />
-                          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-bold text-lg">
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4 mb-3">
+                          <div className="flex items-start justify-between gap-3 mb-2">
                             <div className="min-w-0 flex-1">
-                              <h4 className="text-lg font-bold flex items-center gap-2 mb-2">
-                                <span className="truncate bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                                  {displayName}
-                                </span>
-                                {isSelected && <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />}
+                              <h4 className="font-semibold flex items-center gap-2 mb-1">
+                                <span className="truncate">{displayName}</span>
+                                {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
                               </h4>
-                               <div className="flex items-center gap-3">
-                                 <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
-                                   Специалист
-                                 </Badge>
+                               <div className="flex items-center gap-2">
+                                 <Badge variant="secondary" className="text-xs">Специалист</Badge>
                                  {application.rating && application.rating.rating_count > 0 ? (
                                    <StarRating 
                                      rating={application.rating.avg_score} 
@@ -872,10 +834,10 @@ export const JobApplicationsList = ({
                                </div>
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <div className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent whitespace-nowrap">
+                              <div className="text-xl font-bold text-primary whitespace-nowrap">
                                 {formatPrice(application.price_cents)}
                               </div>
-                              <div className="text-xs text-muted-foreground font-medium">
+                              <div className="text-xs text-muted-foreground">
                                 {formatDistanceToNow(new Date(application.created_at), { 
                                   addSuffix: true, 
                                   locale: ru 
@@ -885,17 +847,17 @@ export const JobApplicationsList = ({
                           </div>
 
                           {/* ETA и гарантия */}
-                          <div className="flex flex-wrap gap-4 text-sm">
+                          <div className="flex flex-wrap gap-3 text-sm">
                             {application.eta_slot && (
-                              <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-200">
-                                <Clock className="w-4 h-4 flex-shrink-0" />
-                                <span className="truncate font-medium">Время: {application.eta_slot}</span>
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                <span className="truncate">Время: {application.eta_slot}</span>
                               </div>
                             )}
                             {application.warranty_days && (
-                              <div className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full border border-green-200">
-                                <Shield className="w-4 h-4 flex-shrink-0" />
-                                <span className="whitespace-nowrap font-medium">Гарантия: {application.warranty_days} дн.</span>
+                              <div className="flex items-center gap-1">
+                                <Shield className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                <span className="whitespace-nowrap">Гарантия: {application.warranty_days} дн.</span>
                               </div>
                             )}
                           </div>
@@ -904,19 +866,19 @@ export const JobApplicationsList = ({
                     </CardHeader>
 
                     {isActive && (
-                      <CardContent className="pt-0 space-y-4 px-6 pb-6">
+                      <CardContent className="pt-0 space-y-3">
                         {/* Note */}
                         {application.note && (
-                          <div className="p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl border border-border/50">
-                            <p className="text-sm font-semibold mb-2 text-primary">Комментарий к отклику:</p>
-                            <p className="text-sm leading-relaxed">{application.note}</p>
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-sm font-medium mb-1">Комментарий к отклику:</p>
+                            <p className="text-sm">{application.note}</p>
                           </div>
                         )}
 
                         {/* Portfolio */}
                         {application.portfolio && application.portfolio.length > 0 && (
                           <div>
-                            <p className="text-sm font-semibold mb-3 text-primary">Портфолио:</p>
+                            <p className="text-sm font-medium mb-2">Портфолио:</p>
                             {application.portfolio.map((item) => {
                               const mediaItems = item.portfolio_media && item.portfolio_media.length > 0 
                                 ? item.portfolio_media.sort((a, b) => a.display_order - b.display_order)
@@ -936,20 +898,20 @@ export const JobApplicationsList = ({
                         {/* Bio */}
                         {application.proProfile?.bio && (
                           <div>
-                            <p className="text-sm font-semibold mb-2 text-primary">О специалисте:</p>
-                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                            <p className="text-sm font-medium mb-1">О специалисте:</p>
+                            <p className="text-sm text-muted-foreground line-clamp-2">
                               {application.proProfile.bio}
                             </p>
                           </div>
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-3 pt-4 border-t border-border/50">
+                        <div className="flex gap-2 pt-2">
                           {/* Profile Dialog */}
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="outline" className="flex-1 h-11 font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
-                                <User className="w-4 h-4 mr-2" />
+                              <Button variant="outline" className="flex-1">
+                                <User className="w-4 h-4 mr-1" />
                                 Профиль
                               </Button>
                             </DialogTrigger>
@@ -1023,9 +985,9 @@ export const JobApplicationsList = ({
                             <Button 
                               onClick={() => handleSelectApplication(application.id)}
                               disabled={selecting === application.id}
-                              className="flex-1 h-11 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-semibold transition-all duration-200"
+                              className="flex-1"
                             >
-                              {selecting === application.id ? 'Выбираем...' : 'Выбрать специалиста'}
+                              {selecting === application.id ? 'Выбираем...' : 'Выбрать'}
                             </Button>
                           )}
                         </div>
@@ -1038,14 +1000,14 @@ export const JobApplicationsList = ({
           </AnimatePresence>
 
           {/* Центральная кнопка для переключения */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
             <Button
               variant="outline"
               size="sm"
               onClick={nextCard}
-              className="rounded-full bg-background/90 backdrop-blur-md border-2 border-primary/20 h-12 w-12 p-0 shadow-lg hover:bg-primary/10 hover:border-primary/40 transition-all duration-300 hover:scale-110"
+              className="rounded-full bg-background/80 backdrop-blur-sm border-2 h-10 w-10 p-0"
             >
-              <RotateCcw className="h-5 w-5 text-primary" />
+              <RotateCcw className="h-4 w-4" />
             </Button>
           </div>
         </div>
