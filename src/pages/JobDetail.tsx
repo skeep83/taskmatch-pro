@@ -677,49 +677,114 @@ const JobDetail = () => {
 
             {/* Professional Action Buttons */}
             {canApply && (
-              <Card className="transition-all">
-                <CardContent className="pt-6 pb-6">
-                  {!showPriceProposal ? (
-                    <>
-                      <h3 className="text-lg font-semibold mb-4 text-center">
-                        Заинтересованы в заказе?
-                      </h3>
-                      
-                      {/* Single Button */}
-                      <div className="flex justify-center">
+              <div className="space-y-4">
+                <Card className="transition-all">
+                  <CardContent className="pt-6 pb-6">
+                    {!showPriceProposal ? (
+                      <>
+                        <h3 className="text-lg font-semibold mb-4 text-center">
+                          Заинтересованы в заказе?
+                        </h3>
+                        
+                        {/* Single Button */}
+                        <div className="flex justify-center">
+                          <Button 
+                            className="flex-1 max-w-xs"
+                            onClick={() => setShowPriceProposal(true)}
+                          >
+                            <User className="w-4 h-4 mr-1" />
+                            Откликнуться
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <div>
+                        <PriceProposalForm
+                          jobId={job.id}
+                          jobTitle={job.title}
+                          budgetMinCents={job.budget_min_cents}
+                          budgetMaxCents={job.budget_max_cents}
+                          clientRating={clientRating}
+                          onProposalSubmit={() => {
+                            setShowPriceProposal(false);
+                            loadJobData();
+                          }}
+                        />
                         <Button 
-                          className="flex-1 max-w-xs"
-                          onClick={() => setShowPriceProposal(true)}
+                          variant="outline" 
+                          className="mt-4 w-full"
+                          onClick={() => setShowPriceProposal(false)}
                         >
-                          <User className="w-4 h-4 mr-1" />
-                          Откликнуться
+                          Отмена
                         </Button>
                       </div>
-                    </>
-                  ) : (
-                    <div>
-                      <PriceProposalForm
-                        jobId={job.id}
-                        jobTitle={job.title}
-                        budgetMinCents={job.budget_min_cents}
-                        budgetMaxCents={job.budget_max_cents}
-                        clientRating={clientRating}
-                        onProposalSubmit={() => {
-                          setShowPriceProposal(false);
-                          loadJobData();
-                        }}
-                      />
-                      <Button 
-                        variant="outline" 
-                        className="mt-4 w-full"
-                        onClick={() => setShowPriceProposal(false)}
-                      >
-                        Отмена
-                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Job Summary Card */}
+                <Card className="transition-all">
+                  <CardContent className="pt-6 pb-6">
+                    <h3 className="text-lg font-semibold mb-4">
+                      О заказе
+                    </h3>
+                    
+                    {/* Job Description */}
+                    <div className="mb-4">
+                      <p className="text-muted-foreground text-sm line-clamp-3">
+                        {job.description}
+                      </p>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    {/* Client Info */}
+                    {clientProfile && (
+                      <div className="border-t pt-4">
+                        <h4 className="text-sm font-medium mb-3 text-muted-foreground">
+                          Заказчик
+                        </h4>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage 
+                              src={clientProfile.avatar_url || ''} 
+                              alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
+                            />
+                            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                              {clientProfile.full_name 
+                                ? clientProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                                : (clientProfile.first_name && clientProfile.last_name 
+                                  ? `${clientProfile.first_name[0]}${clientProfile.last_name[0]}`.toUpperCase()
+                                  : 'К')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-sm">
+                                {clientProfile.full_name || 
+                                 (clientProfile.first_name && clientProfile.last_name 
+                                   ? `${clientProfile.first_name} ${clientProfile.last_name}` 
+                                   : 'Клиент')}
+                              </span>
+                              <Badge variant="secondary" className="text-xs">Клиент</Badge>
+                            </div>
+                            <div>
+                              {clientRating && clientRating.count > 0 ? (
+                                <StarRating 
+                                  rating={clientRating.average} 
+                                  size="sm" 
+                                  showValue={false}
+                                  readonly 
+                                />
+                              ) : (
+                                <span className="text-xs text-muted-foreground">Новый клиент</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </div>
 
