@@ -168,7 +168,7 @@ export const AppNavigation = () => {
   return (
     <>
       {/* Desktop Navigation */}
-      <header className="w-full card-surface sticky top-0 z-50 border-0">
+      <header className="w-full sticky top-0 z-[100] border-0 bg-white/80 backdrop-blur-md shadow-sm">
         <nav className="container mx-auto flex items-center justify-between py-3 px-6">
           {/* Logo */}
           <Link 
