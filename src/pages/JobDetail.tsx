@@ -887,70 +887,7 @@ const JobDetail = () => {
                 </div>
 
                 {/* Statistics */}
-                {canRate ? (
-                  <div>
-                    <h4 className="text-lg font-medium mb-6 text-center">Оцените выполнение услуги специалистом</h4>
-                    
-                    {/* Professional Avatar and Info */}
-                    {proProfile && (
-                      <div className="flex flex-col items-center mb-6">
-                        <Avatar className="w-20 h-20 mb-4">
-                          <AvatarImage 
-                            src={proProfile.avatar_url || ''} 
-                            alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
-                          />
-                          <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xl">
-                            {proProfile.full_name 
-                              ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
-                              : (proProfile.first_name && proProfile.last_name 
-                                ? `${proProfile.first_name[0]}${proProfile.last_name[0]}`.toUpperCase()
-                                : 'С')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <h5 className="font-semibold text-lg">
-                          {proProfile.full_name || 
-                           (proProfile.first_name && proProfile.last_name 
-                             ? `${proProfile.first_name} ${proProfile.last_name}` 
-                             : 'Специалист')}
-                        </h5>
-                        <Badge variant="secondary" className="mt-1">Специалист</Badge>
-                      </div>
-                    )}
-
-                    {/* Rating Section */}
-                    <div className="space-y-4">
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground mb-4">Поставьте оценку от 1 до 5 звезд</p>
-                        <StarRating
-                          rating={rating}
-                          readonly={false}
-                          size="lg"
-                          className="justify-center"
-                          onRatingChange={setRating}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Комментарий (необязательно)</label>
-                        <Textarea
-                          placeholder="Расскажите о качестве выполненной работы..."
-                          value={ratingComment}
-                          onChange={(e) => setRatingComment(e.target.value)}
-                          className="min-h-[100px]"
-                        />
-                      </div>
-
-                      <Button 
-                        onClick={handleSubmitRating}
-                        disabled={rating === 0}
-                        className="w-full"
-                      >
-                        <Send className="w-4 h-4 mr-2" />
-                        Отправить оценку
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
+                <div className="card-surface p-8 relative z-10">
                   <div>
                     <h4 className="text-lg font-medium mb-4 text-muted-foreground">Информация о заказе</h4>
                     <div className="space-y-4">
@@ -970,7 +907,7 @@ const JobDetail = () => {
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Applications List for Job Owner */}
