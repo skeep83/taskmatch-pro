@@ -469,7 +469,7 @@ export const JobApplicationsList = ({
                       <span className="truncate">{displayName}</span>
                       {isSelected && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
                     </h4>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant="secondary">Специалист</Badge>
                       {application.rating && application.rating.rating_count > 0 && (
                         <StarRating 

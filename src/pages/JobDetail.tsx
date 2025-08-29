@@ -342,6 +342,7 @@ const JobDetail = () => {
                        ? `${clientProfile.first_name} ${clientProfile.last_name}` 
                        : 'Клиент')}
                   </h4>
+                  <Badge variant="secondary" className="mt-1">Клиент</Badge>
                   {clientRating && clientRating.count > 0 ? (
                     <StarRating 
                       rating={clientRating.average} 
@@ -349,10 +350,10 @@ const JobDetail = () => {
                       showValue 
                       showCount 
                       count={clientRating.count}
-                      className="mt-1"
+                      className="mt-2"
                     />
                   ) : (
-                    <p className="text-sm text-muted-foreground mt-1">Новый клиент</p>
+                    <p className="text-xs text-muted-foreground mt-2">Новый клиент</p>
                   )}
                 </div>
               </div>
