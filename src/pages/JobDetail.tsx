@@ -342,18 +342,21 @@ const JobDetail = () => {
                        ? `${clientProfile.first_name} ${clientProfile.last_name}` 
                        : 'Клиент')}
                   </h4>
-                  <Badge variant="secondary" className="mt-1">Клиент</Badge>
-                  {clientRating && clientRating.count > 0 ? (
-                    <StarRating 
-                      rating={clientRating.average} 
-                      size="sm" 
-                      showValue 
-                      showCount 
-                      count={clientRating.count}
-                      className="mt-2"
-                    />
-                  ) : (
-                    <p className="text-xs text-muted-foreground mt-2">Новый клиент</p>
+                  <div className="flex items-center gap-2 flex-wrap mt-1">
+                    <Badge variant="secondary">Клиент</Badge>
+                    {clientRating && clientRating.count > 0 && (
+                      <StarRating 
+                        rating={clientRating.average} 
+                        size="sm" 
+                        showValue 
+                        showCount 
+                        count={clientRating.count}
+                        className="text-xs"
+                      />
+                    )}
+                  </div>
+                  {(!clientRating || clientRating.count === 0) && (
+                    <p className="text-xs text-muted-foreground mt-1">Новый клиент</p>
                   )}
                 </div>
               </div>
