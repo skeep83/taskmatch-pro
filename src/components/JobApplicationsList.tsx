@@ -358,7 +358,7 @@ export function JobApplicationsList({
       </div>
       
       {/* Applications List - 3D Cards */}
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="flex flex-wrap gap-8 justify-center">
         <AnimatePresence>
           {applications.map((application, index) => {
             const isSelected = selectedProId === application.pro_id;
