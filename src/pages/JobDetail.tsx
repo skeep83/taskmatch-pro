@@ -472,7 +472,7 @@ const JobDetail = () => {
       if (error) throw error;
 
       // Send notification to specialist
-      const { error: notifyError } = await supabase.functions.invoke('notifications-send', {
+      const { data: notifyResult, error: notifyError } = await supabase.functions.invoke('notifications-send', {
         body: {
           user_id: job.pro_id,
           type: 'rating',
@@ -487,6 +487,13 @@ const JobDetail = () => {
       
       if (notifyError) {
         console.error('Error sending rating notification:', notifyError);
+        toast({
+          title: 'Предупреждение',
+          description: 'Оценка отправлена, но уведомление не удалось доставить',
+          variant: 'default'
+        });
+      } else {
+        console.log('Rating notification sent successfully:', notifyResult);
       }
 
       toast({
@@ -496,6 +503,16 @@ const JobDetail = () => {
       
       setRating(0);
       setRatingComment('');
+      
+      // Force refresh notifications for the specialist
+      if (notifyResult?.notification_id) {
+        console.log('✅ Rating notification sent with ID:', notifyResult.notification_id);
+        // Trigger a refresh of notifications UI for real-time update
+        window.dispatchEvent(new CustomEvent('notification-sent', { 
+          detail: { notificationId: notifyResult.notification_id, type: 'rating' } 
+        }));
+      }
+      
       await fetchJob();
     } catch (error: any) {
       console.error('Error submitting rating:', error);

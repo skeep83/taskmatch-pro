@@ -35,6 +35,13 @@ serve(async (req) => {
     const notificationData: NotificationRequest = await req.json();
     const { channels = ['push'] } = notificationData;
 
+    console.log('📨 Processing notification request:', {
+      user_id: notificationData.user_id,
+      type: notificationData.type,
+      title: notificationData.title,
+      channels
+    });
+
     // Create notification record
     const { data: notification, error: notificationError } = await supabase
       .from('notifications')
@@ -51,8 +58,16 @@ serve(async (req) => {
       .single();
 
     if (notificationError) {
+      console.error('Failed to create notification:', notificationError);
       throw notificationError;
     }
+
+    console.log('✅ Notification created:', {
+      id: notification.id,
+      user_id: notification.user_id,
+      type: notification.type,
+      title: notification.title
+    });
 
     const results = {
       notification_id: notification.id,

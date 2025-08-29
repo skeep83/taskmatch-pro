@@ -48,6 +48,9 @@ export const NotificationCenter = () => {
       window.location.href = `/job/${notification.data.job_id}`;
     } else if (notification.type === 'job_accepted' && notification.data?.job_id) {
       window.location.href = `/job/${notification.data.job_id}`;
+    } else if (notification.type === 'rating' && notification.data?.job_id) {
+      // For rating notifications, navigate to job or dashboard
+      window.location.href = `/job/${notification.data.job_id}`;
     }
     
     // Close the popover after navigation
