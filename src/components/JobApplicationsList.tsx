@@ -396,19 +396,19 @@ export function JobApplicationsList({
                   </div>
                   
                   {/* Avatar positioned to overlap sections - with higher z-index */}
-                  <div className="absolute left-1/2 transform -translate-x-1/2 top-24 z-10">
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-16 z-10">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ duration: 0.2 }}
                       className="relative"
                     >
-                      <Avatar className="w-16 h-16 ring-4 ring-white shadow-xl">
+                      <Avatar className="w-32 h-32 ring-4 ring-white shadow-xl">
                         <AvatarImage 
                           src={application.profiles?.avatar_url || ''} 
                           alt={profileName}
                           className="object-cover"
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-lg">
+                        <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-2xl">
                           {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -418,16 +418,16 @@ export function JobApplicationsList({
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white z-20"
+                          className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white z-20"
                         >
-                          <CheckCircle className="w-4 h-4 text-white" />
+                          <CheckCircle className="w-6 h-6 text-white" />
                         </motion.div>
                       )}
                     </motion.div>
                   </div>
                   
-                  {/* Bottom white section */}
-                  <div className="relative bg-white px-6 pt-12 pb-8">
+                   {/* Bottom white section */}
+                   <div className="relative bg-white px-6 pt-20 pb-8">
                     {/* Name and title */}
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
@@ -499,24 +499,37 @@ export function JobApplicationsList({
                       </div>
                     )}
                     
-                    {/* Action button */}
-                    <div className="mt-6">
-                      {canSelect && (
-                        <Button
-                          onClick={() => handleSelectProfessional(application.pro_id)}
-                          disabled={selecting === application.pro_id}
-                          className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-                        >
-                          {selecting === application.pro_id ? 'Выбираем...' : 'Выбрать специалиста'}
-                        </Button>
-                      )}
-                      
-                      {isSelected && (
-                        <div className="w-full bg-green-100 text-green-800 font-semibold py-3 rounded-xl text-center">
-                          ✓ Выбран
-                        </div>
-                      )}
-                    </div>
+                     {/* Portfolio and Action buttons */}
+                     <div className="space-y-3">
+                       {/* Portfolio button */}
+                       {application.portfolio && application.portfolio.length > 0 && (
+                         <Button
+                           onClick={() => window.open(`/pro-portfolio/${application.pro_id}`, '_blank')}
+                           variant="outline"
+                           className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
+                         >
+                           <Eye className="w-4 h-4 mr-2" />
+                           Портфолио ({application.portfolio.length})
+                         </Button>
+                       )}
+                       
+                       {/* Action button */}
+                       {canSelect && (
+                         <Button
+                           onClick={() => handleSelectProfessional(application.pro_id)}
+                           disabled={selecting === application.pro_id}
+                           className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                         >
+                           {selecting === application.pro_id ? 'Выбираем...' : 'Выбрать специалиста'}
+                         </Button>
+                       )}
+                       
+                       {isSelected && (
+                         <div className="w-full bg-green-100 text-green-800 font-semibold py-3 rounded-xl text-center">
+                           ✓ Выбран
+                         </div>
+                       )}
+                     </div>
                   </div>
                 </div>
               </motion.div>
