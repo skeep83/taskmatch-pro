@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
-import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink } from 'lucide-react';
+import { Clock, Shield, MessageSquare, CheckCircle, User, ExternalLink, Image, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
@@ -42,6 +42,12 @@ interface JobApplication {
     id: string;
     image_url: string;
     title?: string;
+    portfolio_media?: Array<{
+      id: string;
+      file_url: string;
+      file_type: string;
+      display_order: number;
+    }>;
   }>;
 }
 
@@ -157,10 +163,15 @@ export const JobApplicationsList = ({
           console.error('Error loading rating for', app.pro_id, ratingError);
         }
 
-        // Загружаем портфолио (первые 3 работы)
+        // Загружаем портфолио (первые 3 работы) с медиа
         const { data: portfolioData, error: portfolioError } = await supabase
           .from('portfolio_items')
-          .select('id, image_url, title')
+          .select(`
+            id, image_url, title,
+            portfolio_media (
+              id, file_url, file_type, display_order
+            )
+          `)
           .eq('pro_id', app.pro_id)
           .order('created_at', { ascending: false })
           .limit(3);
@@ -221,6 +232,187 @@ export const JobApplicationsList = ({
     } finally {
       setSelecting(null);
     }
+  };
+
+  // Portfolio Carousel for Modal
+  const PortfolioCarousel = ({ media, title }: { media: any[], title: string }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalIndex, setModalIndex] = useState(0);
+    
+    if (!media || media.length === 0) {
+      return (
+        <div className="w-full h-24 bg-muted flex items-center justify-center rounded-lg">
+          <Image className="h-6 w-6 text-muted-foreground" />
+        </div>
+      );
+    }
+
+    if (media.length === 1) {
+      return (
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <div className="w-full h-24 cursor-zoom-in rounded-lg overflow-hidden">
+              <OptimizedImage
+                src={media[0].file_url || media[0].image_url}
+                alt={title}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                bucket="portfolio"
+              />
+            </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl w-full p-2">
+            <OptimizedImage
+              src={media[0].file_url || media[0].image_url}
+              alt={title}
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+              bucket="portfolio"
+            />
+          </DialogContent>
+        </Dialog>
+      );
+    }
+
+    const nextImage = () => {
+      setCurrentIndex((prev) => (prev + 1) % media.length);
+    };
+
+    const prevImage = () => {
+      setCurrentIndex((prev) => (prev - 1 + media.length) % media.length);
+    };
+
+    const nextModalImage = () => {
+      setModalIndex((prev) => (prev + 1) % media.length);
+    };
+
+    const prevModalImage = () => {
+      setModalIndex((prev) => (prev - 1 + media.length) % media.length);
+    };
+
+    const openModal = (index: number) => {
+      setModalIndex(index);
+      setIsModalOpen(true);
+    };
+
+    return (
+      <>
+        <div className="relative w-full h-24 rounded-lg overflow-hidden group">
+          <div 
+            className="w-full h-full cursor-zoom-in"
+            onClick={() => openModal(currentIndex)}
+          >
+            <OptimizedImage
+              src={media[currentIndex]?.file_url || media[currentIndex]?.image_url}
+              alt={`${title} - ${currentIndex + 1}`}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              bucket="portfolio"
+            />
+          </div>
+          
+          {/* Navigation Arrows */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-5 w-5 p-0 backdrop-blur-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              prevImage();
+            }}
+          >
+            <ChevronLeft className="h-3 w-3" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70 text-white h-5 w-5 p-0 backdrop-blur-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              nextImage();
+            }}
+          >
+            <ChevronRight className="h-3 w-3" />
+          </Button>
+
+          {/* Media Count Badge */}
+          <div className="absolute top-1 left-1 bg-black/70 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1">
+            <Image className="h-2 w-2" />
+            {media.length}
+          </div>
+
+          {/* Dots Indicator */}
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            {media.map((_, index) => (
+              <button
+                key={index}
+                className={`w-1 h-1 rounded-full transition-colors ${
+                  index === currentIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentIndex(index);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Full Size Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="max-w-6xl w-full p-2">
+            <div className="relative">
+              <OptimizedImage
+                src={media[modalIndex]?.file_url || media[modalIndex]?.image_url}
+                alt={`${title} - ${modalIndex + 1}`}
+                className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                bucket="portfolio"
+              />
+              
+              {/* Modal Navigation */}
+              {media.length > 1 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-10 w-10 p-0 backdrop-blur-sm rounded-full"
+                    onClick={prevModalImage}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white h-10 w-10 p-0 backdrop-blur-sm rounded-full"
+                    onClick={nextModalImage}
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+
+                  {/* Modal Counter */}
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
+                    {modalIndex + 1} / {media.length}
+                  </div>
+
+                  {/* Modal Dots */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {media.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`w-3 h-3 rounded-full transition-colors ${
+                          index === modalIndex ? 'bg-white' : 'bg-white/50'
+                        }`}
+                        onClick={() => setModalIndex(index)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
   };
 
   if (loading) {
@@ -438,14 +630,16 @@ export const JobApplicationsList = ({
                             <h4 className="font-medium mb-2">Портфолио</h4>
                             <div className="grid grid-cols-3 gap-2">
                               {application.portfolio.map((item) => (
-                                <div key={item.id} className="aspect-square">
-                                  <OptimizedImage
-                                    src={item.image_url}
-                                    alt={item.title || 'Работа специалиста'}
-                                    className="w-full h-full rounded object-cover"
-                                    bucket="portfolio"
-                                    enableZoom
+                                <div key={item.id}>
+                                  <PortfolioCarousel 
+                                    media={item.portfolio_media || (item.image_url ? [{ image_url: item.image_url, file_type: 'image' }] : [])}
+                                    title={item.title || 'Работа'}
                                   />
+                                  {item.title && (
+                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                                      {item.title}
+                                    </p>
+                                  )}
                                 </div>
                               ))}
                             </div>
