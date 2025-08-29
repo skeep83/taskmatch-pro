@@ -108,73 +108,61 @@ export default function Feed() {
     <main className="min-h-screen">
       <Seo title="ServiceHub — Лента заказов" description="Доступные заказы для специалистов" canonical="/feed" />
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={feedImage} alt="Jobs Feed" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-purple-600/80" />
-        </div>
-        <div className="relative container mx-auto px-4 py-24">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-              {userRole === "pro" ? t("feed.title") : t("feed.title")}
-            </h1>
-            <p className="text-xl text-white/90 mb-8">
-              {userRole === "pro" ? t("feed.search") : t("dashboard.welcome")}
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
-                <div className="flex items-center gap-2 text-white">
-                  <AnimatedIcon icon={Zap} className="text-yellow-300" />
-                  <span>Мгновенные выплаты</span>
-                </div>
-              </FloatingCard>
-              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
-                <div className="flex items-center gap-2 text-white">
-                  <AnimatedIcon icon={Shield} className="text-green-300" />
-                  <span>Защита эскроу</span>
-                </div>
-              </FloatingCard>
+      {/* Header Section */}
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+            {userRole === "pro" ? t("feed.title") : t("feed.title")}
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            {userRole === "pro" ? t("feed.search") : t("dashboard.welcome")}
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center mt-8">
+            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <AnimatedIcon icon={Zap} className="text-primary" />
+              <span className="text-sm font-medium">Мгновенные выплаты</span>
+            </div>
+            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <AnimatedIcon icon={Shield} className="text-green-500" />
+              <span className="text-sm font-medium">Защита эскроу</span>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Filters */}
-      <section className="container mx-auto px-4 py-8">
-        <GlassMorphism className="p-6 mb-8">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex-1 min-w-[300px] relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <input
-                type="text"
-                placeholder={t("feed.search")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/50 border border-white/20 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-muted-foreground" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50"
-              >
-                <option value="">{t("feed.category.all")}</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.label_ru || cat.key}</option>
-                ))}
-              </select>
+        <div className="max-w-7xl mx-auto">
+          {/* Filters */}
+          <div className="card-surface p-6 mb-8">
+            <div className="flex flex-wrap gap-4 items-center">
+              <div className="flex-1 min-w-[300px] relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder={t("feed.search")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/50 border border-white/20 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50"
+                >
+                  <option value="">{t("feed.category.all")}</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.label_ru || cat.key}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-        </GlassMorphism>
 
-        {/* Jobs Grid */}
-        <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredJobs.map((job) => (
-            <FloatingCard key={job.id} className="job-card group hover:scale-[1.02] transition-all duration-300">
-              <div className="p-6">
+          {/* Jobs Grid */}
+          <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredJobs.map((job) => (
+              <div key={job.id} className="card-surface p-6 group hover:scale-[1.02] transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
                   <Badge variant="secondary" className="mb-2">
                     {job.category?.label_ru || "Услуга"}
@@ -213,11 +201,11 @@ export default function Feed() {
                     <button
                       onClick={() => acceptJob(job.id)}
                       disabled={loading}
-                      className="btn-hero flex-1 group-hover:shadow-lg transition-all"
+                      className="bg-primary text-white hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold transition-colors flex-1 group-hover:shadow-lg"
                     >
                       {loading ? t("common.loading") : t("feed.accept_job")}
                     </button>
-                    <button className="btn-ghost p-3">
+                    <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-4 py-3 rounded-xl transition-colors">
                       <Video className="w-4 h-4" />
                     </button>
                   </div>
@@ -227,17 +215,17 @@ export default function Feed() {
                   Создан {new Date(job.created_at).toLocaleString()}
                 </div>
               </div>
-            </FloatingCard>
-          ))}
-        </div>
-
-        {filteredJobs.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔍</div>
-            <h2 className="text-xl font-semibold mb-2">{t("feed.no_jobs")}</h2>
-            <p className="text-muted-foreground">Попробуйте изменить фильтры или создать новый заказ</p>
+            ))}
           </div>
-        )}
+
+          {filteredJobs.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🔍</div>
+              <h2 className="text-xl font-semibold mb-2">{t("feed.no_jobs")}</h2>
+              <p className="text-muted-foreground">Попробуйте изменить фильтры или создать новый заказ</p>
+            </div>
+          )}
+        </div>
       </section>
     </main>
   );
