@@ -678,29 +678,30 @@ const JobDetail = () => {
             {/* Professional Action Buttons */}
             {canApply && (
               <Card className="transition-all shadow-elegant">
-                <CardContent className="pt-6 pb-6">
+                <CardContent className="p-8">
                   {!showPriceProposal ? (
                     <>
-                      <h3 className="text-lg font-semibold mb-4 text-center">
+                      <h3 className="text-xl font-semibold mb-6 text-center">
                         Заинтересованы в заказе?
                       </h3>
                       
                       {/* Single Button */}
-                      <div className="flex justify-center mb-6">
+                      <div className="flex justify-center mb-8">
                         <Button 
-                          className="flex-1 max-w-xs"
+                          className="flex-1 max-w-xs py-3"
                           onClick={() => setShowPriceProposal(true)}
                         >
-                          <User className="w-4 h-4 mr-1" />
+                          <User className="w-4 h-4 mr-2" />
                           Откликнуться
                         </Button>
                       </div>
 
                       {/* Client Info */}
                       {clientProfile && (
-                        <div className="border-t pt-4 mb-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Avatar className="w-10 h-10">
+                        <div className="border-t pt-6 mb-6">
+                          <h4 className="text-lg font-semibold mb-4">Заказчик</h4>
+                          <div className="flex items-center gap-4">
+                            <Avatar className="w-12 h-12">
                               <AvatarImage 
                                 src={clientProfile.avatar_url || ''} 
                                 alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
@@ -713,14 +714,14 @@ const JobDetail = () => {
                                     : 'К')}
                               </AvatarFallback>
                             </Avatar>
-                            <div>
-                              <h4 className="font-medium text-sm">
+                            <div className="flex-1">
+                              <h5 className="font-semibold text-base mb-1">
                                 {clientProfile.full_name || 
                                  (clientProfile.first_name && clientProfile.last_name 
                                    ? `${clientProfile.first_name} ${clientProfile.last_name}` 
                                    : 'Клиент')}
-                              </h4>
-                              <div className="flex items-center gap-1">
+                              </h5>
+                              <div className="flex items-center gap-2">
                                 {clientRating && clientRating.count > 0 ? (
                                   <>
                                     <StarRating 
@@ -729,12 +730,12 @@ const JobDetail = () => {
                                       showValue={false}
                                       readonly 
                                     />
-                                    <span className="text-xs text-muted-foreground ml-1">
-                                      ({clientRating.count})
+                                    <span className="text-sm text-muted-foreground">
+                                      {clientRating.average.toFixed(1)} ({clientRating.count})
                                     </span>
                                   </>
                                 ) : (
-                                  <span className="text-xs text-muted-foreground">Новый клиент</span>
+                                  <span className="text-sm text-muted-foreground">Новый клиент</span>
                                 )}
                               </div>
                             </div>
@@ -743,9 +744,9 @@ const JobDetail = () => {
                       )}
 
                       {/* Job Description */}
-                      <div className="border-t pt-4">
-                        <h4 className="font-medium text-sm mb-2">Описание заказа</h4>
-                        <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                      <div className="border-t pt-6">
+                        <h4 className="text-lg font-semibold mb-4">Описание заказа</h4>
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                           {job.description}
                         </p>
                       </div>
