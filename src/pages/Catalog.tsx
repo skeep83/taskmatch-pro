@@ -45,39 +45,47 @@ const Catalog = () => {
         proIds = (pc || []).map((x: any) => x.user_id);
       }
 
-      // Now we can use the foreign key relationship
+      // Simplified query without foreign key reference
       let query = (supabase as any)
         .from("pro_profiles")
-        .select(`
-          user_id,
-          bio,
-          radius_km,
-          hourly_rate_cents,
-          fixed_price_cents,
-          profiles!fk_pro_profiles_user_id (
-            first_name,
-            last_name,
-            full_name,
-            avatar_url
-          )
-        `)
+        .select("user_id,bio,radius_km,hourly_rate_cents,fixed_price_cents")
         .limit(60);
       
       if (proIds && proIds.length > 0) query = query.in("user_id", proIds);
-      const { data: profiles, error } = await query;
-      console.log('Catalog pros data:', profiles, 'error:', error);
-      setPros(profiles || []);
+      const { data: proProfiles, error: proError } = await query;
+      console.log('Pro profiles data:', proProfiles, 'error:', proError);
+      
+      if (proProfiles && proProfiles.length > 0) {
+        // Get corresponding profiles
+        const userIds = proProfiles.map((p: any) => p.user_id);
+        const { data: profilesData, error: profilesError } = await (supabase as any)
+          .from("profiles")
+          .select("id,first_name,last_name,full_name,avatar_url")
+          .in("id", userIds);
+        
+        console.log('Profiles data:', profilesData, 'error:', profilesError);
+        
+        // Merge data
+        const profileMap: Record<string, any> = {};
+        (profilesData || []).forEach((p: any) => { profileMap[p.id] = p; });
+        
+        const mergedData = proProfiles.map((pp: any) => ({
+          ...pp,
+          profiles: profileMap[pp.user_id] || null
+        }));
+        
+        setPros(mergedData);
 
-      const ids = (profiles || []).map((p: any) => p.user_id);
-      if (ids.length > 0) {
+        // Get ratings
         const { data: stats } = await (supabase as any)
           .from("pro_rating_stats")
           .select("pro_id,avg_score,rating_count")
-          .in("pro_id", ids);
+          .in("pro_id", userIds);
         const map: Record<string, any> = {};
         (stats || []).forEach((s: any) => { map[s.pro_id] = { avg_score: Number(s.avg_score || 0), rating_count: s.rating_count || 0 }; });
         setRatingMap(map);
       } else {
+        setPros([]);
         setRatingMap({});
       }
     })();
