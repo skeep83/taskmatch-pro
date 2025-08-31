@@ -116,11 +116,11 @@ const TenderNew = () => {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/dashboard/client?tab=tenders')}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Назад
+              Назад к тендерам
             </Button>
             <div>
               <h1 className="text-3xl font-display font-bold text-gradient">
@@ -227,7 +227,7 @@ const TenderNew = () => {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/dashboard/client?tab=tenders')}
                     className="flex-1"
                   >
                     Отмена

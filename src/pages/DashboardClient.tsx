@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
@@ -39,7 +39,6 @@ import {
   Edit,
   Trash2
 } from "lucide-react";
-
 interface Job {
   id: string;
   title: string;
@@ -65,12 +64,13 @@ interface Subscription {
 
 export default function DashboardClient() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { formatPrice: formatCurrency } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "overview");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [stats, setStats] = useState({
     totalJobs: 0,
