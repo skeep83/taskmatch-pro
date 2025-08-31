@@ -25,6 +25,7 @@ import ProSchedule from "./pages/ProSchedule";
 import ProPortfolio from "./pages/ProPortfolio";
 import TendersList from "./pages/TendersList";
 import TenderDetail from "./pages/TenderDetail";
+import TenderNew from "./pages/TenderNew";
 import Catalog from "./pages/Catalog";
 import ProPublic from "./pages/ProPublic";
 import Feed from "./pages/Feed";
@@ -75,6 +76,7 @@ const AppContent = () => {
           <Route path="/pro/schedule" element={<ProSchedule />} />
           <Route path="/portfolio" element={<ProPortfolio />} />
           <Route path="/tenders" element={<TendersList />} />
+          <Route path="/tenders/new" element={<TenderNew />} />
           <Route path="/tenders/:id" element={<TenderDetail />} />
           <Route path="/pro/:id" element={<ProPublic />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
