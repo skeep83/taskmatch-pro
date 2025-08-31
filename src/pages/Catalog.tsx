@@ -64,7 +64,8 @@ const Catalog = () => {
         .limit(60);
       
       if (proIds && proIds.length > 0) query = query.in("user_id", proIds);
-      const { data: profiles } = await query;
+      const { data: profiles, error } = await query;
+      console.log('Catalog pros data:', profiles, 'error:', error);
       setPros(profiles || []);
 
       const ids = (profiles || []).map((p: any) => p.user_id);
