@@ -152,14 +152,29 @@ export const useNotifications = () => {
             filter: `user_id=eq.${user.id}`,
           },
           (payload) => {
-            console.log('New notification received:', payload);
+            console.log('🔔 New notification received via realtime:', payload);
             const newNotification = payload.new as Notification;
-            setNotifications(prev => [newNotification, ...prev]);
-            setUnreadCount(prev => prev + 1);
+            
+            // Add to notifications list
+            setNotifications(prev => {
+              const updated = [newNotification, ...prev];
+              console.log('🔔 Updated notifications list:', updated.length);
+              return updated;
+            });
+            
+            // Update unread count
+            setUnreadCount(prev => {
+              const newCount = prev + 1;
+              console.log('🔔 Updated unread count:', newCount);
+              return newCount;
+            });
 
             // Play notification sound based on settings
             if (shouldPlaySound(newNotification.type)) {
+              console.log('🔔 Playing notification sound for type:', newNotification.type);
               notificationSounds.playNotification(newNotification.type);
+            } else {
+              console.log('🔔 Sound disabled for type:', newNotification.type, 'Settings:', settings);
             }
 
             // Show toast for new notification
