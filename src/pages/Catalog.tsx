@@ -64,6 +64,7 @@ const Catalog = () => {
           .in("id", userIds);
         
         console.log('Profiles data:', profilesData, 'error:', profilesError);
+        console.log('User IDs to fetch:', userIds);
         
         // Merge data
         const profileMap: Record<string, any> = {};
@@ -74,6 +75,7 @@ const Catalog = () => {
           profiles: profileMap[pp.user_id] || null
         }));
         
+        console.log('Merged data:', mergedData);
         setPros(mergedData);
 
         // Get ratings
@@ -85,6 +87,7 @@ const Catalog = () => {
         (stats || []).forEach((s: any) => { map[s.pro_id] = { avg_score: Number(s.avg_score || 0), rating_count: s.rating_count || 0 }; });
         setRatingMap(map);
       } else {
+        console.log('No pro profiles found');
         setPros([]);
         setRatingMap({});
       }
