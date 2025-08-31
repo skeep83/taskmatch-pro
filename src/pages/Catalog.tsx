@@ -45,7 +45,23 @@ const Catalog = () => {
         proIds = (pc || []).map((x: any) => x.user_id);
       }
 
-      let query = (supabase as any).from("pro_profiles").select("user_id,bio,radius_km,hourly_rate_cents,fixed_price_cents").limit(60);
+      let query = (supabase as any)
+        .from("pro_profiles")
+        .select(`
+          user_id,
+          bio,
+          radius_km,
+          hourly_rate_cents,
+          fixed_price_cents,
+          profiles!inner (
+            first_name,
+            last_name,
+            full_name,
+            avatar_url
+          )
+        `)
+        .limit(60);
+      
       if (proIds && proIds.length > 0) query = query.in("user_id", proIds);
       const { data: profiles } = await query;
       setPros(profiles || []);
@@ -173,8 +189,8 @@ const Catalog = () => {
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                       <img 
-                        src={proPlaceholder} 
-                        alt="Specialist" 
+                        src={p.profiles?.avatar_url || proPlaceholder} 
+                        alt={p.profiles?.full_name || p.profiles?.first_name || "Specialist"} 
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -193,7 +209,7 @@ const Catalog = () => {
                 <div className="bg-white pt-20 px-6 pb-8 h-full flex flex-col">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
-                      Специалист #{String(p.user_id).slice(0,8)}
+                      {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || `Специалист #${String(p.user_id).slice(0,8)}`}
                     </h3>
                     <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
                       {selectedCat ? catById[selectedCat]?.label_ru || 'Специалист' : 'Специалист'}
@@ -219,9 +235,12 @@ const Catalog = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <button className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 py-2 rounded-lg transition-colors">
-                      Портфолио
-                    </button>
+                    <Link 
+                      to={`/pro/${p.user_id}`}
+                      className="block w-full border border-purple-200 text-purple-600 hover:bg-purple-50 py-2 rounded-lg transition-colors text-center"
+                    >
+                      Профиль
+                    </Link>
                     <Link 
                       to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
                       className="block w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all text-center"
