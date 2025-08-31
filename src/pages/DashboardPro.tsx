@@ -132,7 +132,7 @@ const DashboardPro = () => {
     try {
       const { data } = await supabase
         .from('jobs')
-        .select('id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
+        .select('id, client_id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
         .eq('pro_id', uid)
         .in('status', ['accepted', 'in_progress', 'done'])
         .order('created_at', { ascending: false })
