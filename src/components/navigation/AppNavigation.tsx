@@ -31,6 +31,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
+import serviceHubLogo from "@/assets/servicehub-logo.svg";
 
 type UserRole = 'client' | 'pro' | 'business';
 
@@ -176,9 +177,10 @@ export const AppNavigation = () => {
             className="flex items-center gap-3 group flex-shrink-0 hover-scale" 
             aria-label={t("app.name")}
           > 
-            <div 
-              className="h-10 w-10 rounded-xl shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
-              style={{background: "var(--gradient-primary)"}} 
+            <img 
+              src={serviceHubLogo} 
+              alt="ServiceHub Logo" 
+              className="h-10 w-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
             />
             <span className="text-xl font-display font-bold text-gradient hidden sm:block">
               {t("app.name")}
