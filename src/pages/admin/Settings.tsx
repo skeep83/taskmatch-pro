@@ -77,9 +77,14 @@ export default function AdminSettings() {
       
       if (logoData?.value) {
         setLogo({ logoUrl: logoData.value as string });
+      } else {
+        // Set default logo if none exists
+        setLogo({ logoUrl: '/src/assets/servicehub-logo-new.png' });
       }
     } catch (error) {
       console.error('Error loading logo:', error);
+      // Set default logo on error
+      setLogo({ logoUrl: '/src/assets/servicehub-logo-new.png' });
     }
   };
 

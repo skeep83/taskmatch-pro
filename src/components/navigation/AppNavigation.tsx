@@ -31,7 +31,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import serviceHubLogo from "@/assets/servicehub-logo.svg";
+import serviceHubLogo from "@/assets/servicehub-logo-new.png";
 
 type UserRole = 'client' | 'pro' | 'business';
 
