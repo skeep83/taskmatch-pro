@@ -353,28 +353,32 @@ const Messages = () => {
                       onClick={() => navigate(`/messages/${c.id}`)}
                     >
                        <div className="flex items-center gap-3">
-                         <Avatar className="w-10 h-10">
-                           <AvatarImage src={otherProfile?.avatar_url || ''} alt={displayName} />
-                           <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold text-sm">
-                             {initials}
-                           </AvatarFallback>
-                         </Avatar>
-                         <div className="flex-1 min-w-0">
-                           <div className="font-medium text-sm truncate">
-                             {displayName}
-                           </div>
-                           <div className="text-xs text-muted-foreground truncate">
-                             Заказ #{jobNumber}
-                           </div>
-                           <div className="text-xs text-muted-foreground flex items-center gap-1">
-                             <Clock className="w-3 h-3" />
-                             {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}
-                           </div>
-                         </div>
-                       </div>
-                    </FloatingCard>
-                  );
-                })}
+                          <Avatar className="w-10 h-10 flex-shrink-0">
+                            <AvatarImage 
+                              src={otherProfile?.avatar_url || ''} 
+                              alt={displayName}
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold text-sm">
+                              {initials || 'У'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm truncate">
+                              {displayName}
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate">
+                              Заказ #{jobNumber}
+                            </div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : new Date(c.created_at).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                     </FloatingCard>
+                   );
+                 })}
               </div>
             </GlassMorphism>
 
