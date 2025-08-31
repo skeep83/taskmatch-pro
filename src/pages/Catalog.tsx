@@ -185,7 +185,7 @@ const Catalog = () => {
             return (
               <article 
                 key={p.user_id} 
-                className="group relative h-80 w-full rounded-3xl overflow-hidden transition-all duration-500 animate-fade-in hover-scale"
+                className="group relative min-h-96 w-full rounded-3xl overflow-hidden transition-all duration-500 animate-fade-in hover-scale"
                 style={{ 
                   animationDelay: `${index * 100}ms`,
                   transformStyle: 'preserve-3d',
