@@ -6,10 +6,26 @@ import { useToast } from "@/hooks/use-toast";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield } from "lucide-react";
+import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield, Trash2, MoreVertical, AlertTriangle } from "lucide-react";
 import { createChatNotification, markChatNotificationsAsRead } from "@/utils/chatNotifications";
 import { notificationSounds } from "@/utils/notificationSounds";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Messages = () => {
   const { t } = useEnhancedI18n();
@@ -27,6 +43,8 @@ const Messages = () => {
   const [presence, setPresence] = useState<Record<string, any>>({});
   const [otherOnline, setOtherOnline] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const roomRef = useRef<any>(null);
   const typingTimerRef = useRef<any>(null);
 
@@ -243,6 +261,61 @@ const Messages = () => {
       console.error('Error creating chat:', error);
       toast({ title: "Ошибка", description: "Не удалось создать чат", variant: "destructive" });
     }
+  };
+
+  const deleteChat = async (chatId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // Delete chat messages first
+      await (supabase as any)
+        .from("chat_messages")
+        .delete()
+        .eq("chat_id", chatId);
+      
+      // Delete the chat
+      const { error } = await (supabase as any)
+        .from("chats")
+        .delete()
+        .eq("id", chatId);
+      
+      if (error) throw error;
+      
+      // Update local state
+      setChats(prev => prev.filter(c => c.id !== chatId));
+      
+      // Navigate away if current chat was deleted
+      if (String(id) === String(chatId)) {
+        navigate("/messages");
+      }
+      
+      toast({ 
+        title: "Чат удален", 
+        description: "Чат и все сообщения были удалены" 
+      });
+      
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      toast({ 
+        title: "Ошибка", 
+        description: "Не удалось удалить чат", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const handleDeleteChat = (chatId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setChatToDelete(chatId);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (chatToDelete) {
+      deleteChat(chatToDelete);
+    }
+    setDeleteDialogOpen(false);
+    setChatToDelete(null);
   };
 
   useEffect(() => {
@@ -497,20 +570,43 @@ const Messages = () => {
                                 day: '2-digit',
                                 month: '2-digit'
                               })}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+                             </div>
+                           </div>
+                           
+                           {/* Delete button */}
+                           <DropdownMenu>
+                             <DropdownMenuTrigger asChild>
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                                 onClick={(e) => e.stopPropagation()}
+                               >
+                                 <MoreVertical className="w-4 h-4" />
+                               </Button>
+                             </DropdownMenuTrigger>
+                             <DropdownMenuContent align="end">
+                               <DropdownMenuItem
+                                 onClick={(e) => handleDeleteChat(c.id, e)}
+                                 className="text-destructive hover:bg-destructive/10"
+                               >
+                                 <Trash2 className="w-4 h-4 mr-2" />
+                                 Удалить чат
+                               </DropdownMenuItem>
+                             </DropdownMenuContent>
+                           </DropdownMenu>
+                         </div>
+                       </div>
+                     );
+                   })}
+                 </div>
+               </div>
+             </div>
 
-            {/* Chat Messages - Main Chat Interface */}
-            <div className="lg:col-span-3">
-              <div className="card-surface h-full flex flex-col">
-                {!id ? (
+             {/* Chat Messages - Main Chat Interface */}
+             <div className="lg:col-span-3">
+               <div className="card-surface h-full flex flex-col">
+                 {!id ? (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="text-center max-w-md">
                       <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
@@ -692,6 +788,30 @@ const Messages = () => {
           </div>
         </div>
       </section>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Удалить чат?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Это действие нельзя отменить. Чат и все сообщения будут удалены навсегда.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 };
