@@ -41,12 +41,14 @@ const Messages = () => {
         return;
       }
       setUserId(uid);
+      console.log('🔍 Loading chats for user:', uid);
       const { data } = await (supabase as any)
         .from("chats")
         .select("id, job_id, tender_id, client_id, professional_id, last_message_at, created_at")
         .or(`client_id.eq.${uid},professional_id.eq.${uid}`)
         .order("last_message_at", { ascending: false })
         .limit(50);
+      console.log('📋 Loaded chats:', data);
       setChats(data || []);
 
       // Load profiles for chat participants
@@ -76,6 +78,8 @@ const Messages = () => {
       const userParam = searchParams.get('user');
       const jobParam = searchParams.get('job');
       
+      console.log('🔗 URL params:', { userParam, jobParam, currentUserId: uid });
+      
       if (userParam && !id) {
         // Find or create chat with specific user
         const existingChat = data?.find((chat: any) => 
@@ -87,28 +91,39 @@ const Messages = () => {
           ))
         );
         
+        console.log('🔍 Looking for existing chat. Found:', existingChat);
+        
         if (existingChat) {
+          console.log('✅ Found existing chat, navigating to:', existingChat.id);
           navigate(`/messages/${existingChat.id}`, { replace: true });
         } else if (jobParam) {
           // Get job data to determine who is client and who is professional
+          console.log('🏗️ Creating new chat for job:', jobParam);
           const { data: jobData } = await (supabase as any)
             .from("jobs")
             .select("client_id, pro_id")
             .eq("id", jobParam)
             .single();
           
+          console.log('📋 Job data:', jobData);
+          
           if (jobData) {
             let clientId, professionalId;
+            
+            console.log('🔍 Determining roles. Current user:', uid, 'Target user:', userParam);
+            console.log('📋 Job client_id:', jobData.client_id, 'Job pro_id:', jobData.pro_id);
             
             // Current user is client, target user is professional
             if (jobData.client_id === uid && jobData.pro_id === userParam) {
               clientId = uid;
               professionalId = userParam;
+              console.log('✅ Current user is client, target is professional');
             }
             // Current user is professional, target user is client
             else if (jobData.pro_id === uid && jobData.client_id === userParam) {
               clientId = userParam;
               professionalId = uid;
+              console.log('✅ Current user is professional, target is client');
             }
             // Fallback: determine from user roles
             else {
@@ -143,8 +158,12 @@ const Messages = () => {
               }
             }
             
+            console.log('🎯 Final role assignment:', { clientId, professionalId });
+            
             if (clientId && professionalId) {
               await createChatForJob(clientId, professionalId, jobParam);
+            } else {
+              console.error('❌ Could not determine client and professional roles');
             }
           }
         } else {
@@ -184,6 +203,7 @@ const Messages = () => {
 
   const createChatForJob = async (clientId: string, professionalId: string, jobId: string | null) => {
     try {
+      console.log('💬 Creating chat with params:', { clientId, professionalId, jobId });
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: newChat, error } = await (supabase as any)
         .from("chats")
@@ -196,9 +216,14 @@ const Messages = () => {
         .select()
         .single();
       
+      console.log('💬 Chat creation result:', { newChat, error });
+      
       if (error) throw error;
       if (newChat) {
+        console.log('✅ Successfully created chat, navigating to:', newChat.id);
         navigate(`/messages/${newChat.id}`, { replace: true });
+      } else {
+        console.error('❌ No chat created but no error');
       }
     } catch (error) {
       console.error('Error creating chat:', error);
