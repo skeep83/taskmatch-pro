@@ -426,6 +426,8 @@ const Messages = () => {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
+      console.log('📤 Sending message:', { chatId: id, senderId: userId, content: text });
+      
       // Send message
       const { data: newMessage, error } = await (supabase as any)
         .from("chat_messages")
@@ -435,8 +437,16 @@ const Messages = () => {
       
       if (error) throw error;
       
+      console.log('✅ Message sent successfully:', newMessage);
+      
+      // Immediately update local state for instant UI feedback
+      setMessages(prev => [...prev, newMessage]);
+      
       // Update chat timestamp
       await (supabase as any).from('chats').update({ last_message_at: new Date().toISOString() }).eq('id', id);
+      
+      // Clear input field
+      setText("");
       
       // Send notification to other participant
       if (newMessage && selectedChat) {
@@ -456,14 +466,14 @@ const Messages = () => {
             newMessage.id,
             userId
           );
+          console.log('📬 Notification sent successfully');
         } catch (notificationError) {
           console.warn('Failed to send notification:', notificationError);
         }
       }
       
-      setText("");
     } catch (e: any) {
-      console.error(e);
+      console.error('❌ Error sending message:', e);
       toast({ title: "Ошибка", description: e?.message, variant: "destructive" });
     }
   };
