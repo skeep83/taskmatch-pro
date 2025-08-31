@@ -133,11 +133,43 @@ const Messages = () => {
         .limit(500);
       setMessages(data || []);
 
+      // Load profiles for message senders
+      const senderIds = new Set((data || []).map((msg: any) => msg.sender_id));
+      if (senderIds.size > 0) {
+        const { data: messageProfiles } = await (supabase as any)
+          .from("profiles")
+          .select("id, full_name, first_name, last_name, avatar_url")
+          .in("id", Array.from(senderIds));
+        
+        if (messageProfiles) {
+          setProfiles(prev => {
+            const updated = { ...prev };
+            messageProfiles.forEach((profile: any) => {
+              updated[profile.id] = profile;
+            });
+            return updated;
+          });
+        }
+      }
+
       // Realtime subscription with notification handling
       const channel = (supabase as any).channel('schema-db-changes')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${id}` }, async (payload: any) => {
           const newMessage = payload.new;
           setMessages((prev) => [...prev, newMessage]);
+          
+          // Load sender profile if not already loaded
+          if (!profiles[newMessage.sender_id]) {
+            const { data: senderProfile } = await (supabase as any)
+              .from("profiles")
+              .select("id, full_name, first_name, last_name, avatar_url")
+              .eq("id", newMessage.sender_id)
+              .single();
+            
+            if (senderProfile) {
+              setProfiles(prev => ({ ...prev, [senderProfile.id]: senderProfile }));
+            }
+          }
           
           // Play sound and show notification if message is from another user
           if (newMessage.sender_id !== userId && settings.enabled && settings.messageSound) {
@@ -417,28 +449,64 @@ const Messages = () => {
                     </div>
                   </div>
 
-                  {/* Messages */}
-                  <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-                    {messages.map((m) => (
-                      <div key={m.id} className={`flex ${m.sender_id === userId ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[70%] p-3 rounded-2xl ${
-                          m.sender_id === userId 
-                            ? 'bg-primary text-primary-foreground rounded-br-md' 
-                            : 'bg-muted rounded-bl-md'
-                        }`}>
-                          <div className="text-sm whitespace-pre-wrap">{m.content}</div>
-                          <div className={`text-xs mt-1 flex items-center gap-1 ${
-                            m.sender_id === userId ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                          }`}>
-                            <span>{new Date(m.created_at).toLocaleTimeString()}</span>
-                            {m.sender_id === userId && m.is_read && (
-                              <CheckCircle2 className="w-3 h-3" />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                   {/* Messages */}
+                   <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+                     {messages.map((m) => {
+                       const senderProfile = profiles[m.sender_id];
+                       const senderName = senderProfile?.full_name || 
+                                         (senderProfile?.first_name && senderProfile?.last_name ? 
+                                          `${senderProfile.first_name} ${senderProfile.last_name}` : 
+                                          'Пользователь');
+                       const senderInitials = senderName
+                         .split(' ')
+                         .filter(n => n.length > 0)
+                         .map(n => n[0])
+                         .join('')
+                         .toUpperCase()
+                         .slice(0, 2);
+                       
+                       return (
+                         <div key={m.id} className={`flex gap-3 ${m.sender_id === userId ? 'justify-end' : 'justify-start'}`}>
+                           {m.sender_id !== userId && (
+                             <Avatar className="w-8 h-8 flex-shrink-0">
+                               <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
+                               <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold text-xs">
+                                 {senderInitials}
+                               </AvatarFallback>
+                             </Avatar>
+                           )}
+                           <div className={`max-w-[70%] ${m.sender_id === userId ? 'order-2' : ''}`}>
+                             {m.sender_id !== userId && (
+                               <div className="text-xs text-muted-foreground mb-1 px-1">{senderName}</div>
+                             )}
+                             <div className={`p-3 rounded-2xl ${
+                               m.sender_id === userId 
+                                 ? 'bg-primary text-primary-foreground rounded-br-md' 
+                                 : 'bg-muted rounded-bl-md'
+                             }`}>
+                               <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                               <div className={`text-xs mt-1 flex items-center gap-1 ${
+                                 m.sender_id === userId ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                               }`}>
+                                 <span>{new Date(m.created_at).toLocaleTimeString()}</span>
+                                 {m.sender_id === userId && m.is_read && (
+                                   <CheckCircle2 className="w-3 h-3" />
+                                 )}
+                               </div>
+                             </div>
+                           </div>
+                           {m.sender_id === userId && (
+                             <Avatar className="w-8 h-8 flex-shrink-0 order-3">
+                               <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
+                               <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold text-xs">
+                                 {senderInitials}
+                               </AvatarFallback>
+                             </Avatar>
+                           )}
+                         </div>
+                       );
+                     })}
+                   </div>
 
                   {/* Message Input */}
                   <div className="p-4 border-t border-white/10">
