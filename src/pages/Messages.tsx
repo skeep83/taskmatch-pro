@@ -273,71 +273,25 @@ const Messages = () => {
     <main className="relative min-h-screen overflow-hidden bg-background">
       <Seo title={`${t('app.name')} — Сообщения`} description="Чаты и сообщения" canonical="/messages" />
       
-      {/* Hero Section with Neumorphic Design */}
-      <section className="relative min-h-[40vh] flex items-center overflow-hidden">
-        {/* Background with subtle gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.1),transparent_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsl(var(--accent)/0.1),transparent_70%)]" />
-        
-        <div className="relative container mx-auto px-6 py-16 z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-6 animate-fade-in">
-              <span className="text-gradient bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                {t("messages.title")}
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
-              {t("messages.subtitle")}
-            </p>
-            
-            {/* Feature badges */}
-            <div className="flex flex-wrap gap-4 justify-center animate-fade-in" style={{ animationDelay: '400ms' }}>
-              <FloatingCard className="p-4 bg-white/60 dark:bg-card/60 backdrop-blur-xl border-white/30" delay={600}>
-                <div className="flex items-center gap-3 text-foreground">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-primary" />
-                  </div>
-                  <span className="font-medium">Защищенные чаты</span>
-                </div>
-              </FloatingCard>
-              
-              <FloatingCard className="p-4 bg-white/60 dark:bg-card/60 backdrop-blur-xl border-white/30" delay={800}>
-                <div className="flex items-center gap-3 text-foreground">
-                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <Video className="w-5 h-5 text-accent" />
-                  </div>
-                  <span className="font-medium">Видео-оценка</span>
-                </div>
-              </FloatingCard>
-              
-              <FloatingCard className="p-4 bg-white/60 dark:bg-card/60 backdrop-blur-xl border-white/30" delay={1000}>
-                <div className="flex items-center gap-3 text-foreground">
-                  <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                    <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  </div>
-                  <span className="font-medium">Мгновенные ответы</span>
-                </div>
-              </FloatingCard>
-            </div>
-          </div>
+      {/* Header Section */}
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+            Сообщения
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Общайтесь с клиентами и специалистами в реальном времени
+          </p>
         </div>
-      </section>
 
-      {/* Chat Interface Section */}
-      <section className="container mx-auto px-6 py-12">
+        {/* Main Content */}
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-4 gap-8 h-[700px]">
             
-            {/* Chat List - Neumorphic Card */}
+            {/* Chat List */}
             <div className="lg:col-span-1">
-              <FloatingCard className="h-full p-6 backdrop-blur-xl bg-card/80 border-white/20" delay={200}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                    <Circle className="w-5 h-5 text-green-500 fill-current" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-foreground">Активные чаты</h2>
-                </div>
+              <div className="card-surface h-full p-6">
+                <h2 className="text-lg font-semibold mb-6">Активные чаты</h2>
                 
                 <div className="space-y-3 overflow-y-auto max-h-[580px] pr-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
                   {chats.length === 0 && (
@@ -422,12 +376,12 @@ const Messages = () => {
                     );
                   })}
                 </div>
-              </FloatingCard>
+              </div>
             </div>
 
             {/* Chat Messages - Main Chat Interface */}
             <div className="lg:col-span-3">
-              <FloatingCard className="h-full backdrop-blur-xl bg-card/80 border-white/20 flex flex-col" delay={400}>
+              <div className="card-surface h-full flex flex-col">
                 {!id ? (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="text-center max-w-md">
@@ -605,7 +559,7 @@ const Messages = () => {
                     </div>
                   </>
                 )}
-              </FloatingCard>
+              </div>
             </div>
           </div>
         </div>
