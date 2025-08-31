@@ -61,10 +61,12 @@ const Messages = () => {
         });
 
         if (userIds.size > 0) {
-          const { data: profilesData } = await (supabase as any)
+          const { data: profilesData, error: profilesError } = await (supabase as any)
             .from("profiles")
             .select("id, full_name, first_name, last_name, avatar_url")
             .in("id", Array.from(userIds));
+          
+          console.log('👥 Loaded profiles:', { profilesData, profilesError, userIds: Array.from(userIds) });
           
           const profilesMap: Record<string, any> = {};
           (profilesData || []).forEach((profile: any) => {
