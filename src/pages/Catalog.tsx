@@ -185,7 +185,7 @@ const Catalog = () => {
             return (
               <article 
                 key={p.user_id} 
-                className="group relative min-h-96 w-full rounded-3xl overflow-hidden transition-all duration-500 animate-fade-in hover-scale"
+                className="group relative h-80 w-full rounded-3xl overflow-hidden transition-all duration-500 animate-fade-in hover-scale"
                 style={{ 
                   animationDelay: `${index * 100}ms`,
                   transformStyle: 'preserve-3d',
@@ -233,50 +233,54 @@ const Catalog = () => {
                 </div>
 
                 {/* Content Section with glass morphism effect */}
-                <div className="pt-20 px-6 pb-8 h-full flex flex-col" 
+                <div className="pt-20 px-6 pb-4 h-full flex flex-col justify-between" 
                      style={{ 
                        background: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
                        backdropFilter: 'blur(10px)',
                        borderTop: '1px solid rgba(255,255,255,0.5)',
                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)'
                      }}>
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
-                      {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || `Специалист #${String(p.user_id).slice(0,8)}`}
-                    </h3>
-                    <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
-                      {selectedCat ? catById[selectedCat]?.label_ru || 'Специалист' : 'Специалист'}
-                    </p>
-                    
-                    <div className="mt-4 flex justify-center">
-                      <StarRating 
-                        rating={r.avg_score} 
-                        size="sm" 
-                        showValue={false}
-                        readonly
-                      />
+                  {/* Top content */}
+                  <div>
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">
+                        {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || `Специалист #${String(p.user_id).slice(0,8)}`}
+                      </h3>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        {selectedCat ? catById[selectedCat]?.label_ru || 'Специалист' : 'Специалист'}
+                      </p>
+                      
+                      <div className="mt-2 flex justify-center">
+                        <StarRating 
+                          rating={r.avg_score} 
+                          size="sm" 
+                          showValue={false}
+                          readonly
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {r.rating_count > 0 ? `${r.rating_count} отзывов` : 'Новый специалист'}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {r.rating_count > 0 ? `${r.rating_count} отзывов` : 'Новый специалист'}
-                    </p>
+
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 text-center">
+                        {p.bio || 'Профессиональный специалист'}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex-1 mb-6">
-                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 text-center">
-                      {p.bio || 'Профессиональный специалист с многолетним опытом работы'}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
+                  {/* Bottom buttons - always at bottom */}
+                  <div className="space-y-2 mt-auto">
                     <Link 
                       to={`/pro/${p.user_id}`}
-                      className="block w-full border border-purple-200 text-purple-600 hover:bg-purple-50 py-2 rounded-lg transition-colors text-center"
+                      className="block w-full border border-purple-200 text-purple-600 hover:bg-purple-50 py-2 rounded-lg transition-colors text-center text-sm"
                     >
                       Профиль
                     </Link>
                     <Link 
                       to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
-                      className="block w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all text-center"
+                      className="block w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-2 rounded-xl shadow-lg hover:shadow-xl transition-all text-center text-sm"
                     >
                       Выбрать специалиста
                     </Link>
