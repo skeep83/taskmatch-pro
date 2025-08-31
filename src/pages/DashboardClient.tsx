@@ -81,8 +81,6 @@ export default function DashboardClient() {
     refferalCode: '',
     subscriptionStatus: 'none' as 'none' | 'basic' | 'plus' | 'max'
   });
-  const [subscription, setSubscription] = useState<any>(null);
-  const [referralCode, setReferralCode] = useState<string>('');
   const [profileData, setProfileData] = useState({
     phone: '',
     emailNotifications: true,
