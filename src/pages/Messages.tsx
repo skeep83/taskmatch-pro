@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
@@ -11,12 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield } from "lucide-react";
 import messagesImage from "@/assets/messages-chat.jpg";
+import { createChatNotification, markChatNotificationsAsRead } from "@/utils/chatNotifications";
+import { notificationSounds } from "@/utils/notificationSounds";
+import { useSoundSettings } from "@/hooks/useSoundSettings";
 
 const Messages = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const { settings } = useSoundSettings();
 
   const [userId, setUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<any[]>([]);
@@ -25,7 +30,6 @@ const Messages = () => {
   const [text, setText] = useState("");
   const [presence, setPresence] = useState<Record<string, any>>({});
   const [otherOnline, setOtherOnline] = useState(false);
-
   const [otherTyping, setOtherTyping] = useState(false);
   const roomRef = useRef<any>(null);
   const typingTimerRef = useRef<any>(null);
@@ -52,6 +56,7 @@ const Messages = () => {
       // Load profiles for chat participants
       if (data && data.length > 0) {
         const userIds = new Set<string>();
+        userIds.add(uid); // Add current user to load their profile too
         data.forEach((chat: any) => {
           if (chat.client_id !== uid) userIds.add(chat.client_id);
           if (chat.professional_id !== uid) userIds.add(chat.professional_id);
@@ -70,8 +75,51 @@ const Messages = () => {
           setProfiles(profilesMap);
         }
       }
+
+      // Handle URL parameters for creating/opening chats
+      const userParam = searchParams.get('user');
+      const jobParam = searchParams.get('job');
+      
+      if (userParam && !id) {
+        // Find or create chat with specific user
+        const existingChat = data?.find((chat: any) => 
+          (chat.client_id === userParam && chat.professional_id === uid) ||
+          (chat.professional_id === userParam && chat.client_id === uid)
+        );
+        
+        if (existingChat) {
+          navigate(`/messages/${existingChat.id}`, { replace: true });
+        } else if (jobParam) {
+          // Create new chat for job
+          await createChatForJob(uid, userParam, jobParam);
+        }
+      }
     })();
-  }, [navigate, toast]);
+  }, [navigate, toast, searchParams, id]);
+
+  const createChatForJob = async (clientId: string, professionalId: string, jobId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data: newChat, error } = await (supabase as any)
+        .from("chats")
+        .insert({
+          job_id: jobId,
+          client_id: clientId,
+          professional_id: professionalId,
+          status: 'active'
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      if (newChat) {
+        navigate(`/messages/${newChat.id}`, { replace: true });
+      }
+    } catch (error) {
+      console.error('Error creating chat:', error);
+      toast({ title: "Ошибка", description: "Не удалось создать чат", variant: "destructive" });
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -85,10 +133,25 @@ const Messages = () => {
         .limit(500);
       setMessages(data || []);
 
-      // Realtime subscription
+      // Realtime subscription with notification handling
       const channel = (supabase as any).channel('schema-db-changes')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${id}` }, (payload: any) => {
-          setMessages((prev) => [...prev, payload.new]);
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${id}` }, async (payload: any) => {
+          const newMessage = payload.new;
+          setMessages((prev) => [...prev, newMessage]);
+          
+          // Play sound and show notification if message is from another user
+          if (newMessage.sender_id !== userId && settings.enabled && settings.messageSound) {
+            try {
+              await notificationSounds.playNotification('message');
+            } catch (error) {
+              console.warn('Could not play notification sound:', error);
+            }
+          }
+          
+          // Mark chat notifications as read when user is viewing the chat
+          if (document.visibilityState === 'visible') {
+            await markChatNotificationsAsRead(id);
+          }
         })
         .subscribe();
 
@@ -133,12 +196,43 @@ const Messages = () => {
     if (!text.trim() || !userId || !id) return;
     try {
       const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await (supabase as any)
+      
+      // Send message
+      const { data: newMessage, error } = await (supabase as any)
         .from("chat_messages")
-        .insert({ chat_id: id, sender_id: userId, message_type: 'text', content: text });
+        .insert({ chat_id: id, sender_id: userId, message_type: 'text', content: text })
+        .select()
+        .single();
+      
       if (error) throw error;
-      setText("");
+      
+      // Update chat timestamp
       await (supabase as any).from('chats').update({ last_message_at: new Date().toISOString() }).eq('id', id);
+      
+      // Send notification to other participant
+      if (newMessage && selectedChat) {
+        const receiverId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
+        const senderProfile = profiles[userId] || { full_name: 'Пользователь' };
+        const senderName = senderProfile.full_name || 
+                          (senderProfile.first_name && senderProfile.last_name ? 
+                           `${senderProfile.first_name} ${senderProfile.last_name}` : 
+                           'Пользователь');
+        
+        try {
+          await createChatNotification(
+            receiverId,
+            senderName,
+            text,
+            id,
+            newMessage.id,
+            userId
+          );
+        } catch (notificationError) {
+          console.warn('Failed to send notification:', notificationError);
+        }
+      }
+      
+      setText("");
     } catch (e: any) {
       console.error(e);
       toast({ title: "Ошибка", description: e?.message, variant: "destructive" });
