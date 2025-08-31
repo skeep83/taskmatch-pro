@@ -80,20 +80,109 @@ const Messages = () => {
         // Find or create chat with specific user
         const existingChat = data?.find((chat: any) => 
           (chat.client_id === userParam && chat.professional_id === uid) ||
-          (chat.professional_id === userParam && chat.client_id === uid)
+          (chat.professional_id === userParam && chat.client_id === uid) ||
+          (chat.job_id === jobParam && (
+            (chat.client_id === uid && chat.professional_id === userParam) ||
+            (chat.professional_id === uid && chat.client_id === userParam)
+          ))
         );
         
         if (existingChat) {
           navigate(`/messages/${existingChat.id}`, { replace: true });
         } else if (jobParam) {
-          // Create new chat for job
-          await createChatForJob(uid, userParam, jobParam);
+          // Get job data to determine who is client and who is professional
+          const { data: jobData } = await (supabase as any)
+            .from("jobs")
+            .select("client_id, pro_id")
+            .eq("id", jobParam)
+            .single();
+          
+          if (jobData) {
+            let clientId, professionalId;
+            
+            // Current user is client, target user is professional
+            if (jobData.client_id === uid && jobData.pro_id === userParam) {
+              clientId = uid;
+              professionalId = userParam;
+            }
+            // Current user is professional, target user is client
+            else if (jobData.pro_id === uid && jobData.client_id === userParam) {
+              clientId = userParam;
+              professionalId = uid;
+            }
+            // Fallback: determine from user roles
+            else {
+              // Load user roles to determine client vs professional
+              const { data: currentUserRoles } = await (supabase as any)
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", uid);
+              
+              const { data: targetUserRoles } = await (supabase as any)
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", userParam);
+              
+              const currentRoles = (currentUserRoles || []).map((r: any) => r.role);
+              const targetRoles = (targetUserRoles || []).map((r: any) => r.role);
+              
+              // If current user has client role and target has pro role
+              if (currentRoles.includes('client') && targetRoles.includes('pro')) {
+                clientId = uid;
+                professionalId = userParam;
+              }
+              // If current user has pro role and target has client role
+              else if (currentRoles.includes('pro') && targetRoles.includes('client')) {
+                clientId = userParam;
+                professionalId = uid;
+              }
+              // Default fallback
+              else {
+                clientId = uid;
+                professionalId = userParam;
+              }
+            }
+            
+            if (clientId && professionalId) {
+              await createChatForJob(clientId, professionalId, jobParam);
+            }
+          }
+        } else {
+          // Create chat without job context - need to determine roles
+          const { data: currentUserRoles } = await (supabase as any)
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", uid);
+          
+          const { data: targetUserRoles } = await (supabase as any)
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", userParam);
+          
+          const currentRoles = (currentUserRoles || []).map((r: any) => r.role);
+          const targetRoles = (targetUserRoles || []).map((r: any) => r.role);
+          
+          let clientId, professionalId;
+          
+          if (currentRoles.includes('client') && targetRoles.includes('pro')) {
+            clientId = uid;
+            professionalId = userParam;
+          } else if (currentRoles.includes('pro') && targetRoles.includes('client')) {
+            clientId = userParam;
+            professionalId = uid;
+          } else {
+            // Default fallback
+            clientId = uid;
+            professionalId = userParam;
+          }
+          
+          await createChatForJob(clientId, professionalId, null);
         }
       }
     })();
   }, [navigate, toast, searchParams, id]);
 
-  const createChatForJob = async (clientId: string, professionalId: string, jobId: string) => {
+  const createChatForJob = async (clientId: string, professionalId: string, jobId: string | null) => {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: newChat, error } = await (supabase as any)

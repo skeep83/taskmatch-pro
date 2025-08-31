@@ -828,7 +828,7 @@ const JobDetail = () => {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => navigate(`/messages?user=${job.pro_id}`)}
+                            onClick={() => navigate(`/messages?user=${job.pro_id}&job=${job.id}`)}
                           >
                             <MessageSquare className="w-4 h-4 mr-1" />
                             Написать
