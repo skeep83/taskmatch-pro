@@ -45,44 +45,38 @@ const Catalog = () => {
         proIds = (pc || []).map((x: any) => x.user_id);
       }
 
-      // First get pro_profiles
+      // Now we can use the foreign key relationship
       let query = (supabase as any)
         .from("pro_profiles")
-        .select("user_id,bio,radius_km,hourly_rate_cents,fixed_price_cents")
+        .select(`
+          user_id,
+          bio,
+          radius_km,
+          hourly_rate_cents,
+          fixed_price_cents,
+          profiles!fk_pro_profiles_user_id (
+            first_name,
+            last_name,
+            full_name,
+            avatar_url
+          )
+        `)
         .limit(60);
       
       if (proIds && proIds.length > 0) query = query.in("user_id", proIds);
-      const { data: proProfiles } = await query;
-      
-      if (proProfiles && proProfiles.length > 0) {
-        // Get corresponding profiles
-        const userIds = proProfiles.map((p: any) => p.user_id);
-        const { data: profilesData } = await (supabase as any)
-          .from("profiles")
-          .select("id,first_name,last_name,full_name,avatar_url")
-          .in("id", userIds);
-        
-        // Merge data
-        const profileMap: Record<string, any> = {};
-        (profilesData || []).forEach((p: any) => { profileMap[p.id] = p; });
-        
-        const mergedData = proProfiles.map((pp: any) => ({
-          ...pp,
-          profiles: profileMap[pp.user_id] || null
-        }));
-        
-        setPros(mergedData);
+      const { data: profiles } = await query;
+      setPros(profiles || []);
 
-        // Get ratings
+      const ids = (profiles || []).map((p: any) => p.user_id);
+      if (ids.length > 0) {
         const { data: stats } = await (supabase as any)
           .from("pro_rating_stats")
           .select("pro_id,avg_score,rating_count")
-          .in("pro_id", userIds);
+          .in("pro_id", ids);
         const map: Record<string, any> = {};
         (stats || []).forEach((s: any) => { map[s.pro_id] = { avg_score: Number(s.avg_score || 0), rating_count: s.rating_count || 0 }; });
         setRatingMap(map);
       } else {
-        setPros([]);
         setRatingMap({});
       }
     })();
