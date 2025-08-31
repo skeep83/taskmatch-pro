@@ -43,10 +43,31 @@ export const AppNavigation = () => {
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [currentRole, setCurrentRole] = useState<UserRole>('client');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [platformLogo, setPlatformLogo] = useState<string | null>(null);
   const { unreadCount } = useNotifications();
 
   console.log('🔔 AppNavigation unreadCount:', unreadCount);
+
+  // Load platform logo
+  useEffect(() => {
+    const loadLogo = async () => {
+      try {
+        const { data: logoData } = await supabase
+          .from('app_settings')
+          .select('value')
+          .eq('key', 'platform_logo')
+          .maybeSingle();
+        
+        if (logoData?.value) {
+          setPlatformLogo(logoData.value as string);
+        }
+      } catch (error) {
+        console.error('Error loading platform logo:', error);
+      }
+    };
+
+    loadLogo();
+  }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -95,28 +116,8 @@ export const AppNavigation = () => {
       setIsAuthenticated(!!session?.user);
     });
 
-    // Load logo URL
-    loadLogoUrl();
-
     return () => subscription.unsubscribe();
   }, [location.pathname]); // Add location.pathname as dependency
-
-  const loadLogoUrl = async () => {
-    try {
-      const { data } = await supabase
-        .from('app_settings')
-        .select('value')
-        .eq('key', 'logo_url')
-        .maybeSingle();
-      
-      if (data?.value) {
-        setLogoUrl(JSON.parse(data.value));
-      }
-    } catch (error) {
-      // Ignore error, use default logo
-      console.log('No custom logo found, using default');
-    }
-  };
 
   const mainNavItems = [
     {
@@ -198,11 +199,11 @@ export const AppNavigation = () => {
             className="flex items-center gap-3 group flex-shrink-0 hover-scale" 
             aria-label={t("app.name")}
           > 
-            {logoUrl ? (
+            {platformLogo ? (
               <img 
-                src={logoUrl} 
+                src={platformLogo} 
                 alt="ServiceHub Logo" 
-                className="h-10 w-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
+                className="h-10 w-10 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
               />
             ) : (
               <img 

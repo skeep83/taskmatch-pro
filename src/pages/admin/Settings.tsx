@@ -11,6 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/hooks/use-toast";
 import { Settings, CreditCard, Shield, DollarSign, Upload, Image as ImageIcon } from "lucide-react";
 
+interface LogoSettings {
+  logoUrl: string | null;
+}
+
 interface PlatformSettings {
   platformName: string;
   commissionRate: number;
@@ -40,7 +44,7 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [logo, setLogo] = useState<LogoSettings>({ logoUrl: null });
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [settings, setSettings] = useState<PlatformSettings>({
     platformName: "ServiceHub",
@@ -60,7 +64,24 @@ export default function AdminSettings() {
 
   useEffect(() => {
     loadSettings();
+    loadLogo();
   }, []);
+
+  const loadLogo = async () => {
+    try {
+      const { data: logoData } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'platform_logo')
+        .maybeSingle();
+      
+      if (logoData?.value) {
+        setLogo({ logoUrl: logoData.value as string });
+      }
+    } catch (error) {
+      console.error('Error loading logo:', error);
+    }
+  };
 
   const loadSettings = async () => {
     try {
@@ -72,17 +93,6 @@ export default function AdminSettings() {
         .order('code');
       
       setCurrencies(currencyData || []);
-
-      // Load logo URL from app settings
-      const { data: logoData } = await supabase
-        .from('app_settings')
-        .select('value')
-        .eq('key', 'logo_url')
-        .single();
-      
-      if (logoData?.value) {
-        setLogoUrl(logoData.value as string);
-      }
 
       // Load platform settings
       const { data: settingsData } = await supabase
@@ -169,22 +179,17 @@ export default function AdminSettings() {
     }
   };
 
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
+  const uploadLogo = async (file: File) => {
     if (!file.type.startsWith('image/png')) {
       toast({
         title: "Ошибка",
-        description: "Пожалуйста, загрузите PNG файл",
+        description: "Поддерживаются только PNG файлы",
         variant: "destructive"
       });
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
         title: "Ошибка", 
         description: "Размер файла не должен превышать 5MB",
@@ -194,13 +199,12 @@ export default function AdminSettings() {
     }
 
     setUploadingLogo(true);
-    
     try {
       const fileName = `logo-${Date.now()}.png`;
       
-      // Upload to Supabase storage
+      // Upload to logos bucket (use existing bucket or portfolio if logos doesn't exist)
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('logos')
+        .from('portfolio') // Using existing public bucket
         .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false
@@ -208,24 +212,25 @@ export default function AdminSettings() {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('logos')
+      const { data: urlData } = supabase.storage
+        .from('portfolio')
         .getPublicUrl(fileName);
 
-      // Save logo URL to app settings
+      const logoUrl = urlData.publicUrl;
+
+      // Save logo URL to app_settings
       await supabase
         .from('app_settings')
         .upsert({
-          key: 'logo_url',
-          value: JSON.stringify(publicUrl)
+          key: 'platform_logo',
+          value: logoUrl
         }, { onConflict: 'key' });
 
-      setLogoUrl(publicUrl);
+      setLogo({ logoUrl });
       
       toast({
         title: "Логотип загружен",
-        description: "Новый логотип успешно установлен",
+        description: "Новый логотип успешно сохранен",
       });
     } catch (error) {
       console.error('Error uploading logo:', error);
@@ -236,6 +241,13 @@ export default function AdminSettings() {
       });
     } finally {
       setUploadingLogo(false);
+    }
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      uploadLogo(file);
     }
   };
 
@@ -320,6 +332,63 @@ export default function AdminSettings() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="branding" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5" />
+                Брендинг платформы
+              </CardTitle>
+              <CardDescription>
+                Настройка логотипа и визуального оформления
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <Label>Логотип платформы</Label>
+                <div className="flex items-center gap-4">
+                  {logo.logoUrl ? (
+                    <div className="flex items-center gap-4">
+                      <img 
+                        src={logo.logoUrl} 
+                        alt="Platform Logo" 
+                        className="h-16 w-16 object-contain border border-border rounded-lg p-2"
+                      />
+                      <div className="text-sm text-muted-foreground">
+                        Текущий логотип
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-16 w-16 border-2 border-dashed border-border rounded-lg flex items-center justify-center">
+                      <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Input
+                    id="logo-upload"
+                    type="file"
+                    accept="image/png"
+                    onChange={handleLogoUpload}
+                    disabled={uploadingLogo}
+                    className="cursor-pointer file:cursor-pointer"
+                  />
+                  <div className="text-sm text-muted-foreground">
+                    Поддерживаются PNG файлы размером до 5MB. Рекомендуемый размер: 256x256px.
+                  </div>
+                  {uploadingLogo && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                      Загрузка логотипа...
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="finance" className="space-y-4">
           <Card>
             <CardHeader>
@@ -398,57 +467,6 @@ export default function AdminSettings() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="branding" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                Логотип платформы
-              </CardTitle>
-              <CardDescription>
-                Загрузите логотип в формате PNG для отображения в хедере
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                {logoUrl && (
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src={logoUrl} 
-                      alt="Current logo" 
-                      className="h-12 w-12 object-contain rounded border" 
-                    />
-                    <div className="text-sm text-muted-foreground">
-                      Текущий логотип
-                    </div>
-                  </div>
-                )}
-                
-                <div className="flex-1">
-                  <Label htmlFor="logo-upload" className="cursor-pointer">
-                    <div className="flex items-center gap-2 p-4 border-2 border-dashed border-muted-foreground/25 rounded-lg hover:border-muted-foreground/50 transition-colors">
-                      <Upload className="h-5 w-5" />
-                      <span>
-                        {uploadingLogo ? 'Загрузка...' : 'Выберите PNG файл'}
-                      </span>
-                    </div>
-                    <input
-                      id="logo-upload"
-                      type="file"
-                      accept="image/png"
-                      onChange={handleLogoUpload}
-                      disabled={uploadingLogo}
-                      className="hidden"
-                    />
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Рекомендуемый размер: 40x40px, максимум 5MB
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="currency" className="space-y-4">
           <Card>
