@@ -212,9 +212,6 @@ export const AppNavigation = () => {
                 className="h-14 w-14 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
               />
             )}
-            <span className="text-2xl font-display font-bold text-gradient hidden sm:block">
-              {t("app.name")}
-            </span>
           </Link>
           
           {/* Main Navigation - Desktop */}
