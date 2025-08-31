@@ -150,89 +150,84 @@ const Catalog = () => {
           <p className="text-muted-foreground">Проверенные профессионалы готовы выполнить вашу задачу</p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto" style={{ perspective: '1000px' }}>
           {pros.map((p, index) => {
             const r = ratingMap[p.user_id] || { avg_score: 0, rating_count: 0 };
             return (
               <article 
                 key={p.user_id} 
-                className="group relative overflow-hidden rounded-2xl bg-card border hover:border-primary/30 transition-all duration-300 animate-fade-in hover-scale"
+                className="group relative h-80 w-full rounded-3xl shadow-2xl overflow-hidden transition-all duration-400 animate-fade-in hover-scale"
                 style={{ 
                   animationDelay: `${index * 100}ms`,
-                  backgroundImage: `url(${cardBgPattern})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
+                  transformStyle: 'preserve-3d',
+                  backfaceVisibility: 'hidden'
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-card/95 via-card/90 to-card/95 backdrop-blur-sm" />
-                
-                <div className="relative p-6 flex flex-col h-full">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-primary/20 group-hover:border-primary/50 transition-colors">
+                {/* Gradient Header */}
+                <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600">
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
+                </div>
+
+                {/* Avatar */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 top-16 z-10">
+                  <div className="relative">
+                    <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                       <img 
                         src={proPlaceholder} 
                         alt="Specialist" 
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <StarRating 
-                      rating={r.avg_score} 
-                      size="sm" 
-                      showValue={false}
-                      className="px-3 py-1 rounded-full bg-primary/10"
-                    />
+                    {/* Status indicator for verified specialists */}
+                    {r.rating_count > 0 && (
+                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="bg-white pt-20 px-6 pb-8 h-full flex flex-col">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                      Специалист #{String(p.user_id).slice(0,8)}
+                    </h3>
+                    <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
+                      {selectedCat ? catById[selectedCat]?.label_ru || 'Специалист' : 'Специалист'}
+                    </p>
+                    
+                    <div className="mt-4 flex justify-center">
+                      <StarRating 
+                        rating={r.avg_score} 
+                        size="sm" 
+                        showValue={false}
+                        readonly
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {r.rating_count > 0 ? `${r.rating_count} отзывов` : 'Новый специалист'}
+                    </p>
                   </div>
 
                   <div className="flex-1 mb-6">
-                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                      Специалист #{String(p.user_id).slice(0,8)}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed line-clamp-3 mb-4">
+                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 text-center">
                       {p.bio || 'Профессиональный специалист с многолетним опытом работы'}
                     </p>
-                    
-                    <div className="flex flex-wrap gap-3 text-sm">
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <AnimatedIcon icon={Clock} size={14} />
-                        Быстрый отклик
-                      </div>
-                      <div className="flex items-center gap-1 text-success">
-                        <AnimatedIcon icon={Zap} size={14} />
-                        {r.rating_count} отзывов
-                      </div>
-                      <div className="flex items-center">
-                        <StarRating 
-                          rating={r.avg_score} 
-                          size="sm" 
-                          showValue
-                          className="text-sm"
-                        />
-                      </div>
-                    </div>
                   </div>
 
-                  <div className="border-t pt-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-muted-foreground">Стоимость:</span>
-                      <span className="text-lg font-semibold text-primary">
-                        {p.hourly_rate_cents ? `$${(p.hourly_rate_cents/100).toFixed(0)}/ч` : 'Договорная'}
-                      </span>
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      <Link 
-                        to={`/pro/${p.user_id}`} 
-                        className="flex-1 btn-ghost text-center py-3 hover-scale"
-                      >
-                        Профиль
-                      </Link>
-                      <Link 
-                        to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
-                        className="flex-1 btn-hero text-center py-3 hover-scale"
-                      >
-                        Заказать
-                      </Link>
-                    </div>
+                  <div className="space-y-3">
+                    <button className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 py-2 rounded-lg transition-colors">
+                      Портфолио
+                    </button>
+                    <Link 
+                      to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
+                      className="block w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all text-center"
+                    >
+                      Выбрать специалиста
+                    </Link>
                   </div>
                 </div>
               </article>
