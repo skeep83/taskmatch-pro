@@ -204,7 +204,7 @@ const Catalog = () => {
                 </div>
 
                 {/* Avatar with enhanced 3D effect */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 top-16 z-10">
+                <div className="absolute left-1/2 transform -translate-x-1/2 top-12 z-10">
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden group-hover:scale-110 group-hover:rotate-12 transition-all duration-300"
                          style={{ 
