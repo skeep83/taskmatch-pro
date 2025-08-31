@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,7 @@ interface Subscription {
 export default function DashboardClient() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { formatPrice: formatCurrency } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -248,13 +250,11 @@ export default function DashboardClient() {
   const formatPrice = (minCents?: number, maxCents?: number) => {
     if (!minCents && !maxCents) return "Не указан";
     
-    const formatCents = (cents: number) => `$${(cents / 100).toFixed(2)}`;
-    
     if (minCents && maxCents) {
-      return `${formatCents(minCents)} - ${formatCents(maxCents)}`;
+      return `${formatCurrency(minCents)} - ${formatCurrency(maxCents)}`;
     }
     
-    return formatCents(minCents || maxCents || 0);
+    return formatCurrency(minCents || maxCents || 0);
   };
 
   if (loading) {
@@ -360,7 +360,7 @@ export default function DashboardClient() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Потрачено</p>
-                      <p className="text-2xl font-bold">${(stats.totalSpent / 100).toFixed(2)}</p>
+                      <p className="text-2xl font-bold">{formatCurrency(stats.totalSpent)}</p>
                     </div>
                     <DollarSign className="h-8 w-8 text-primary" />
                   </div>
