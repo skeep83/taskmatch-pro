@@ -43,6 +43,7 @@ export const AppNavigation = () => {
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [currentRole, setCurrentRole] = useState<UserRole>('client');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>('');
   const { unreadCount } = useNotifications();
 
   console.log('🔔 AppNavigation unreadCount:', unreadCount);
@@ -94,8 +95,28 @@ export const AppNavigation = () => {
       setIsAuthenticated(!!session?.user);
     });
 
+    // Load logo URL
+    loadLogoUrl();
+
     return () => subscription.unsubscribe();
   }, [location.pathname]); // Add location.pathname as dependency
+
+  const loadLogoUrl = async () => {
+    try {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'logo_url')
+        .maybeSingle();
+      
+      if (data?.value) {
+        setLogoUrl(JSON.parse(data.value));
+      }
+    } catch (error) {
+      // Ignore error, use default logo
+      console.log('No custom logo found, using default');
+    }
+  };
 
   const mainNavItems = [
     {
@@ -177,11 +198,19 @@ export const AppNavigation = () => {
             className="flex items-center gap-3 group flex-shrink-0 hover-scale" 
             aria-label={t("app.name")}
           > 
-            <img 
-              src={serviceHubLogo} 
-              alt="ServiceHub Logo" 
-              className="h-10 w-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
-            />
+            {logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt="ServiceHub Logo" 
+                className="h-10 w-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
+              />
+            ) : (
+              <img 
+                src={serviceHubLogo} 
+                alt="ServiceHub Logo" 
+                className="h-10 w-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
+              />
+            )}
             <span className="text-xl font-display font-bold text-gradient hidden sm:block">
               {t("app.name")}
             </span>

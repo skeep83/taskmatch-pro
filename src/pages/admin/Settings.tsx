@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Settings, CreditCard, Shield, DollarSign } from "lucide-react";
+import { Settings, CreditCard, Shield, DollarSign, Upload, Image as ImageIcon } from "lucide-react";
 
 interface PlatformSettings {
   platformName: string;
@@ -39,6 +39,8 @@ export default function AdminSettings() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>('');
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [settings, setSettings] = useState<PlatformSettings>({
     platformName: "ServiceHub",
@@ -70,6 +72,17 @@ export default function AdminSettings() {
         .order('code');
       
       setCurrencies(currencyData || []);
+
+      // Load logo URL from app settings
+      const { data: logoData } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'logo_url')
+        .single();
+      
+      if (logoData?.value) {
+        setLogoUrl(logoData.value as string);
+      }
 
       // Load platform settings
       const { data: settingsData } = await supabase
@@ -156,6 +169,76 @@ export default function AdminSettings() {
     }
   };
 
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/png')) {
+      toast({
+        title: "Ошибка",
+        description: "Пожалуйста, загрузите PNG файл",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Ошибка", 
+        description: "Размер файла не должен превышать 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploadingLogo(true);
+    
+    try {
+      const fileName = `logo-${Date.now()}.png`;
+      
+      // Upload to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('logos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('logos')
+        .getPublicUrl(fileName);
+
+      // Save logo URL to app settings
+      await supabase
+        .from('app_settings')
+        .upsert({
+          key: 'logo_url',
+          value: JSON.stringify(publicUrl)
+        }, { onConflict: 'key' });
+
+      setLogoUrl(publicUrl);
+      
+      toast({
+        title: "Логотип загружен",
+        description: "Новый логотип успешно установлен",
+      });
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить логотип",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
   const updateSetting = (key: keyof PlatformSettings, value: any) => {
     setSettings(prev => ({
       ...prev,
@@ -194,8 +277,9 @@ export default function AdminSettings() {
       </div>
 
       <Tabs defaultValue="platform" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="platform">Платформа</TabsTrigger>
+          <TabsTrigger value="branding">Брендинг</TabsTrigger>
           <TabsTrigger value="finance">Финансы</TabsTrigger>
           <TabsTrigger value="currency">Валюты</TabsTrigger>
           <TabsTrigger value="security">Безопасность</TabsTrigger>
@@ -308,6 +392,58 @@ export default function AdminSettings() {
                     value={settings.maxInstantPayout}
                     onChange={(e) => updateSetting('maxInstantPayout', parseInt(e.target.value) || 0)}
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="branding" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5" />
+                Логотип платформы
+              </CardTitle>
+              <CardDescription>
+                Загрузите логотип в формате PNG для отображения в хедере
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                {logoUrl && (
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={logoUrl} 
+                      alt="Current logo" 
+                      className="h-12 w-12 object-contain rounded border" 
+                    />
+                    <div className="text-sm text-muted-foreground">
+                      Текущий логотип
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex-1">
+                  <Label htmlFor="logo-upload" className="cursor-pointer">
+                    <div className="flex items-center gap-2 p-4 border-2 border-dashed border-muted-foreground/25 rounded-lg hover:border-muted-foreground/50 transition-colors">
+                      <Upload className="h-5 w-5" />
+                      <span>
+                        {uploadingLogo ? 'Загрузка...' : 'Выберите PNG файл'}
+                      </span>
+                    </div>
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/png"
+                      onChange={handleLogoUpload}
+                      disabled={uploadingLogo}
+                      className="hidden"
+                    />
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Рекомендуемый размер: 40x40px, максимум 5MB
+                  </p>
                 </div>
               </div>
             </CardContent>
