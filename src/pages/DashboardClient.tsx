@@ -81,6 +81,14 @@ export default function DashboardClient() {
     refferalCode: '',
     subscriptionStatus: 'none' as 'none' | 'basic' | 'plus' | 'max'
   });
+  const [subscription, setSubscription] = useState<any>(null);
+  const [referralCode, setReferralCode] = useState<string>('');
+  const [profileData, setProfileData] = useState({
+    phone: '',
+    emailNotifications: true,
+    smsNotifications: false
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -102,6 +110,21 @@ export default function DashboardClient() {
       }
 
       setUser(session.session.user);
+      
+      // Load profile data
+      const { data: profileInfo } = await supabase
+        .from('profiles')
+        .select('phone')
+        .eq('id', session.session.user.id)
+        .single();
+      
+      if (profileInfo) {
+        setProfileData(prev => ({
+          ...prev,
+          phone: profileInfo.phone || ''
+        }));
+      }
+      
       setLoading(false);
     } catch (error: any) {
       toast({ 
@@ -170,6 +193,36 @@ export default function DashboardClient() {
 
     } catch (error: any) {
       console.error('Failed to load user data:', error);
+    }
+  };
+
+  const saveProfile = async () => {
+    if (!user) return;
+    
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          phone: profileData.phone
+        })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: 'Профиль обновлен',
+        description: 'Изменения сохранены успешно'
+      });
+    } catch (error: any) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось сохранить изменения: ${error.message}`,
+        variant: 'destructive'
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -718,10 +771,22 @@ export default function DashboardClient() {
                       <label className="block text-sm font-medium mb-2">Телефон</label>
                       <input 
                         type="tel" 
+                        value={profileData.phone}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
                         placeholder="+373 XX XXX XXX"
                         className="w-full p-3 border rounded-lg"
                       />
                     </div>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <Button 
+                      onClick={saveProfile}
+                      disabled={saving}
+                      className="w-full md:w-auto"
+                    >
+                      {saving ? 'Сохранение...' : 'Сохранить изменения'}
+                    </Button>
                   </div>
                 </div>
 
@@ -733,14 +798,24 @@ export default function DashboardClient() {
                         <h4 className="font-medium">Email уведомления</h4>
                         <p className="text-sm text-muted-foreground">Получать уведомления на email</p>
                       </div>
-                      <input type="checkbox" className="toggle" />
+                      <input 
+                        type="checkbox" 
+                        checked={profileData.emailNotifications}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, emailNotifications: e.target.checked }))}
+                        className="toggle" 
+                      />
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="font-medium">SMS уведомления</h4>
                         <p className="text-sm text-muted-foreground">Получать SMS о важных событиях</p>
                       </div>
-                      <input type="checkbox" className="toggle" />
+                      <input 
+                        type="checkbox" 
+                        checked={profileData.smsNotifications}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, smsNotifications: e.target.checked }))}
+                        className="toggle" 
+                      />
                     </div>
                   </div>
                 </div>
