@@ -262,12 +262,6 @@ const Catalog = () => {
                     </p>
                   </div>
 
-                  <div className="mb-4">
-                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 text-center">
-                      {p.bio || 'Профессиональный специалист'}
-                    </p>
-                  </div>
-
                   {/* Buttons positioned higher */}
                   <div className="space-y-2">
                     <Link 
