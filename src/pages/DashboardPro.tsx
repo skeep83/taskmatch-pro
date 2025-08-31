@@ -448,7 +448,7 @@ const DashboardPro = () => {
                           Управлять
                         </Link>
                         <Link 
-                          to={`/messages?job=${job.id}`}
+                          to={`/messages?user=${job.client_id}&job=${job.id}`}
                           className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
                         >
                           <MessageSquare className="h-4 w-4" />

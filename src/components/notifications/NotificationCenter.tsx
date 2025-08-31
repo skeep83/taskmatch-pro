@@ -39,8 +39,10 @@ export const NotificationCenter = () => {
       window.location.href = `/job/${notification.data.job_id}`;
     } else if (notification.type === 'message' && notification.data?.message_id) {
       // Navigate to messages with specific parameters
-      if (notification.data?.job_id) {
-        window.location.href = `/messages?job=${notification.data.job_id}`;
+      if (notification.data?.job_id && notification.data?.other_user_id) {
+        window.location.href = `/messages?user=${notification.data.other_user_id}&job=${notification.data.job_id}`;
+      } else if (notification.data?.chat_id) {
+        window.location.href = `/messages/${notification.data.chat_id}`;
       } else {
         window.location.href = `/messages`;
       }
