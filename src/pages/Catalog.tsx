@@ -272,13 +272,13 @@ const Catalog = () => {
                   <div className="space-y-2">
                     <Link 
                       to={`/pro/${p.user_id}`}
-                      className="block w-full border border-purple-200 text-purple-600 hover:bg-purple-50 py-2 rounded-lg transition-colors text-center text-sm"
+                      className="block w-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
                     >
                       Профиль
                     </Link>
                     <Link 
                       to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
-                      className="block w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-2 rounded-xl shadow-lg hover:shadow-xl transition-all text-center text-sm"
+                      className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
                     >
                       Выбрать специалиста
                     </Link>
