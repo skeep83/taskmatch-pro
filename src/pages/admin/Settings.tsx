@@ -180,10 +180,10 @@ export default function AdminSettings() {
   };
 
   const uploadLogo = async (file: File) => {
-    if (!file.type.startsWith('image/png')) {
+    if (!file.type.startsWith('image/')) {
       toast({
         title: "Ошибка",
-        description: "Поддерживаются только PNG файлы",
+        description: "Поддерживаются только файлы изображений",
         variant: "destructive"
       });
       return;
@@ -200,31 +200,45 @@ export default function AdminSettings() {
 
     setUploadingLogo(true);
     try {
-      const fileName = `logo-${Date.now()}.png`;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `logo-${Date.now()}.${fileExt}`;
       
-      // Upload to logos bucket (use existing bucket or portfolio if logos doesn't exist)
+      console.log('Uploading logo:', fileName, 'File size:', file.size);
+      
+      // Upload to portfolio bucket (which is public)
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('portfolio') // Using existing public bucket
+        .from('portfolio')
         .upload(fileName, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: true // Allow overwriting
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('Upload successful:', uploadData);
 
       const { data: urlData } = supabase.storage
         .from('portfolio')
         .getPublicUrl(fileName);
 
       const logoUrl = urlData.publicUrl;
+      console.log('Logo URL:', logoUrl);
 
       // Save logo URL to app_settings
-      await supabase
+      const { error: settingsError } = await supabase
         .from('app_settings')
         .upsert({
           key: 'platform_logo',
           value: logoUrl
         }, { onConflict: 'key' });
+
+      if (settingsError) {
+        console.error('Settings error:', settingsError);
+        throw settingsError;
+      }
 
       setLogo({ logoUrl });
       
@@ -234,9 +248,10 @@ export default function AdminSettings() {
       });
     } catch (error) {
       console.error('Error uploading logo:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
       toast({
         title: "Ошибка",
-        description: "Не удалось загрузить логотип",
+        description: `Не удалось загрузить логотип: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
