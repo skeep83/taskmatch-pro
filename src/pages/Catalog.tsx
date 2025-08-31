@@ -233,45 +233,43 @@ const Catalog = () => {
                 </div>
 
                 {/* Content Section with glass morphism effect */}
-                <div className="pt-20 px-6 pb-4 h-full flex flex-col justify-between" 
+                <div className="pt-16 px-6 pb-6 h-full flex flex-col" 
                      style={{ 
                        background: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
                        backdropFilter: 'blur(10px)',
                        borderTop: '1px solid rgba(255,255,255,0.5)',
                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)'
                      }}>
-                  {/* Top content */}
-                  <div>
-                    <div className="text-center mb-4">
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">
-                        {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || `Специалист #${String(p.user_id).slice(0,8)}`}
-                      </h3>
-                      <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        {selectedCat ? catById[selectedCat]?.label_ru || 'Специалист' : 'Специалист'}
-                      </p>
-                      
-                      <div className="mt-2 flex justify-center">
-                        <StarRating 
-                          rating={r.avg_score} 
-                          size="sm" 
-                          showValue={false}
-                          readonly
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {r.rating_count > 0 ? `${r.rating_count} отзывов` : 'Новый специалист'}
-                      </p>
+                  {/* Content */}
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                      {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || `Специалист #${String(p.user_id).slice(0,8)}`}
+                    </h3>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      {selectedCat ? catById[selectedCat]?.label_ru || 'Специалист' : 'Специалист'}
+                    </p>
+                    
+                    <div className="mt-2 flex justify-center">
+                      <StarRating 
+                        rating={r.avg_score} 
+                        size="sm" 
+                        showValue={false}
+                        readonly
+                      />
                     </div>
-
-                    <div className="mb-3">
-                      <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 text-center">
-                        {p.bio || 'Профессиональный специалист'}
-                      </p>
-                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {r.rating_count > 0 ? `${r.rating_count} отзывов` : 'Новый специалист'}
+                    </p>
                   </div>
 
-                  {/* Bottom buttons - always at bottom */}
-                  <div className="space-y-2 mt-auto">
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 text-center">
+                      {p.bio || 'Профессиональный специалист'}
+                    </p>
+                  </div>
+
+                  {/* Buttons positioned higher */}
+                  <div className="space-y-2">
                     <Link 
                       to={`/pro/${p.user_id}`}
                       className="block w-full border border-purple-200 text-purple-600 hover:bg-purple-50 py-2 rounded-lg transition-colors text-center text-sm"
