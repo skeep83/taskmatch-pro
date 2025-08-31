@@ -204,6 +204,18 @@ const Messages = () => {
   const createChatForJob = async (clientId: string, professionalId: string, jobId: string | null) => {
     try {
       console.log('💬 Creating chat with params:', { clientId, professionalId, jobId });
+      
+      // Validate required parameters
+      if (!clientId || !professionalId) {
+        console.error('❌ Missing required parameters:', { clientId, professionalId, jobId });
+        toast({ 
+          title: "Ошибка", 
+          description: "Недостаточно данных для создания чата", 
+          variant: "destructive" 
+        });
+        return;
+      }
+      
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: newChat, error } = await (supabase as any)
         .from("chats")
