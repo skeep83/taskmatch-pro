@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { Suspense } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -116,14 +117,27 @@ const App = () => (
     <EnhancedI18nProvider>
       <DatabaseI18nProvider>
         <TooltipProvider>
-          <div style={{ background: 'var(--background-neomorphic)' }}>
-            <Toaster />
-            <Sonner />
-            <Diagnostics />
-            <BrowserRouter>
-              <AppContent />
-            </BrowserRouter>
-          </div>
+          <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
+              <div className="text-center p-8">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-6"></div>
+                  <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-primary/40 animate-spin mx-auto" style={{animationDuration: '1.5s'}}></div>
+                </div>
+                <h2 className="text-xl font-semibold text-foreground mb-2">ServiceHub</h2>
+                <p className="text-muted-foreground animate-pulse">Загрузка переводов...</p>
+              </div>
+            </div>
+          }>
+            <div style={{ background: 'var(--background-neomorphic)' }}>
+              <Toaster />
+              <Sonner />
+              <Diagnostics />
+              <BrowserRouter>
+                <AppContent />
+              </BrowserRouter>
+            </div>
+          </Suspense>
         </TooltipProvider>
       </DatabaseI18nProvider>
     </EnhancedI18nProvider>

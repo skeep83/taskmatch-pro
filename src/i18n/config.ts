@@ -41,9 +41,17 @@ i18n
     returnNull: false, // return key if translation is null
     returnObjects: true, // ВАЖНО: разрешаем объекты для вложенных структур
     
+    // ЖЕСТКИЙ КОНТРОЛЬ ПРОПАВШИХ КЛЮЧЕЙ
+    debug: import.meta.env.DEV,
+    saveMissing: import.meta.env.DEV,          // писать недостающие ключи
+    parseMissingKeyHandler: (key) => {
+      console.warn("[i18n] MISSING KEY:", key);
+      return `⛔ ${key}`;                       // в UI будет видно, что ключ не найден
+    },
+    
     // React-specific options
     react: {
-      useSuspense: false, // we handle loading manually
+      useSuspense: true, // используем Suspense для ожидания загрузки
       bindI18n: 'languageChanged loaded',
       bindI18nStore: 'added removed',
       transEmptyNodeValue: '', // what to return for empty nodes
@@ -51,12 +59,16 @@ i18n
       transKeepBasicHtmlNodesFor: ['br', 'strong', 'i', 'b', 'span'], // allowed HTML tags
     },
     
-    // Debug in development
-    debug: true, // Включаем debug для диагностики
-    
     // Load path configuration
     load: 'languageOnly',
     nonExplicitSupportedLngs: true,
+    
+    // Дополнительная отладка
+    missingKeyHandler: (lng, ns, key, fallbackValue) => {
+      if (import.meta.env.DEV) {
+        console.error(`[i18n] Missing translation: lng=${lng}, ns=${ns}, key=${key}`);
+      }
+    },
   });
 
 // Save language to localStorage when it changes

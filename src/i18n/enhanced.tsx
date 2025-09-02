@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import './config'; // Initialize i18n
+import { translationDetector, createMonitoredTranslation, runGlobalTranslationChecks } from './detector';
 
 export type SupportedLanguage = 'ru' | 'ro';
 
@@ -42,6 +43,11 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
             setI18nInstance(i18n);
             setCurrentLanguage(i18n.language as SupportedLanguage);
             setIsInitialized(true);
+            
+            // Запускаем глобальные проверки переводов
+            if (import.meta.env.DEV) {
+              setTimeout(() => runGlobalTranslationChecks(), 1000);
+            }
             i18n.off('initialized', onInitialized);
           };
           i18n.on('initialized', onInitialized);
@@ -110,11 +116,27 @@ const I18nProviderWrapper: React.FC<{
         'nav.login_account': 'Войти в аккаунт',
         'catalog.description': 'Поиск специалистов по категориям'
       };
-      return basicTranslations[key] || key;
+      
+      const result = basicTranslations[key] || key;
+      
+      // Логируем использование fallback переводов
+      if (import.meta.env.DEV && basicTranslations[key]) {
+        translationDetector.logIssue({
+          key,
+          type: 'fallback',
+          context: 'Using basic translation - i18n not ready'
+        });
+      }
+      
+      return result;
     }
     
     try {
-      return i18nInstance.t(key, options);
+      const result = i18nInstance.t(key, options);
+      
+      // Создаем мониторируемую версию перевода
+      const monitoredT = createMonitoredTranslation((k, opts) => i18nInstance.t(k, opts));
+      return monitoredT(key, options);
     } catch (error) {
       console.warn('Translation error for key:', key, error);
       return key;
