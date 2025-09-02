@@ -2131,6 +2131,10 @@ export type Database = {
         Args: { _biz: string; _user: string }
         Returns: boolean
       }
+      is_super_admin: {
+        Args: { _user_id?: string }
+        Returns: boolean
+      }
       log_admin_action: {
         Args: {
           p_action: string
@@ -2150,6 +2154,14 @@ export type Database = {
       make_user_admin: {
         Args: { _email: string }
         Returns: undefined
+      }
+      manage_admin_role: {
+        Args: {
+          action_type: string
+          target_role: Database["public"]["Enums"]["app_role"]
+          target_user_email: string
+        }
+        Returns: boolean
       }
       refresh_pro_rating_stats: {
         Args: { _pro_id: string }
