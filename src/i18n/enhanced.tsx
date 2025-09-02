@@ -30,56 +30,83 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
         
         // Ждем полной инициализации
         if (i18n.isInitialized) {
+          console.log('i18n already initialized');
           setI18nInstance(i18n);
           setIsInitialized(true);
         } else {
-          i18n.on('initialized', () => {
+          console.log('waiting for i18n initialization');
+          const onInitialized = () => {
+            console.log('i18n initialized');
             setI18nInstance(i18n);
             setIsInitialized(true);
-          });
+            i18n.off('initialized', onInitialized);
+          };
+          i18n.on('initialized', onInitialized);
         }
       } catch (error) {
         console.error('Failed to initialize i18n:', error);
+        // В случае ошибки всё равно показываем контент
+        setIsInitialized(true);
       }
     };
     
     initializeI18n();
   }, []);
 
-  if (!isInitialized || !i18nInstance) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="relative">
-            <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-6"></div>
-            <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-primary/40 animate-spin mx-auto" style={{animationDuration: '1.5s'}}></div>
-          </div>
-          <h2 className="text-xl font-semibold text-foreground mb-2">ServiceHub</h2>
-          <p className="text-muted-foreground animate-pulse">Инициализация переводов...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Теперь у нас есть инициализированный i18n
-  return <I18nProviderWrapper i18nInstance={i18nInstance}>{children}</I18nProviderWrapper>;
+  // Всегда предоставляем контекст, даже во время загрузки
+  return <I18nProviderWrapper i18nInstance={i18nInstance} isReady={isInitialized}>{children}</I18nProviderWrapper>;
 };
 
-const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNode }> = ({ 
-  i18nInstance, 
-  children 
-}) => {
-  const { t } = useTranslation(undefined, { i18n: i18nInstance });
+const I18nProviderWrapper: React.FC<{ 
+  i18nInstance: any; 
+  isReady: boolean;
+  children: React.ReactNode 
+}> = ({ i18nInstance, isReady, children }) => {
+  // Если i18n еще не готов, используем базовые переводы
+  const t = (key: string, options?: any) => {
+    if (!i18nInstance || !isReady) {
+      // Базовые переводы для критических элементов
+      const basicTranslations: Record<string, string> = {
+        'app.name': 'ServiceHub',
+        'nav.catalog': 'Каталог',
+        'nav.sign_in': 'Войти',
+        'nav.dashboard': 'Личный кабинет',
+        'nav.messages': 'Сообщения',
+        'loading.translations': 'Загрузка переводов...',
+        'nav.home': 'Главная',
+        'nav.specialists': 'Специалисты',
+        'nav.jobs': 'Заказы',
+        'nav.services': 'Услуги',
+        'nav.login': 'Войти',
+        'hero.cta_primary': 'Заказать услугу',
+        'feed.title': 'Лента заказов'
+      };
+      return basicTranslations[key] || key;
+    }
+    
+    const { t: i18nT } = useTranslation(undefined, { i18n: i18nInstance });
+    const result = i18nT(key, options) as string;
+    if (key.startsWith('client.dashboard') && result === key) {
+      console.warn('Translation missing for key:', key);
+    }
+    return result;
+  };
+
+  const handleChangeLanguage = async (lng: SupportedLanguage) => {
+    if (i18nInstance) {
+      await i18nInstance.changeLanguage(lng);
+    }
+  };
 
   // Enhanced formatting functions
   const formatNumber = (num: number, options?: Intl.NumberFormatOptions) => {
-    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
+    const locale = (i18nInstance?.language === 'ro') ? 'ro-RO' : 'ru-RU';
     return new Intl.NumberFormat(locale, options).format(num);
   };
 
   const formatCurrency = (amount: number, currency: string = 'RUB') => {
-    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
-    const currencyCode = i18nInstance.language === 'ro' ? 'MDL' : currency;
+    const locale = (i18nInstance?.language === 'ro') ? 'ro-RO' : 'ru-RU';
+    const currencyCode = (i18nInstance?.language === 'ro') ? 'MDL' : currency;
     return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: currencyCode,
@@ -89,7 +116,7 @@ const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNo
   };
 
   const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions) => {
-    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
+    const locale = (i18nInstance?.language === 'ro') ? 'ro-RO' : 'ru-RU';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
@@ -100,19 +127,19 @@ const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNo
   };
 
   const formatRelativeTime = (date: Date | string) => {
-    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
+    const locale = (i18nInstance?.language === 'ro') ? 'ro-RO' : 'ru-RU';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     const now = new Date();
     const diffInHours = (now.getTime() - dateObj.getTime()) / (1000 * 60 * 60);
     
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
-      return i18nInstance.language === 'ro' 
+      return (i18nInstance?.language === 'ro') 
         ? `acum ${diffInMinutes} ${diffInMinutes === 1 ? 'minut' : 'minute'}`
         : `${diffInMinutes} ${diffInMinutes === 1 ? 'минуту' : diffInMinutes < 5 ? 'минуты' : 'минут'} назад`;
     } else if (diffInHours < 24) {
       const hours = Math.floor(diffInHours);
-      return i18nInstance.language === 'ro'
+      return (i18nInstance?.language === 'ro')
         ? `acum ${hours} ${hours === 1 ? 'oră' : 'ore'}`
         : `${hours} ${hours === 1 ? 'час' : hours < 5 ? 'часа' : 'часов'} назад`;
     } else {
@@ -120,21 +147,11 @@ const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNo
     }
   };
 
-  const handleChangeLanguage = async (lng: SupportedLanguage) => {
-    await i18nInstance.changeLanguage(lng);
-  };
-
   const value: EnhancedI18nContextType = {
-    t: (key: string, options?: any) => {
-      const result = t(key, options) as string;
-      if (key.startsWith('client.dashboard') && result === key) {
-        console.warn('Translation missing for key:', key);
-      }
-      return result;
-    },
+    t,
     changeLanguage: handleChangeLanguage,
-    language: i18nInstance.language as SupportedLanguage,
-    ready: true,
+    language: (i18nInstance?.language as SupportedLanguage) || 'ru',
+    ready: isReady,
     formatNumber,
     formatCurrency,
     formatDate,
