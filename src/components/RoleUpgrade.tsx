@@ -93,7 +93,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
               rotateY: 3,
               transition: { duration: 0.2 }
             }}
-            className="perspective-1000"
+            className="perspective-1000 group"
           >
             <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d">
               {/* Верхняя секция с градиентом - уменьшена */}
@@ -103,19 +103,19 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                 
                 {/* Иконка меньшего размера */}
-                <motion.div
-                  whileHover={{ scale: 1.15, rotate: 8 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute left-1/2 top-10 transform -translate-x-1/2 z-10"
-                >
-                  <div className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/20">
+                <div className="absolute left-1/2 top-10 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                  <motion.div
+                    whileHover={{ scale: 1.15, rotate: 8 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/20"
+                  >
                     <IconComponent className="w-8 h-8 text-gray-700" />
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               </div>
               
               {/* Нижняя секция с контентом - более компактная */}
-              <div className="bg-gradient-to-b from-gray-50 to-white pt-12 px-5 pb-5">
+              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5">
                 <div className="text-center mb-4">
                   <h4 className="text-lg font-bold text-gray-900 mb-1">{config.title}</h4>
                   <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
