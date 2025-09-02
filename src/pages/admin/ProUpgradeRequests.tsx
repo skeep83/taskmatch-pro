@@ -81,10 +81,7 @@ export default function ProUpgradeRequests() {
       
       let query = supabase
         .from('pro_upgrade_requests')
-        .select(`
-          *,
-          profiles!inner(first_name, last_name, full_name, avatar_url, city, phone)
-        `)
+        .select('*')
         .order('submitted_at', { ascending: false });
 
       if (filter !== 'all') {
@@ -241,29 +238,28 @@ export default function ProUpgradeRequests() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">
-                            {request.profiles?.full_name || 
-                             `${request.profiles?.first_name || ''} ${request.profiles?.last_name || ''}`.trim() ||
-                             'Не указано'}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {request.profiles?.city || 'Город не указан'}
-                          </p>
-                        </div>
+                         <div>
+                           <p className="font-medium">
+                             {`${request.profile_data.first_name || ''} ${request.profile_data.last_name || ''}`.trim() ||
+                              'Не указано'}
+                           </p>
+                           <p className="text-sm text-muted-foreground">
+                             {request.profile_data.city || 'Город не указан'}
+                           </p>
+                         </div>
                       </div>
                     </TableCell>
                     
-                    <TableCell>
-                      <div className="text-sm">
-                        <p>{request.profiles?.phone || 'Телефон не указан'}</p>
-                        {request.profile_data.bio && (
-                          <p className="text-muted-foreground truncate max-w-xs">
-                            {request.profile_data.bio}
-                          </p>
-                        )}
-                      </div>
-                    </TableCell>
+                     <TableCell>
+                       <div className="text-sm">
+                         <p>{request.profile_data.phone || 'Телефон не указан'}</p>
+                         {request.profile_data.bio && (
+                           <p className="text-muted-foreground truncate max-w-xs">
+                             {request.profile_data.bio}
+                           </p>
+                         )}
+                       </div>
+                     </TableCell>
                     
                     <TableCell>
                       <div className="flex items-center gap-1 text-sm">
@@ -361,7 +357,7 @@ export default function ProUpgradeRequests() {
               {!reviewModal.action && 'Просмотр заявки'}
             </DialogTitle>
             <DialogDescription>
-              Заявка на статус специалиста от {reviewModal.request?.profiles?.full_name}
+              Заявка на статус специалиста от {`${reviewModal.request?.profile_data.first_name || ''} ${reviewModal.request?.profile_data.last_name || ''}`.trim() || 'пользователя'}
             </DialogDescription>
           </DialogHeader>
 
