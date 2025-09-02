@@ -23,6 +23,9 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    console.log('i18n state:', { ready, language: i18n.language, isInitialized: i18n.isInitialized });
+    console.log('Available resources:', i18n.getResourceBundle(i18n.language, 'translation'));
+    
     // Ensure i18n is properly initialized
     setIsReady(ready && i18n.language && i18n.isInitialized);
   }, [ready, i18n.language, i18n.isInitialized]);
@@ -81,7 +84,13 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const value: EnhancedI18nContextType = {
-    t,
+    t: (key: string, options?: any) => {
+      const result = t(key, options) as string;
+      if (key.startsWith('client.dashboard') && result === key) {
+        console.warn('Translation missing for key:', key, 'Available resources:', i18n.getResourceBundle(i18n.language, 'translation'));
+      }
+      return result;
+    },
     changeLanguage,
     language: i18n.language as SupportedLanguage,
     ready: isReady,

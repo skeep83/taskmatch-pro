@@ -8,10 +8,10 @@ import translationRO from '../locales/ro.json';
 // the translations
 const resources = {
   ru: {
-    translation: translationRU
+    translation: translationRU as any
   },
   ro: {
-    translation: translationRO
+    translation: translationRO as any
   }
 };
 
@@ -39,7 +39,7 @@ i18n
     // Improved options
     returnEmptyString: false, // return key if translation is empty
     returnNull: false, // return key if translation is null
-    returnObjects: false, // don't return objects
+    returnObjects: true, // ВАЖНО: разрешаем объекты для вложенных структур
     
     // React-specific options
     react: {
@@ -52,7 +52,7 @@ i18n
     },
     
     // Debug in development
-    debug: false, // Disable debug to avoid console noise
+    debug: true, // Включаем debug для диагностики
     
     // Load path configuration
     load: 'languageOnly',

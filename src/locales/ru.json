@@ -49,6 +49,40 @@
   "auth.success.check_email": "Проверьте почту для подтверждения",
   "auth.error.action_failed": "Не удалось выполнить действие",
   
+  "client": {
+    "title": "Клиент",
+    "order": "Заказать", 
+    "dashboard": {
+      "title": "Кабинет клиента",
+      "description": "Управляйте заказами, тендерами и подпиской",
+      "welcome": "Добро пожаловать",
+      "loading": "Загружаем кабинет клиента...",
+      "tabs": {
+        "overview": "Обзор",
+        "jobs": "Заказы", 
+        "tenders": "Тендеры",
+        "subscription": "Подписка",
+        "payments": "Платежи",
+        "referrals": "Рефералы",
+        "settings": "Настройки"
+      },
+      "stats": {
+        "total_jobs": "Всего заказов",
+        "active_jobs": "Активных",
+        "completed_jobs": "Завершено", 
+        "total_spent": "Потрачено"
+      },
+      "quick_actions": {
+        "create_job": "Создать заказ",
+        "create_job_description": "Инстант-бронирование",
+        "create_tender": "Создать тендер",
+        "create_tender_description": "Получить предложения",
+        "homecare": "HomeCare",
+        "premium_subscription": "Подписка Premium"
+      }
+    }
+  },
+  
   "dashboard.client.title": "Добро пожаловать!",
   "dashboard.client.subtitle": "Управляйте своими заказами и подпиской",
   "dashboard.client.new_job": "Новый заказ",

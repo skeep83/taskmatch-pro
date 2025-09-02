@@ -49,6 +49,40 @@
   "auth.success.check_email": "Verifică emailul pentru confirmare",
   "auth.error.action_failed": "Nu s-a putut efectua acțiunea",
   
+  "client": {
+    "title": "Client",
+    "order": "Comandă",
+    "dashboard": {
+      "title": "Panoul clientului", 
+      "description": "Gestionați comenzi, licitații și abonamente",
+      "welcome": "Bun venit",
+      "loading": "Se încarcă panoul clientului...",
+      "tabs": {
+        "overview": "Prezentare",
+        "jobs": "Comenzi",
+        "tenders": "Licitații", 
+        "subscription": "Abonament",
+        "payments": "Plăți",
+        "referrals": "Recomandări",
+        "settings": "Setări"
+      },
+      "stats": {
+        "total_jobs": "Total comenzi",
+        "active_jobs": "Active",
+        "completed_jobs": "Finalizate",
+        "total_spent": "Cheltuit"
+      },
+      "quick_actions": {
+        "create_job": "Creează comandă",
+        "create_job_description": "Rezervare instant",
+        "create_tender": "Creează licitație",
+        "create_tender_description": "Obține oferte", 
+        "homecare": "HomeCare",
+        "premium_subscription": "Abonament Premium"
+      }
+    }
+  },
+  
   "dashboard.client.title": "Bun venit!",
   "dashboard.client.subtitle": "Gestionează comenzile și abonamentul",
   "dashboard.client.new_job": "Comandă nouă",
