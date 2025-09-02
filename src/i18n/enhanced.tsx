@@ -62,13 +62,9 @@ const I18nProviderWrapper: React.FC<{
   isReady: boolean;
   children: React.ReactNode 
 }> = ({ i18nInstance, isReady, children }) => {
-  // Always call useTranslation at the top level to avoid hook rule violations
-  // We pass a dummy i18n instance if none is available
-  const dummyI18n = { t: (key: string) => key, language: 'ru', isInitialized: false };
-  const { t: i18nT } = useTranslation(undefined, { i18n: i18nInstance || dummyI18n });
   
-  // If i18n еще не готов, используем базовые переводы
-  const t = (key: string, options?: any) => {
+  // Create a safe wrapper for translation that doesn't break when i18n isn't ready
+  const safeT = (key: string, options?: any) => {
     if (!i18nInstance || !isReady) {
       // Базовые переводы для критических элементов
       const basicTranslations: Record<string, string> = {
@@ -102,11 +98,12 @@ const I18nProviderWrapper: React.FC<{
       return basicTranslations[key] || key;
     }
     
-    const result = i18nT(key, options) as string;
-    if (key.startsWith('client.dashboard') && result === key) {
-      console.warn('Translation missing for key:', key);
+    try {
+      return i18nInstance.t(key, options);
+    } catch (error) {
+      console.warn('Translation error for key:', key, error);
+      return key;
     }
-    return result;
   };
 
   const handleChangeLanguage = async (lng: SupportedLanguage) => {
@@ -165,10 +162,10 @@ const I18nProviderWrapper: React.FC<{
   };
 
   const value: EnhancedI18nContextType = {
-    t,
+    t: safeT,
     changeLanguage: handleChangeLanguage,
     language: (i18nInstance?.language as SupportedLanguage) || 'ru',
-    ready: isReady,
+    ready: isReady && !!i18nInstance,
     formatNumber,
     formatCurrency,
     formatDate,
