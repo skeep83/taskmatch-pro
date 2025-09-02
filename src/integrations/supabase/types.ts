@@ -2163,6 +2163,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      notify_user: {
+        Args: {
+          p_data?: Json
+          p_message_ro?: string
+          p_message_ru: string
+          p_title_ro?: string
+          p_title_ru: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       refresh_pro_rating_stats: {
         Args: { _pro_id: string }
         Returns: undefined
