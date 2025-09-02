@@ -62,7 +62,12 @@ const I18nProviderWrapper: React.FC<{
   isReady: boolean;
   children: React.ReactNode 
 }> = ({ i18nInstance, isReady, children }) => {
-  // Если i18n еще не готов, используем базовые переводы
+  // Always call useTranslation at the top level to avoid hook rule violations
+  // We pass a dummy i18n instance if none is available
+  const dummyI18n = { t: (key: string) => key, language: 'ru', isInitialized: false };
+  const { t: i18nT } = useTranslation(undefined, { i18n: i18nInstance || dummyI18n });
+  
+  // If i18n еще не готов, используем базовые переводы
   const t = (key: string, options?: any) => {
     if (!i18nInstance || !isReady) {
       // Базовые переводы для критических элементов
@@ -79,12 +84,24 @@ const I18nProviderWrapper: React.FC<{
         'nav.services': 'Услуги',
         'nav.login': 'Войти',
         'hero.cta_primary': 'Заказать услугу',
-        'feed.title': 'Лента заказов'
+        'feed.title': 'Лента заказов',
+        'nav.how_it_works': 'Как это работает',
+        'nav.how_it_works_description': 'Узнать больше о платформе',
+        'nav.schedule': 'Расписание',
+        'nav.new_order': 'Новый заказ',
+        'nav.new_order_description': 'Создайте заказ за 3 минуты',
+        'nav.catalog_specialists': 'Каталог специалистов',
+        'nav.catalog_specialists_description': 'Найти проверенных профессионалов',
+        'nav.job_feed': 'Лента заказов',
+        'nav.job_feed_description': 'Активные предложения работы',
+        'nav.tenders': 'Тендеры',
+        'nav.tenders_description': 'Корпоративные конкурсы',
+        'nav.login_account': 'Войти в аккаунт',
+        'catalog.description': 'Поиск специалистов по категориям'
       };
       return basicTranslations[key] || key;
     }
     
-    const { t: i18nT } = useTranslation(undefined, { i18n: i18nInstance });
     const result = i18nT(key, options) as string;
     if (key.startsWith('client.dashboard') && result === key) {
       console.warn('Translation missing for key:', key);
