@@ -619,6 +619,51 @@ export type Database = {
         }
         Relationships: []
       }
+      email_queue: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          html_content: string
+          id: string
+          language: string | null
+          recipient: string
+          sent_at: string | null
+          status: string | null
+          subject: string
+          template: string
+          template_data: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          html_content: string
+          id?: string
+          language?: string | null
+          recipient: string
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          template: string
+          template_data?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          html_content?: string
+          id?: string
+          language?: string | null
+          recipient?: string
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          template?: string
+          template_data?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       endorsements: {
         Row: {
           created_at: string
@@ -741,6 +786,42 @@ export type Database = {
           target_id?: string
           target_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      integration_logs: {
+        Row: {
+          action: string
+          created_at: string
+          error_message: string | null
+          execution_time_ms: number | null
+          id: string
+          provider: string
+          request_data: Json | null
+          response_data: Json | null
+          status: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          provider: string
+          request_data?: Json | null
+          response_data?: Json | null
+          status: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          provider?: string
+          request_data?: Json | null
+          response_data?: Json | null
+          status?: string
         }
         Relationships: []
       }
@@ -1348,6 +1429,54 @@ export type Database = {
         }
         Relationships: []
       }
+      price_estimations: {
+        Row: {
+          accuracy_score: number | null
+          actual_hours: number | null
+          actual_price: number | null
+          category: string
+          created_at: string
+          description: string
+          estimated_hours: number
+          estimated_price: number
+          id: string
+          image_analysis: string | null
+          location: string | null
+          updated_at: string
+          urgency: string | null
+        }
+        Insert: {
+          accuracy_score?: number | null
+          actual_hours?: number | null
+          actual_price?: number | null
+          category: string
+          created_at?: string
+          description: string
+          estimated_hours: number
+          estimated_price: number
+          id?: string
+          image_analysis?: string | null
+          location?: string | null
+          updated_at?: string
+          urgency?: string | null
+        }
+        Update: {
+          accuracy_score?: number | null
+          actual_hours?: number | null
+          actual_price?: number | null
+          category?: string
+          created_at?: string
+          description?: string
+          estimated_hours?: number
+          estimated_price?: number
+          id?: string
+          image_analysis?: string | null
+          location?: string | null
+          updated_at?: string
+          urgency?: string | null
+        }
+        Relationships: []
+      }
       pricing_templates: {
         Row: {
           active: boolean
@@ -1815,6 +1944,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sms_queue: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          external_id: string | null
+          id: string
+          language: string | null
+          message: string
+          phone: string
+          provider_response: Json | null
+          sent_at: string | null
+          status: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          external_id?: string | null
+          id?: string
+          language?: string | null
+          message: string
+          phone: string
+          provider_response?: Json | null
+          sent_at?: string | null
+          status?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          external_id?: string | null
+          id?: string
+          language?: string | null
+          message?: string
+          phone?: string
+          provider_response?: Json | null
+          sent_at?: string | null
+          status?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       subscriptions: {
         Row: {
