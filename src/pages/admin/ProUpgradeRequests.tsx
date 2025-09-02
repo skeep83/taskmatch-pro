@@ -21,6 +21,25 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
+// Helper function to generate signed URL for private storage files
+const getSignedUrl = async (filePath: string, bucket: string = 'kyc') => {
+  try {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(filePath, 3600); // 1 hour expiry
+
+    if (error) {
+      console.error('Error creating signed URL:', error);
+      return null;
+    }
+    
+    return data.signedUrl;
+  } catch (error) {
+    console.error('Error generating signed URL:', error);
+    return null;
+  }
+};
+
 interface ProUpgradeRequest {
   id: string;
   user_id: string;
@@ -413,7 +432,27 @@ export default function ProUpgradeRequests() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => window.open(doc.file_url, '_blank')}
+                            onClick={async () => {
+                              // Extract file path from URL for private bucket access
+                              const urlParts = doc.file_url.split('/');
+                              const bucketIndex = urlParts.findIndex(part => part === 'kyc');
+                              if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
+                                const filePath = urlParts.slice(bucketIndex + 1).join('/');
+                                const signedUrl = await getSignedUrl(filePath, 'kyc');
+                                if (signedUrl) {
+                                  window.open(signedUrl, '_blank');
+                                } else {
+                                  toast({
+                                    title: "Ошибка",
+                                    description: "Не удалось открыть документ",
+                                    variant: "destructive"
+                                  });
+                                }
+                              } else {
+                                // Fallback to original URL if path parsing fails
+                                window.open(doc.file_url, '_blank');
+                              }
+                            }}
                           >
                             <ExternalLink className="w-3 h-3 mr-1" />
                             Открыть
