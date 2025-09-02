@@ -1547,6 +1547,48 @@ export type Database = {
           },
         ]
       }
+      pro_upgrade_requests: {
+        Row: {
+          created_at: string
+          id: string
+          kyc_documents: Json
+          profile_data: Json
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kyc_documents?: Json
+          profile_data?: Json
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kyc_documents?: Json
+          profile_data?: Json
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2038,6 +2080,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      approve_pro_upgrade_request: {
+        Args: { _request_id: string }
+        Returns: boolean
+      }
       cleanup_rate_limits: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -2108,6 +2154,10 @@ export type Database = {
       refresh_pro_rating_stats: {
         Args: { _pro_id: string }
         Returns: undefined
+      }
+      reject_pro_upgrade_request: {
+        Args: { _reason?: string; _request_id: string }
+        Returns: boolean
       }
       upgrade_user_role: {
         Args: {

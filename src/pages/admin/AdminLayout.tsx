@@ -176,6 +176,9 @@ export default function AdminLayout() {
             <NavLink to="/admin/disputes" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
               Disputes
             </NavLink>
+            <NavLink to="/admin/pro-requests" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
+              Заявки специалистов
+            </NavLink>
             <NavLink to="/admin/finance" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
               Finance
             </NavLink>

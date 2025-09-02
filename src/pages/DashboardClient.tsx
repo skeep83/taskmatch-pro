@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
+import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,6 +92,7 @@ export default function DashboardClient() {
   });
   const [saving, setSaving] = useState(false);
   const [currentRole, setCurrentRole] = useState<UserRole>('client');
+  const [hasPendingProRequest, setHasPendingProRequest] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -118,6 +120,16 @@ export default function DashboardClient() {
       if (roleResult.success) {
         setCurrentRole(roleResult.role);
       }
+
+      // Check for pending pro upgrade request
+      const { data: proRequest } = await supabase
+        .from('pro_upgrade_requests')
+        .select('status')
+        .eq('user_id', session.session.user.id)
+        .eq('status', 'pending')
+        .maybeSingle();
+      
+      setHasPendingProRequest(!!proRequest);
       
       // Load profile data
       const { data: profileInfo } = await supabase
@@ -484,20 +496,29 @@ export default function DashboardClient() {
                 </div>
               </div>
 
-              {/* Role Upgrade Section */}
-              <div className="card-surface p-8">
-                <RoleUpgrade
-                  userId={user?.id || ''}
-                  currentRole={currentRole}
-                  onRoleUpgraded={(newRole) => {
-                    setCurrentRole(newRole);
-                    toast({
-                      title: "Роль обновлена",
-                      description: "Ваша роль была успешно обновлена!"
-                    });
-                  }}
-                />
-              </div>
+              {/* Role Status & Upgrade Section */}
+              {hasPendingProRequest ? (
+                <ProUpgradeStatusCard userId={user?.id || ''} />
+              ) : (
+                <div className="card-surface p-8">
+                  <RoleUpgrade
+                    userId={user?.id || ''}
+                    currentRole={currentRole}
+                    onRoleUpgraded={(newRole) => {
+                      setCurrentRole(newRole);
+                      if (newRole === 'pro') {
+                        setHasPendingProRequest(true);
+                      }
+                      toast({
+                        title: "Заявка отправлена",
+                        description: newRole === 'pro' 
+                          ? "Ваша заявка на статус специалиста отправлена на рассмотрение!"
+                          : "Ваша роль была успешно обновлена!"
+                      });
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Recent Jobs */}
               <div className="card-surface p-8">

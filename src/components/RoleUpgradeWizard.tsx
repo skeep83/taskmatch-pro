@@ -257,22 +257,49 @@ export const RoleUpgradeWizard = ({
     try {
       setLoading(true);
       
-      const result = await upgradeUserRole(userId, targetRole);
-      
-      if (result.success) {
+      // For pro role, submit upgrade request instead of direct upgrade
+      if (targetRole === 'pro') {
+        // Gather KYC documents
+        const { data: kycDocs } = await supabase
+          .from('kyc_documents')
+          .select('*')
+          .eq('user_id', userId);
+
+        // Submit upgrade request for admin review
+        const { error } = await supabase
+          .from('pro_upgrade_requests')
+          .insert({
+            user_id: userId,
+            profile_data: profileData,
+            kyc_documents: kycDocs || []
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Заявка подана!",
+          description: "Ваша заявка на статус специалиста отправлена на рассмотрение администрации. Мы свяжемся с вами в течение 24 часов."
+        });
+      } else {
+        // For business role, use direct upgrade
+        const result = await upgradeUserRole(userId, targetRole);
+        
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
         toast({
           title: "Апгрейд завершен!",
           description: `Вы успешно стали ${config.title.toLowerCase()}ом`
         });
         onSuccess(targetRole);
-        onClose();
-      } else {
-        throw new Error(result.error);
       }
+      
+      onClose();
     } catch (error: any) {
       toast({
-        title: "Ошибка апгрейда",
-        description: error.message || "Не удалось завершить апгрейд",
+        title: "Ошибка",
+        description: error.message || "Не удалось завершить операцию",
         variant: "destructive"
       });
     } finally {
@@ -465,7 +492,7 @@ export const RoleUpgradeWizard = ({
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />
-                      Готово к активации
+                      {targetRole === 'pro' ? 'Готово к отправке' : 'Готово к активации'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -480,12 +507,18 @@ export const RoleUpgradeWizard = ({
 
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <p className="text-sm text-blue-800">
-                        Все требования выполнены! Теперь вы можете активировать аккаунт {config.title.toLowerCase()}а.
+                        {targetRole === 'pro' ? (
+                          "Все требования выполнены! После отправки заявки администрация рассмотрит вашу кандидатуру в течение 24 часов."
+                        ) : (
+                          "Все требования выполнены! Теперь вы можете активировать аккаунт бизнеса."
+                        )}
                       </p>
                     </div>
 
                     <Button onClick={completeUpgrade} disabled={loading} className="w-full" size="lg">
-                      {loading ? "Активируем..." : `Стать ${config.title.toLowerCase()}ом`}
+                      {loading ? "Обрабатываем..." : (
+                        targetRole === 'pro' ? "Отправить заявку на рассмотрение" : `Стать ${config.title.toLowerCase()}ом`
+                      )}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </CardContent>

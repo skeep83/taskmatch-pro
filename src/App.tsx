@@ -43,6 +43,7 @@ import AdminContent from "./pages/admin/Content";
 import AdminSettings from "./pages/admin/Settings";
 import AdminTesting from "./pages/admin/Testing";
 import AdminCurrencies from "./pages/admin/Currencies";
+import ProUpgradeRequests from "./pages/admin/ProUpgradeRequests";
 import ProfileSettings from "./pages/ProfileSettings";
 import HowItWorks from "./pages/HowItWorks";
 import PageTransition from "./components/PageTransition";
@@ -88,6 +89,7 @@ const AppContent = () => {
             <Route path="jobs" element={<AdminJobs />} />
             <Route path="tenders" element={<AdminTenders />} />
             <Route path="disputes" element={<AdminDisputes />} />
+            <Route path="pro-requests" element={<ProUpgradeRequests />} />
             <Route path="finance" element={<AdminFinance />} />
             <Route path="risk" element={<AdminRisk />} />
             <Route path="content" element={<AdminContent />} />
