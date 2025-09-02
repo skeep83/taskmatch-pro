@@ -193,6 +193,7 @@
   "catalog.order": "Comandă",
   "catalog.not_found": "Specialiști negăsiți",
   "catalog.try_filters": "Încearcă să modifici filtrele de căutare",
+  "catalog.new_specialist": "Specialist nou",
   
   "messages.title": "Chat-uri sigure",
   "messages.subtitle": "Comunică cu clienții și specialiștii într-un mediu protejat",
@@ -267,5 +268,21 @@
   
   "dashboard.welcome": "Bun venit la ServiceHub",
   
-  "nav.how_it_works": "Cum funcționează"
+  "nav.how_it_works": "Cum funcționează",
+  "nav.how_it_works_description": "Află mai multe despre platformă",
+  "nav.home": "Acasă",
+  "nav.specialists": "Specialiști",
+  "nav.jobs": "Comenzi",
+  "nav.schedule": "Program",
+  "nav.services": "Servicii",
+  "nav.new_order": "Comandă nouă",
+  "nav.new_order_description": "Creează o comandă în 3 minute",
+  "nav.catalog_specialists": "Catalogul specialiștilor",
+  "nav.catalog_specialists_description": "Găsește profesioniști verificați",
+  "nav.job_feed": "Fluxul comenzilor",
+  "nav.job_feed_description": "Oferte active de lucru",
+  "nav.tenders": "Licitații",
+  "nav.tenders_description": "Concursuri corporative",
+  "nav.login": "Conectare",
+  "nav.login_account": "Conectează-te"
 }

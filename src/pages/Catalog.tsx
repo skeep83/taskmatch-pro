@@ -5,11 +5,13 @@ import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { Search, Filter, Star, Clock, MapPin, Zap } from "lucide-react";
 import { StarRating } from "@/components/ui/star-rating";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import proPlaceholder from "@/assets/pro-placeholder.jpg";
 import servicesHero from "@/assets/services-hero.jpg";
 import cardBgPattern from "@/assets/card-bg-pattern.jpg";
 
 const Catalog = () => {
+  const { t } = useEnhancedI18n();
   const [categories, setCategories] = useState<Array<{ id: string; key: string; label_ru?: string; label_ro?: string }>>([]);
   const [selectedCat, setSelectedCat] = useState<string>("");
   const [pros, setPros] = useState<Array<any>>([]);
@@ -101,7 +103,7 @@ const Catalog = () => {
   return (
     <main className="relative min-h-screen overflow-hidden">
       <SignatureGradient />
-      <Seo title="ServiceHub — Каталог специалистов" description="Поиск специалистов по категориям" canonical="/catalog" jsonLd={{"@context":"https://schema.org","@type":"CollectionPage","name":"Каталог специалистов"}} />
+      <Seo title={t("catalog.title")} description={t("catalog.description")} canonical="/catalog" jsonLd={{"@context":"https://schema.org","@type":"CollectionPage","name":t("catalog.title")}} />
       
       {/* Hero Section */}
       <section className="relative container mx-auto pt-20 pb-16">
@@ -110,10 +112,10 @@ const Catalog = () => {
             <AnimatedIcon icon={Search} size={48} className="text-primary" />
           </div>
           <h1 className="text-6xl font-display font-bold text-gradient mb-6">
-            Найдите идеального специалиста
+            {t("catalog.hero_title")}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Подключайтесь к проверенным профессионалам в вашем городе. Быстро, безопасно, с гарантией качества.
+            {t("catalog.hero_subtitle")}
           </p>
         </div>
 
@@ -133,7 +135,7 @@ const Catalog = () => {
             <div className="md:col-span-2">
               <label className="flex items-center gap-2 text-sm font-medium mb-3">
                 <AnimatedIcon icon={Filter} size={20} delayMs={300} />
-                Категория услуг
+                {t("catalog.category_filter")}
               </label>
               <select 
                 value={selectedCat} 
@@ -147,25 +149,25 @@ const Catalog = () => {
                 }} 
                 className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 backdrop-blur-sm transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20"
               >
-                <option value="">Все категории</option>
+                <option value="">{t("catalog.all_categories")}</option>
                 {categoryOptions}
               </select>
             </div>
             <div>
               <label className="flex items-center gap-2 text-sm font-medium mb-3">
                 <AnimatedIcon icon={MapPin} size={20} delayMs={400} />
-                Расстояние
+                {t("catalog.distance")}
               </label>
               <select className="w-full border-2 border-border/50 rounded-xl px-4 py-3 bg-background/80 backdrop-blur-sm transition-all hover:border-primary/50">
-                <option>В пределах 5 км</option>
-                <option>В пределах 10 км</option>
-                <option>В пределах 25 км</option>
+                <option>{t("catalog.distance_5km")}</option>
+                <option>{t("catalog.distance_10km")}</option>
+                <option>{t("catalog.distance_25km")}</option>
               </select>
             </div>
             <div className="flex items-end">
               <button className="btn-hero w-full flex items-center justify-center gap-2 hover-scale">
                 <AnimatedIcon icon={Search} size={20} delayMs={500} />
-                Найти
+                {t("catalog.search")}
               </button>
             </div>
           </div>
@@ -175,8 +177,8 @@ const Catalog = () => {
       {/* Specialists Grid */}
       <section className="container mx-auto pb-20">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-display font-bold mb-4">Наши специалисты</h2>
-          <p className="text-muted-foreground">Проверенные профессионалы готовы выполнить вашу задачу</p>
+          <h2 className="text-4xl font-display font-bold mb-4">{t("catalog.our_specialists")}</h2>
+          <p className="text-muted-foreground">{t("catalog.verified_professionals")}</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto" style={{ perspective: '1000px' }}>
@@ -243,10 +245,10 @@ const Catalog = () => {
                   {/* Content */}
                   <div className="text-center mb-4">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || `Специалист #${String(p.user_id).slice(0,8)}`}
+                      {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || t("catalog.specialist_id", { id: String(p.user_id).slice(0,8) })}
                     </h3>
                     <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      {selectedCat ? catById[selectedCat]?.label_ru || 'Специалист' : 'Специалист'}
+                      {selectedCat ? catById[selectedCat]?.label_ru || t("catalog.professional_bio") : t("catalog.professional_bio")}
                     </p>
                     
                     <div className="mt-2 flex justify-center">
@@ -258,7 +260,7 @@ const Catalog = () => {
                       />
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      {r.rating_count > 0 ? `${r.rating_count} отзывов` : 'Новый специалист'}
+                      {r.rating_count > 0 ? t("catalog.reviews", { count: r.rating_count }) : t("catalog.new_specialist")}
                     </p>
                   </div>
 
@@ -268,13 +270,13 @@ const Catalog = () => {
                       to={`/pro/${p.user_id}`}
                       className="block w-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
                     >
-                      Профиль
+                      {t("catalog.profile")}
                     </Link>
                     <Link 
                       to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
                       className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
                     >
-                      Выбрать специалиста
+                      {t("catalog.order")}
                     </Link>
                   </div>
                 </div>
@@ -286,8 +288,8 @@ const Catalog = () => {
         {pros.length === 0 && (
           <div className="text-center py-20 animate-fade-in">
             <div className="text-6xl opacity-20 mb-4">🔍</div>
-            <h3 className="text-2xl font-semibold mb-2">Специалисты не найдены</h3>
-            <p className="text-muted-foreground">Попробуйте изменить фильтры поиска</p>
+            <h3 className="text-2xl font-semibold mb-2">{t("catalog.not_found")}</h3>
+            <p className="text-muted-foreground">{t("catalog.try_filters")}</p>
           </div>
         )}
       </section>

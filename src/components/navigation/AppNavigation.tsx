@@ -124,26 +124,26 @@ export const AppNavigation = () => {
       title: t("nav.catalog"),
       href: "/catalog",
       icon: Search,
-      description: "Найти специалистов"
+      description: t("catalog.description")
     },
     {
       title: t("nav.how_it_works"),
       href: "/how-it-works", 
       icon: BarChart3,
-      description: "Узнать больше о платформе"
+      description: t("nav.how_it_works_description")
     }
   ];
 
   const serviceActions = [
     {
-      title: "Заказать услугу",
+      title: t("hero.cta_primary"),
       href: "/job/new",
       icon: Plus,
       variant: "default" as const,
       priority: true
     },
     {
-      title: "Лента заказов",
+      title: t("feed.title"),
       href: "/feed",
       icon: TrendingUp,
       variant: "ghost" as const,
@@ -153,7 +153,7 @@ export const AppNavigation = () => {
 
   const userActions = [
     {
-      title: "Сообщения",
+      title: t("nav.messages"),
       href: "/messages",
       icon: MessageCircle,
       badge: unreadCount > 0 ? unreadCount.toString() : undefined
@@ -162,25 +162,25 @@ export const AppNavigation = () => {
 
   const quickAccess = [
     { 
-      title: "Главная", 
+      title: t("nav.home"), 
       href: "/", 
       icon: Home,
       active: location.pathname === "/"
     },
     { 
-      title: "Специалисты", 
+      title: t("nav.specialists"), 
       href: "/catalog", 
       icon: Users,
       active: location.pathname === "/catalog"
     },
     { 
-      title: "Заказы", 
+      title: t("nav.jobs"), 
       href: "/feed", 
       icon: ShoppingCart,
       active: location.pathname === "/feed"
     },
     { 
-      title: "Расписание", 
+      title: t("nav.schedule"), 
       href: "/pro/schedule", 
       icon: Calendar,
       active: location.pathname === "/pro/schedule",
@@ -224,7 +224,7 @@ export const AppNavigation = () => {
                 {/* Services Menu */}
                 <NavigationMenuItem>
                   <NavigationMenuTrigger className="text-sm font-medium">
-                    Услуги
+                    {t("nav.services")}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="card-surface border-0 shadow-none">
@@ -237,22 +237,22 @@ export const AppNavigation = () => {
                           >
                             <Plus className="h-6 w-6 mb-2" />
                             <div className="mb-2 mt-4 text-lg font-medium">
-                              Новый заказ
+                              {t("nav.new_order")}
                             </div>
                             <p className="text-sm leading-tight text-muted-foreground">
-                              Создайте заказ за 3 минуты
+                              {t("nav.new_order_description")}
                             </p>
                           </Link>
                         </NavigationMenuLink>
                       </li>
-                      <ListItem href="/catalog" title="Каталог специалистов">
-                        Найти проверенных профессионалов
+                      <ListItem href="/catalog" title={t("nav.catalog_specialists")}>
+                        {t("nav.catalog_specialists_description")}
                       </ListItem>
-                      <ListItem href="/feed" title="Лента заказов">
-                        Активные предложения работы
+                      <ListItem href="/feed" title={t("nav.job_feed")}>
+                        {t("nav.job_feed_description")}
                       </ListItem>
-                      <ListItem href="/tenders" title="Тендеры">
-                        Корпоративные конкурсы
+                      <ListItem href="/tenders" title={t("nav.tenders")}>
+                        {t("nav.tenders_description")}
                       </ListItem>
                       </ul>
                     </div>
@@ -343,7 +343,7 @@ export const AppNavigation = () => {
                   to="/auth" 
                   className="btn-hero text-sm px-6 py-2 whitespace-nowrap hover-scale shadow-lg"
                 >
-                  Войти
+                   {t("nav.login")}
                 </Link>
               </div>
             )}
@@ -427,7 +427,7 @@ export const AppNavigation = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-2 p-4 rounded-lg btn-hero text-center font-medium"
                 >
-                  Войти в аккаунт
+                  {t("nav.login_account")}
                 </Link>
               )}
 

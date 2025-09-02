@@ -193,6 +193,7 @@
   "catalog.order": "Заказать",
   "catalog.not_found": "Специалисты не найдены",
   "catalog.try_filters": "Попробуйте изменить фильтры поиска",
+  "catalog.new_specialist": "Новый специалист",
   
   "messages.title": "Безопасные чаты",
   "messages.subtitle": "Общайтесь с клиентами и специалистами в защищенной среде",
@@ -267,5 +268,21 @@
   
   "dashboard.welcome": "Добро пожаловать в ServiceHub",
   
-  "nav.how_it_works": "Как это работает"
+  "nav.how_it_works": "Как это работает",
+  "nav.how_it_works_description": "Узнать больше о платформе",
+  "nav.home": "Главная",
+  "nav.specialists": "Специалисты",
+  "nav.jobs": "Заказы",
+  "nav.schedule": "Расписание",
+  "nav.services": "Услуги",
+  "nav.new_order": "Новый заказ",
+  "nav.new_order_description": "Создайте заказ за 3 минуты",
+  "nav.catalog_specialists": "Каталог специалистов", 
+  "nav.catalog_specialists_description": "Найти проверенных профессионалов",
+  "nav.job_feed": "Лента заказов",
+  "nav.job_feed_description": "Активные предложения работы",
+  "nav.tenders": "Тендеры",
+  "nav.tenders_description": "Корпоративные конкурсы",
+  "nav.login": "Войти",
+  "nav.login_account": "Войти в аккаунт"
 }
