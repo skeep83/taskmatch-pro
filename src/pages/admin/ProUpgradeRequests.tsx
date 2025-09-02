@@ -466,16 +466,30 @@ export default function ProUpgradeRequests() {
 
               {/* Rejection Reason Input */}
               {reviewModal.action === 'reject' && (
-                <div className="space-y-2">
-                  <Label htmlFor="rejectionReason">Причина отклонения</Label>
-                  <Textarea
-                    id="rejectionReason"
-                    value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                    placeholder="Укажите причину отклонения заявки"
-                    rows={3}
-                  />
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm text-red-600">Причина отклонения</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <Label htmlFor="rejectionReason" className="text-sm font-medium">
+                        Опишите причины отклонения *
+                      </Label>
+                      <Textarea
+                        id="rejectionReason"
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        placeholder="Например: Документы неразборчивы, требуется лучшее качество фото, отсутствует необходимая информация..."
+                        rows={4}
+                        className="resize-none"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        💡 Пользователь получит уведомление с этой причиной и сможет исправить недостатки для повторной подачи заявки
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </div>
           )}
@@ -495,11 +509,31 @@ export default function ProUpgradeRequests() {
                 
                 <Button
                   onClick={() => handleReview(reviewModal.action!)}
-                  disabled={processing === reviewModal.request?.id}
-                  variant={reviewModal.action === 'approve' ? 'default' : 'destructive'}
+                  disabled={processing === reviewModal.request?.id || (reviewModal.action === 'reject' && !rejectionReason.trim())}
+                  className={reviewModal.action === 'approve' 
+                    ? "bg-green-600 hover:bg-green-700" 
+                    : "bg-red-600 hover:bg-red-700"
+                  }
                 >
-                  {processing === reviewModal.request?.id ? 'Обрабатываем...' : (
-                    reviewModal.action === 'approve' ? 'Одобрить' : 'Отклонить'
+                  {processing === reviewModal.request?.id ? (
+                    <>
+                      <Clock className="w-3 h-3 mr-1 animate-spin" />
+                      Обрабатываем...
+                    </>
+                  ) : (
+                    <>
+                      {reviewModal.action === 'approve' ? (
+                        <>
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Одобрить заявку
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="w-3 h-3 mr-1" />
+                          Отклонить заявку
+                        </>
+                      )}
+                    </>
                   )}
                 </Button>
               </div>
