@@ -1983,18 +1983,27 @@ export type Database = {
           created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          upgraded_at: string | null
+          upgraded_from: Database["public"]["Enums"]["app_role"] | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          role: Database["public"]["Enums"]["app_role"]
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          upgraded_at?: string | null
+          upgraded_from?: Database["public"]["Enums"]["app_role"] | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          upgraded_at?: string | null
+          upgraded_from?: Database["public"]["Enums"]["app_role"] | null
           user_id?: string
         }
         Relationships: []
@@ -2057,6 +2066,10 @@ export type Database = {
           response_time_minutes: number
         }[]
       }
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2095,6 +2108,13 @@ export type Database = {
       refresh_pro_rating_stats: {
         Args: { _pro_id: string }
         Returns: undefined
+      }
+      upgrade_user_role: {
+        Args: {
+          _new_role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       validate_user_role_assignment: {
         Args: {
