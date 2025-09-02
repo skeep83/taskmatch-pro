@@ -19,30 +19,71 @@ interface EnhancedI18nContextType {
 const EnhancedI18nContext = createContext<EnhancedI18nContextType | null>(null);
 
 export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { t, i18n, ready } = useTranslation();
-  const [isReady, setIsReady] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [i18nInstance, setI18nInstance] = useState<any>(null);
 
   useEffect(() => {
-    console.log('i18n state:', { ready, language: i18n.language, isInitialized: i18n.isInitialized });
-    console.log('Available resources:', i18n.getResourceBundle(i18n.language, 'translation'));
+    const initializeI18n = async () => {
+      try {
+        // Динамически импортируем config для инициализации i18n
+        const i18n = (await import('./config')).default;
+        
+        // Ждем полной инициализации
+        if (i18n.isInitialized) {
+          setI18nInstance(i18n);
+          setIsInitialized(true);
+        } else {
+          i18n.on('initialized', () => {
+            setI18nInstance(i18n);
+            setIsInitialized(true);
+          });
+        }
+      } catch (error) {
+        console.error('Failed to initialize i18n:', error);
+      }
+    };
     
-    // Ensure i18n is properly initialized
-    setIsReady(ready && i18n.language && i18n.isInitialized);
-  }, [ready, i18n.language, i18n.isInitialized]);
+    initializeI18n();
+  }, []);
+
+  if (!isInitialized || !i18nInstance) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-6"></div>
+            <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-primary/40 animate-spin mx-auto" style={{animationDuration: '1.5s'}}></div>
+          </div>
+          <h2 className="text-xl font-semibold text-foreground mb-2">ServiceHub</h2>
+          <p className="text-muted-foreground animate-pulse">Инициализация переводов...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Теперь у нас есть инициализированный i18n
+  return <I18nProviderWrapper i18nInstance={i18nInstance}>{children}</I18nProviderWrapper>;
+};
+
+const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNode }> = ({ 
+  i18nInstance, 
+  children 
+}) => {
+  const { t } = useTranslation(undefined, { i18n: i18nInstance });
 
   const changeLanguage = async (lng: SupportedLanguage) => {
-    await i18n.changeLanguage(lng);
+    await i18nInstance.changeLanguage(lng);
   };
 
   // Enhanced formatting functions
   const formatNumber = (num: number, options?: Intl.NumberFormatOptions) => {
-    const locale = i18n.language === 'ro' ? 'ro-RO' : 'ru-RU';
+    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
     return new Intl.NumberFormat(locale, options).format(num);
   };
 
   const formatCurrency = (amount: number, currency: string = 'RUB') => {
-    const locale = i18n.language === 'ro' ? 'ro-RO' : 'ru-RU';
-    const currencyCode = i18n.language === 'ro' ? 'MDL' : currency;
+    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
+    const currencyCode = i18nInstance.language === 'ro' ? 'MDL' : currency;
     return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: currencyCode,
@@ -52,7 +93,7 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions) => {
-    const locale = i18n.language === 'ro' ? 'ro-RO' : 'ru-RU';
+    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
@@ -63,19 +104,19 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const formatRelativeTime = (date: Date | string) => {
-    const locale = i18n.language === 'ro' ? 'ro-RO' : 'ru-RU';
+    const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     const now = new Date();
     const diffInHours = (now.getTime() - dateObj.getTime()) / (1000 * 60 * 60);
     
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
-      return i18n.language === 'ro' 
+      return i18nInstance.language === 'ro' 
         ? `acum ${diffInMinutes} ${diffInMinutes === 1 ? 'minut' : 'minute'}`
         : `${diffInMinutes} ${diffInMinutes === 1 ? 'минуту' : diffInMinutes < 5 ? 'минуты' : 'минут'} назад`;
     } else if (diffInHours < 24) {
       const hours = Math.floor(diffInHours);
-      return i18n.language === 'ro'
+      return i18nInstance.language === 'ro'
         ? `acum ${hours} ${hours === 1 ? 'oră' : 'ore'}`
         : `${hours} ${hours === 1 ? 'час' : hours < 5 ? 'часа' : 'часов'} назад`;
     } else {
@@ -87,38 +128,23 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
     t: (key: string, options?: any) => {
       const result = t(key, options) as string;
       if (key.startsWith('client.dashboard') && result === key) {
-        console.warn('Translation missing for key:', key, 'Available resources:', i18n.getResourceBundle(i18n.language, 'translation'));
+        console.warn('Translation missing for key:', key);
       }
       return result;
     },
     changeLanguage,
-    language: i18n.language as SupportedLanguage,
-    ready: isReady,
+    language: i18nInstance.language as SupportedLanguage,
+    ready: true,
     formatNumber,
     formatCurrency,
     formatDate,
     formatRelativeTime,
   };
 
-  // Always provide context, but conditionally render children
+  // Always provide context
   return (
     <EnhancedI18nContext.Provider value={value}>
-      {!isReady ? (
-        <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
-          <div className="text-center p-8">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-6"></div>
-              <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-primary/40 animate-spin mx-auto" style={{animationDuration: '1.5s'}}></div>
-            </div>
-            <h2 className="text-xl font-semibold text-foreground mb-2">ServiceHub</h2>
-            <p className="text-muted-foreground animate-pulse">
-              {i18n.language === 'ro' ? 'Se încarcă traducerile...' : 'Загрузка переводов...'}
-            </p>
-          </div>
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </EnhancedI18nContext.Provider>
   );
 };
