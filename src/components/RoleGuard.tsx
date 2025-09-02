@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserRole, UserRole, hasRoleAccess } from "@/lib/userRoles";
+import { UserRole } from "@/lib/userRoles";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,20 +29,27 @@ export const RoleGuard = ({ requiredRole, children, redirectTo }: RoleGuardProps
         return;
       }
 
-      const roleResult = await getUserRole(user.id);
+      // Load user roles  
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .in("role", ['client', 'pro', 'business']);
       
-      if (roleResult.success) {
-        const userRole = roleResult.role;
-        
-        if (hasRoleAccess(userRole, requiredRole)) {
+      const userRoles = (roles || []).map((r: any) => r.role as UserRole);
+      
+      if (userRoles.length > 0) {
+        if (userRoles.includes(requiredRole)) {
           setHasAccess(true);
         } else {
-          // Redirect based on user's actual role
-          const redirectPath = redirectTo || getRoleDefaultPath(userRole);
+          // Find the highest role for redirect
+          const highestRole = userRoles.includes('business') ? 'business' : 
+                             userRoles.includes('pro') ? 'pro' : 'client';
+          const redirectPath = redirectTo || getRoleDefaultPath(highestRole);
           
           toast({
             title: "Доступ ограничен",
-            description: `У вас нет доступа к этой панели. Перенаправляем вас на панель ${getRoleTitle(userRole)}.`,
+            description: `У вас нет доступа к этой панели. Перенаправляем вас на панель ${getRoleTitle(highestRole)}.`,
             variant: "destructive"
           });
           

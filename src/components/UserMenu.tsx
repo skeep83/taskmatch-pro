@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getUserRole, UserRole, hasRoleAccess } from "@/lib/userRoles";
+import { UserRole } from "@/lib/userRoles";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   User, Briefcase, Building2, Settings, LogOut,
@@ -55,7 +55,7 @@ export const UserMenu = () => {
     full_name?: string;
     avatar_url?: string;
   } | null>(null);
-  const [userRole, setUserRole] = useState<UserRole>('client');
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
 
   console.log('UserMenu component rendering!');
 
@@ -75,11 +75,15 @@ export const UserMenu = () => {
         
         setUserProfile(profile);
 
-        // Load user role
-        const roleResult = await getUserRole(user.id);
-        if (roleResult.success) {
-          setUserRole(roleResult.role);
-        }
+        // Load user roles
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .in("role", ['client', 'pro', 'business']);
+        
+        const rolesList = (roles || []).map((r: any) => r.role as UserRole);
+        setUserRoles(rolesList);
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
@@ -109,12 +113,8 @@ export const UserMenu = () => {
     .toUpperCase()
     .slice(0, 2);
 
-  // Get available dashboard based on role hierarchy
-  const getAvailableDashboards = () => {
-    return roleItems.filter(item => hasRoleAccess(userRole, item.key));
-  };
-
-  const availableDashboards = getAvailableDashboards();
+  // Get available dashboards based on user roles
+  const availableDashboards = roleItems.filter(item => userRoles.includes(item.key));
 
   return (
     <DropdownMenu>
