@@ -14,6 +14,7 @@ import { AppNavigation } from "./components/navigation/AppNavigation";
 import { FloatingActionButton } from "./components/navigation/FloatingActionButton";
 import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
+import { DatabaseI18nProvider } from "./i18n/DatabaseI18n";
 import Diagnostics from "./components/Diagnostics";
 import DashboardClient from "./pages/DashboardClient";
 import DashboardPro from "./pages/DashboardPro";
@@ -113,16 +114,18 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <EnhancedI18nProvider>
-      <TooltipProvider>
-        <div style={{ background: 'var(--background-neomorphic)' }}>
-          <Toaster />
-          <Sonner />
-          <Diagnostics />
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
+      <DatabaseI18nProvider>
+        <TooltipProvider>
+          <div style={{ background: 'var(--background-neomorphic)' }}>
+            <Toaster />
+            <Sonner />
+            <Diagnostics />
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </div>
+        </TooltipProvider>
+      </DatabaseI18nProvider>
     </EnhancedI18nProvider>
   </QueryClientProvider>
 );

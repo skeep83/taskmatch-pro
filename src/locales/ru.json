@@ -209,6 +209,18 @@
   "common.required": "*",
   "common.optional": "(необязательно)",
   "common.loading": "Загрузка...",
+  "common.error": "Ошибка",
+  "common.success": "Успех",
+  "common.page_not_found": "Страница не найдена",
+  "common.page_not_found_message": "Упс! Страница не найдена",
+  "common.return_home": "Вернуться на главную",
+  
+  "auth.error.generic": "Ошибка аутентификации",
+  
+  "payments.success.title": "Платеж успешен",
+  "payments.success.message": "Спасибо! Мы получили платеж. Детали доступны в вашем аккаунте.",
+  "payments.canceled.title": "Платеж отменен", 
+  "payments.canceled.message": "Операция отменена. Вы можете повторить попытку позже.",
   
   "feed.title": "Лента заказов",
   "feed.search": "Поиск по заказам...",

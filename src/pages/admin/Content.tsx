@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Activity, Search, FileText, Image, MessageSquare, Eye, CheckCircle, XCircle, AlertTriangle, Flag, Languages, Plus, Edit, Trash2, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
+import { TranslationMigration } from '@/components/admin/TranslationMigration';
+import { TranslationTester } from '@/components/admin/TranslationTester';
 
 interface ContentItem {
   id: string;
@@ -1086,6 +1088,11 @@ export default function AdminContent() {
         </TabsContent>
 
         <TabsContent value="translations" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <TranslationMigration />
+            <TranslationTester />
+          </div>
+          
           {/* Translations Management */}
           <Card>
             <CardHeader>

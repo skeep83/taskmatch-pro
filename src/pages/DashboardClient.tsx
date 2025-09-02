@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useEnhancedI18n } from "@/i18n/enhanced";
+import { Seo } from "@/components/Seo";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
 import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
@@ -71,6 +73,7 @@ export default function DashboardClient() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { formatPrice: formatCurrency } = useCurrency();
+  const { t } = useEnhancedI18n();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -148,8 +151,8 @@ export default function DashboardClient() {
       setLoading(false);
     } catch (error: any) {
       toast({ 
-        title: "Ошибка", 
-        description: error.message || "Ошибка аутентификации", 
+        title: t("common.error"), 
+        description: error.message || t("auth.error.generic"), 
         variant: "destructive" 
       });
       setLoading(false);
@@ -334,7 +337,7 @@ export default function DashboardClient() {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="card-surface p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Загружаем кабинет клиента...</h1>
+          <h1 className="text-2xl font-bold mb-4">{t('client.dashboard.loading')}</h1>
           <div className="animate-spin">⏳</div>
         </div>
       </main>
@@ -343,15 +346,16 @@ export default function DashboardClient() {
 
   return (
     <RoleGuard requiredRole="client">
+      <Seo title={`${t('app.name')} — ${t('client.dashboard.title')}`} description={t('client.dashboard.description')} canonical="/dashboard/client" />
       <main className="min-h-screen">
         {/* Header Section */}
         <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Кабинет клиента
+            {t('client.dashboard.title')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Добро пожаловать, {
+            {t('client.dashboard.welcome')}, {
               userProfile?.full_name || 
               (userProfile?.first_name && userProfile?.last_name 
                 ? `${userProfile.first_name} ${userProfile.last_name}` 
@@ -367,31 +371,31 @@ export default function DashboardClient() {
               <TabsList className="grid w-full grid-cols-7 bg-transparent">
                 <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Обзор</span>
+                  <span className="hidden sm:inline">{t('client.dashboard.tabs.overview')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="jobs" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Briefcase className="h-4 w-4" />
-                  <span className="hidden sm:inline">Заказы</span>
+                  <span className="hidden sm:inline">{t('client.dashboard.tabs.jobs')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="tenders" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Gavel className="h-4 w-4" />
-                  <span className="hidden sm:inline">Тендеры</span>
+                  <span className="hidden sm:inline">{t('client.dashboard.tabs.tenders')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="subscription" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Crown className="h-4 w-4" />
-                  <span className="hidden sm:inline">Подписка</span>
+                  <span className="hidden sm:inline">{t('client.dashboard.tabs.subscription')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="payments" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <CreditCard className="h-4 w-4" />
-                  <span className="hidden sm:inline">Платежи</span>
+                  <span className="hidden sm:inline">{t('client.dashboard.tabs.payments')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="referrals" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Gift className="h-4 w-4" />
-                  <span className="hidden sm:inline">Рефералы</span>
+                  <span className="hidden sm:inline">{t('client.dashboard.tabs.referrals')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Settings className="h-4 w-4" />
-                  <span className="hidden sm:inline">Настройки</span>
+                  <span className="hidden sm:inline">{t('client.dashboard.tabs.settings')}</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -403,7 +407,7 @@ export default function DashboardClient() {
                 <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Всего заказов</p>
+                      <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_jobs')}</p>
                       <p className="text-2xl font-bold">{stats.totalJobs}</p>
                     </div>
                     <Briefcase className="h-8 w-8 text-primary" />
@@ -413,7 +417,7 @@ export default function DashboardClient() {
                 <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Активных</p>
+                      <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.active_jobs')}</p>
                       <p className="text-2xl font-bold">{stats.activeJobs}</p>
                     </div>
                     <Clock className="h-8 w-8 text-accent" />
@@ -423,7 +427,7 @@ export default function DashboardClient() {
                 <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Завершено</p>
+                      <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.completed_jobs')}</p>
                       <p className="text-2xl font-bold">{stats.completedJobs}</p>
                     </div>
                     <CheckCircle className="h-8 w-8 text-success" />
@@ -433,7 +437,7 @@ export default function DashboardClient() {
                 <div className="card-surface p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Потрачено</p>
+                      <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_spent')}</p>
                       <p className="text-2xl font-bold">{formatCurrency(stats.totalSpent)}</p>
                     </div>
                     <DollarSign className="h-8 w-8 text-primary" />
@@ -450,8 +454,8 @@ export default function DashboardClient() {
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={Plus} className="h-8 w-8 text-primary" />
                     <div>
-                      <h3 className="font-semibold mb-1">Создать заказ</h3>
-                      <p className="text-sm text-muted-foreground">Инстант-бронирование</p>
+                      <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.create_job')}</h3>
+                      <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.create_job_description')}</p>
                     </div>
                   </div>
                 </div>
@@ -463,8 +467,8 @@ export default function DashboardClient() {
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={Gavel} className="h-8 w-8 text-primary" />
                     <div>
-                      <h3 className="font-semibold mb-1">Создать тендер</h3>
-                      <p className="text-sm text-muted-foreground">Получить предложения</p>
+                      <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.create_tender')}</h3>
+                      <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.create_tender_description')}</p>
                     </div>
                   </div>
                 </div>
@@ -476,8 +480,8 @@ export default function DashboardClient() {
                   <div className="flex flex-col items-center gap-4 text-center">
                     <AnimatedIcon icon={Crown} className="h-8 w-8 text-primary" />
                     <div>
-                      <h3 className="font-semibold mb-1">HomeCare</h3>
-                      <p className="text-sm text-muted-foreground">Подписка Premium</p>
+                      <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.homecare')}</h3>
+                      <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.premium_subscription')}</p>
                     </div>
                   </div>
                 </div>

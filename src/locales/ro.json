@@ -207,8 +207,20 @@
   
   "loading.translations": "Se încarcă traducerile...",
   "common.required": "*",
-  "common.optional": "(opțional)",
+  "common.optional": "(opțional)", 
   "common.loading": "Se încarcă...",
+  "common.error": "Eroare",
+  "common.success": "Succes",
+  "common.page_not_found": "Pagina nu a fost găsită",
+  "common.page_not_found_message": "Ups! Pagina nu a fost găsită",
+  "common.return_home": "Întoarce-te acasă",
+  
+  "auth.error.generic": "Eroare de autentificare",
+  
+  "payments.success.title": "Plata a fost efectuată cu succes",
+  "payments.success.message": "Mulțumim! Am primit plata. Detaliile sunt disponibile în contul tău.",
+  "payments.canceled.title": "Plata anulată",
+  "payments.canceled.message": "Operațiunea a fost anulată. Poți încerca din nou mai târziu.",
   
   "feed.title": "Fluxul comenzilor",
   "feed.search": "Căutare în comenzi...",

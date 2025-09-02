@@ -1,8 +1,11 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { useEnhancedI18n } from "@/i18n/enhanced";
+import { Seo } from "@/components/Seo";
 
 const NotFound = () => {
   const location = useLocation();
+  const { t } = useEnhancedI18n();
 
   useEffect(() => {
     console.error(
@@ -12,13 +15,16 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-foreground mb-4">Oops! Page not found</p>
-        <a href="/" className="btn-ghost">Return to Home</a>
+    <>
+      <Seo title={`${t('app.name')} — ${t('common.page_not_found')}`} description={t('common.page_not_found')} canonical="/404" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">404</h1>
+          <p className="text-xl text-foreground mb-4">{t('common.page_not_found_message')}</p>
+          <a href="/" className="btn-ghost">{t('common.return_home')}</a>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

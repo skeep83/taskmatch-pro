@@ -6,8 +6,8 @@ const PaymentCanceled = () => {
   return (
     <main className="container mx-auto py-16 text-center">
       <Seo title={`${t('app.name')} — Canceled`} description="Payment canceled" canonical="/payment-canceled" />
-      <h1 className="text-3xl font-semibold mb-4">Payment canceled</h1>
-      <p className="text-muted-foreground">Операция отменена. Вы можете повторить попытку позже.</p>
+      <h1 className="text-3xl font-semibold mb-4">{t('payments.canceled.title')}</h1>
+      <p className="text-muted-foreground">{t('payments.canceled.message')}</p>
     </main>
   );
 };
