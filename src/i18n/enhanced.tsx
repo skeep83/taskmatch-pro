@@ -21,6 +21,7 @@ const EnhancedI18nContext = createContext<EnhancedI18nContextType | null>(null);
 export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [i18nInstance, setI18nInstance] = useState<any>(null);
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('ru');
 
   useEffect(() => {
     const initializeI18n = async () => {
@@ -30,19 +31,32 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
         
         // Ждем полной инициализации
         if (i18n.isInitialized) {
-          console.log('i18n already initialized');
+          console.log('i18n already initialized, language:', i18n.language);
           setI18nInstance(i18n);
+          setCurrentLanguage(i18n.language as SupportedLanguage);
           setIsInitialized(true);
         } else {
           console.log('waiting for i18n initialization');
           const onInitialized = () => {
-            console.log('i18n initialized');
+            console.log('i18n initialized, language:', i18n.language);
             setI18nInstance(i18n);
+            setCurrentLanguage(i18n.language as SupportedLanguage);
             setIsInitialized(true);
             i18n.off('initialized', onInitialized);
           };
           i18n.on('initialized', onInitialized);
         }
+
+        // Listen for language changes
+        const onLanguageChanged = (lng: string) => {
+          console.log('Language changed event received:', lng);
+          setCurrentLanguage(lng as SupportedLanguage);
+        };
+        i18n.on('languageChanged', onLanguageChanged);
+
+        return () => {
+          i18n.off('languageChanged', onLanguageChanged);
+        };
       } catch (error) {
         console.error('Failed to initialize i18n:', error);
         // В случае ошибки всё равно показываем контент
@@ -54,14 +68,15 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   // Всегда предоставляем контекст, даже во время загрузки
-  return <I18nProviderWrapper i18nInstance={i18nInstance} isReady={isInitialized}>{children}</I18nProviderWrapper>;
+  return <I18nProviderWrapper i18nInstance={i18nInstance} isReady={isInitialized} currentLanguage={currentLanguage}>{children}</I18nProviderWrapper>;
 };
 
 const I18nProviderWrapper: React.FC<{ 
   i18nInstance: any; 
   isReady: boolean;
+  currentLanguage: SupportedLanguage;
   children: React.ReactNode 
-}> = ({ i18nInstance, isReady, children }) => {
+}> = ({ i18nInstance, isReady, currentLanguage, children }) => {
   
   // Create a safe wrapper for translation that doesn't break when i18n isn't ready
   const safeT = (key: string, options?: any) => {
@@ -107,8 +122,16 @@ const I18nProviderWrapper: React.FC<{
   };
 
   const handleChangeLanguage = async (lng: SupportedLanguage) => {
+    console.log('Changing language to:', lng);
     if (i18nInstance) {
-      await i18nInstance.changeLanguage(lng);
+      try {
+        await i18nInstance.changeLanguage(lng);
+        console.log('Language changed successfully to:', lng);
+      } catch (error) {
+        console.error('Failed to change language:', error);
+      }
+    } else {
+      console.warn('i18n instance not available, cannot change language');
     }
   };
 
@@ -164,7 +187,7 @@ const I18nProviderWrapper: React.FC<{
   const value: EnhancedI18nContextType = {
     t: safeT,
     changeLanguage: handleChangeLanguage,
-    language: (i18nInstance?.language as SupportedLanguage) || 'ru',
+    language: currentLanguage,
     ready: isReady && !!i18nInstance,
     formatNumber,
     formatCurrency,

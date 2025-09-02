@@ -313,7 +313,10 @@ export const AppNavigation = () => {
                     ? 'bg-primary text-primary-foreground shadow-sm' 
                     : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                 )} 
-                onClick={() => changeLanguage('ru')}
+                onClick={() => {
+                  console.log('Clicked RU button, current language:', language);
+                  changeLanguage('ru');
+                }}
               >
                 RU
               </button>
@@ -325,7 +328,10 @@ export const AppNavigation = () => {
                     ? 'bg-primary text-primary-foreground shadow-sm' 
                     : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                 )} 
-                onClick={() => changeLanguage('ro')}
+                onClick={() => {
+                  console.log('Clicked RO button, current language:', language);
+                  changeLanguage('ro');
+                }}
               >
                 RO
               </button>
