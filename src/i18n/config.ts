@@ -41,15 +41,6 @@ i18n
     returnNull: false, // return key if translation is null
     returnObjects: false, // don't return objects
     
-    // Save to localStorage when language changes
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
-    },
-    
-    // Debug in development
-    debug: process.env.NODE_ENV === 'development',
-    
     // React-specific options
     react: {
       useSuspense: false, // we handle loading manually
@@ -58,7 +49,14 @@ i18n
       transEmptyNodeValue: '', // what to return for empty nodes
       transSupportBasicHtmlNodes: true, // allow basic HTML tags
       transKeepBasicHtmlNodesFor: ['br', 'strong', 'i', 'b', 'span'], // allowed HTML tags
-    }
+    },
+    
+    // Debug in development
+    debug: false, // Disable debug to avoid console noise
+    
+    // Load path configuration
+    load: 'languageOnly',
+    nonExplicitSupportedLngs: true,
   });
 
 // Save language to localStorage when it changes
