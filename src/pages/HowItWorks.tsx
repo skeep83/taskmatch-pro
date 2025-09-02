@@ -26,32 +26,32 @@ const HowItWorks = () => {
   const steps = [
     {
       icon: Search,
-      title: "Найдите специалиста",
-      description: "Выберите категорию услуги и просмотрите анкеты проверенных специалистов в вашем районе. Изучите рейтинги, отзывы и портфолио.",
+      title: t("how_it_works.steps.step1.title"),
+      description: t("how_it_works.steps.step1.description"),
       gradient: "from-blue-500 to-cyan-500",
       bgGradient: "from-blue-50 to-cyan-50 dark:from-blue-950/20 to-cyan-950/20",
       number: "01"
     },
     {
       icon: MessageSquare,
-      title: "Создайте заказ",
-      description: "Опишите задачу, загрузите фото, укажите бюджет и удобное время. Система автоматически уведомит подходящих специалистов.",
+      title: t("how_it_works.steps.step2.title"),
+      description: t("how_it_works.steps.step2.description"),
       gradient: "from-green-500 to-emerald-500",
       bgGradient: "from-green-50 to-emerald-50 dark:from-green-950/20 to-emerald-950/20",
       number: "02"
     },
     {
       icon: CreditCard,
-      title: "Безопасная оплата",
-      description: "Деньги блокируются в защищенном эскроу. Оплата переводится исполнителю только после успешного завершения работ.",
+      title: t("how_it_works.steps.step3.title"),
+      description: t("how_it_works.steps.step3.description"),
       gradient: "from-purple-500 to-pink-500",
       bgGradient: "from-purple-50 to-pink-50 dark:from-purple-950/20 to-pink-950/20",
       number: "03"
     },
     {
       icon: Star,
-      title: "Оценка качества",
-      description: "После завершения работ оставьте отзыв и оценку. Это помогает другим клиентам выбрать лучших специалистов.",
+      title: t("how_it_works.steps.step4.title"),
+      description: t("how_it_works.steps.step4.description"),
       gradient: "from-amber-500 to-orange-500",
       bgGradient: "from-amber-50 to-orange-50 dark:from-amber-950/20 to-orange-950/20",
       number: "04"
@@ -61,85 +61,85 @@ const HowItWorks = () => {
   const features = [
     {
       icon: Shield,
-      title: "Безопасность",
-      description: "Эскроу-платежи, проверка документов, страховка",
+      title: t("how_it_works.features.security.title"),
+      description: t("how_it_works.features.security.description"),
       gradient: "from-red-500 to-rose-500",
-      stats: "99.8% безопасных сделок",
+      stats: t("how_it_works.features.security.stats"),
       image: securityImg
     },
     {
       icon: Zap,
-      title: "Скорость",
-      description: "Мгновенные отклики, быстрое выполнение заказов",
+      title: t("how_it_works.features.speed.title"),
+      description: t("how_it_works.features.speed.description"),
       gradient: "from-yellow-500 to-amber-500",
-      stats: "< 15 мин средний отклик",
+      stats: t("how_it_works.features.speed.stats"),
       image: speedImg
     },
     {
       icon: Users,
-      title: "Качество",
-      description: "Проверенные специалисты, система рейтингов",
+      title: t("how_it_works.features.quality.title"),
+      description: t("how_it_works.features.quality.description"),
       gradient: "from-blue-500 to-indigo-500",
-      stats: "4.9/5 средний рейтинг",
+      stats: t("how_it_works.features.quality.stats"),
       image: qualityImg
     },
     {
       icon: Globe,
-      title: "Доступность",
-      description: "Работаем в 50+ городах по всей стране",
+      title: t("how_it_works.features.availability.title"),
+      description: t("how_it_works.features.availability.description"),
       gradient: "from-green-500 to-teal-500",
-      stats: "24/7 поддержка",
+      stats: t("how_it_works.features.availability.stats"),
       image: availabilityImg
     },
     {
       icon: Award,
-      title: "Гарантии",
-      description: "Возврат средств, повторное выполнение",
+      title: t("how_it_works.features.guarantees.title"),
+      description: t("how_it_works.features.guarantees.description"),
       gradient: "from-purple-500 to-violet-500",
-      stats: "100% гарантия качества",
+      stats: t("how_it_works.features.guarantees.stats"),
       image: guaranteesImg
     },
     {
       icon: TrendingUp,
-      title: "Рост",
-      description: "Постоянно расширяем список услуг",
+      title: t("how_it_works.features.growth.title"),
+      description: t("how_it_works.features.growth.description"),
       gradient: "from-pink-500 to-rose-500",
-      stats: "+200% роста в год",
+      stats: t("how_it_works.features.growth.stats"),
       image: growthImg
     }
   ];
 
   const stats = [
-    { icon: Users, number: "50K+", label: "Довольных клиентов" },
-    { icon: Star, number: "25K+", label: "Выполненных заказов" },
-    { icon: Shield, number: "99.8%", label: "Безопасных платежей" },
-    { icon: Clock, number: "15 мин", label: "Средний отклик" }
+    { icon: Users, number: "50K+", label: t("how_it_works.stats.happy_clients") },
+    { icon: Star, number: "25K+", label: t("how_it_works.stats.completed_orders") },
+    { icon: Shield, number: "99.8%", label: t("how_it_works.stats.secure_payments") },
+    { icon: Clock, number: "15 мин", label: t("how_it_works.stats.avg_response") }
   ];
 
   const faq = [
     {
-      question: "Как гарантируется безопасность платежей?",
-      answer: "Мы используем систему эскроу: деньги блокируются на специальном счете и переводятся исполнителю только после подтверждения выполнения работ клиентом. Также все транзакции защищены банковским шифрованием SSL."
+      question: t("how_it_works.faq.q1.question"),
+      answer: t("how_it_works.faq.q1.answer")
     },
     {
-      question: "Что делать, если работа выполнена некачественно?",
-      answer: "У нас есть система разрешения споров. Вы можете подать жалобу, и наша команда модераторов разберет ситуацию в течение 24 часов. Предусмотрен возврат средств или бесплатное переделывание работ."
+      question: t("how_it_works.faq.q2.question"),
+      answer: t("how_it_works.faq.q2.answer")
     },
     {
-      question: "Как стать исполнителем на платформе?",
-      answer: "Зарегистрируйтесь как специалист, пройдите верификацию документов (KYC), заполните профиль с портфолио и начинайте получать заказы. Первые 3 заказа без комиссии!"
+      question: t("how_it_works.faq.q3.question"),
+      answer: t("how_it_works.faq.q3.answer")
     },
     {
-      question: "Какую комиссию берет сервис?",
-      answer: "Комиссия составляет 8-12% с суммы заказа в зависимости от категории услуги. Точная информация отображается при создании заказа. Для постоянных клиентов действуют скидки."
+      question: t("how_it_works.faq.q4.question"),
+      answer: t("how_it_works.faq.q4.answer")
     },
     {
-      question: "Что такое тендеры для бизнеса?",
-      answer: "Корпоративные клиенты могут выставлять тендеры на крупные заказы. Специалисты подают заявки, а система автоматически выбирает лучшее предложение по алгоритму Vickrey auction."
+      question: t("how_it_works.faq.q5.question"),
+      answer: t("how_it_works.faq.q5.answer")
     },
     {
-      question: "Как работает система рейтингов?",
-      answer: "После каждого заказа клиент и исполнитель оставляют взаимные отзывы. Рейтинг формируется на основе качества работы, соблюдения сроков, вежливости и других факторов."
+      question: t("how_it_works.faq.q6.question"),
+      answer: t("how_it_works.faq.q6.answer")
     }
   ];
 
@@ -150,8 +150,8 @@ const HowItWorks = () => {
   return (
     <main className="min-h-screen">
       <Seo 
-        title="Как это работает — ServiceHub" 
-        description="Узнайте, как использовать ServiceHub для поиска специалистов и выполнения заказов. Простой и безопасный способ решить любые задачи."
+        title={t("how_it_works.title")}
+        description={t("how_it_works.description")}
         canonical="/how-it-works" 
       />
       
@@ -165,28 +165,26 @@ const HowItWorks = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-display font-bold text-gradient mb-8 leading-tight">
-            Как работает<br />
+            {t("how_it_works.hero.title")}<br />
             <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              ServiceHub
+              {t("how_it_works.hero.subtitle")}
             </span>
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-10">
-            Революционная платформа для поиска профессионалов. 
-            <br className="hidden md:block" />
-            Простой, быстрый и безопасный способ решить любые задачи.
+            {t("how_it_works.hero.description")}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link to="/catalog" className="bg-primary text-white hover:bg-primary/90 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
               <Search size={24} />
-              Найти специалиста
+              {t("how_it_works.hero.find_specialist")}
               <ArrowRight size={20} />
             </Link>
             
             <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
               <Play size={20} />
-              Смотреть видео
+              {t("how_it_works.hero.watch_video")}
             </button>
           </div>
         </div>
@@ -211,13 +209,13 @@ const HowItWorks = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
             <Target size={20} />
-            Простые шаги
+            {t("how_it_works.steps.badge")}
           </div>
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Всего 4 простых шага
+            {t("how_it_works.steps.title")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            От поиска специалиста до завершения работ — весь процесс максимально упрощен
+            {t("how_it_works.steps.subtitle")}
           </p>
         </div>
         
@@ -269,13 +267,13 @@ const HowItWorks = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary/10 text-secondary font-medium mb-6">
             <Heart size={20} />
-            Наши преимущества
+            {t("how_it_works.features.badge")}
           </div>
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Почему выбирают ServiceHub
+            {t("how_it_works.features.title")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Мы создали платформу, которая решает все проблемы традиционного поиска услуг
+            {t("how_it_works.features.subtitle")}
           </p>
         </div>
         
@@ -314,13 +312,13 @@ const HowItWorks = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent/10 text-accent font-medium mb-6">
             <Eye size={20} />
-            Часто задаваемые вопросы
+            {t("how_it_works.faq.badge")}
           </div>
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Ответы на ваши вопросы
+            {t("how_it_works.faq.title")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Все, что нужно знать о работе с ServiceHub
+            {t("how_it_works.faq.subtitle")}
           </p>
         </div>
         
@@ -385,37 +383,36 @@ const HowItWorks = () => {
             </div>
             
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 text-gradient">
-              Готовы начать?
+              {t("how_it_works.cta.title")}
             </h2>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Присоединяйтесь к тысячам довольных клиентов и специалистов. 
-              Первый заказ — без комиссии!
+              {t("how_it_works.cta.subtitle")}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
               <Link to="/catalog" className="bg-primary text-white hover:bg-primary/90 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
                 <Search size={24} />
-                Найти специалиста
+                {t("how_it_works.hero.find_specialist")}
                 <ArrowRight size={20} />
               </Link>
               <Link to="/auth" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
                 <Users size={24} />
-                Стать исполнителем
+                {t("hero.cta_secondary")}
               </Link>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-8 justify-center items-center text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Lock size={16} />
-                100% безопасные платежи
+                {t("how_it_works.features.security.stats")}
               </div>
               <div className="flex items-center gap-2">
                 <Coins size={16} />
-                Первый заказ без комиссии
+                {t("how_it_works.faq.q3.answer").split('.')[0]}
               </div>
               <div className="flex items-center gap-2">
                 <Phone size={16} />
-                24/7 поддержка
+                {t("how_it_works.features.availability.stats")}
               </div>
             </div>
           </div>

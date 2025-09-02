@@ -284,5 +284,114 @@
   "nav.tenders": "Licitații",
   "nav.tenders_description": "Concursuri corporative",
   "nav.login": "Conectare",
-  "nav.login_account": "Conectează-te"
+  "nav.login_account": "Conectează-te",
+  
+  "how_it_works": {
+    "title": "Cum funcționează — ServiceHub",
+    "description": "Află cum să folosești ServiceHub pentru a găsi specialiști și a executa comenzi. Modul simplu și sigur de a rezolva orice sarcină.",
+    "hero": {
+      "title": "Cum funcționează",
+      "subtitle": "ServiceHub",
+      "description": "Platformă revoluționară pentru găsirea profesioniștilor. Modul simplu, rapid și sigur de a rezolva orice sarcină.",
+      "find_specialist": "Găsește specialist",
+      "watch_video": "Urmărește video"
+    },
+    "stats": {
+      "happy_clients": "Clienți mulțumiți",
+      "completed_orders": "Comenzi finalizate",
+      "secure_payments": "Plăți sigure",
+      "avg_response": "Răspuns mediu"
+    },
+    "steps": {
+      "badge": "Pași simpli",
+      "title": "Doar 4 pași simpli",
+      "subtitle": "De la găsirea specialistului până la finalizarea lucrării — întregul proces este simplificat la maximum",
+      "step1": {
+        "title": "Găsește specialist",
+        "description": "Alege categoria serviciului și vizualizează profilurile specialiștilor verificați din zona ta. Studiază ratingurile, recenziile și portofoliul."
+      },
+      "step2": {
+        "title": "Creează comandă",
+        "description": "Descrie sarcina, încarcă fotografii, specifică bugetul și timpul convenabil. Sistemul va notifica automat specialiștii potriviți."
+      },
+      "step3": {
+        "title": "Plată sigură",
+        "description": "Banii sunt blocați în escrow protejat. Plata este transferată executantului doar după confirmarea finalizării lucrării de către client."
+      },
+      "step4": {
+        "title": "Evaluarea calității",
+        "description": "După finalizarea lucrării, lasă o recenzie și evaluare. Acest lucru îi ajută pe alți clienți să aleagă cei mai buni specialiști."
+      }
+    },
+    "features": {
+      "badge": "Avantajele noastre",
+      "title": "De ce aleg ServiceHub",
+      "subtitle": "Am creat o platformă care rezolvă toate problemele căutării tradiționale de servicii",
+      "security": {
+        "title": "Securitate",
+        "description": "Plăți escrow, verificarea documentelor, asigurare",
+        "stats": "99.8% tranzacții sigure"
+      },
+      "speed": {
+        "title": "Viteză",
+        "description": "Răspunsuri instant, executare rapidă a comenzilor",
+        "stats": "< 15 min răspuns mediu"
+      },
+      "quality": {
+        "title": "Calitate",
+        "description": "Specialiști verificați, sistem de rating",
+        "stats": "4.9/5 rating mediu"
+      },
+      "availability": {
+        "title": "Disponibilitate",
+        "description": "Lucrăm în 50+ orașe din toată țara",
+        "stats": "24/7 suport"
+      },
+      "guarantees": {
+        "title": "Garanții",
+        "description": "Returnarea banilor, reexecutarea lucrării",
+        "stats": "100% garanție de calitate"
+      },
+      "growth": {
+        "title": "Creștere",
+        "description": "Extindem constant lista de servicii",
+        "stats": "+200% creștere pe an"
+      }
+    },
+    "faq": {
+      "badge": "Întrebări frecvente",
+      "title": "Răspunsuri la întrebările tale",
+      "subtitle": "Tot ce trebuie să știi despre lucrul cu ServiceHub",
+      "q1": {
+        "question": "Cum este garantată securitatea plăților?",
+        "answer": "Folosim sistemul escrow: banii sunt blocați într-un cont special și transferați executantului doar după confirmarea finalizării lucrării de către client. De asemenea, toate tranzacțiile sunt protejate prin criptarea bancară SSL."
+      },
+      "q2": {
+        "question": "Ce să fac dacă lucrarea este executată prost?",
+        "answer": "Avem un sistem de rezolvare a disputelor. Poți depune o plângere, iar echipa noastră de moderatori va analiza situația în 24 de ore. Este prevăzută returnarea banilor sau refacerea gratuită a lucrării."
+      },
+      "q3": {
+        "question": "Cum să devin executant pe platformă?",
+        "answer": "Înregistrează-te ca specialist, treci prin verificarea documentelor (KYC), completează profilul cu portofoliul și începe să primești comenzi. Primele 3 comenzi fără comision!"
+      },
+      "q4": {
+        "question": "Ce comision percepe serviciul?",
+        "answer": "Comisionul este de 8-12% din suma comenzii, în funcție de categoria serviciului. Informația exactă este afișată la crearea comenzii. Pentru clienții constanți sunt reduceri."
+      },
+      "q5": {
+        "question": "Ce sunt licitațiile pentru business?",
+        "answer": "Clienții corporativi pot organiza licitații pentru comenzi mari. Specialiștii depun oferte, iar sistemul alege automat cea mai bună ofertă conform algoritmului Vickrey auction."
+      },
+      "q6": {
+        "question": "Cum funcționează sistemul de rating?",
+        "answer": "După fiecare comandă, clientul și executantul lasă recenzii reciproce. Ratingul se formează pe baza calității lucrării, respectării termenelor, politețe și alți factori."
+      }
+    },
+    "cta": {
+      "title": "Gata să începi?",
+      "subtitle": "Alătură-te miilor de utilizatori mulțumiți astăzi",
+      "start_now": "Începe acum",
+      "learn_more": "Află mai multe"
+    }
+  }
 }
