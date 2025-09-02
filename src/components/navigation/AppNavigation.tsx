@@ -203,16 +203,16 @@ export const AppNavigation = () => {
               <img 
                 src={platformLogo} 
                 alt="ServiceHub Logo" 
-                className="h-14 w-14 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
+                className="h-10 w-10 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
               />
             ) : (
               <img 
                 src={serviceHubLogo} 
                 alt="ServiceHub Logo" 
-                className="h-14 w-14 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
+                className="h-10 w-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
               />
             )}
-            <span className="text-2xl font-display font-bold text-gradient hidden sm:block">
+            <span className="text-xl font-display font-bold text-gradient hidden sm:block">
               {t("app.name")}
             </span>
           </Link>
