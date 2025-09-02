@@ -44,6 +44,7 @@ import AdminSettings from "./pages/admin/Settings";
 import AdminTesting from "./pages/admin/Testing";
 import AdminCurrencies from "./pages/admin/Currencies";
 import ProUpgradeRequests from "./pages/admin/ProUpgradeRequests";
+import ProUpgradeStatus from "./pages/ProUpgradeStatus";
 import ProfileSettings from "./pages/ProfileSettings";
 import HowItWorks from "./pages/HowItWorks";
 import PageTransition from "./components/PageTransition";
@@ -73,6 +74,7 @@ const AppContent = () => {
           <Route path="/messages/:id" element={<Messages />} />
           <Route path="/profile/settings" element={<ProfileSettings />} />
           <Route path="/kyc" element={<Kyc />} />
+          <Route path="/pro-upgrade-status" element={<ProUpgradeStatus />} />
           <Route path="/pro/profile" element={<Navigate to="/profile/settings" replace />} />
           <Route path="/pro/schedule" element={<ProSchedule />} />
           <Route path="/portfolio" element={<ProPortfolio />} />
