@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   User, Briefcase, Building2, Settings, LogOut,
@@ -16,8 +17,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-
-type UserRole = 'client' | 'pro' | 'business';
 
 interface RoleItem {
   key: UserRole;
@@ -56,6 +55,7 @@ export const UserMenu = () => {
     full_name?: string;
     avatar_url?: string;
   } | null>(null);
+  const [userRole, setUserRole] = useState<UserRole>('client');
 
   console.log('UserMenu component rendering!');
 
@@ -74,6 +74,12 @@ export const UserMenu = () => {
           .single();
         
         setUserProfile(profile);
+
+        // Load user role
+        const roleResult = await getUserRole(user.id);
+        if (roleResult.success) {
+          setUserRole(roleResult.role);
+        }
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
@@ -103,6 +109,8 @@ export const UserMenu = () => {
     .toUpperCase()
     .slice(0, 2);
 
+  const currentRoleItem = roleItems.find(item => item.key === userRole);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -121,20 +129,13 @@ export const UserMenu = () => {
         <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => navigate('/dashboard/client')} className="cursor-pointer">
-          <User className="h-4 w-4 mr-2" />
-          Панель клиента
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem onClick={() => navigate('/dashboard/pro')} className="cursor-pointer">
-          <Briefcase className="h-4 w-4 mr-2" />
-          Панель специалиста
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem onClick={() => navigate('/dashboard/business')} className="cursor-pointer">
-          <Building2 className="h-4 w-4 mr-2" />
-          Панель бизнеса
-        </DropdownMenuItem>
+        {/* Show only current role panel */}
+        {currentRoleItem && (
+          <DropdownMenuItem onClick={() => navigate(currentRoleItem.route)} className="cursor-pointer">
+            <currentRoleItem.icon className="h-4 w-4 mr-2" />
+            {currentRoleItem.title}
+          </DropdownMenuItem>
+        )}
         
         <DropdownMenuSeparator />
         

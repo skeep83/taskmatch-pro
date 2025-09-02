@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
+import { RoleGuard } from "@/components/RoleGuard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -320,9 +321,10 @@ export default function DashboardClient() {
   }
 
   return (
-    <main className="min-h-screen">
-      {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
+    <RoleGuard requiredRole="client">
+      <main className="min-h-screen">
+        {/* Header Section */}
+        <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Кабинет клиента
@@ -823,5 +825,6 @@ export default function DashboardClient() {
         </div>
       </section>
     </main>
+    </RoleGuard>
   );
 }

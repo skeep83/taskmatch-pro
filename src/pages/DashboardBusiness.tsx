@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { RoleGuard } from "@/components/RoleGuard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
@@ -60,9 +61,10 @@ export default function DashboardBusiness() {
   }
 
   return (
-    <main className="min-h-screen">
-      {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
+    <RoleGuard requiredRole="business">
+      <main className="min-h-screen">
+        {/* Header Section */}
+        <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Бизнес-панель
@@ -231,5 +233,6 @@ export default function DashboardBusiness() {
         </div>
       </section>
     </main>
+    </RoleGuard>
   );
 }

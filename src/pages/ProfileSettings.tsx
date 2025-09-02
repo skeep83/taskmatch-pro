@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { AvatarUpload } from "@/components/AvatarUpload";
+import { RoleUpgrade } from "@/components/RoleUpgrade";
 import { 
   User, 
   ArrowLeft, 
@@ -65,7 +67,7 @@ export default function ProfileSettings() {
   });
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [userRole, setUserRole] = useState<UserRole>('client');
   const [showProSettings, setShowProSettings] = useState(false);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function ProfileSettings() {
       }
 
       setUser(user);
-      await loadUserRoles(user.id);
+      await loadUserRole(user.id);
       await loadCategories();
       await loadProfile(user.id);
     } catch (error: any) {
@@ -124,7 +126,7 @@ export default function ProfileSettings() {
       }
 
       // Load pro profile if user is a pro
-      if (userRoles.includes('pro')) {
+      if (userRole === 'pro') {
         await loadProProfile(userId);
       }
     } catch (error: any) {
@@ -137,20 +139,24 @@ export default function ProfileSettings() {
     }
   };
 
-  const loadUserRoles = async (userId: string) => {
+  const loadUserRole = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
-
-      if (error) throw error;
-
-      const roles = (data || []).map(r => r.role);
-      setUserRoles(roles);
-      setShowProSettings(roles.includes('pro'));
+      const result = await getUserRole(userId);
+      if (result.success) {
+        setUserRole(result.role);
+        setShowProSettings(result.role === 'pro');
+      }
     } catch (error: any) {
-      console.error('Error loading user roles:', error);
+      console.error('Error loading user role:', error);
+    }
+  };
+
+  const handleRoleUpgraded = (newRole: UserRole) => {
+    setUserRole(newRole);
+    setShowProSettings(newRole === 'pro');
+    // Reload profile data for new role
+    if (user) {
+      loadProfile(user.id);
     }
   };
 
@@ -466,6 +472,19 @@ export default function ProfileSettings() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Role Upgrade */}
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                  Статус аккаунта
+                </h2>
+                <RoleUpgrade 
+                  userId={user.id} 
+                  currentRole={userRole} 
+                  onRoleUpgraded={handleRoleUpgraded}
+                />
               </div>
 
               {/* Professional Settings */}

@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { RoleGuard } from "@/components/RoleGuard";
 import { 
   Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, 
   CreditCard, Briefcase, Clock, ShieldCheck, TrendingUp, Award,
@@ -218,8 +219,9 @@ const DashboardPro = () => {
   );
 
   return (
-    <main className="min-h-screen">
-      <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
+    <RoleGuard requiredRole="pro">
+      <main className="min-h-screen">
+        <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
       
       {/* Header Section */}
       <section className="container mx-auto py-24 px-6">
@@ -546,6 +548,7 @@ const DashboardPro = () => {
         </div>
       </section>
     </main>
+    </RoleGuard>
   );
 };
 
