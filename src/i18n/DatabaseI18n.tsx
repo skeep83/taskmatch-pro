@@ -15,8 +15,7 @@ interface DatabaseTranslation {
 /**
  * Hook to load and sync translations from database
  */
-export const useDatabaseTranslations = () => {
-  const { language } = useEnhancedI18n();
+export const useDatabaseTranslations = (language: string) => {
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
@@ -106,21 +105,33 @@ export const useDatabaseTranslations = () => {
 };
 
 /**
+ * Internal component that handles database translation sync
+ */
+const DatabaseSyncHandler: React.FC = () => {
+  const { language } = useEnhancedI18n();
+  const { loading } = useDatabaseTranslations(language);
+
+  if (loading) {
+    return (
+      <div className="fixed top-4 right-4 z-50 bg-primary text-white px-3 py-2 rounded-lg text-sm">
+        Обновление переводов...
+      </div>
+    );
+  }
+
+  return null;
+};
+
+/**
  * Component to automatically sync database translations
  */
 export const DatabaseI18nProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { loading } = useDatabaseTranslations();
-
   return (
     <>
       {children}
-      {loading && (
-        <div className="fixed top-4 right-4 z-50 bg-primary text-white px-3 py-2 rounded-lg text-sm">
-          Обновление переводов...
-        </div>
-      )}
+      <DatabaseSyncHandler />
     </>
   );
 };
