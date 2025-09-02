@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { RoleGuard } from "@/components/RoleGuard";
+import { RoleUpgrade } from "@/components/RoleUpgrade";
+import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -88,6 +90,7 @@ export default function DashboardClient() {
     smsNotifications: false
   });
   const [saving, setSaving] = useState(false);
+  const [currentRole, setCurrentRole] = useState<UserRole>('client');
 
   useEffect(() => {
     checkAuth();
@@ -109,6 +112,12 @@ export default function DashboardClient() {
       }
 
       setUser(session.session.user);
+      
+      // Load role data
+      const roleResult = await getUserRole(session.session.user.id);
+      if (roleResult.success) {
+        setCurrentRole(roleResult.role);
+      }
       
       // Load profile data
       const { data: profileInfo } = await supabase
@@ -473,6 +482,21 @@ export default function DashboardClient() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Role Upgrade Section */}
+              <div className="card-surface p-8">
+                <RoleUpgrade
+                  userId={user?.id || ''}
+                  currentRole={currentRole}
+                  onRoleUpgraded={(newRole) => {
+                    setCurrentRole(newRole);
+                    toast({
+                      title: "Роль обновлена",
+                      description: "Ваша роль была успешно обновлена!"
+                    });
+                  }}
+                />
               </div>
 
               {/* Recent Jobs */}
