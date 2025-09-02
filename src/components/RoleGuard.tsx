@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserRole, UserRole } from "@/lib/userRoles";
+import { getUserRole, UserRole, hasRoleAccess } from "@/lib/userRoles";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,7 +34,7 @@ export const RoleGuard = ({ requiredRole, children, redirectTo }: RoleGuardProps
       if (roleResult.success) {
         const userRole = roleResult.role;
         
-        if (userRole === requiredRole) {
+        if (hasRoleAccess(userRole, requiredRole)) {
           setHasAccess(true);
         } else {
           // Redirect based on user's actual role

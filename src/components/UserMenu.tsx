@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getUserRole, UserRole } from "@/lib/userRoles";
+import { getUserRole, UserRole, hasRoleAccess } from "@/lib/userRoles";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   User, Briefcase, Building2, Settings, LogOut,
@@ -109,7 +109,12 @@ export const UserMenu = () => {
     .toUpperCase()
     .slice(0, 2);
 
-  const currentRoleItem = roleItems.find(item => item.key === userRole);
+  // Get available dashboard based on role hierarchy
+  const getAvailableDashboards = () => {
+    return roleItems.filter(item => hasRoleAccess(userRole, item.key));
+  };
+
+  const availableDashboards = getAvailableDashboards();
 
   return (
     <DropdownMenu>
@@ -129,15 +134,22 @@ export const UserMenu = () => {
         <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        {/* Show only current role panel */}
-        {currentRoleItem && (
-          <DropdownMenuItem onClick={() => navigate(currentRoleItem.route)} className="cursor-pointer">
-            <currentRoleItem.icon className="h-4 w-4 mr-2" />
-            {currentRoleItem.title}
-          </DropdownMenuItem>
+        {/* Show all available dashboards based on role hierarchy */}
+        {availableDashboards.length > 0 && (
+          <>
+            {availableDashboards.map((item) => (
+              <DropdownMenuItem 
+                key={item.key}
+                onClick={() => navigate(item.route)} 
+                className="cursor-pointer"
+              >
+                <item.icon className="h-4 w-4 mr-2" />
+                {item.title}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+          </>
         )}
-        
-        <DropdownMenuSeparator />
         
         <DropdownMenuItem onClick={() => navigate('/profile/settings')} className="cursor-pointer">
           <Settings className="h-4 w-4 mr-2" />

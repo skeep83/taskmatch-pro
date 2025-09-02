@@ -61,6 +61,17 @@ export const hasUserRole = (userRole: UserRole, targetRole: UserRole): boolean =
   return userRole === targetRole;
 };
 
+// Иерархия ролей: business > pro > client
+export const hasRoleAccess = (userRole: UserRole, requiredRole: UserRole): boolean => {
+  const roleHierarchy: Record<UserRole, number> = {
+    'client': 1,
+    'pro': 2,
+    'business': 3
+  };
+  
+  return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
+};
+
 export const canUpgradeTo = (currentRole: UserRole, targetRole: UserRole): boolean => {
   switch (targetRole) {
     case 'pro':
