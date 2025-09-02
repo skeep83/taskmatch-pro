@@ -2088,6 +2088,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      clear_expired_otp: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       find_nearby_pros: {
         Args: {
           job_category_id: string
