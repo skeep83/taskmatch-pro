@@ -71,10 +71,6 @@ const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNo
 }) => {
   const { t } = useTranslation(undefined, { i18n: i18nInstance });
 
-  const changeLanguage = async (lng: SupportedLanguage) => {
-    await i18nInstance.changeLanguage(lng);
-  };
-
   // Enhanced formatting functions
   const formatNumber = (num: number, options?: Intl.NumberFormatOptions) => {
     const locale = i18nInstance.language === 'ro' ? 'ro-RO' : 'ru-RU';
@@ -124,6 +120,10 @@ const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNo
     }
   };
 
+  const handleChangeLanguage = async (lng: SupportedLanguage) => {
+    await i18nInstance.changeLanguage(lng);
+  };
+
   const value: EnhancedI18nContextType = {
     t: (key: string, options?: any) => {
       const result = t(key, options) as string;
@@ -132,7 +132,7 @@ const I18nProviderWrapper: React.FC<{ i18nInstance: any; children: React.ReactNo
       }
       return result;
     },
-    changeLanguage,
+    changeLanguage: handleChangeLanguage,
     language: i18nInstance.language as SupportedLanguage,
     ready: true,
     formatNumber,
