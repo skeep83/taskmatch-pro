@@ -1065,6 +1065,45 @@ export type Database = {
         }
         Relationships: []
       }
+      languages: {
+        Row: {
+          code: string
+          created_at: string
+          flag_emoji: string | null
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          native_name: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          native_name: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          flag_emoji?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          native_name?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       likes: {
         Row: {
           created_at: string
@@ -2149,6 +2188,42 @@ export type Database = {
           pro_id?: string | null
           subject?: string
           subject_id?: string | null
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          context: string | null
+          created_at: string
+          id: string
+          is_pluralized: boolean | null
+          language_code: string
+          namespace: string | null
+          translation_key: string
+          translation_value: string
+          updated_at: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          is_pluralized?: boolean | null
+          language_code: string
+          namespace?: string | null
+          translation_key: string
+          translation_value: string
+          updated_at?: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          is_pluralized?: boolean | null
+          language_code?: string
+          namespace?: string | null
+          translation_key?: string
+          translation_value?: string
+          updated_at?: string
         }
         Relationships: []
       }
