@@ -296,10 +296,18 @@ All colors MUST be HSL.
   .card-3d {
     transform-style: preserve-3d;
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 
+      0 10px 30px -5px rgba(0, 0, 0, 0.15),
+      0 25px 60px -15px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   
   .card-3d:hover {
-    transform: translateY(-12px) rotateX(8deg) rotateY(3deg) scale(1.03);
+    transform: translateY(-12px) rotateX(8deg) rotateY(3deg) scale(1.02);
+    box-shadow: 
+      0 20px 40px -5px rgba(0, 0, 0, 0.2),
+      0 35px 80px -15px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
   
   .gradient-border {

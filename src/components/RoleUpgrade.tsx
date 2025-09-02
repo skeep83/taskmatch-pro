@@ -77,70 +77,83 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
         <p className="text-muted-foreground">Станьте специалистом или создайте бизнес аккаунт</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">{availableUpgrades.map((targetRole) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">{availableUpgrades.map((targetRole) => {
         const config = roleConfig[targetRole];
         const IconComponent = config.icon;
         
         return (
           <motion.div
             key={targetRole}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            initial={{ opacity: 0, y: 20, rotateX: 20 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            whileHover={{ 
+              y: -8, 
+              rotateX: 5, 
+              rotateY: 3,
+              transition: { duration: 0.2 }
+            }}
             className="perspective-1000"
           >
-            <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]">
-              {/* Верхняя секция с градиентом */}
-              <div className={`h-32 bg-gradient-to-br ${config.gradient} relative`}>
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d">
+              {/* Верхняя секция с градиентом - уменьшена */}
+              <div className={`h-20 bg-gradient-to-br ${config.gradient} relative`}>
                 {/* Декоративный оверлей */}
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                 
-                {/* Иконка по центру */}
+                {/* Иконка меньшего размера */}
                 <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileHover={{ scale: 1.15, rotate: 8 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute left-1/2 top-16 transform -translate-x-1/2 z-10"
+                  className="absolute left-1/2 top-10 transform -translate-x-1/2 z-10"
                 >
-                  <div className="w-32 h-32 bg-white rounded-full shadow-xl flex items-center justify-center">
-                    <IconComponent className="w-12 h-12 text-gray-800" />
+                  <div className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/20">
+                    <IconComponent className="w-8 h-8 text-gray-700" />
                   </div>
                 </motion.div>
               </div>
               
-              {/* Нижняя секция с контентом */}
-              <div className="bg-white pt-20 px-6 pb-8">
-                <div className="text-center mb-6">
-                  <h4 className="text-xl font-bold text-gray-900 mb-1">{config.title}</h4>
-                  <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
+              {/* Нижняя секция с контентом - более компактная */}
+              <div className="bg-gradient-to-b from-gray-50 to-white pt-12 px-5 pb-5">
+                <div className="text-center mb-4">
+                  <h4 className="text-lg font-bold text-gray-900 mb-1">{config.title}</h4>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                     {config.description}
                   </p>
                 </div>
                 
-                {/* Преимущества */}
-                <div className="space-y-2 mb-6">
-                  {config.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                      {benefit}
+                {/* Преимущества - более компактные */}
+                <div className="space-y-1 mb-4">
+                  {config.benefits.slice(0, 2).map((benefit, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs text-gray-600">
+                      <Star className="w-3 h-3 text-yellow-500 fill-current flex-shrink-0" />
+                      <span className="truncate">{benefit}</span>
                     </div>
                   ))}
                 </div>
                 
-                {/* Кнопка действия */}
+                {/* Кнопка действия - меньшего размера */}
                 <Button
                   onClick={() => handleUpgrade(targetRole)}
                   disabled={upgrading === targetRole}
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm hover-scale"
                 >
                   {upgrading === targetRole ? (
                     "Обновляем..."
                   ) : (
                     <>
-                      <ArrowRight className="w-4 h-4 mr-2" />
+                      <ArrowRight className="w-4 h-4 mr-1" />
                       Стать {config.title.toLowerCase()}ом
                     </>
                   )}
                 </Button>
+              </div>
+              
+              {/* Дополнительные блики для объема */}
+              <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                <div className="absolute top-2 left-2 w-8 h-8 bg-white/30 rounded-full blur-md"></div>
+                <div className="absolute bottom-2 right-2 w-6 h-6 bg-black/10 rounded-full blur-sm"></div>
               </div>
             </div>
           </motion.div>
