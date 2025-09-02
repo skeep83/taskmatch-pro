@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { upgradeUserRole, canUpgradeTo, UserRole } from "@/lib/userRoles";
-import { useToast } from "@/hooks/use-toast";
+import { UserRole } from "@/lib/userRoles";
 import { Button } from "@/components/ui/button";
 import { Briefcase, Building2, ArrowRight, Star } from "lucide-react";
+import { RoleUpgradeWizard } from "./RoleUpgradeWizard";
 
 interface RoleUpgradeProps {
   userId: string;
   currentRole: UserRole;
   onRoleUpgraded: (newRole: UserRole) => void;
+}
+
+interface UpgradeModal {
+  isOpen: boolean;
+  targetRole: UserRole | null;
 }
 
 const roleConfig = {
@@ -29,41 +34,24 @@ const roleConfig = {
 };
 
 export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgradeProps) => {
-  const { toast } = useToast();
-  const [upgrading, setUpgrading] = useState<UserRole | null>(null);
+  const [modal, setModal] = useState<UpgradeModal>({ isOpen: false, targetRole: null });
 
-  const handleUpgrade = async (targetRole: UserRole) => {
-    setUpgrading(targetRole);
-    
-    try {
-      const result = await upgradeUserRole(userId, targetRole);
-      
-      if (result.success) {
-        toast({
-          title: "Аккаунт обновлен",
-          description: `Вы успешно обновили аккаунт до ${roleConfig[targetRole].title}`
-        });
-        onRoleUpgraded(targetRole);
-      } else {
-        toast({
-          title: "Ошибка",
-          description: result.error || "Не удалось обновить аккаунт",
-          variant: "destructive"
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Ошибка",
-        description: "Произошла ошибка при обновлении аккаунта",
-        variant: "destructive"
-      });
-    } finally {
-      setUpgrading(null);
-    }
+  const handleUpgradeClick = (targetRole: UserRole) => {
+    setModal({ isOpen: true, targetRole });
   };
 
+  const handleCloseModal = () => {
+    setModal({ isOpen: false, targetRole: null });
+  };
+
+  const handleUpgradeSuccess = (newRole: UserRole) => {
+    onRoleUpgraded(newRole);
+    handleCloseModal();
+  };
+
+  // Доступные апгрейды (исключаем текущую роль)
   const availableUpgrades = (['pro', 'business'] as UserRole[]).filter(role => 
-    role !== currentRole && canUpgradeTo(currentRole, role)
+    role !== currentRole
   );
 
   if (availableUpgrades.length === 0) {
@@ -135,18 +123,11 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                 
                 {/* Кнопка действия - меньшего размера */}
                 <Button
-                  onClick={() => handleUpgrade(targetRole)}
-                  disabled={upgrading === targetRole}
+                  onClick={() => handleUpgradeClick(targetRole)}
                   className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm hover-scale"
                 >
-                  {upgrading === targetRole ? (
-                    "Обновляем..."
-                  ) : (
-                    <>
-                      <ArrowRight className="w-4 h-4 mr-1" />
-                      Стать {config.title.toLowerCase()}ом
-                    </>
-                  )}
+                  <ArrowRight className="w-4 h-4 mr-1" />
+                  Стать {config.title.toLowerCase()}ом
                 </Button>
               </div>
               
@@ -160,6 +141,18 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
         );
       })}
       </div>
+
+      {/* Role Upgrade Wizard Modal */}
+      {modal.isOpen && modal.targetRole && (
+        <RoleUpgradeWizard
+          userId={userId}
+          currentRole={currentRole}
+          targetRole={modal.targetRole}
+          isOpen={modal.isOpen}
+          onClose={handleCloseModal}
+          onSuccess={handleUpgradeSuccess}
+        />
+      )}
     </div>
   );
 };
