@@ -68,7 +68,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
   };
 
   const availableUpgrades = (['pro', 'business'] as UserRole[]).filter(role => 
-    canUpgradeTo(currentRole, role)
+    role !== currentRole && canUpgradeTo(currentRole, role)
   );
 
   if (availableUpgrades.length === 0) {
