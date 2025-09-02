@@ -77,44 +77,16 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Апгрейд аккаунта</h3>
+      <h3 className="text-lg font-semibold">Расширьте возможности</h3>
+      <p className="text-sm text-muted-foreground">Станьте специалистом или создайте бизнес аккаунт</p>
       
       <div className="grid gap-4">
-        {/* Current Role */}
-        <Card className="border-2 border-muted">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <div className={`w-2 h-2 rounded-full ${roleConfig[currentRole].color}`} />
-              Текущий статус
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${roleConfig[currentRole].color} text-white`}>
-                  {(() => {
-                    const IconComponent = roleConfig[currentRole].icon;
-                    return <IconComponent className="w-4 h-4" />;
-                  })()}
-                </div>
-              <div>
-                <p className="font-medium">{roleConfig[currentRole].title}</p>
-                <p className="text-sm text-muted-foreground">{roleConfig[currentRole].description}</p>
-              </div>
-              <Badge variant="outline" className="ml-auto">
-                <Check className="w-3 h-3 mr-1" />
-                Активен
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Available Upgrades */}
         {availableUpgrades.map((targetRole) => (
           <Card key={targetRole} className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-sm">
                 <div className={`w-2 h-2 rounded-full ${roleConfig[targetRole].color}`} />
-                Доступно для апгрейда
+                Стать {roleConfig[targetRole].title.toLowerCase()}ом
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
