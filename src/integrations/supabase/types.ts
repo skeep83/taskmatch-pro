@@ -88,21 +88,27 @@ export type Database = {
       }
       app_settings: {
         Row: {
+          category: string | null
           created_at: string
+          description: string | null
           id: string
           key: string
           updated_at: string
           value: Json | null
         }
         Insert: {
+          category?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           key: string
           updated_at?: string
           value?: Json | null
         }
         Update: {
+          category?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           key?: string
           updated_at?: string

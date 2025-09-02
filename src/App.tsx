@@ -43,6 +43,7 @@ import AdminContent from "./pages/admin/Content";
 import AdminSettings from "./pages/admin/Settings";
 import AdminTesting from "./pages/admin/Testing";
 import AdminCurrencies from "./pages/admin/Currencies";
+import AdminCategories from "./pages/admin/Categories";
 import ProUpgradeRequests from "./pages/admin/ProUpgradeRequests";
 import ProUpgradeStatus from "./pages/ProUpgradeStatus";
 import ProfileSettings from "./pages/ProfileSettings";
@@ -96,6 +97,7 @@ const AppContent = () => {
             <Route path="risk" element={<AdminRisk />} />
             <Route path="content" element={<AdminContent />} />
             <Route path="currencies" element={<AdminCurrencies />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="testing" element={<AdminTesting />} />
           </Route>
