@@ -2116,6 +2116,7 @@ export type Database = {
       tenders: {
         Row: {
           budget_hint_cents: number | null
+          business_id: string | null
           category_id: string
           client_id: string
           created_at: string
@@ -2129,6 +2130,7 @@ export type Database = {
         }
         Insert: {
           budget_hint_cents?: number | null
+          business_id?: string | null
           category_id: string
           client_id: string
           created_at?: string
@@ -2142,6 +2144,7 @@ export type Database = {
         }
         Update: {
           budget_hint_cents?: number | null
+          business_id?: string | null
           category_id?: string
           client_id?: string
           created_at?: string
@@ -2153,7 +2156,15 @@ export type Database = {
           window_from?: string | null
           window_to?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tenders_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {

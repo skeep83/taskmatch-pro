@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Calendar, DollarSign, Gavel } from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign, Gavel, AlertTriangle } from "lucide-react";
 import { useCurrency } from "@/hooks/useCurrency";
+import { RoleGuard } from "@/components/RoleGuard";
+import { getUserRole } from "@/lib/userRoles";
 
 const TenderNew = () => {
   const { t } = useEnhancedI18n();
@@ -19,6 +21,8 @@ const TenderNew = () => {
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
+  const [businessId, setBusinessId] = useState<string | null>(null);
+  const [checkingAccess, setCheckingAccess] = useState(true);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -35,6 +39,66 @@ const TenderNew = () => {
     { id: '4', name: 'Уборка' },
     { id: '5', name: 'Другое' }
   ]);
+
+  useEffect(() => {
+    checkBusinessAccess();
+  }, []);
+
+  const checkBusinessAccess = async () => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session.session?.user) {
+        toast({ title: 'Ошибка', description: 'Необходимо войти в систему', variant: 'destructive' });
+        navigate('/auth');
+        return;
+      }
+
+      const userId = session.session.user.id;
+      
+      // Check if user has business role
+      const roleResult = await getUserRole(userId);
+      
+      if (!roleResult.success || roleResult.role !== 'business') {
+        toast({ 
+          title: 'Доступ запрещен', 
+          description: 'Только бизнес аккаунты могут создавать тендеры', 
+          variant: 'destructive' 
+        });
+        navigate('/dashboard/client');
+        return;
+      }
+
+      // Get business account ID
+      const { data: businessAccount, error } = await supabase
+        .from('business_accounts')
+        .select('id')
+        .eq('owner_id', userId)
+        .single();
+
+      if (error || !businessAccount) {
+        toast({ 
+          title: 'Ошибка', 
+          description: 'Бизнес аккаунт не найден', 
+          variant: 'destructive' 
+        });
+        navigate('/dashboard/business');
+        return;
+      }
+
+      setBusinessId(businessAccount.id);
+    } catch (error) {
+      console.error('Error checking business access:', error);
+      toast({ 
+        title: 'Ошибка', 
+        description: 'Произошла ошибка при проверке доступа', 
+        variant: 'destructive' 
+      });
+      navigate('/dashboard/client');
+    } finally {
+      setCheckingAccess(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,10 +134,16 @@ const TenderNew = () => {
         return;
       }
 
+      if (!businessId) {
+        toast({ title: 'Ошибка', description: 'Бизнес аккаунт не определен', variant: 'destructive' });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('tenders')
         .insert({
           client_id: session.session.user.id,
+          business_id: businessId,
           title: formData.title,
           description: formData.description,
           budget_max_cents: parseInt(formData.budget_max_cents) * 100, // Convert to cents
@@ -101,13 +171,25 @@ const TenderNew = () => {
     }
   };
 
+  if (checkingAccess) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="card-surface p-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">Проверяем доступ...</h1>
+          <div className="animate-spin">⏳</div>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen">
-      <Seo 
-        title={`${t('app.name')} — Создать тендер`} 
-        description="Создайте тендер для получения предложений от специалистов" 
-        canonical="/tenders/new" 
-      />
+    <RoleGuard requiredRole="business">
+      <main className="min-h-screen">
+        <Seo 
+          title={`${t('app.name')} — Создать тендер`} 
+          description="Создайте тендер для получения предложений от специалистов" 
+          canonical="/tenders/new" 
+        />
       
       {/* Header */}
       <section className="container mx-auto py-12 px-6">
@@ -246,6 +328,7 @@ const TenderNew = () => {
         </div>
       </section>
     </main>
+    </RoleGuard>
   );
 };
 

@@ -460,15 +460,21 @@ export default function DashboardClient() {
                   </div>
                 </div>
 
+                {/* Тендеры доступны только для бизнес аккаунтов */}
                 <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
-                  onClick={() => setActiveTab("tenders")}
+                  className="card-surface p-6 opacity-50 cursor-not-allowed border-dashed"
+                  title="Тендеры доступны только для бизнес аккаунтов"
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={Gavel} className="h-8 w-8 text-primary" />
+                    <div className="relative">
+                      <AnimatedIcon icon={Gavel} className="h-8 w-8 text-muted-foreground" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                        <span className="text-xs text-white font-bold">B</span>
+                      </div>
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.create_tender')}</h3>
-                      <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.create_tender_description')}</p>
+                      <h3 className="font-semibold mb-1 text-muted-foreground">Создать тендер</h3>
+                      <p className="text-sm text-muted-foreground">Только для бизнес аккаунтов</p>
                     </div>
                   </div>
                 </div>
@@ -689,17 +695,21 @@ export default function DashboardClient() {
             {/* Tenders Tab */}
             <TabsContent value="tenders">
               <div className="card-surface p-8">
-                <div className="flex flex-row items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold">Мои тендеры</h2>
-                  <Button onClick={() => navigate("/tenders/new")}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Создать тендер
+                <div className="text-center py-12 text-muted-foreground">
+                  <div className="relative inline-block mb-6">
+                    <Gavel className="h-16 w-16 mx-auto opacity-30" />
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <span className="text-sm text-white font-bold">B</span>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Тендеры доступны только для бизнес аккаунтов</h3>
+                  <p className="mb-4">Для создания тендеров необходимо перейти на бизнес аккаунт</p>
+                  <Button 
+                    onClick={() => navigate("/dashboard/business")}
+                    variant="outline"
+                  >
+                    Перейти к бизнес аккаунту
                   </Button>
-                </div>
-                <div className="text-center py-8 text-muted-foreground">
-                  <Gavel className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>У вас пока нет тендеров</p>
-                  <p className="text-sm">Создайте тендер для получения предложений от специалистов</p>
                 </div>
               </div>
             </TabsContent>
