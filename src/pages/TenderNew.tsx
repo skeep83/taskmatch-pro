@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Calendar, DollarSign, Gavel, AlertTriangle } from "lucide-react";
 import { useCurrency } from "@/hooks/useCurrency";
 import { RoleGuard } from "@/components/RoleGuard";
-import { getUserRole } from "@/lib/userRoles";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const TenderNew = () => {
   const { t } = useEnhancedI18n();
@@ -21,8 +21,8 @@ const TenderNew = () => {
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
-  const [businessId, setBusinessId] = useState<string | null>(null);
-  const [checkingAccess, setCheckingAccess] = useState(true);
+  const [businessAccount, setBusinessAccount] = useState<any>(null);
+  const [businessAccountLoading, setBusinessAccountLoading] = useState(true);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -40,65 +40,49 @@ const TenderNew = () => {
     { id: '5', name: 'Другое' }
   ]);
 
+  // Load business account on component mount
   useEffect(() => {
-    checkBusinessAccess();
-  }, []);
+    const loadBusinessAccount = async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        
+        if (!session.session?.user) {
+          navigate('/auth');
+          return;
+        }
 
-  const checkBusinessAccess = async () => {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      
-      if (!session.session?.user) {
-        toast({ title: 'Ошибка', description: 'Необходимо войти в систему', variant: 'destructive' });
-        navigate('/auth');
-        return;
-      }
+        // Check if user has business account
+        const { data: businessData, error } = await supabase
+          .from('business_accounts')
+          .select('*')
+          .eq('owner_id', session.session.user.id)
+          .maybeSingle();
 
-      const userId = session.session.user.id;
-      
-      // Check if user has business role
-      const roleResult = await getUserRole(userId);
-      
-      if (!roleResult.success || roleResult.role !== 'business') {
-        toast({ 
-          title: 'Доступ запрещен', 
-          description: 'Только бизнес аккаунты могут создавать тендеры', 
-          variant: 'destructive' 
-        });
-        navigate('/dashboard/client');
-        return;
-      }
+        if (error) {
+          console.error('Error checking business account:', error);
+          toast({ 
+            title: 'Ошибка', 
+            description: 'Не удалось проверить бизнес-аккаунт', 
+            variant: 'destructive' 
+          });
+          return;
+        }
 
-      // Get business account ID
-      const { data: businessAccount, error } = await supabase
-        .from('business_accounts')
-        .select('id')
-        .eq('owner_id', userId)
-        .single();
-
-      if (error || !businessAccount) {
+        setBusinessAccount(businessData);
+      } catch (error: any) {
+        console.error('Error loading business account:', error);
         toast({ 
           title: 'Ошибка', 
-          description: 'Бизнес аккаунт не найден', 
+          description: 'Не удалось загрузить бизнес-аккаунт', 
           variant: 'destructive' 
         });
-        navigate('/dashboard/business');
-        return;
+      } finally {
+        setBusinessAccountLoading(false);
       }
+    };
 
-      setBusinessId(businessAccount.id);
-    } catch (error) {
-      console.error('Error checking business access:', error);
-      toast({ 
-        title: 'Ошибка', 
-        description: 'Произошла ошибка при проверке доступа', 
-        variant: 'destructive' 
-      });
-      navigate('/dashboard/client');
-    } finally {
-      setCheckingAccess(false);
-    }
-  };
+    loadBusinessAccount();
+  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,8 +118,12 @@ const TenderNew = () => {
         return;
       }
 
-      if (!businessId) {
-        toast({ title: 'Ошибка', description: 'Бизнес аккаунт не определен', variant: 'destructive' });
+      if (!businessAccount) {
+        toast({ 
+          title: 'Ошибка', 
+          description: 'У вас нет бизнес-аккаунта. Только бизнес-аккаунты могут создавать тендеры.', 
+          variant: 'destructive' 
+        });
         return;
       }
 
@@ -143,7 +131,7 @@ const TenderNew = () => {
         .from('tenders')
         .insert({
           client_id: session.session.user.id,
-          business_id: businessId,
+          business_id: businessAccount.id,
           title: formData.title,
           description: formData.description,
           budget_max_cents: parseInt(formData.budget_max_cents) * 100, // Convert to cents
@@ -171,12 +159,12 @@ const TenderNew = () => {
     }
   };
 
-  if (checkingAccess) {
+  if (businessAccountLoading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <div className="card-surface p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Проверяем доступ...</h1>
-          <div className="animate-spin">⏳</div>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Загрузка...</h2>
+          <p className="text-muted-foreground">Проверяем ваш бизнес-аккаунт</p>
         </div>
       </main>
     );
@@ -190,144 +178,169 @@ const TenderNew = () => {
           description="Создайте тендер для получения предложений от специалистов" 
           canonical="/tenders/new" 
         />
-      
-      {/* Header */}
-      <section className="container mx-auto py-12 px-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/dashboard/client?tab=tenders')}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Назад к тендерам
-            </Button>
-            <div>
-              <h1 className="text-3xl font-display font-bold text-gradient">
-                Создать тендер
-              </h1>
-              <p className="text-muted-foreground">
-                Опишите задачу и получите предложения от специалистов
-              </p>
+        
+        {/* Header */}
+        <section className="container mx-auto py-12 px-6">
+          <div className="max-w-2xl mx-auto">
+            
+            {!businessAccount && (
+              <Alert className="mb-6">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Для создания тендеров необходим бизнес-аккаунт. Тендеры доступны только для корпоративных клиентов.
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto ml-2"
+                    onClick={() => navigate('/dashboard/business')}
+                  >
+                    Создать бизнес-аккаунт
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex items-center gap-4 mb-8">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/dashboard/business?tab=tenders')}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Назад к тендерам
+              </Button>
+              <div>
+                <h1 className="text-3xl font-display font-bold text-gradient">
+                  Создать тендер
+                </h1>
+                <p className="text-muted-foreground">
+                  Опишите задачу и получите предложения от специалистов
+                </p>
+              </div>
             </div>
-          </div>
 
-          <Card className="card-surface">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Gavel className="h-5 w-5 text-primary" />
-                Информация о тендере
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Название тендера *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Например: Ремонт крана в ванной комнате"
-                    maxLength={200}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {formData.title.length}/200 символов
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Описание работ *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Опишите подробно что нужно сделать, требования к материалам, сроки выполнения..."
-                    rows={4}
-                    maxLength={1000}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {formData.description.length}/1000 символов
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="category">Категория услуги</Label>
-                  <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите категорию" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="budget" className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    Максимальный бюджет *
-                  </Label>
-                  <Input
-                    id="budget"
-                    type="number"
-                    min="1"
-                    value={formData.budget_max_cents}
-                    onChange={(e) => setFormData(prev => ({ ...prev, budget_max_cents: e.target.value }))}
-                    placeholder="1000"
-                  />
-                  {formData.budget_max_cents && (
-                    <p className="text-sm text-muted-foreground">
-                      Сумма: {formatPrice(parseInt(formData.budget_max_cents) * 100)}
-                    </p>
+            <Card className="card-surface">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Gavel className="h-5 w-5 text-primary" />
+                  Информация о тендере
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {businessAccount && (
+                    <div className="p-4 bg-accent/10 rounded-lg border">
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Бизнес-аккаунт:</strong> {businessAccount.company_name}
+                      </p>
+                    </div>
                   )}
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="deadline" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Срок подачи заявок *
-                  </Label>
-                  <Input
-                    id="deadline"
-                    type="datetime-local"
-                    value={formData.deadline}
-                    onChange={(e) => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
-                    min={new Date().toISOString().slice(0, 16)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    После этого времени подача заявок будет закрыта
-                  </p>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Название тендера *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="Например: Ремонт крана в ванной комнате"
+                      maxLength={200}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {formData.title.length}/200 символов
+                    </p>
+                  </div>
 
-                <div className="flex gap-4 pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => navigate('/dashboard/client?tab=tenders')}
-                    className="flex-1"
-                  >
-                    Отмена
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={loading}
-                    className="flex-1"
-                  >
-                    {loading ? 'Создание...' : 'Создать тендер'}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    </main>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Описание работ *</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Опишите подробно что нужно сделать, требования к материалам, сроки выполнения..."
+                      rows={4}
+                      maxLength={1000}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {formData.description.length}/1000 символов
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Категория услуги</Label>
+                    <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите категорию" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="budget" className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Максимальный бюджет *
+                    </Label>
+                    <Input
+                      id="budget"
+                      type="number"
+                      min="1"
+                      value={formData.budget_max_cents}
+                      onChange={(e) => setFormData(prev => ({ ...prev, budget_max_cents: e.target.value }))}
+                      placeholder="1000"
+                    />
+                    {formData.budget_max_cents && (
+                      <p className="text-sm text-muted-foreground">
+                        Сумма: {formatPrice(parseInt(formData.budget_max_cents) * 100)}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="deadline" className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Срок подачи заявок *
+                    </Label>
+                    <Input
+                      id="deadline"
+                      type="datetime-local"
+                      value={formData.deadline}
+                      onChange={(e) => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
+                      min={new Date().toISOString().slice(0, 16)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      После этого времени подача заявок будет закрыта
+                    </p>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => navigate('/dashboard/business?tab=tenders')}
+                      className="flex-1"
+                    >
+                      Отмена
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={loading || !businessAccount}
+                      className="flex-1"
+                    >
+                      {loading ? 'Создание...' : 'Создать тендер'}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      </main>
     </RoleGuard>
   );
 };

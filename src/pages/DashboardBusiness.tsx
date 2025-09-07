@@ -6,12 +6,13 @@ import { RoleGuard } from "@/components/RoleGuard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { Building2, User, Calendar, Settings, BarChart3, Users, FileText, Briefcase, UserPlus } from "lucide-react";
+import { Building2, User, Calendar, Settings, BarChart3, Users, FileText, Briefcase, UserPlus, Gavel } from "lucide-react";
 import { BusinessAccountForm } from "@/components/business/BusinessAccountForm";
 import { BusinessMembers } from "@/components/business/BusinessMembers";
 import { BusinessJobs } from "@/components/business/BusinessJobs";
 import { BusinessInvoices } from "@/components/business/BusinessInvoices";
 import { BusinessAnalytics } from "@/components/business/BusinessAnalytics";
+import { BusinessTenders } from "@/components/business/BusinessTenders";
 
 export default function DashboardBusiness() {
   const navigate = useNavigate();
@@ -94,6 +95,10 @@ export default function DashboardBusiness() {
                 <TabsTrigger value="jobs" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <Briefcase className="h-4 w-4" />
                   <span className="hidden sm:inline">Заказы</span>
+                </TabsTrigger>
+                <TabsTrigger value="tenders" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Gavel className="h-4 w-4" />
+                  <span className="hidden sm:inline">Тендеры</span>
                 </TabsTrigger>
                 <TabsTrigger value="invoices" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <FileText className="h-4 w-4" />
@@ -220,6 +225,10 @@ export default function DashboardBusiness() {
 
             <TabsContent value="jobs">
               <BusinessJobs />
+            </TabsContent>
+
+            <TabsContent value="tenders">
+              <BusinessTenders />
             </TabsContent>
 
             <TabsContent value="invoices">
