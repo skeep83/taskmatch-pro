@@ -306,7 +306,6 @@ export const AppNavigation = () => {
             {/* Language switcher */}
             <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg card-surface border-0 shadow-none bg-transparent">
               <button 
-                aria-label="Русский" 
                 className={cn(
                   "text-xs px-2 py-1 rounded-md font-medium transition-all",
                   language === 'ru' 
@@ -321,7 +320,6 @@ export const AppNavigation = () => {
                 RU
               </button>
               <button 
-                aria-label="Română" 
                 className={cn(
                   "text-xs px-2 py-1 rounded-md font-medium transition-all",
                   language === 'ro' 
