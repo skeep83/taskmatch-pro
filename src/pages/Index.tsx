@@ -105,7 +105,7 @@ export default function Index() {
   return (
     <div style={{ background: 'var(--background-neomorphic)' }}>
       <SignatureGradient />
-      <Seo 
+      <Seo
         title={t("seo.home.title")}
         description={t("seo.home.desc")}
         canonical="/"
