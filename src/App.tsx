@@ -4,52 +4,59 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
+
+// Core pages loaded immediately
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentCanceled from "./pages/PaymentCanceled";
-import Auth from "./pages/Auth";
-import JobNew from "./pages/JobNew";
+import HowItWorks from "./pages/HowItWorks";
+
+// UI components loaded immediately
 import { AppNavigation } from "./components/navigation/AppNavigation";
 import { FloatingActionButton } from "./components/navigation/FloatingActionButton";
 import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
 import { DatabaseI18nProvider } from "./i18n/DatabaseI18n";
 import Diagnostics from "./components/Diagnostics";
-import DashboardClient from "./pages/DashboardClient";
-import DashboardPro from "./pages/DashboardPro";
-import DashboardBusiness from "./pages/DashboardBusiness";
-import Messages from "./pages/Messages";
-import Kyc from "./pages/Kyc";
 
-import ProSchedule from "./pages/ProSchedule";
-import ProPortfolio from "./pages/ProPortfolio";
-import TendersList from "./pages/TendersList";
-import TenderDetail from "./pages/TenderDetail";
-import TenderNew from "./pages/TenderNew";
-import Catalog from "./pages/Catalog";
-import ProPublic from "./pages/ProPublic";
-import Feed from "./pages/Feed";
-import JobDetail from "./pages/JobDetail";
-import JobEdit from "./pages/JobEdit";
-import AdminLayout from "./pages/admin/AdminLayout";
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminUsers from "./pages/admin/Users";
-import AdminJobs from "./pages/admin/Jobs";
-import AdminTenders from "./pages/admin/Tenders";
-import AdminDisputes from "./pages/admin/Disputes";
-import AdminFinance from "./pages/admin/Finance";
-import AdminRisk from "./pages/admin/Risk";
-import AdminContent from "./pages/admin/Content";
-import AdminSettings from "./pages/admin/Settings";
-import AdminTesting from "./pages/admin/Testing";
-import AdminCurrencies from "./pages/admin/Currencies";
-import AdminCategories from "./pages/admin/Categories";
-import ProUpgradeRequests from "./pages/admin/ProUpgradeRequests";
-import ProUpgradeStatus from "./pages/ProUpgradeStatus";
-import ProfileSettings from "./pages/ProfileSettings";
-import HowItWorks from "./pages/HowItWorks";
+// Lazy-loaded pages for code splitting
+const Auth = lazy(() => import("./pages/Auth"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
+const JobNew = lazy(() => import("./pages/JobNew"));
+const JobDetail = lazy(() => import("./pages/JobDetail"));
+const JobEdit = lazy(() => import("./pages/JobEdit"));
+const DashboardClient = lazy(() => import("./pages/DashboardClient"));
+const DashboardPro = lazy(() => import("./pages/DashboardPro"));
+const DashboardBusiness = lazy(() => import("./pages/DashboardBusiness"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Kyc = lazy(() => import("./pages/Kyc"));
+const ProSchedule = lazy(() => import("./pages/ProSchedule"));
+const ProPortfolio = lazy(() => import("./pages/ProPortfolio"));
+const TendersList = lazy(() => import("./pages/TendersList"));
+const TenderDetail = lazy(() => import("./pages/TenderDetail"));
+const TenderNew = lazy(() => import("./pages/TenderNew"));
+const Catalog = lazy(() => import("./pages/Catalog"));
+const ProPublic = lazy(() => import("./pages/ProPublic"));
+const Feed = lazy(() => import("./pages/Feed"));
+const ProUpgradeStatus = lazy(() => import("./pages/ProUpgradeStatus"));
+const ProfileSettings = lazy(() => import("./pages/ProfileSettings"));
+
+// Admin pages lazy-loaded
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminJobs = lazy(() => import("./pages/admin/Jobs"));
+const AdminTenders = lazy(() => import("./pages/admin/Tenders"));
+const AdminDisputes = lazy(() => import("./pages/admin/Disputes"));
+const AdminFinance = lazy(() => import("./pages/admin/Finance"));
+const AdminRisk = lazy(() => import("./pages/admin/Risk"));
+const AdminContent = lazy(() => import("./pages/admin/Content"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminTesting = lazy(() => import("./pages/admin/Testing"));
+const AdminCurrencies = lazy(() => import("./pages/admin/Currencies"));
+const AdminCategories = lazy(() => import("./pages/admin/Categories"));
+const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests"));
 import PageTransition from "./components/PageTransition";
 
 const queryClient = new QueryClient();
@@ -61,50 +68,61 @@ const AppContent = () => {
     <>
       <AppNavigation />
       <PageTransition>
-        <Routes location={location}>
-          <Route path="/" element={<Index />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/catalog" element={<Catalog />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/job/:id" element={<JobDetail />} />
-          <Route path="/job/:id/edit" element={<JobEdit />} />
-          <Route path="/job/new" element={<JobNew />} />
-          <Route path="/dashboard/client" element={<DashboardClient />} />
-          <Route path="/dashboard/pro" element={<DashboardPro />} />
-          <Route path="/dashboard/business" element={<DashboardBusiness />} />
-          <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/messages/:id" element={<Messages />} />
-          <Route path="/profile/settings" element={<ProfileSettings />} />
-          <Route path="/kyc" element={<Kyc />} />
-          <Route path="/pro-upgrade-status" element={<ProUpgradeStatus />} />
-          <Route path="/pro/profile" element={<Navigate to="/profile/settings" replace />} />
-          <Route path="/pro/schedule" element={<ProSchedule />} />
-          <Route path="/portfolio" element={<ProPortfolio />} />
-          <Route path="/tenders" element={<TendersList />} />
-          <Route path="/tenders/new" element={<TenderNew />} />
-          <Route path="/tenders/:id" element={<TenderDetail />} />
-          <Route path="/pro/:id" element={<ProPublic />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/payment-canceled" element={<PaymentCanceled />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="jobs" element={<AdminJobs />} />
-            <Route path="tenders" element={<AdminTenders />} />
-            <Route path="disputes" element={<AdminDisputes />} />
-            <Route path="pro-requests" element={<ProUpgradeRequests />} />
-            <Route path="finance" element={<AdminFinance />} />
-            <Route path="risk" element={<AdminRisk />} />
-            <Route path="content" element={<AdminContent />} />
-            <Route path="currencies" element={<AdminCurrencies />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="settings" element={<AdminSettings />} />
-            <Route path="testing" element={<AdminTesting />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={
+          <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
+            <div className="text-center p-8">
+              <div className="relative">
+                <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin mx-auto mb-4"></div>
+              </div>
+              <p className="text-sm text-muted-foreground animate-pulse">Загрузка...</p>
+            </div>
+          </div>
+        }>
+          <Routes location={location}>
+            <Route path="/" element={<Index />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/job/:id" element={<JobDetail />} />
+            <Route path="/job/:id/edit" element={<JobEdit />} />
+            <Route path="/job/new" element={<JobNew />} />
+            <Route path="/dashboard/client" element={<DashboardClient />} />
+            <Route path="/dashboard/pro" element={<DashboardPro />} />
+            <Route path="/dashboard/business" element={<DashboardBusiness />} />
+            <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/messages/:id" element={<Messages />} />
+            <Route path="/profile/settings" element={<ProfileSettings />} />
+            <Route path="/kyc" element={<Kyc />} />
+            <Route path="/pro-upgrade-status" element={<ProUpgradeStatus />} />
+            <Route path="/pro/profile" element={<Navigate to="/profile/settings" replace />} />
+            <Route path="/pro/schedule" element={<ProSchedule />} />
+            <Route path="/portfolio" element={<ProPortfolio />} />
+            <Route path="/tenders" element={<TendersList />} />
+            <Route path="/tenders/new" element={<TenderNew />} />
+            <Route path="/tenders/:id" element={<TenderDetail />} />
+            <Route path="/pro/:id" element={<ProPublic />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-canceled" element={<PaymentCanceled />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="jobs" element={<AdminJobs />} />
+              <Route path="tenders" element={<AdminTenders />} />
+              <Route path="disputes" element={<AdminDisputes />} />
+              <Route path="pro-requests" element={<ProUpgradeRequests />} />
+              <Route path="finance" element={<AdminFinance />} />
+              <Route path="risk" element={<AdminRisk />} />
+              <Route path="content" element={<AdminContent />} />
+              <Route path="currencies" element={<AdminCurrencies />} />
+              <Route path="categories" element={<AdminCategories />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="testing" element={<AdminTesting />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </PageTransition>
       <FloatingActionButton />
       <Footer />
