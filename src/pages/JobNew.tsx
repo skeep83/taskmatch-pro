@@ -143,7 +143,7 @@ const JobNew = () => {
       }
 
       toast({ title: "Заказ создан", description: "Мы нашли специалистов в вашем районе и отправили им уведомления" });
-      navigate("/dashboard", { replace: true });
+      navigate("/dashboard/client", { replace: true });
     } catch (err: any) {
       console.error(err);
       toast({ title: "Ошибка", description: err?.message || "Не удалось создать заказ", variant: "destructive" });

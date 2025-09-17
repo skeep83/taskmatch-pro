@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { MediaViewer } from "@/components/media";
 import { useEnhancedI18n } from "@/i18n/enhanced";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 
 const ProPortfolio = () => {
   const { t } = useEnhancedI18n();
+  const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
   const [items, setItems] = useState<any[]>([]);
   const [title, setTitle] = useState('');
@@ -27,7 +29,7 @@ const ProPortfolio = () => {
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id || null;
-      if (!uid) { window.location.href = '/auth'; return; }
+      if (!uid) { navigate('/auth'); return; }
       setUserId(uid);
       const { data } = await (supabase as any)
         .from('portfolio_items')

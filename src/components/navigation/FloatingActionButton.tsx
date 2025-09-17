@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export const FloatingActionButton = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -158,7 +159,7 @@ export const FloatingActionButton = () => {
                 setIsExpanded(!isExpanded);
               } else {
                 // If only one action, navigate directly
-                window.location.href = quickActions[0].href;
+                navigate(quickActions[0].href);
               }
             }}
           >

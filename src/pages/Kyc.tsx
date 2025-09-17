@@ -92,7 +92,7 @@ const Kyc = () => {
                 <p className="text-sm">{d.doc_type}</p>
                 <p className="text-xs text-muted-foreground">Статус: {d.status} • {new Date(d.created_at).toLocaleString()}</p>
               </div>
-              <a className="text-xs underline" href={d.file_url} target="_blank" rel="noreferrer">Открыть</a>
+              <a className="text-xs underline" href={d.file_url} target="_blank" rel="noopener noreferrer">Открыть</a>
             </li>
           ))}
         </ul>

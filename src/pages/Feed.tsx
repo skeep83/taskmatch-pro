@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { useCurrency } from "@/hooks/useCurrency";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
@@ -14,6 +15,7 @@ export default function Feed() {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -82,7 +84,7 @@ export default function Feed() {
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id;
-      if (!uid) { window.location.href = "/auth"; return; }
+      if (!uid) { navigate("/auth"); return; }
       
       const { error } = await (supabase as any)
         .from("jobs")

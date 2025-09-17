@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const weekdays = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 
 const ProSchedule = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
   const [items, setItems] = useState<any[]>([]);
   const [weekday, setWeekday] = useState<number>(1);
@@ -19,7 +21,7 @@ const ProSchedule = () => {
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id || null;
-      if (!uid) { window.location.href = '/auth'; return; }
+      if (!uid) { navigate('/auth'); return; }
       setUserId(uid);
       const { data } = await (supabase as any).from('pro_availability').select('*').eq('user_id', uid).order('weekday');
       setItems(data || []);

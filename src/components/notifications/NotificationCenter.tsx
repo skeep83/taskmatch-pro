@@ -11,10 +11,12 @@ import { useSoundSettings } from '@/hooks/useSoundSettings';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const NotificationCenter = () => {
   const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
   const { settings, updateSettings } = useSoundSettings();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [showSoundSettings, setShowSoundSettings] = useState(false);
 
@@ -32,27 +34,27 @@ export const NotificationCenter = () => {
     
     // Handle navigation based on notification type
     if (notification.type === 'job_match' && notification.data?.job_id) {
-      window.location.href = `/job/${notification.data.job_id}`;
+      navigate(`/job/${notification.data.job_id}`);
     } else if (notification.type === 'price_proposal' && notification.data?.job_id) {
-      window.location.href = `/job/${notification.data.job_id}`;
+      navigate(`/job/${notification.data.job_id}`);
     } else if (notification.type === 'job_application' && notification.data?.job_id) {
-      window.location.href = `/job/${notification.data.job_id}`;
+      navigate(`/job/${notification.data.job_id}`);
     } else if (notification.type === 'message' && notification.data?.message_id) {
       // Navigate to messages with specific parameters
       if (notification.data?.job_id && notification.data?.other_user_id) {
-        window.location.href = `/messages?user=${notification.data.other_user_id}&job=${notification.data.job_id}`;
+        navigate(`/messages?user=${notification.data.other_user_id}&job=${notification.data.job_id}`);
       } else if (notification.data?.chat_id) {
-        window.location.href = `/messages/${notification.data.chat_id}`;
+        navigate(`/messages/${notification.data.chat_id}`);
       } else {
-        window.location.href = `/messages`;
+        navigate(`/messages`);
       }
     } else if (notification.type === 'job_update' && notification.data?.job_id) {
-      window.location.href = `/job/${notification.data.job_id}`;
+      navigate(`/job/${notification.data.job_id}`);
     } else if (notification.type === 'job_accepted' && notification.data?.job_id) {
-      window.location.href = `/job/${notification.data.job_id}`;
+      navigate(`/job/${notification.data.job_id}`);
     } else if (notification.type === 'rating' && notification.data?.job_id) {
       // For rating notifications, navigate to job or dashboard
-      window.location.href = `/job/${notification.data.job_id}`;
+      navigate(`/job/${notification.data.job_id}`);
     }
     
     // Close the popover after navigation

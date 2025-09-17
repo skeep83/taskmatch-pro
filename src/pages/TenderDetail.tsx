@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const TenderDetail = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { id } = useParams();
   const [tender, setTender] = useState<any | null>(null);
   const [price, setPrice] = useState<number | ''>('');
@@ -25,7 +26,7 @@ const TenderDetail = () => {
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id || null;
-      if (!uid) { window.location.href = '/auth'; return; }
+      if (!uid) { navigate('/auth'); return; }
       if (price === '' || Number(price) <= 0) return toast({ title: 'Укажите цену', variant: 'destructive' });
       const { error } = await (supabase as any).from('bids').insert({ tender_id: id, pro_id: uid, price_cents: Number(price), note });
       if (error) throw error;

@@ -58,9 +58,9 @@ const Auth = () => {
           const { data: roles2 } = await supabase.from("user_roles").select("role");
           const roleList = (roles2 || []).map((r: any) => r.role);
           toast({ title: "Успешный вход", description: `Добро пожаловать, ${email}` });
-          if (roleList.includes("pro")) navigate("/pro/dashboard", { replace: true });
-          else if (roleList.includes("business")) navigate("/business/dashboard", { replace: true });
-          else navigate("/dashboard", { replace: true });
+          if (roleList.includes("pro")) navigate("/dashboard/pro", { replace: true });
+          else if (roleList.includes("business")) navigate("/dashboard/business", { replace: true });
+          else navigate("/dashboard/client", { replace: true });
         }
       } else {
         const redirectUrl = `${window.location.origin}/`;
@@ -74,9 +74,9 @@ const Auth = () => {
           // Email confirmation disabled: attach role immediately
           await supabase.from("user_roles").insert({ user_id: data.session.user.id, role: desiredRole });
           toast({ title: "Аккаунт создан", description: "Роль назначена. Добро пожаловать!" });
-          if (desiredRole === "pro") navigate("/pro/dashboard", { replace: true });
-          else if (desiredRole === "business") navigate("/business/dashboard", { replace: true });
-          else navigate("/dashboard", { replace: true });
+          if (desiredRole === "pro") navigate("/dashboard/pro", { replace: true });
+          else if (desiredRole === "business") navigate("/dashboard/business", { replace: true });
+          else navigate("/dashboard/client", { replace: true });
         } else {
           // Most setups require email confirmation
           localStorage.setItem("desired_role", desiredRole);

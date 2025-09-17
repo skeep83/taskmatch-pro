@@ -146,7 +146,7 @@ const JobDetail = () => {
         description: `Не удалось загрузить заказ: ${error.message}`,
         variant: 'destructive'
       });
-      navigate('/dashboard');
+      navigate('/dashboard/client');
     } finally {
       setLoading(false);
     }
