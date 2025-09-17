@@ -35,6 +35,42 @@
       html { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
       body { margin: 0; padding: 0; background: #ffffff; color: #0f172a; }
       #root { min-height: 100vh; }
+      
+      /* Critical above-the-fold styles */
+      .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+      .grid { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+      .flex { display: flex; }
+      .items-center { align-items: center; }
+      .justify-center { justify-content: center; }
+      .text-center { text-align: center; }
+      .w-full { width: 100%; }
+      .h-auto { height: auto; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .mb-4 { margin-bottom: 1rem; }
+      .mb-8 { margin-bottom: 2rem; }
+      .px-4 { padding-left: 1rem; padding-right: 1rem; }
+      .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+      .py-16 { padding-top: 4rem; padding-bottom: 4rem; }
+      .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+      .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+      .font-bold { font-weight: 700; }
+      .font-semibold { font-weight: 600; }
+      .rounded-lg { border-radius: 0.5rem; }
+      .rounded-3xl { border-radius: 1.5rem; }
+      .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+      .hidden { display: none; }
+      
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        body { background: #0f172a; color: #f1f5f9; }
+      }
+      
+      /* Responsive grid */
+      @media (min-width: 768px) {
+        .grid { grid-template-columns: 1fr 1fr; }
+        .text-4xl { font-size: 3rem; line-height: 1; }
+      }
+      
       /* Prevent flash of unstyled content */
       .font-display { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
       .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -44,8 +80,11 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
     
+    <!-- Defer non-critical CSS for better performance -->
+    <link rel="preload" href="/assets/index.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
+    
     <!-- Resource hints for faster loading -->
-    <link rel="prefetch" href="/assets/index.css">
     <link rel="prefetch" href="/assets/index.js">
     <link rel="canonical" href="/" />
 
