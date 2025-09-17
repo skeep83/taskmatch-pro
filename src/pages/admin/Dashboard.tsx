@@ -474,7 +474,7 @@ export default function AdminDashboard() {
                 <div className="text-xs font-medium text-center text-muted-foreground">
                   Uptime
                 </div>
-                <div className="relative w-8 h-32 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
+                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
                     className="w-full bg-gradient-to-t from-green-500 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
                     style={{ height: '99.9%' }}
@@ -491,7 +491,7 @@ export default function AdminDashboard() {
                 <div className="text-xs font-medium text-center text-muted-foreground">
                   API Time
                 </div>
-                <div className="relative w-8 h-32 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
+                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
                     className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-full transition-all duration-1000 ease-out"
                     style={{ height: `${Math.max(0, 100 - (stats.api_response_time || 120) / 5)}%` }}
@@ -508,7 +508,7 @@ export default function AdminDashboard() {
                 <div className="text-xs font-medium text-center text-muted-foreground">
                   Errors
                 </div>
-                <div className="relative w-8 h-32 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
+                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
                     className="w-full bg-gradient-to-t from-pink-500 to-pink-400 rounded-full transition-all duration-1000 ease-out"
                     style={{ height: `${Math.max(5, (stats.error_rate || 0.1) * 20)}%` }}
@@ -525,7 +525,7 @@ export default function AdminDashboard() {
                 <div className="text-xs font-medium text-center text-muted-foreground">
                   Queue
                 </div>
-                <div className="relative w-8 h-32 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
+                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
                     className="w-full bg-gradient-to-t from-teal-500 to-cyan-400 rounded-full transition-all duration-1000 ease-out"
                     style={{ height: `${stats.queue_health || 98}%` }}
@@ -542,7 +542,7 @@ export default function AdminDashboard() {
                 <div className="text-xs font-medium text-center text-muted-foreground">
                   Memory
                 </div>
-                <div className="relative w-8 h-32 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
+                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
                     className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-full transition-all duration-1000 ease-out"
                     style={{ height: `${stats.memory_usage || 68}%` }}
