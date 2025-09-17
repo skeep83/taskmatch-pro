@@ -103,7 +103,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
               </div>
               
               {/* Нижняя секция с контентом - более компактная */}
-              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5 flex flex-col h-full">
+              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5 flex flex-col flex-1">
                 <div className="text-center mb-4">
                   <h4 className="text-lg font-bold text-gray-900 mb-1">{config.title}</h4>
                   <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
