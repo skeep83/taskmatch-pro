@@ -6,6 +6,13 @@
     <title>ServiceHub — маркетплейс услуг</title>
     <meta name="description" content="ServiceHub: быстрый подбор проверенных специалистов, эскроу-платежи, тендеры, чаты, мгновенные выплаты." />
     <meta name="author" content="ServiceHub" />
+    
+    <!-- Cache control and performance hints -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
@@ -14,6 +21,10 @@
     <link rel="modulepreload" href="/src/main.tsx">
     <link rel="modulepreload" href="/src/App.tsx">
     <link rel="modulepreload" href="/src/integrations/supabase/client.ts">
+    
+    <!-- Additional resource hints for better caching -->
+    <link rel="preload" href="/assets/index.js" as="script" crossorigin>
+    <link rel="preload" href="/assets/index.css" as="style">
     
     <!-- Early hints for critical resources -->
     <script>
