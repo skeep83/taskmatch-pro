@@ -159,9 +159,7 @@ const HowItWorks = () => {
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
-            <div className="card-surface p-6 rounded-full">
-              <Sparkles size={72} className="text-primary" />
-            </div>
+            <NeumorphicIcon icon={Sparkles} size={120} variant="behance" />
           </div>
           
           <h1 className="text-5xl md:text-7xl font-display font-bold text-gradient mb-8 leading-tight">
@@ -176,14 +174,14 @@ const HowItWorks = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link to="/catalog" className="bg-primary text-white hover:bg-primary/90 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
-              <Search size={24} />
+            <Link to="/catalog" className="btn-hero px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
+              <NeumorphicIcon icon={Search} size={24} variant="behance" />
               {t("how_it_works.hero.find_specialist")}
               <ArrowRight size={20} />
             </Link>
             
-            <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
-              <Play size={20} />
+            <button className="btn-ghost px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
+              <NeumorphicIcon icon={Play} size={20} variant="behance" />
               {t("how_it_works.hero.watch_video")}
             </button>
           </div>
@@ -193,9 +191,11 @@ const HowItWorks = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <div key={index} className="card-surface p-6 text-center">
-              <stat.icon 
-                size={48} 
-                className="mx-auto mb-3 text-primary"
+              <NeumorphicIcon 
+                icon={stat.icon}
+                size={64} 
+                variant="behance"
+                className="mx-auto mb-3"
               />
               <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
@@ -208,7 +208,7 @@ const HowItWorks = () => {
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
-            <Target size={20} />
+            <NeumorphicIcon icon={Target} size={24} variant="behance" />
             {t("how_it_works.steps.badge")}
           </div>
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
@@ -232,16 +232,14 @@ const HowItWorks = () => {
                     <span className="text-sm font-bold text-primary">{step.number}</span>
                   </div>
                   
-                  {/* Icon with Gradient Background */}
+                  {/* Icon with Neumorphic Style */}
                   <div className="relative mb-8">
-                    <div className={`relative w-20 h-20 mx-auto rounded-full bg-gradient-to-r ${step.gradient} p-0.5`}>
-                      <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                        <step.icon 
-                          size={48}
-                          className="text-foreground"
-                        />
-                      </div>
-                    </div>
+                    <NeumorphicIcon 
+                      icon={step.icon}
+                      size={80}
+                      variant="behance"
+                      className="mx-auto"
+                    />
                   </div>
                   
                   <h3 className="text-xl font-bold mb-4 text-gradient-subtle">{step.title}</h3>
@@ -266,7 +264,7 @@ const HowItWorks = () => {
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary/10 text-secondary font-medium mb-6">
-            <Heart size={20} />
+            <NeumorphicIcon icon={Heart} size={24} variant="behance" />
             {t("how_it_works.features.badge")}
           </div>
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
@@ -286,12 +284,12 @@ const HowItWorks = () => {
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="mb-6">
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-r ${feature.gradient} shadow-lg`}>
-                    <feature.icon 
-                      size={56}
-                      className="text-white"
-                    />
-                  </div>
+                  <NeumorphicIcon 
+                    icon={feature.icon}
+                    size={80}
+                    variant="behance"
+                    className="mx-auto"
+                  />
                 </div>
                 
                 <h3 className="text-2xl font-bold mb-3 text-gradient-subtle">{feature.title}</h3>
@@ -311,7 +309,7 @@ const HowItWorks = () => {
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent/10 text-accent font-medium mb-6">
-            <Eye size={20} />
+            <NeumorphicIcon icon={Eye} size={24} variant="behance" />
             {t("how_it_works.faq.badge")}
           </div>
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
@@ -363,22 +361,10 @@ const HowItWorks = () => {
           
           <div className="relative">
             <div className="flex justify-center mb-8">
-              <div className="flex -space-x-2">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 p-0.5">
-                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                    <Users className="text-primary" size={24} />
-                  </div>
-                </div>
-                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-blue-500 p-0.5">
-                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                    <Star className="text-primary" size={24} />
-                  </div>
-                </div>
-                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-0.5">
-                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                    <Shield className="text-primary" size={24} />
-                  </div>
-                </div>
+              <div className="flex gap-4">
+                <NeumorphicIcon icon={Users} size={64} variant="behance" />
+                <NeumorphicIcon icon={Star} size={64} variant="behance" />
+                <NeumorphicIcon icon={Shield} size={64} variant="behance" />
               </div>
             </div>
             
@@ -390,13 +376,13 @@ const HowItWorks = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
-              <Link to="/catalog" className="bg-primary text-white hover:bg-primary/90 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
-                <Search size={24} />
+              <Link to="/catalog" className="btn-hero px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
+                <NeumorphicIcon icon={Search} size={24} variant="behance" />
                 {t("how_it_works.hero.find_specialist")}
                 <ArrowRight size={20} />
               </Link>
-              <Link to="/auth" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-10 py-5 rounded-xl font-semibold text-xl transition-colors shadow-lg flex items-center gap-3">
-                <Users size={24} />
+              <Link to="/auth" className="btn-ghost px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
+                <NeumorphicIcon icon={Users} size={24} variant="behance" />
                 {t("hero.cta_secondary")}
               </Link>
             </div>
