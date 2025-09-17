@@ -235,7 +235,7 @@ const Catalog = () => {
                 </div>
 
                 {/* Content Section with glass morphism effect */}
-                <div className="pt-16 px-4 pb-4 h-full flex flex-col" 
+                <div className="pt-16 px-4 pb-4 h-full flex flex-col justify-between" 
                      style={{ 
                        background: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
                        backdropFilter: 'blur(10px)',
@@ -243,7 +243,7 @@ const Catalog = () => {
                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)'
                      }}>
                   {/* Content */}
-                  <div className="text-center mb-3 flex-1">
+                  <div className="text-center">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">
                       {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || t("catalog.specialist_id", { id: String(p.user_id).slice(0,8) })}
                     </h3>
@@ -264,8 +264,8 @@ const Catalog = () => {
                     </p>
                   </div>
 
-                  {/* Buttons positioned higher */}
-                  <div className="space-y-2 mt-auto">
+                  {/* Buttons always at bottom */}
+                  <div className="space-y-2 mt-4">
                     <Link 
                       to={`/pro/${p.user_id}`}
                       className="block w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
