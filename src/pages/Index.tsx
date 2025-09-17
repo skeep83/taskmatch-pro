@@ -1,15 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { 
-  Rocket, 
-  Shield, 
-  Clock, 
-  Users, 
-  CheckCircle,
-  TrendingUp,
-  Smartphone,
-  Globe
-} from "lucide-react";
+import { Rocket } from "lucide-react";
+import { Icon } from "@/ui/icons3d";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { Seo } from "@/components/Seo";
 import { Icon3D } from "@/components/ui/Icon3D";
@@ -22,34 +14,34 @@ import elenaCahul from "@/assets/testimonials/elena-cahul.jpg";
 
 const features = [
   {
-    icon: Shield,
+    iconName: "shield" as const,
     title: "Безопасные платежи",
     description: "Эскроу-система защищает ваши средства до полного завершения работ"
   },
   {
-    icon: Clock,
-    title: "Быстрые отклики",
-    description: "Специалисты откликаются в течение нескольких минут"
+    iconName: "payout" as const,
+    title: "Быстрые выплаты",
+    description: "Мгновенные выплаты специалистам после завершения работ"
   },
   {
-    icon: Users,
+    iconName: "user" as const,
     title: "Проверенные мастера",
     description: "Все специалисты проходят верификацию и имеют рейтинг"
   },
   {
-    icon: CheckCircle,
+    iconName: "star" as const,
     title: "Гарантия качества",
     description: "Система отзывов и гарантий на выполненные работы"
   },
   {
-    icon: TrendingUp,
-    title: "Умное ценообразование",
-    description: "AI-алгоритмы помогают найти оптимальную цену"
+    iconName: "auction" as const,
+    title: "Тендерная система",
+    description: "Получайте лучшие предложения через тендеры"
   },
   {
-    icon: Smartphone,
-    title: "Мобильное приложение",
-    description: "Управляйте заказами из любой точки мира"
+    iconName: "video" as const,
+    title: "Видео-оценка",
+    description: "Предварительная оценка работ через видеозвонок"
   }
 ];
 
@@ -204,7 +196,7 @@ export default function Index() {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
-                  <feature.icon className="w-8 h-8 text-primary" />
+                  <Icon name={feature.iconName} size={32} />
                 </div>
                 <div className="card-title-aligned">
                   <h3 className="text-xl font-semibold mb-4">
@@ -241,7 +233,7 @@ export default function Index() {
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="w-16 h-16 mx-auto mb-4 group-hover:animate-bounce-gentle">
-                  <Icon3D name={category.iconKey} size="lg" loading="lazy" />
+                  <Icon name="star" size={64} />
                 </div>
                 <div className="card-title-aligned">
                   <h3 className="text-lg font-semibold mb-2 whitespace-nowrap">
@@ -288,7 +280,7 @@ export default function Index() {
                   </div>
                   <div className="flex flex-shrink-0">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Icon3D key={i} name="star" size="sm" className="text-yellow-400" />
+                      <Icon key={i} name="star" size={16} />
                     ))}
                   </div>
                 </div>

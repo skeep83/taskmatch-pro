@@ -550,6 +550,22 @@ All colors MUST be HSL.
     backface-visibility: hidden;
   }
 
+  /* 3D Icons - WebP with alpha channel */
+  .icon {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    background: transparent;
+  }
+
+  /* Icon size classes */
+  .icon-sm { @apply w-8 h-8; }
+  .icon-md { @apply w-12 h-12; }
+  .icon-lg { @apply w-16 h-16; }
+  .icon-xl { @apply w-24 h-24; }
+  .icon-2xl { @apply w-32 h-32; }
+
   .neumorphic-icon {
     background: linear-gradient(145deg, #f0f0f0, #cacaca);
     box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
