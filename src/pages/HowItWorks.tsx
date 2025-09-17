@@ -224,11 +224,11 @@ const HowItWorks = () => {
             {steps.map((step, index) => (
               <div key={index} className="relative">
                 <div 
-                  className={`card-surface p-8 text-center relative overflow-hidden border-0 transition-all duration-500 bg-gradient-to-br ${step.bgGradient}`}
+                  className="card-surface p-8 text-center relative overflow-hidden border-0 transition-all duration-500"
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
                   {/* Step Number */}
-                  <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 flex items-center justify-center">
+                  <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-bold text-primary">{step.number}</span>
                   </div>
                   
