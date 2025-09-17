@@ -249,47 +249,53 @@ const DashboardPro = () => {
 
         <div className="max-w-7xl mx-auto">
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
-            <div className="card-surface p-6 text-center">
-              <NeumorphicIcon icon={Wallet} size={64} variant="behance" className="mb-4 mx-auto" />
-              <div className="text-2xl font-bold text-success mb-1">
-                {formatPrice(walletBalance)}
-              </div>
-              <div className="text-sm text-muted-foreground">Баланс</div>
-            </div>
-            
-            <div className="card-surface p-6 text-center">
-              <NeumorphicIcon icon={Star} size={64} variant="behance" className="mb-4 mx-auto" />
-              <div className="flex flex-col items-center">
-                <StarRating 
-                  rating={ratingAvg || 0} 
-                  size="md" 
-                  showValue 
-                  showCount 
-                  count={ratingCount}
-                  className="mb-1"
-                />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div className="card-surface p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Баланс</p>
+                  <p className="text-2xl font-bold text-success">{formatPrice(walletBalance)}</p>
+                </div>
+                <NeumorphicIcon icon={Wallet} size={64} variant="behance" />
               </div>
             </div>
             
-            <div className="card-surface p-6 text-center">
-              <NeumorphicIcon icon={DollarSign} size={64} variant="behance" className="mb-4 mx-auto" />
-              <div className="text-2xl font-bold text-primary mb-1">
-                {formatPrice(monthlyEarnings)}
+            <div className="card-surface p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Рейтинг</p>
+                  <div className="flex items-center gap-2">
+                    <StarRating 
+                      rating={ratingAvg || 0} 
+                      size="sm" 
+                      showValue 
+                      showCount={false}
+                    />
+                    <span className="text-sm text-muted-foreground">({ratingCount})</span>
+                  </div>
+                </div>
+                <NeumorphicIcon icon={Star} size={64} variant="behance" />
               </div>
-              <div className="text-sm text-muted-foreground">Этот месяц</div>
             </div>
             
-            <div className="card-surface p-6 text-center">
-              <NeumorphicIcon icon={Award} size={64} variant="behance" className="mb-4 mx-auto" />
-              <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
-              <div className="text-sm text-muted-foreground">Выполнено</div>
+            <div className="card-surface p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Выполнено</p>
+                  <p className="text-2xl font-bold text-accent">{completedJobs}</p>
+                </div>
+                <NeumorphicIcon icon={Award} size={64} variant="behance" />
+              </div>
             </div>
             
-            <div className="card-surface p-6 text-center">
-              <NeumorphicIcon icon={Clock} size={64} variant="behance" className="mb-4 mx-auto" />
-              <div className="text-2xl font-bold text-secondary mb-1">{responseTime}</div>
-              <div className="text-sm text-muted-foreground">Время ответа</div>
+            <div className="card-surface p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Время ответа</p>
+                  <p className="text-2xl font-bold text-secondary">{responseTime}</p>
+                </div>
+                <NeumorphicIcon icon={Clock} size={64} variant="behance" />
+              </div>
             </div>
           </div>
 
