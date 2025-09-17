@@ -86,7 +86,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
             <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d h-80 flex flex-col">
               {/* Верхняя секция с градиентом - уменьшена */}
               <div className={`h-24 bg-gradient-to-br ${config.gradient} relative`}>
-                {/* Декоративный оверлей без темного наложения */}
+                {/* Декоративный оверлей */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent"></div>
                 
                 {/* Иконка */}
@@ -96,7 +96,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                     transition={{ duration: 0.2 }}
                     className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/30"
                   >
-                    <IconComponent className="w-8 h-8 text-primary" />
+                    <IconComponent className="w-8 h-8 text-white" />
                   </motion.div>
                 </div>
               </div>
