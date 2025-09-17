@@ -90,7 +90,7 @@ const navigationItems = [
 
 export function NeumorphicSidebar() {
   return (
-    <aside className="fixed left-0 top-0 h-screen w-80 bg-[#E5E7EB] p-6 overflow-y-auto">
+    <aside className="fixed left-0 top-20 h-[calc(100vh-80px)] w-80 bg-[#E5E7EB] p-6 overflow-y-auto z-10">
       {/* Header */}
       <div className="mb-8">
         <motion.div
