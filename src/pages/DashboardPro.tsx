@@ -250,7 +250,7 @@ const DashboardPro = () => {
         <div className="max-w-7xl mx-auto">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
-            <div className="card-surface p-6 text-center">
+            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
               <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
                 <Wallet className="h-8 w-8 text-white" />
               </div>
@@ -260,7 +260,7 @@ const DashboardPro = () => {
               <div className="text-sm text-muted-foreground">Баланс</div>
             </div>
             
-            <div className="card-surface p-6 text-center">
+            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
               <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
                 <Star className="h-8 w-8 text-white" />
               </div>
@@ -276,7 +276,7 @@ const DashboardPro = () => {
               </div>
             </div>
             
-            <div className="card-surface p-6 text-center">
+            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
                 <DollarSign className="h-8 w-8 text-white" />
               </div>
@@ -286,7 +286,7 @@ const DashboardPro = () => {
               <div className="text-sm text-muted-foreground">Этот месяц</div>
             </div>
             
-            <div className="card-surface p-6 text-center">
+            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
                 <Award className="h-8 w-8 text-white" />
               </div>
@@ -294,7 +294,7 @@ const DashboardPro = () => {
               <div className="text-sm text-muted-foreground">Выполнено</div>
             </div>
             
-            <div className="card-surface p-6 text-center">
+            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
               <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
                 <Clock className="h-8 w-8 text-white" />
               </div>
