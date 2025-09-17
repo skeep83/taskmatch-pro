@@ -268,15 +268,15 @@ const Catalog = () => {
                   <div className="space-y-2 mt-4">
                     <Link 
                       to={`/pro/${p.user_id}`}
-                      className="block w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
+                      className="block w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg transition-colors text-center text-sm font-medium"
                     >
-                      {t("catalog.profile")}
+                      Профиль
                     </Link>
                     <Link 
                       to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
-                      className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
+                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
                     >
-                      {t("catalog.order")}
+                      Заказать
                     </Link>
                   </div>
                 </div>
