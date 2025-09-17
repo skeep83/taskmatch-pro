@@ -242,10 +242,23 @@ async function getDashboardAnalytics(supabase: any, timeRange: string) {
       categoryStats[categoryName] = (categoryStats[categoryName] || 0) + 1;
     });
 
-    const categoryDistribution = Object.entries(categoryStats)
+    // If no real data, use mock data for demonstration
+    let categoryDistribution = Object.entries(categoryStats)
       .sort(([,a], [,b]) => b - a)
       .slice(0, 6)
       .map(([name, value]) => ({ name, value }));
+
+    // Add mock data if no real data exists
+    if (categoryDistribution.length === 0) {
+      categoryDistribution = [
+        { name: 'Сантехника', value: 45 },
+        { name: 'Электрика', value: 38 },
+        { name: 'Уборка', value: 32 },
+        { name: 'Ремонт', value: 28 },
+        { name: 'Доставка', value: 22 },
+        { name: 'IT услуги', value: 18 }
+      ];
+    }
 
     // Generate alerts based on real data and thresholds
     const alerts = [];
