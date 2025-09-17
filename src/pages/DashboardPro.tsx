@@ -250,27 +250,29 @@ const DashboardPro = () => {
         <div className="max-w-7xl mx-auto">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
-            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-6 text-center h-40 flex flex-col justify-between rounded-3xl shadow-[8px_8px_16px_rgba(174,187,204,0.4),-8px_-8px_16px_rgba(255,255,255,0.8)]">
               <NeumorphicIcon 
                 icon={Wallet} 
-                size={56} 
-                variant="rounded" 
-                className="mx-auto mb-2 shadow-[inset_4px_4px_8px_hsl(var(--muted)),inset_-4px_-4px_8px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                size={64} 
+                variant="inset" 
+                iconColor="text-green-600"
+                className="mx-auto mb-2" 
               />
               <div>
                 <div className="text-2xl font-bold text-green-600 mb-1">
                   {formatPrice(walletBalance)}
                 </div>
-                <div className="text-sm text-muted-foreground">Баланс</div>
+                <div className="text-sm text-slate-500">Баланс</div>
               </div>
             </div>
             
-            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-6 text-center h-40 flex flex-col justify-between rounded-3xl shadow-[8px_8px_16px_rgba(174,187,204,0.4),-8px_-8px_16px_rgba(255,255,255,0.8)]">
               <NeumorphicIcon 
                 icon={Star} 
-                size={56} 
-                variant="rounded" 
-                className="mx-auto mb-2 shadow-[inset_4px_4px_8px_hsl(var(--muted)),inset_-4px_-4px_8px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                size={64} 
+                variant="inset" 
+                iconColor="text-yellow-500"
+                className="mx-auto mb-2" 
               />
               <div className="flex flex-col items-center">
                 <StarRating 
@@ -284,119 +286,122 @@ const DashboardPro = () => {
               </div>
             </div>
             
-            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-6 text-center h-40 flex flex-col justify-between rounded-3xl shadow-[8px_8px_16px_rgba(174,187,204,0.4),-8px_-8px_16px_rgba(255,255,255,0.8)]">
               <NeumorphicIcon 
                 icon={DollarSign} 
-                size={56} 
-                variant="rounded" 
-                className="mx-auto mb-2 shadow-[inset_4px_4px_8px_hsl(var(--muted)),inset_-4px_-4px_8px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                size={64} 
+                variant="inset" 
+                iconColor="text-blue-600"
+                className="mx-auto mb-2" 
               />
               <div>
-                <div className="text-2xl font-bold text-primary mb-1">
+                <div className="text-2xl font-bold text-blue-600 mb-1">
                   {formatPrice(monthlyEarnings)}
                 </div>
-                <div className="text-sm text-muted-foreground">Этот месяц</div>
+                <div className="text-sm text-slate-500">Этот месяц</div>
               </div>
             </div>
             
-            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-6 text-center h-40 flex flex-col justify-between rounded-3xl shadow-[8px_8px_16px_rgba(174,187,204,0.4),-8px_-8px_16px_rgba(255,255,255,0.8)]">
               <NeumorphicIcon 
                 icon={Award} 
-                size={56} 
-                variant="rounded" 
-                className="mx-auto mb-2 shadow-[inset_4px_4px_8px_hsl(var(--muted)),inset_-4px_-4px_8px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                size={64} 
+                variant="inset" 
+                iconColor="text-orange-500"
+                className="mx-auto mb-2" 
               />
               <div>
-                <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
-                <div className="text-sm text-muted-foreground">Выполнено</div>
+                <div className="text-2xl font-bold text-orange-500 mb-1">{completedJobs}</div>
+                <div className="text-sm text-slate-500">Выполнено</div>
               </div>
             </div>
             
-            <div className="card-surface p-6 text-center h-40 flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-6 text-center h-40 flex flex-col justify-between rounded-3xl shadow-[8px_8px_16px_rgba(174,187,204,0.4),-8px_-8px_16px_rgba(255,255,255,0.8)]">
               <NeumorphicIcon 
                 icon={Clock} 
-                size={56} 
-                variant="rounded" 
-                className="mx-auto mb-2 shadow-[inset_4px_4px_8px_hsl(var(--muted)),inset_-4px_-4px_8px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                size={64} 
+                variant="inset" 
+                iconColor="text-purple-600"
+                className="mx-auto mb-2" 
               />
               <div>
-                <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
-                <div className="text-sm text-muted-foreground">Время ответа</div>
+                <div className="text-2xl font-bold text-purple-600 mb-1">{responseTime}</div>
+                <div className="text-sm text-slate-500">Время ответа</div>
               </div>
             </div>
           </div>
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-4 text-center cursor-pointer rounded-2xl shadow-[6px_6px_12px_rgba(174,187,204,0.4),-6px_-6px_12px_rgba(255,255,255,0.8)] hover:shadow-[8px_8px_16px_rgba(174,187,204,0.5),-8px_-8px_16px_rgba(255,255,255,0.9)] transition-all duration-200">
               <Link to="/profile/settings" className="flex flex-col items-center gap-3">
                 <NeumorphicIcon 
                   icon={UserCog} 
                   size={48} 
-                  variant="rounded" 
-                  className="shadow-[inset_3px_3px_6px_hsl(var(--muted)),inset_-3px_-3px_6px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                  variant="inset" 
+                  iconColor="text-slate-600"
                 />
-                <span className="text-sm font-medium">Профиль</span>
+                <span className="text-sm font-medium text-slate-700">Профиль</span>
               </Link>
             </div>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-4 text-center cursor-pointer rounded-2xl shadow-[6px_6px_12px_rgba(174,187,204,0.4),-6px_-6px_12px_rgba(255,255,255,0.8)] hover:shadow-[8px_8px_16px_rgba(174,187,204,0.5),-8px_-8px_16px_rgba(255,255,255,0.9)] transition-all duration-200">
               <Link to="/pro/schedule" className="flex flex-col items-center gap-3">
                 <NeumorphicIcon 
                   icon={Calendar} 
                   size={48} 
-                  variant="rounded" 
-                  className="shadow-[inset_3px_3px_6px_hsl(var(--muted)),inset_-3px_-3px_6px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                  variant="inset" 
+                  iconColor="text-slate-600"
                 />
-                <span className="text-sm font-medium">Расписание</span>
+                <span className="text-sm font-medium text-slate-700">Расписание</span>
               </Link>
             </div>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-4 text-center cursor-pointer rounded-2xl shadow-[6px_6px_12px_rgba(174,187,204,0.4),-6px_-6px_12px_rgba(255,255,255,0.8)] hover:shadow-[8px_8px_16px_rgba(174,187,204,0.5),-8px_-8px_16px_rgba(255,255,255,0.9)] transition-all duration-200">
               <Link to="/portfolio" className="flex flex-col items-center gap-3">
                 <NeumorphicIcon 
                   icon={ImageIcon} 
                   size={48} 
-                  variant="rounded" 
-                  className="shadow-[inset_3px_3px_6px_hsl(var(--muted)),inset_-3px_-3px_6px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                  variant="inset" 
+                  iconColor="text-slate-600"
                 />
-                <span className="text-sm font-medium">Портфолио</span>
+                <span className="text-sm font-medium text-slate-700">Портфолио</span>
               </Link>
             </div>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-4 text-center cursor-pointer rounded-2xl shadow-[6px_6px_12px_rgba(174,187,204,0.4),-6px_-6px_12px_rgba(255,255,255,0.8)] hover:shadow-[8px_8px_16px_rgba(174,187,204,0.5),-8px_-8px_16px_rgba(255,255,255,0.9)] transition-all duration-200">
               <Link to="/tenders" className="flex flex-col items-center gap-3">
                 <NeumorphicIcon 
                   icon={Briefcase} 
                   size={48} 
-                  variant="rounded" 
-                  className="shadow-[inset_3px_3px_6px_hsl(var(--muted)),inset_-3px_-3px_6px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                  variant="inset" 
+                  iconColor="text-slate-600"
                 />
-                <span className="text-sm font-medium">Тендеры</span>
+                <span className="text-sm font-medium text-slate-700">Тендеры</span>
               </Link>
             </div>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-4 text-center cursor-pointer rounded-2xl shadow-[6px_6px_12px_rgba(174,187,204,0.4),-6px_-6px_12px_rgba(255,255,255,0.8)] hover:shadow-[8px_8px_16px_rgba(174,187,204,0.5),-8px_-8px_16px_rgba(255,255,255,0.9)] transition-all duration-200">
               <button className="flex flex-col items-center gap-3 w-full">
                 <NeumorphicIcon 
                   icon={CreditCard} 
                   size={48} 
-                  variant="rounded" 
-                  className="shadow-[inset_3px_3px_6px_hsl(var(--muted)),inset_-3px_-3px_6px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                  variant="inset" 
+                  iconColor="text-slate-600"
                 />
-                <span className="text-sm font-medium">Выплата</span>
+                <span className="text-sm font-medium text-slate-700">Выплата</span>
               </button>
             </div>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <div className="bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 p-4 text-center cursor-pointer rounded-2xl shadow-[6px_6px_12px_rgba(174,187,204,0.4),-6px_-6px_12px_rgba(255,255,255,0.8)] hover:shadow-[8px_8px_16px_rgba(174,187,204,0.5),-8px_-8px_16px_rgba(255,255,255,0.9)] transition-all duration-200">
               <Link to="/kyc" className="flex flex-col items-center gap-3">
                 <NeumorphicIcon 
                   icon={ShieldCheck} 
                   size={48} 
-                  variant="rounded" 
-                  className="shadow-[inset_3px_3px_6px_hsl(var(--muted)),inset_-3px_-3px_6px_white] bg-gradient-to-br from-background via-muted/20 to-background" 
+                  variant="inset" 
+                  iconColor="text-slate-600"
                 />
-                <span className="text-sm font-medium">KYC</span>
+                <span className="text-sm font-medium text-slate-700">KYC</span>
               </Link>
             </div>
           </div>
