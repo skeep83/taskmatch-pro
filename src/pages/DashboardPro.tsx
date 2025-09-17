@@ -254,7 +254,7 @@ const DashboardPro = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Баланс</p>
-                  <p className="text-2xl font-bold text-success">{formatPrice(walletBalance)}</p>
+                  <p className="text-2xl font-bold">{formatPrice(walletBalance)}</p>
                 </div>
                 <NeumorphicIcon icon={Wallet} size={64} variant="behance" />
               </div>
@@ -282,7 +282,7 @@ const DashboardPro = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Выполнено</p>
-                  <p className="text-2xl font-bold text-accent">{completedJobs}</p>
+                  <p className="text-2xl font-bold">{completedJobs}</p>
                 </div>
                 <NeumorphicIcon icon={Award} size={64} variant="behance" />
               </div>
@@ -292,7 +292,7 @@ const DashboardPro = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Время ответа</p>
-                  <p className="text-2xl font-bold text-secondary">{responseTime}</p>
+                  <p className="text-2xl font-bold">{responseTime}</p>
                 </div>
                 <NeumorphicIcon icon={Clock} size={64} variant="behance" />
               </div>
