@@ -83,7 +83,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
             }}
             className="perspective-1000 group"
           >
-            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d h-64 flex flex-col">
               {/* Верхняя секция с градиентом - уменьшена */}
               <div className={`h-20 bg-gradient-to-br ${config.gradient} relative`}>
                 {/* Декоративный оверлей */}
@@ -97,28 +97,30 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                     transition={{ duration: 0.2 }}
                     className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/20"
                   >
-                    <IconComponent className="w-8 h-8 text-gray-700" />
+                    <IconComponent className="w-8 h-8 text-primary" />
                   </motion.div>
                 </div>
               </div>
               
               {/* Нижняя секция с контентом - более компактная */}
-              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5">
-                <div className="text-center mb-4">
-                  <h4 className="text-lg font-bold text-gray-900 mb-1">{config.title}</h4>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                    {config.description}
-                  </p>
-                </div>
-                
-                {/* Преимущества - более компактные */}
-                <div className="space-y-1 mb-4">
-                  {config.benefits.slice(0, 2).map((benefit, index) => (
-                    <div key={index} className="flex items-center gap-2 text-xs text-gray-600">
-                      <Star className="w-3 h-3 text-yellow-500 fill-current flex-shrink-0" />
-                      <span className="truncate">{benefit}</span>
-                    </div>
-                  ))}
+              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="text-center mb-4">
+                    <h4 className="text-lg font-bold text-foreground mb-1">{config.title}</h4>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+                      {config.description}
+                    </p>
+                  </div>
+                  
+                  {/* Преимущества - более компактные */}
+                  <div className="space-y-1 mb-4">
+                    {config.benefits.slice(0, 2).map((benefit, index) => (
+                      <div key={index} className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Star className="w-3 h-3 text-yellow-500 fill-current flex-shrink-0" />
+                        <span className="truncate">{benefit}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 
                 {/* Кнопка действия - меньшего размера */}
