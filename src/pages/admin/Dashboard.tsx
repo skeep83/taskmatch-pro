@@ -158,16 +158,18 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="space-y-8">
       <Seo title="ServiceHub — Admin Dashboard" description="Операционные метрики и аналитика" canonical="/admin" />
       
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Admin Dashboard
+          <h1 className="text-3xl font-bold mb-2">
+            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Admin Dashboard
+            </span>
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground">
             Операционные метрики и ключевые показатели платформы
           </p>
         </div>
@@ -175,23 +177,21 @@ export default function AdminDashboard() {
           <select 
             value={timeRange} 
             onChange={(e) => setTimeRange(e.target.value)}
-            className="px-3 py-2 border rounded-md bg-background"
+            className="px-4 py-2 card-surface border-0 rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
           >
             <option value="24h">24 часа</option>
             <option value="7d">7 дней</option>
             <option value="30d">30 дней</option>
             <option value="90d">90 дней</option>
           </select>
-          <Button 
-            variant="outline" 
-            size="sm"
+          <button
             onClick={loadDashboardData}
             disabled={refreshing}
-            className="gap-2"
+            className="btn-ghost px-4 py-2 rounded-xl flex items-center gap-2"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             Обновить
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -200,21 +200,21 @@ export default function AdminDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid gap-3"
+          className="grid gap-4"
         >
           {alerts.map((alert: any, index: number) => (
-            <Card key={index} className="border-l-4 border-l-red-500 bg-red-50/50">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-red-900">{alert.title}</p>
-                    <p className="text-sm text-red-700">{alert.message}</p>
-                    <Badge variant="destructive" className="mt-2">{alert.severity}</Badge>
-                  </div>
+            <div key={index} className="card-surface border-l-4 border-l-red-500 p-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-red-500/10 rounded-lg">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex-1">
+                  <h3 className="font-medium text-red-900 mb-1">{alert.title}</h3>
+                  <p className="text-sm text-red-700 mb-2">{alert.message}</p>
+                  <Badge variant="destructive" className="text-xs">{alert.severity}</Badge>
+                </div>
+              </div>
+            </div>
           ))}
         </motion.div>
       )}
@@ -232,34 +232,55 @@ export default function AdminDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
+              className="group hover-scale"
             >
-              <Card className="relative overflow-hidden">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Icon className={`h-4 w-4 ${metric.color}`} />
-                    {metric.title}
-                  </CardTitle>
-                  <div className="flex items-center justify-between">
-                    <p className="text-2xl font-bold">{metric.value}</p>
-                    {metric.change !== 0 && (
-                      <div className={`flex items-center gap-1 text-sm ${
-                        isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-600'
-                      }`}>
-                        {isPositive ? (
-                          <ArrowUpRight className="h-4 w-4" />
-                        ) : isNegative ? (
-                          <ArrowDownRight className="h-4 w-4" />
-                        ) : null}
-                        {Math.abs(metric.change).toFixed(1)}%
-                      </div>
-                    )}
+              <div className="card-surface p-6 relative overflow-hidden">
+                {/* Icon and Title */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`p-3 rounded-xl ${metric.color.replace('text-', 'bg-')}/10`}>
+                    <Icon className={`h-6 w-6 ${metric.color}`} />
                   </div>
-                </CardHeader>
-                <div className={`absolute bottom-0 left-0 right-0 h-1 ${metric.color.replace('text-', 'bg-')}/20`}>
-                  <div className={`h-full ${metric.color.replace('text-', 'bg-')} transition-all duration-1000 ease-out`} 
-                       style={{ width: `${Math.min(100, Math.abs(metric.change) * 2)}%` }} />
+                  <div className="flex-1">
+                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                      {metric.title}
+                    </h3>
+                  </div>
                 </div>
-              </Card>
+
+                {/* Value and Change */}
+                <div className="flex items-end justify-between mb-4">
+                  <div className="text-3xl font-bold">
+                    {metric.value}
+                  </div>
+                  {metric.change !== 0 && (
+                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                      isPositive 
+                        ? 'bg-green-500/10 text-green-600' 
+                        : isNegative 
+                        ? 'bg-red-500/10 text-red-600' 
+                        : 'bg-gray-500/10 text-gray-600'
+                    }`}>
+                      {isPositive ? (
+                        <ArrowUpRight className="h-3 w-3" />
+                      ) : isNegative ? (
+                        <ArrowDownRight className="h-3 w-3" />
+                      ) : null}
+                      {Math.abs(metric.change).toFixed(1)}%
+                    </div>
+                  )}
+                </div>
+
+                {/* Progress bar */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent to-primary/20">
+                  <div 
+                    className={`h-full bg-gradient-to-r ${metric.color.replace('text-', 'from-')} to-primary transition-all duration-1000 ease-out`}
+                    style={{ width: `${Math.min(100, Math.abs(metric.change) * 2)}%` }}
+                  />
+                </div>
+
+                {/* Hover glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+              </div>
             </motion.div>
           );
         })}
@@ -272,17 +293,20 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="hover-scale"
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="card-surface p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-green-500/10 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-green-600" />
-                GMV Тренд
-              </CardTitle>
-              <CardDescription>Валовый объем сделок за период</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              </div>
+              <div>
+                <h3 className="font-semibold">GMV Тренд</h3>
+                <p className="text-sm text-muted-foreground">Валовый объем сделок за период</p>
+              </div>
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={charts.gmv_trend || []}>
                   <defs>
                     <linearGradient id="gmv" x1="0" y1="0" x2="0" y2="1">
@@ -290,21 +314,40 @@ export default function AdminDashboard() {
                       <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <Tooltip 
                     contentStyle={{
                       backgroundColor: 'hsl(var(--background))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
-                  <Area type="monotone" dataKey="gmv" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#gmv)" />
+                  <Area 
+                    type="monotone" 
+                    dataKey="gmv" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#gmv)" 
+                  />
                 </AreaChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
         {/* User Activity */}
@@ -312,36 +355,51 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
+          className="hover-scale"
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="card-surface p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
                 <Activity className="h-5 w-5 text-blue-600" />
-                Активность пользователей
-              </CardTitle>
-              <CardDescription>MAU, WAU, DAU динамика</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              </div>
+              <div>
+                <h3 className="font-semibold">Активность пользователей</h3>
+                <p className="text-sm text-muted-foreground">MAU, WAU, DAU динамика</p>
+              </div>
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={charts.user_activity || []}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <Tooltip 
                     contentStyle={{
                       backgroundColor: 'hsl(var(--background))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
                   <Legend />
-                  <Line type="monotone" dataKey="dau" stroke="#3b82f6" strokeWidth={2} name="DAU" />
-                  <Line type="monotone" dataKey="wau" stroke="#8b5cf6" strokeWidth={2} name="WAU" />
-                  <Line type="monotone" dataKey="mau" stroke="#10b981" strokeWidth={2} name="MAU" />
+                  <Line type="monotone" dataKey="dau" stroke="#3b82f6" strokeWidth={3} name="DAU" dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="wau" stroke="#8b5cf6" strokeWidth={3} name="WAU" dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="mau" stroke="#10b981" strokeWidth={3} name="MAU" dot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
         {/* Job Categories Distribution */}
@@ -349,17 +407,20 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
+          className="hover-scale"
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="card-surface p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-purple-500/10 rounded-lg">
                 <Briefcase className="h-5 w-5 text-purple-600" />
-                Распределение по категориям
-              </CardTitle>
-              <CardDescription>Топ категории услуг</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              </div>
+              <div>
+                <h3 className="font-semibold">Распределение по категориям</h3>
+                <p className="text-sm text-muted-foreground">Топ категории услуг</p>
+              </div>
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={charts.category_distribution || []}
@@ -374,11 +435,18 @@ export default function AdminDashboard() {
                       <Cell key={`cell-${index}`} fill={`hsl(${index * 45 + 200}, 70%, 50%)`} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
         {/* System Health */}
@@ -386,46 +454,69 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
+          className="hover-scale"
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="card-surface p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-teal-500/10 rounded-lg">
                 <Shield className="h-5 w-5 text-teal-600" />
-                Здоровье системы
-              </CardTitle>
-              <CardDescription>Ключевые операционные показатели</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Uptime</span>
-                  <span className="font-medium">99.9%</span>
-                </div>
-                <Progress value={99.9} className="h-2" />
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>API Response Time</span>
-                  <span className="font-medium">{stats.api_response_time || 120}ms</span>
-                </div>
-                <Progress value={Math.max(0, 100 - (stats.api_response_time || 120) / 5)} className="h-2" />
+              <div>
+                <h3 className="font-semibold">Здоровье системы</h3>
+                <p className="text-sm text-muted-foreground">Ключевые операционные показатели</p>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Error Rate</span>
-                  <span className="font-medium">{(stats.error_rate || 0.1).toFixed(2)}%</span>
+            </div>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Uptime</span>
+                  <span className="text-sm font-semibold text-green-600">99.9%</span>
                 </div>
-                <Progress value={Math.max(0, 100 - (stats.error_rate || 0.1) * 20)} className="h-2" />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Queue Health</span>
-                  <span className="font-medium">{stats.queue_health || 98}%</span>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-1000" style={{ width: '99.9%' }} />
                 </div>
-                <Progress value={stats.queue_health || 98} className="h-2" />
               </div>
-            </CardContent>
-          </Card>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">API Response Time</span>
+                  <span className="text-sm font-semibold">{stats.api_response_time || 120}ms</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-1000" 
+                    style={{ width: `${Math.max(0, 100 - (stats.api_response_time || 120) / 5)}%` }} 
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Error Rate</span>
+                  <span className="text-sm font-semibold">{(stats.error_rate || 0.1).toFixed(2)}%</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-1000" 
+                    style={{ width: `${Math.max(0, 100 - (stats.error_rate || 0.1) * 20)}%` }} 
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Queue Health</span>
+                  <span className="text-sm font-semibold text-teal-600">{stats.queue_health || 98}%</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-1000" 
+                    style={{ width: `${stats.queue_health || 98}%` }} 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
       </div>
 
@@ -435,32 +526,46 @@ export default function AdminDashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
       >
-        <Card>
-          <CardHeader>
-            <CardTitle>Быстрые действия</CardTitle>
-            <CardDescription>Часто используемые операции</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button variant="outline" className="h-20 flex-col gap-2">
-                <Users className="h-6 w-6" />
-                <span className="text-sm">Пользователи</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex-col gap-2">
-                <Briefcase className="h-6 w-6" />
-                <span className="text-sm">Заказы</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex-col gap-2">
-                <DollarSign className="h-6 w-6" />
-                <span className="text-sm">Финансы</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex-col gap-2">
-                <AlertTriangle className="h-6 w-6" />
-                <span className="text-sm">Споры</span>
-              </Button>
+        <div className="card-surface p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Activity className="h-5 w-5 text-primary" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h3 className="font-semibold">Быстрые действия</h3>
+              <p className="text-sm text-muted-foreground">Часто используемые операции</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
+              <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium">Пользователи</span>
+            </button>
+            
+            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
+              <div className="p-3 bg-purple-500/10 rounded-xl group-hover:bg-purple-500/20 transition-colors">
+                <Briefcase className="h-6 w-6 text-purple-600" />
+              </div>
+              <span className="text-sm font-medium">Заказы</span>
+            </button>
+            
+            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
+              <div className="p-3 bg-green-500/10 rounded-xl group-hover:bg-green-500/20 transition-colors">
+                <DollarSign className="h-6 w-6 text-green-600" />
+              </div>
+              <span className="text-sm font-medium">Финансы</span>
+            </button>
+            
+            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
+              <div className="p-3 bg-red-500/10 rounded-xl group-hover:bg-red-500/20 transition-colors">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <span className="text-sm font-medium">Споры</span>
+            </button>
+          </div>
+        </div>
       </motion.div>
     </div>
   );

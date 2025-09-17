@@ -90,48 +90,53 @@ export default function AdminLayout() {
   useEffect(()=>{ if (!loading && !ok) navigate("/auth"); }, [loading, ok, navigate]);
 
   if (loading) return (
-    <main className="container mx-auto py-10">
-      <section className="max-w-6xl mx-auto card-surface">
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <Activity className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-            <h1 className="text-xl">Проверка прав доступа...</h1>
-            <p className="text-sm text-muted-foreground mt-2">Верификация административных привилегий</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-background-subtle to-background">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="card-surface p-8 text-center">
+          <Activity className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+          <h1 className="text-xl font-medium">Проверка прав доступа...</h1>
+          <p className="text-sm text-muted-foreground mt-2">Верификация административных привилегий</p>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
   
   if (!ok) return null;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-background-subtle to-background">
       <Seo title="ServiceHub — Admin" description="Защищенная операционная админ-панель" canonical="/admin" />
       
-      <header className="w-full glass-nav sticky top-0 z-20">
-        <nav className="container mx-auto flex items-center justify-between py-3">
+      {/* Header */}
+      <header className="glass-nav sticky top-0 z-20 backdrop-blur-xl">
+        <div className="container mx-auto flex items-center justify-between py-4">
           <div className="flex items-center gap-4">
-            <Link to="/" className="font-semibold flex items-center gap-2">
-              <Shield className="w-5 h-5 text-primary" />
-              ServiceHub Admin
+            <Link to="/" className="font-semibold flex items-center gap-3 hover:scale-105 transition-transform">
+              <div className="p-2 bg-primary/10 rounded-xl">
+                <Shield className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  ServiceHub Admin
+                </span>
+                <Badge variant="outline" className="ml-2 text-xs">
+                  Secure
+                </Badge>
+              </div>
             </Link>
-            <Badge variant="outline" className="text-xs">
-              Защищенная панель
-            </Badge>
           </div>
           
           <div className="flex items-center gap-4">
             {securityWarnings.length > 0 && (
-              <div className="flex items-center gap-2 text-yellow-600">
-                <AlertTriangle className="w-4 h-4" />
-                <span className="text-xs">{securityWarnings.length} предупреждений</span>
+              <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 rounded-full">
+                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                <span className="text-xs text-yellow-700">{securityWarnings.length} предупреждений</span>
               </div>
             )}
             
             <div className="flex items-center gap-2">
               {userRoles.map(role => (
-                <Badge key={role} variant="secondary" className="text-xs">
+                <Badge key={role} variant="secondary" className="text-xs px-2 py-1">
                   {role}
                 </Badge>
               ))}
@@ -139,72 +144,257 @@ export default function AdminLayout() {
             
             <button 
               onClick={logout}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="btn-ghost flex items-center gap-2 text-sm px-3 py-2"
             >
               <LogOut className="w-4 h-4" />
               Выход
             </button>
           </div>
-        </nav>
+        </div>
       </header>
 
-      <div className="container mx-auto py-6 grid md:grid-cols-[220px_1fr] gap-6">
-        <aside className="border rounded-md p-3">
-          <div className="mb-4 p-3 bg-green-500/10 border border-green-200 rounded-md">
-            <div className="flex items-center gap-2 text-green-700 text-sm">
-              <Shield className="w-4 h-4" />
-              <span>API-защищенная панель</span>
+      {/* Main Content */}
+      <div className="container mx-auto px-6 py-8">
+        <div className="grid lg:grid-cols-[280px_1fr] gap-8">
+          {/* Sidebar */}
+          <aside className="space-y-6">
+            {/* Security Status */}
+            <div className="card-surface p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-green-500/10 rounded-lg">
+                  <Shield className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Безопасность</h3>
+                  <p className="text-xs text-muted-foreground">API-защищенная панель</p>
+                </div>
+              </div>
+              <p className="text-xs text-green-600">
+                Все операции логируются и защищены серверной валидацией
+              </p>
             </div>
-            <p className="text-xs text-green-600 mt-1">
-              Все операции логируются и защищены серверной валидацией
-            </p>
-          </div>
-          
-          <nav className="flex flex-col gap-1 text-sm">
-            <NavLink to="/admin" end className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Dashboard
-            </NavLink>
-            <NavLink to="/admin/users" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Users & Pros
-            </NavLink>
-            <NavLink to="/admin/jobs" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Jobs
-            </NavLink>
-            <NavLink to="/admin/tenders" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Tenders
-            </NavLink>
-            <NavLink to="/admin/disputes" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Disputes
-            </NavLink>
-            <NavLink to="/admin/pro-requests" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Заявки специалистов
-            </NavLink>
-            <NavLink to="/admin/finance" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Finance
-            </NavLink>
-            <NavLink to="/admin/risk" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Risk
-            </NavLink>
-            <NavLink to="/admin/content" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Content
-            </NavLink>
-            <NavLink to="/admin/currencies" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Currencies
-            </NavLink>
-            <NavLink to="/admin/categories" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Categories
-            </NavLink>
-            <NavLink to="/admin/settings" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Settings
-            </NavLink>
-            <NavLink to="/admin/testing" className={({isActive})=> `p-2 rounded transition-colors ${isActive?"font-medium bg-primary/10":"opacity-80 hover:opacity-100 hover:bg-muted"}`}>
-              Testing
-            </NavLink>
-          </nav>
-        </aside>
-        <main>
-          <Outlet />
-        </main>
+
+            {/* Navigation */}
+            <nav className="card-surface p-4">
+              <h3 className="font-medium mb-4 text-sm text-muted-foreground uppercase tracking-wider">
+                Навигация
+              </h3>
+              <div className="space-y-1">
+                <NavLink 
+                  to="/admin" 
+                  end 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <Activity className="w-4 h-4" />
+                  Dashboard
+                </NavLink>
+                
+                <NavLink 
+                  to="/admin/users" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-blue-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                  </div>
+                  Users & Pros
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/jobs" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-purple-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                  </div>
+                  Jobs
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/tenders" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-amber-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                  </div>
+                  Tenders
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/disputes" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-red-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  </div>
+                  Disputes
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/pro-requests" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-green-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  </div>
+                  Заявки специалистов
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/finance" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-emerald-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                  </div>
+                  Finance
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/risk" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-orange-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                  </div>
+                  Risk
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/content" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-cyan-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
+                  </div>
+                  Content
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/currencies" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-indigo-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                  </div>
+                  Currencies
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/categories" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-pink-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-pink-500"></div>
+                  </div>
+                  Categories
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/settings" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-slate-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+                  </div>
+                  Settings
+                </NavLink>
+
+                <NavLink 
+                  to="/admin/testing" 
+                  className={({isActive}) => `
+                    flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200
+                    ${isActive 
+                      ? "bg-primary/10 text-primary font-medium shadow-inner" 
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <div className="w-4 h-4 rounded bg-teal-500/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-teal-500"></div>
+                  </div>
+                  Testing
+                </NavLink>
+              </div>
+            </nav>
+          </aside>
+
+          {/* Main Content */}
+          <main className="min-h-[600px]">
+            <Outlet />
+          </main>
+        </div>
       </div>
     </div>
   );
