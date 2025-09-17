@@ -177,8 +177,8 @@ const Catalog = () => {
       {/* Specialists Grid */}
       <section className="container mx-auto pb-20">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-display font-bold mb-4">{t("catalog.our_specialists")}</h2>
-          <p className="text-muted-foreground">{t("catalog.verified_professionals")}</p>
+          <h2 className="text-4xl font-display font-bold mb-4 mx-auto">{t("catalog.our_specialists")}</h2>
+          <p className="text-muted-foreground mx-auto">{t("catalog.verified_professionals")}</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto" style={{ perspective: '1000px' }}>
