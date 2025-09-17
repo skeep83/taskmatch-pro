@@ -954,77 +954,84 @@ const JobDetail = () => {
                   />
                 </div>
 
-                {/* Rating Section - Appears first when job is done and user can rate */}
-                {canRate ? (
+                {/* Rating Section - Mutual rating system */}
+                {job.status === 'done' && currentUser && (
                   <div className="mb-8">
-                    <h4 className="text-lg font-medium mb-6 text-center text-primary animate-pulse">Оцените выполнение услуги специалистом</h4>
+                    <h4 className="text-lg font-medium mb-6 text-center">Взаимная оценка</h4>
                     
-                    {/* Professional Avatar and Info */}
-                    {proProfile && (
-                      <div className="flex flex-col items-center mb-6">
-                        <Avatar className="w-40 h-40 mb-4 border-4 border-white/50 shadow-2xl">
-                          <AvatarImage 
-                            src={proProfile.avatar_url || ''} 
-                            alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
-                          />
-                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-3xl">
-                            {proProfile.full_name 
-                              ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
-                              : (proProfile.first_name && proProfile.last_name 
-                                ? `${proProfile.first_name[0]}${proProfile.last_name[0]}`.toUpperCase()
-                                : 'С')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <h5 className="font-bold text-xl text-center mb-2">
-                          {proProfile.full_name || 
-                           (proProfile.first_name && proProfile.last_name 
-                             ? `${proProfile.first_name} ${proProfile.last_name}` 
-                             : 'Специалист')}
-                        </h5>
-                        <Badge variant="default" className="bg-gradient-to-r from-primary to-accent text-white">Специалист</Badge>
-                      </div>
-                    )}
-
-                    {/* Rating Section */}
-                    <div className="space-y-6">
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground mb-6 font-medium animate-fade-in">Поставьте оценку от 1 до 5 звезд</p>
-                        <div className="relative group">
-                          <div className="absolute -inset-3 bg-gradient-to-r from-yellow-400/20 via-orange-400/20 to-red-400/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                          <div className="relative transform hover:scale-110 transition-all duration-300">
-                            <StarRating
-                              rating={rating}
-                              readonly={false}
-                              size="lg"
-                              className="justify-center [&>*]:transition-all [&>*]:duration-300 [&>*]:hover:drop-shadow-lg [&>*]:hover:brightness-125 [&>svg]:w-12 [&>svg]:h-12"
-                              onRatingChange={setRating}
-                            />
-                          </div>
-                        </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Client rating of specialist */}
+                      <div className="space-y-4">
+                        <h5 className="font-semibold text-center">Оценка специалиста</h5>
+                        {(() => {
+                          const clientRating = jobRatings.find(r => 
+                            r.from_user_id === job.client_id && r.to_user_id === job.pro_id
+                          );
+                          
+                          if (clientRating) {
+                            return (
+                              <RatingDisplay
+                                rating={clientRating}
+                                canEdit={currentUser.id === job.client_id}
+                                onRatingUpdated={loadJobRatings}
+                              />
+                            );
+                          } else if (currentUser.id === job.client_id && job.pro_id) {
+                            return (
+                              <RatingForm
+                                jobId={job.id}
+                                toUserId={job.pro_id}
+                                fromUserId={currentUser.id}
+                                onRatingSubmitted={loadJobRatings}
+                              />
+                            );
+                          } else {
+                            return (
+                              <div className="text-muted-foreground text-center py-8">
+                                Оценка еще не выставлена
+                              </div>
+                            );
+                          }
+                        })()}
                       </div>
 
-                      <div>
-                        <label className="text-sm font-medium mb-3 block">Комментарий (необязательно)</label>
-                        <Textarea
-                          placeholder="Расскажите о качестве выполненной работы..."
-                          value={ratingComment}
-                          onChange={(e) => setRatingComment(e.target.value)}
-                          className="min-h-[120px] transition-all duration-300 focus:scale-[1.02]"
-                        />
+                      {/* Specialist rating of client */}
+                      <div className="space-y-4">
+                        <h5 className="font-semibold text-center">Оценка клиента</h5>
+                        {(() => {
+                          const proRating = jobRatings.find(r => 
+                            r.from_user_id === job.pro_id && r.to_user_id === job.client_id
+                          );
+                          
+                          if (proRating) {
+                            return (
+                              <RatingDisplay
+                                rating={proRating}
+                                canEdit={currentUser.id === job.pro_id}
+                                onRatingUpdated={loadJobRatings}
+                              />
+                            );
+                          } else if (currentUser.id === job.pro_id) {
+                            return (
+                              <RatingForm
+                                jobId={job.id}
+                                toUserId={job.client_id}
+                                fromUserId={currentUser.id}
+                                onRatingSubmitted={loadJobRatings}
+                              />
+                            );
+                          } else {
+                            return (
+                              <div className="text-muted-foreground text-center py-8">
+                                Оценка еще не выставлена
+                              </div>
+                            );
+                          }
+                        })()}
                       </div>
-
-                      <Button 
-                        onClick={handleSubmitRating}
-                        disabled={rating === 0}
-                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:hover:scale-100 disabled:opacity-50 relative overflow-hidden group"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-                        <Send className="w-5 h-5 mr-2 relative z-10" />
-                        <span className="relative z-10">Отправить оценку</span>
-                      </Button>
                     </div>
                   </div>
-                ) : null}
+                )}
 
                 {/* Statistics - Always shown, but moved below rating when rating is available */}
                 <div>

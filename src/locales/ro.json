@@ -421,5 +421,10 @@
   "common.anonymous": "Anonim",
   "common.characters": "caractere",
   "rating.all_ratings": "Toate evaluările",
-  "common.specialist": "Specialist"
+  "common.specialist": "Specialist",
+  "rating.client_to_specialist": "Evaluarea specialistului de către client",
+  "rating.specialist_to_client": "Evaluarea clientului de către specialist",
+  "rating.rate_specialist": "Evaluează specialistul",
+  "rating.rate_client": "Evaluează clientul",
+  "rating.no_rating_yet": "Evaluarea nu a fost încă acordată"
 }

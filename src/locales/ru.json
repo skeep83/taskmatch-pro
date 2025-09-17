@@ -421,5 +421,10 @@
   "common.anonymous": "Аноним",
   "common.characters": "символов",
   "rating.all_ratings": "Все оценки",
-  "common.specialist": "Специалист"
+  "common.specialist": "Специалист",
+  "rating.client_to_specialist": "Оценка специалиста клиентом",
+  "rating.specialist_to_client": "Оценка клиента специалистом",
+  "rating.rate_specialist": "Оценить специалиста",
+  "rating.rate_client": "Оценить клиента",
+  "rating.no_rating_yet": "Оценка еще не выставлена"
 }
