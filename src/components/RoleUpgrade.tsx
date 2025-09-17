@@ -60,7 +60,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
 
   return (
     <div className="space-y-8">
-      <div className="text-center">
+      <div className="text-center mx-auto max-w-lg">
         <h3 className="text-2xl font-bold mb-2">Расширьте возможности</h3>
         <p className="text-muted-foreground">Станьте специалистом или создайте бизнес аккаунт</p>
       </div>
