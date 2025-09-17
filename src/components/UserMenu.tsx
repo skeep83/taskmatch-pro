@@ -119,16 +119,16 @@ export const UserMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="flex items-center gap-2 h-10">
+        <button className="flex items-center gap-2 h-10 px-4 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
           <Avatar className="w-6 h-6">
             <AvatarImage src={userProfile?.avatar_url || ''} alt={displayName} />
             <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
               {initials}
             </AvatarFallback>
           </Avatar>
-          <span className="hidden sm:inline font-medium truncate max-w-24">{displayName}</span>
-          <ChevronDown className="h-3 w-3 flex-shrink-0" />
-        </Button>
+          <span className="hidden sm:inline font-medium truncate max-w-24 text-gray-700">{displayName}</span>
+          <ChevronDown className="h-3 w-3 flex-shrink-0 text-gray-600" />
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 bg-background border z-50">
         <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>

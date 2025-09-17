@@ -449,18 +449,20 @@ export default function DashboardClient() {
 
               {/* Quick Actions */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                <button 
+                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => navigate("/job/new")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <NeumorphicIcon icon={Plus} size={64} variant="behance" />
+                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <Plus className="h-8 w-8 text-primary" />
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.create_job')}</h3>
-                      <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.create_job_description')}</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">{t('client.dashboard.quick_actions.create_job')}</h3>
+                      <p className="text-sm text-gray-600">{t('client.dashboard.quick_actions.create_job_description')}</p>
                     </div>
                   </div>
-                </div>
+                </button>
 
                 {/* Тендеры доступны только для бизнес аккаунтов */}
                 <div 
@@ -481,31 +483,35 @@ export default function DashboardClient() {
                   </div>
                 </div>
 
-                <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                <button 
+                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => setActiveTab("subscription")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <NeumorphicIcon icon={Crown} size={64} variant="behance" />
+                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <Crown className="h-8 w-8 text-primary" />
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.homecare')}</h3>
-                      <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.premium_subscription')}</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">{t('client.dashboard.quick_actions.homecare')}</h3>
+                      <p className="text-sm text-gray-600">{t('client.dashboard.quick_actions.premium_subscription')}</p>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                <button 
+                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => navigate("/messages")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <NeumorphicIcon icon={MessageSquare} size={64} variant="behance" />
+                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <MessageSquare className="h-8 w-8 text-primary" />
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Сообщения</h3>
-                      <p className="text-sm text-muted-foreground">Чат со специалистами</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">Сообщения</h3>
+                      <p className="text-sm text-gray-600">Чат со специалистами</p>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Role Status & Upgrade Section */}
@@ -540,10 +546,13 @@ export default function DashboardClient() {
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>У вас пока нет заказов</p>
                     <p className="text-sm mb-4">Создайте первый заказ для поиска специалистов</p>
-                    <Button onClick={() => navigate("/job/new")}>
-                      <Plus className="h-4 w-4 mr-2" />
+                    <button 
+                      onClick={() => navigate("/job/new")}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
+                    >
+                      <Plus className="h-4 w-4" />
                       Создать заказ
-                    </Button>
+                    </button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -706,12 +715,12 @@ export default function DashboardClient() {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Тендеры доступны только для бизнес аккаунтов</h3>
                   <p className="mb-4">Для создания тендеров необходимо перейти на бизнес аккаунт</p>
-                  <Button 
+                  <button 
                     onClick={() => navigate("/dashboard/business")}
-                    variant="outline"
+                    className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
                   >
                     Перейти к бизнес аккаунту
-                  </Button>
+                  </button>
                 </div>
               </div>
             </TabsContent>
@@ -749,7 +758,7 @@ export default function DashboardClient() {
                         <li>• Бесплатная диагностика</li>
                         <li>• Мгновенные выплаты</li>
                       </ul>
-                      <Button className="w-full">Выбрать план</Button>
+                      <button className="w-full px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800">Выбрать план</button>
                     </div>
                     
                     <div className="border rounded-lg p-6">
@@ -790,7 +799,7 @@ export default function DashboardClient() {
                     <h3 className="font-semibold mb-4">Ваш реферальный код</h3>
                     <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
                       <code className="font-mono text-lg">{stats.refferalCode}</code>
-                      <Button variant="outline" size="sm">Копировать</Button>
+                      <button className="px-4 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 hover:text-gray-800 text-sm">Копировать</button>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2">
                       Поделитесь этим кодом с друзьями и получайте бонусы за каждого нового пользователя
@@ -841,13 +850,13 @@ export default function DashboardClient() {
                   </div>
                   
                   <div className="mt-6">
-                    <Button 
+                    <button 
                       onClick={saveProfile}
                       disabled={saving}
-                      className="w-full md:w-auto"
+                      className="w-full md:w-auto px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800 disabled:opacity-50"
                     >
                       {saving ? 'Сохранение...' : 'Сохранить изменения'}
-                    </Button>
+                    </button>
                   </div>
                 </div>
 
