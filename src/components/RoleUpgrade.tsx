@@ -96,7 +96,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                     transition={{ duration: 0.2 }}
                     className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/30"
                   >
-                    <IconComponent className="w-8 h-8 text-white" />
+                    <IconComponent className="w-10 h-10 text-gray-700" />
                   </motion.div>
                 </div>
               </div>
