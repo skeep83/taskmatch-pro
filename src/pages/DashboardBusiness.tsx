@@ -6,6 +6,7 @@ import { RoleGuard } from "@/components/RoleGuard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { Building2, User, Calendar, Settings, BarChart3, Users, FileText, Briefcase, UserPlus, Gavel } from "lucide-react";
 import { BusinessAccountForm } from "@/components/business/BusinessAccountForm";
 import { BusinessMembers } from "@/components/business/BusinessMembers";
@@ -120,7 +121,7 @@ export default function DashboardBusiness() {
                       <p className="text-sm font-medium text-muted-foreground">Общие расходы</p>
                       <p className="text-2xl font-bold">$0.00</p>
                     </div>
-                    <BarChart3 className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={BarChart3} size={64} variant="behance" />
                   </div>
                 </div>
 
@@ -130,7 +131,7 @@ export default function DashboardBusiness() {
                       <p className="text-sm font-medium text-muted-foreground">Сотрудников</p>
                       <p className="text-2xl font-bold">0</p>
                     </div>
-                    <Users className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={Users} size={64} variant="behance" />
                   </div>
                 </div>
 
@@ -140,7 +141,7 @@ export default function DashboardBusiness() {
                       <p className="text-sm font-medium text-muted-foreground">Заказов</p>
                       <p className="text-2xl font-bold">0</p>
                     </div>
-                    <Briefcase className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={Briefcase} size={64} variant="behance" />
                   </div>
                 </div>
               </div>
@@ -152,7 +153,7 @@ export default function DashboardBusiness() {
                   onClick={() => navigate("/job/new")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={Building2} className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={Building2} size={64} variant="behance" />
                     <div>
                       <h3 className="font-semibold mb-1">Создать заказ</h3>
                       <p className="text-sm text-muted-foreground">Для компании</p>
@@ -165,7 +166,7 @@ export default function DashboardBusiness() {
                   onClick={() => setActiveTab("employees")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={UserPlus} className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={UserPlus} size={64} variant="behance" />
                     <div>
                       <h3 className="font-semibold mb-1">Пригласить сотрудника</h3>
                       <p className="text-sm text-muted-foreground">Расширить команду</p>
@@ -178,7 +179,7 @@ export default function DashboardBusiness() {
                   onClick={() => setActiveTab("invoices")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={FileText} className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={FileText} size={64} variant="behance" />
                     <div>
                       <h3 className="font-semibold mb-1">Создать инвойс</h3>
                       <p className="text-sm text-muted-foreground">Финансы</p>
@@ -191,7 +192,7 @@ export default function DashboardBusiness() {
                   onClick={() => setActiveTab("analytics")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={BarChart3} className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={BarChart3} size={64} variant="behance" />
                     <div>
                       <h3 className="font-semibold mb-1">Посмотреть отчеты</h3>
                       <p className="text-sm text-muted-foreground">Аналитика</p>

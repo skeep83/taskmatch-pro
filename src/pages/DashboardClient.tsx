@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { 
   Briefcase, 
   User, 
@@ -410,7 +411,7 @@ export default function DashboardClient() {
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_jobs')}</p>
                       <p className="text-2xl font-bold">{stats.totalJobs}</p>
                     </div>
-                    <Briefcase className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={Briefcase} size={64} variant="behance" />
                   </div>
                 </div>
 
@@ -420,7 +421,7 @@ export default function DashboardClient() {
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.active_jobs')}</p>
                       <p className="text-2xl font-bold">{stats.activeJobs}</p>
                     </div>
-                    <Clock className="h-8 w-8 text-accent" />
+                    <NeumorphicIcon icon={Clock} size={64} variant="behance" />
                   </div>
                 </div>
 
@@ -430,7 +431,7 @@ export default function DashboardClient() {
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.completed_jobs')}</p>
                       <p className="text-2xl font-bold">{stats.completedJobs}</p>
                     </div>
-                    <CheckCircle className="h-8 w-8 text-success" />
+                    <NeumorphicIcon icon={CheckCircle} size={64} variant="behance" />
                   </div>
                 </div>
 
@@ -440,7 +441,7 @@ export default function DashboardClient() {
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_spent')}</p>
                       <p className="text-2xl font-bold">{formatCurrency(stats.totalSpent)}</p>
                     </div>
-                    <DollarSign className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={DollarSign} size={64} variant="behance" />
                   </div>
                 </div>
               </div>
@@ -452,7 +453,7 @@ export default function DashboardClient() {
                   onClick={() => navigate("/job/new")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={Plus} className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={Plus} size={64} variant="behance" />
                     <div>
                       <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.create_job')}</h3>
                       <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.create_job_description')}</p>
@@ -467,7 +468,7 @@ export default function DashboardClient() {
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <div className="relative">
-                      <AnimatedIcon icon={Gavel} className="h-8 w-8 text-muted-foreground" />
+                      <NeumorphicIcon icon={Gavel} size={64} variant="behance" />
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
                         <span className="text-xs text-white font-bold">B</span>
                       </div>
@@ -484,7 +485,7 @@ export default function DashboardClient() {
                   onClick={() => setActiveTab("subscription")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={Crown} className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={Crown} size={64} variant="behance" />
                     <div>
                       <h3 className="font-semibold mb-1">{t('client.dashboard.quick_actions.homecare')}</h3>
                       <p className="text-sm text-muted-foreground">{t('client.dashboard.quick_actions.premium_subscription')}</p>
@@ -497,7 +498,7 @@ export default function DashboardClient() {
                   onClick={() => navigate("/messages")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <AnimatedIcon icon={MessageSquare} className="h-8 w-8 text-primary" />
+                    <NeumorphicIcon icon={MessageSquare} size={64} variant="behance" />
                     <div>
                       <h3 className="font-semibold mb-1">Сообщения</h3>
                       <p className="text-sm text-muted-foreground">Чат со специалистами</p>
