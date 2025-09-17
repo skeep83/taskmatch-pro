@@ -1,0 +1,389 @@
+/* iOS Specific Styles for ServiceHub */
+
+/* Safe Area Support */
+.ios-safe-area {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.ios-safe-top {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+.ios-safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* iOS Header с учетом notch */
+.ios-header {
+  background: var(--background);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding-top: max(1rem, env(safe-area-inset-top));
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* iOS Footer с учетом home indicator */
+.ios-footer {
+  background: var(--background);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+}
+
+/* iOS Navigation Bar Style */
+.ios-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  margin: 0 16px 16px 16px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dark .ios-nav {
+  background: rgba(26, 31, 46, 0.85);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* iOS Card Style */
+.ios-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.dark .ios-card {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* iOS Button Styles */
+.ios-button {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.ios-button:active {
+  transform: scale(0.98);
+}
+
+.ios-button-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-variant));
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.ios-button-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* iOS List Style */
+.ios-list {
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ios-list-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.2s ease;
+}
+
+.ios-list-item:last-child {
+  border-bottom: none;
+}
+
+.ios-list-item:active {
+  background: var(--accent);
+}
+
+/* iOS Input Styles */
+.ios-input {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 16px; /* Prevents zoom on iOS */
+  transition: all 0.2s ease;
+}
+
+.ios-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+/* iOS Pull to Refresh */
+.ios-pull-refresh {
+  min-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS Scroll Areas */
+.ios-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ios-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* iOS Modal/Sheet Styles */
+.ios-modal {
+  border-radius: 16px 16px 0 0;
+  background: var(--background);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dark .ios-modal {
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* iOS Tab Bar */
+.ios-tab-bar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 8px 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.dark .ios-tab-bar {
+  background: rgba(26, 31, 46, 0.85);
+}
+
+.ios-tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.ios-tab-item:active {
+  transform: scale(0.95);
+}
+
+.ios-tab-item.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* iOS Loading Spinner */
+.ios-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: ios-spin 1s linear infinite;
+}
+
+@keyframes ios-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* iOS Toast/Alert Styles */
+.ios-toast {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* iOS Search Bar */
+.ios-search {
+  background: var(--accent);
+  border-radius: 12px;
+  padding: 8px 16px;
+  border: none;
+  font-size: 16px;
+  width: 100%;
+}
+
+.ios-search::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* iOS Avatar Styles */
+.ios-avatar {
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid white;
+}
+
+.dark .ios-avatar {
+  border-color: var(--border);
+}
+
+/* iOS Badge/Chip Styles */
+.ios-badge {
+  background: var(--primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* iOS Floating Action Button */
+.ios-fab {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.ios-fab:active {
+  transform: scale(0.95);
+}
+
+/* iOS Haptic Feedback Classes */
+.haptic-light:active {
+  /* Визуальная обратная связь для light haptic */
+  opacity: 0.8;
+}
+
+.haptic-medium:active {
+  /* Визуальная обратная связь для medium haptic */
+  transform: scale(0.98);
+}
+
+.haptic-heavy:active {
+  /* Визуальная обратная связь для heavy haptic */
+  transform: scale(0.95);
+}
+
+/* iOS Status Indicators */
+.ios-status-online {
+  width: 12px;
+  height: 12px;
+  background: #34D399;
+  border-radius: 50%;
+  border: 2px solid white;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+}
+
+.ios-status-offline {
+  width: 12px;
+  height: 12px;
+  background: #9CA3AF;
+  border-radius: 50%;
+  border: 2px solid white;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+}
+
+/* iOS Keyboard Avoidance */
+.ios-keyboard-avoiding {
+  padding-bottom: env(keyboard-inset-height);
+}
+
+/* iOS Native Feel Animations */
+.ios-fade-in {
+  animation: ios-fade-in 0.3s ease-out;
+}
+
+@keyframes ios-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ios-slide-up {
+  animation: ios-slide-up 0.3s ease-out;
+}
+
+@keyframes ios-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* iOS Native Feel Transitions */
+.ios-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Media Queries for iPhone specific sizes */
+@media screen and (max-width: 430px) {
+  .ios-card {
+    margin: 0 12px 12px 12px;
+    padding: 16px;
+  }
+  
+  .ios-nav {
+    margin: 0 12px 12px 12px;
+  }
+}
+
+/* Support for landscape mode */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .ios-safe-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+  
+  .ios-safe-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+}
