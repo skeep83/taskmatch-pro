@@ -305,6 +305,7 @@ export default function DashboardClient() {
     };
     
     const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const };
+    console.log('Status badge rendering:', status, 'text:', statusInfo.label, 'icon at end');
     return (
       <Badge variant={statusInfo.variant} className="flex items-center gap-1">
         {statusInfo.label}
