@@ -252,7 +252,7 @@ const DashboardPro = () => {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
             <div className="card-surface p-6 text-center">
               <NeumorphicIcon icon={Wallet} size={64} variant="behance" className="mb-4 mx-auto" />
-              <div className="text-2xl font-bold text-green-600 mb-1">
+              <div className="text-2xl font-bold text-success mb-1">
                 {formatPrice(walletBalance)}
               </div>
               <div className="text-sm text-muted-foreground">Баланс</div>
@@ -288,7 +288,7 @@ const DashboardPro = () => {
             
             <div className="card-surface p-6 text-center">
               <NeumorphicIcon icon={Clock} size={64} variant="behance" className="mb-4 mx-auto" />
-              <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
+              <div className="text-2xl font-bold text-secondary mb-1">{responseTime}</div>
               <div className="text-sm text-muted-foreground">Время ответа</div>
             </div>
           </div>
