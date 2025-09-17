@@ -222,9 +222,9 @@ const HowItWorks = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
-              <div key={index} className="relative">
+              <div key={index} className="relative h-full">
                 <div 
-                  className="card-surface p-8 text-center relative overflow-hidden border-0 transition-all duration-500"
+                  className="card-surface p-8 text-center relative overflow-hidden border-0 transition-all duration-500 h-full flex flex-col"
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
                   {/* Step Number */}
@@ -243,7 +243,7 @@ const HowItWorks = () => {
                   </div>
                   
                   <h3 className="text-xl font-bold mb-4 text-gradient-subtle">{step.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed text-sm">
+                  <p className="text-muted-foreground leading-relaxed text-sm flex-1">
                     {step.description}
                   </p>
                   
