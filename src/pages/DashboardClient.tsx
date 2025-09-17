@@ -369,33 +369,33 @@ export default function DashboardClient() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="card-surface p-2 rounded-2xl">
+            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
               <TabsList className="grid w-full grid-cols-7 bg-transparent">
-                <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="overview" className="flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('client.dashboard.tabs.overview')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="jobs" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="jobs" className="flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Briefcase className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('client.dashboard.tabs.jobs')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="tenders" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="tenders" className="flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Gavel className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('client.dashboard.tabs.tenders')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="subscription" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="subscription" className="flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Crown className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('client.dashboard.tabs.subscription')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="payments" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="payments" className="flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <CreditCard className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('client.dashboard.tabs.payments')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="referrals" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="referrals" className="flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Gift className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('client.dashboard.tabs.referrals')}</span>
                 </TabsTrigger>
-                <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="settings" className="flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Settings className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('client.dashboard.tabs.settings')}</span>
                 </TabsTrigger>
