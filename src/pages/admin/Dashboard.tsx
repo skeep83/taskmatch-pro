@@ -287,7 +287,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* GMV Trend */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
