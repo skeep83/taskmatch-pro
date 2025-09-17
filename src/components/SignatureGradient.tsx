@@ -8,11 +8,30 @@ export const SignatureGradient: React.FC = () => {
     if (!el) return;
     let raf = 0;
     let x = 50, y = 30;
+    let cachedRect: DOMRect | null = null;
+    let rectUpdateQueued = false;
+
+    const updateRect = () => {
+      if (el) {
+        cachedRect = el.getBoundingClientRect();
+        rectUpdateQueued = false;
+      }
+    };
+
+    const queueRectUpdate = () => {
+      if (!rectUpdateQueued) {
+        rectUpdateQueued = true;
+        requestAnimationFrame(updateRect);
+      }
+    };
 
     const onMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      const nx = ((e.clientX - rect.left) / rect.width) * 100;
-      const ny = ((e.clientY - rect.top) / rect.height) * 100;
+      if (!cachedRect) {
+        cachedRect = el.getBoundingClientRect();
+      }
+      
+      const nx = ((e.clientX - cachedRect.left) / cachedRect.width) * 100;
+      const ny = ((e.clientY - cachedRect.top) / cachedRect.height) * 100;
       x = nx; y = ny;
       if (!raf) raf = requestAnimationFrame(update);
     };
@@ -23,10 +42,24 @@ export const SignatureGradient: React.FC = () => {
       raf = 0;
     };
 
+    const onResize = () => {
+      queueRectUpdate();
+    };
+
+    // Initial rect calculation
+    updateRect();
+
     const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!mql.matches) el.addEventListener("mousemove", onMove);
+    if (!mql.matches) {
+      el.addEventListener("mousemove", onMove);
+      window.addEventListener("resize", onResize, { passive: true });
+    }
+    
     return () => {
-      if (!mql.matches) el.removeEventListener("mousemove", onMove);
+      if (!mql.matches) {
+        el.removeEventListener("mousemove", onMove);
+        window.removeEventListener("resize", onResize);
+      }
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
