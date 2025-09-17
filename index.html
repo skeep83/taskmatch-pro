@@ -10,15 +10,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="/src/assets/hero-dashboard.jpg" as="image" fetchpriority="high">
     <link rel="modulepreload" href="/src/main.tsx">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" media="print">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" media="print"></noscript>
-    <script>
-      // Immediately switch font media to 'all' after DOM loads
-      document.addEventListener('DOMContentLoaded', function() {
-        var links = document.querySelectorAll('link[href*="fonts.googleapis.com"]');
-        links.forEach(function(link) { link.media = 'all'; });
-      });
-    </script>
+    
+    <!-- Critical CSS inline for immediate render -->
+    <style>
+      /* Critical base styles to prevent layout shift */
+      * { box-sizing: border-box; }
+      html { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      body { margin: 0; padding: 0; background: #ffffff; color: #0f172a; }
+      #root { min-height: 100vh; }
+      /* Prevent flash of unstyled content */
+      .font-display { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+      .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    </style>
+    
+    <!-- Load Google Fonts asynchronously to prevent render blocking -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
     <link rel="canonical" href="/" />
 
     <meta property="og:title" content="ServiceHub — маркетплейс услуг" />
