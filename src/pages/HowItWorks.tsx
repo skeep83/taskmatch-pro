@@ -263,7 +263,7 @@ const HowItWorks = () => {
       {/* Features Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary/10 text-secondary font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
             <NeumorphicIcon icon={Heart} size={24} variant="behance" />
             {t("how_it_works.features.badge")}
           </div>
@@ -308,7 +308,7 @@ const HowItWorks = () => {
       {/* FAQ Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent/10 text-accent font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
             <NeumorphicIcon icon={Eye} size={24} variant="behance" />
             {t("how_it_works.faq.badge")}
           </div>
