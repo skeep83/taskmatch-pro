@@ -286,12 +286,12 @@ export default function DashboardClient() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'new': return <AlertCircle className="h-4 w-4" />;
-      case 'accepted': return <CheckCircle className="h-4 w-4" />;
-      case 'in_progress': return <PlayCircle className="h-4 w-4" />;
-      case 'done': return <CheckCircle className="h-4 w-4" />;
-      case 'cancelled': return <XCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case 'new': return <AlertCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'accepted': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'in_progress': return <PlayCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'done': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'cancelled': return <XCircle className="h-3 w-3 flex-shrink-0" />;
+      default: return <Clock className="h-3 w-3 flex-shrink-0" />;
     }
   };
 
@@ -308,7 +308,7 @@ export default function DashboardClient() {
     console.log('Status badge rendering:', status, 'text:', statusInfo.label, 'icon at end');
     return (
       <Badge variant={statusInfo.variant} className="flex items-center gap-1">
-        {statusInfo.label}
+        <span>{statusInfo.label}</span>
         {getStatusIcon(status)}
       </Badge>
     );
