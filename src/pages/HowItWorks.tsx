@@ -261,18 +261,20 @@ const HowItWorks = () => {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto py-24">
-        <div className="text-center mb-16 max-w-7xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
-            <NeumorphicIcon icon={Heart} size={24} variant="behance" />
-            {t("how_it_works.features.badge")}
+      <section className="py-24">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
+              <NeumorphicIcon icon={Heart} size={24} variant="behance" />
+              {t("how_it_works.features.badge")}
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight px-4 overflow-hidden">
+              {t("how_it_works.features.title")}
+            </h2>
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
+              {t("how_it_works.features.subtitle")}
+            </p>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight word-break overflow-wrap-anywhere w-full">
-            {t("how_it_works.features.title")}
-          </h2>
-          <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
-            {t("how_it_works.features.subtitle")}
-          </p>
         </div>
         
         <div className="max-w-7xl mx-auto">
