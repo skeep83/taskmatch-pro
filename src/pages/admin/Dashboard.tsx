@@ -550,32 +550,32 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
-              <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
+            <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
-              <span className="text-sm font-medium">Пользователи</span>
+              <span className="text-sm font-medium text-gray-700">Пользователи</span>
             </button>
             
-            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
-              <div className="p-3 bg-purple-500/10 rounded-xl group-hover:bg-purple-500/20 transition-colors">
+            <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
                 <Briefcase className="h-6 w-6 text-purple-600" />
               </div>
-              <span className="text-sm font-medium">Заказы</span>
+              <span className="text-sm font-medium text-gray-700">Заказы</span>
             </button>
             
-            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
-              <div className="p-3 bg-green-500/10 rounded-xl group-hover:bg-green-500/20 transition-colors">
+            <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
                 <DollarSign className="h-6 w-6 text-green-600" />
               </div>
-              <span className="text-sm font-medium">Финансы</span>
+              <span className="text-sm font-medium text-gray-700">Финансы</span>
             </button>
             
-            <button className="card-surface p-4 rounded-xl hover-scale group flex flex-col items-center gap-3 text-center min-h-[100px] border-0">
-              <div className="p-3 bg-red-500/10 rounded-xl group-hover:bg-red-500/20 transition-colors">
+            <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+              <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
                 <AlertTriangle className="h-6 w-6 text-red-600" />
               </div>
-              <span className="text-sm font-medium">Споры</span>
+              <span className="text-sm font-medium text-gray-700">Споры</span>
             </button>
           </div>
         </div>
