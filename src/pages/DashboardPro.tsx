@@ -251,7 +251,7 @@ const DashboardPro = () => {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
             <div className="card-surface p-6 text-center">
-              <Wallet className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <NeumorphicIcon icon={Wallet} size={64} variant="behance" className="mb-4 mx-auto" />
               <div className="text-2xl font-bold text-green-600 mb-1">
                 {formatPrice(walletBalance)}
               </div>
@@ -259,7 +259,7 @@ const DashboardPro = () => {
             </div>
             
             <div className="card-surface p-6 text-center">
-              <Star className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <NeumorphicIcon icon={Star} size={64} variant="behance" className="mb-4 mx-auto" />
               <div className="flex flex-col items-center">
                 <StarRating 
                   rating={ratingAvg || 0} 
@@ -273,7 +273,7 @@ const DashboardPro = () => {
             </div>
             
             <div className="card-surface p-6 text-center">
-              <DollarSign className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <NeumorphicIcon icon={DollarSign} size={64} variant="behance" className="mb-4 mx-auto" />
               <div className="text-2xl font-bold text-primary mb-1">
                 {formatPrice(monthlyEarnings)}
               </div>
@@ -281,13 +281,13 @@ const DashboardPro = () => {
             </div>
             
             <div className="card-surface p-6 text-center">
-              <Award className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <NeumorphicIcon icon={Award} size={64} variant="behance" className="mb-4 mx-auto" />
               <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
               <div className="text-sm text-muted-foreground">Выполнено</div>
             </div>
             
             <div className="card-surface p-6 text-center">
-              <Clock className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <NeumorphicIcon icon={Clock} size={64} variant="behance" className="mb-4 mx-auto" />
               <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
               <div className="text-sm text-muted-foreground">Время ответа</div>
             </div>
@@ -297,42 +297,42 @@ const DashboardPro = () => {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
             <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
               <Link to="/profile/settings" className="flex flex-col items-center gap-2">
-                <UserCog className="h-10 w-10 text-primary" />
+                <NeumorphicIcon icon={UserCog} size={48} variant="behance" />
                 <span className="text-sm font-medium">Профиль</span>
               </Link>
             </div>
             
             <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
               <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-                <Calendar className="h-10 w-10 text-primary" />
+                <NeumorphicIcon icon={Calendar} size={48} variant="behance" />
                 <span className="text-sm font-medium">Расписание</span>
               </Link>
             </div>
             
             <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
               <Link to="/portfolio" className="flex flex-col items-center gap-2">
-                <ImageIcon className="h-10 w-10 text-primary" />
+                <NeumorphicIcon icon={ImageIcon} size={48} variant="behance" />
                 <span className="text-sm font-medium">Портфолио</span>
               </Link>
             </div>
             
             <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
               <Link to="/tenders" className="flex flex-col items-center gap-2">
-                <Briefcase className="h-10 w-10 text-primary" />
+                <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
                 <span className="text-sm font-medium">Тендеры</span>
               </Link>
             </div>
             
             <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
               <button className="flex flex-col items-center gap-2 w-full">
-                <CreditCard className="h-10 w-10 text-primary" />
+                <NeumorphicIcon icon={CreditCard} size={48} variant="behance" />
                 <span className="text-sm font-medium">Выплата</span>
               </button>
             </div>
             
             <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
               <Link to="/kyc" className="flex flex-col items-center gap-2">
-                <ShieldCheck className="h-10 w-10 text-primary" />
+                <NeumorphicIcon icon={ShieldCheck} size={48} variant="behance" />
                 <span className="text-sm font-medium">KYC</span>
               </Link>
             </div>

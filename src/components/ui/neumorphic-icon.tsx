@@ -8,7 +8,7 @@ interface NeumorphicIconProps {
   className?: string;
   iconSize?: number;
   delayMs?: number;
-  variant?: 'circle' | 'rounded' | 'square';
+  variant?: 'circle' | 'rounded' | 'square' | 'soft-inset' | 'behance';
   style?: React.CSSProperties;
 }
 
@@ -27,13 +27,20 @@ export const NeumorphicIcon = ({
   const variantStyles = {
     circle: 'rounded-full',
     rounded: 'rounded-2xl', 
-    square: 'rounded-2xl' // Made more rounded like in reference
+    square: 'rounded-2xl',
+    'soft-inset': 'rounded-3xl bg-gray-100/80 dark:bg-gray-800/50',
+    'behance': 'rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900'
   };
 
   return (
     <div
       className={cn(
-        'card-surface flex items-center justify-center transition-all duration-300 ease-out border-0',
+        'flex items-center justify-center transition-all duration-300 ease-out border-0',
+        variant === 'behance' 
+          ? 'shadow-[inset_8px_8px_16px_rgba(0,0,0,0.1),inset_-8px_-8px_16px_rgba(255,255,255,0.9)] border border-gray-200/50 dark:border-gray-700/50' 
+          : variant === 'soft-inset'
+          ? 'shadow-[inset_4px_4px_8px_rgba(0,0,0,0.1),inset_-4px_-4px_8px_rgba(255,255,255,0.7)]'
+          : 'card-surface',
         variantStyles[variant],
         className
       )}
@@ -47,8 +54,12 @@ export const NeumorphicIcon = ({
     >
       <Icon 
         size={actualIconSize} 
-        className="text-slate-500 dark:text-slate-400"
-        strokeWidth={2}
+        className={cn(
+          variant === 'behance' || variant === 'soft-inset'
+            ? "text-gray-600 dark:text-gray-300" 
+            : "text-slate-500 dark:text-slate-400"
+        )}
+        strokeWidth={variant === 'behance' ? 1.5 : 2}
       />
     </div>
   );
