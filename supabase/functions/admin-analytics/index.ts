@@ -152,10 +152,10 @@ async function getDashboardAnalytics(supabase: any, timeRange: string) {
         .select('id, created_at, status')
         .gte('created_at', currentPeriodStart.toISOString()),
       
-      // Categories for distribution
-      supabase
-        .from('categories')
-        .select('id, key, label_ru'),
+       // Categories for distribution (get all categories with jobs, not limited by date)
+       supabase
+         .from('categories')
+         .select('id, key, label_ru'),
       
       // Ratings for NPS calculation
       supabase
@@ -232,33 +232,25 @@ async function getDashboardAnalytics(supabase: any, timeRange: string) {
       };
     });
 
-    // Category distribution based on real data
+    // Category distribution based on ALL jobs (not limited by current period for better visualization)
     const categoryMap = new Map();
     categoriesData.data?.forEach(cat => categoryMap.set(cat.id, cat.label_ru || cat.key));
     
+    // Get all jobs for category distribution
+    const { data: allJobs } = await supabase
+      .from('jobs')
+      .select('category_id');
+    
     const categoryStats = {};
-    jobsData.data?.forEach(job => {
+    allJobs?.forEach(job => {
       const categoryName = categoryMap.get(job.category_id) || 'Прочее';
       categoryStats[categoryName] = (categoryStats[categoryName] || 0) + 1;
     });
 
-    // If no real data, use mock data for demonstration
-    let categoryDistribution = Object.entries(categoryStats)
+    const categoryDistribution = Object.entries(categoryStats)
       .sort(([,a], [,b]) => b - a)
       .slice(0, 6)
       .map(([name, value]) => ({ name, value }));
-
-    // Add mock data if no real data exists
-    if (categoryDistribution.length === 0) {
-      categoryDistribution = [
-        { name: 'Сантехника', value: 45 },
-        { name: 'Электрика', value: 38 },
-        { name: 'Уборка', value: 32 },
-        { name: 'Ремонт', value: 28 },
-        { name: 'Доставка', value: 22 },
-        { name: 'IT услуги', value: 18 }
-      ];
-    }
 
     // Generate alerts based on real data and thresholds
     const alerts = [];
