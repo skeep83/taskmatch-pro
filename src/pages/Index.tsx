@@ -5,10 +5,6 @@ import {
   Shield, 
   Clock, 
   Users, 
-  Star, 
-  ShieldCheck, 
-  Zap, 
-  Award,
   CheckCircle,
   TrendingUp,
   Smartphone,
@@ -16,6 +12,7 @@ import {
 } from "lucide-react";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { Seo } from "@/components/Seo";
+import { Icon3D } from "@/components/ui/Icon3D";
 
 // Images
 import heroDashboard from "@/assets/hero-dashboard.jpg";
@@ -57,14 +54,14 @@ const features = [
 ];
 
 const categories = [
-  { name: "Сантехника", icon: "🔧", count: 150 },
-  { name: "Электрика", icon: "⚡", count: 120 },
-  { name: "Уборка", icon: "🧹", count: 200 },
-  { name: "Ремонт", icon: "🔨", count: 180 },
-  { name: "Грузоперевозки", icon: "🚚", count: 90 },
-  { name: "Красота", icon: "💄", count: 110 },
-  { name: "Репетиторство", icon: "📚", count: 75 },
-  { name: "Фотография", icon: "📸", count: 65 }
+  { name: "Сантехника", iconKey: "pipeWrench" as const, count: 150 },
+  { name: "Электрика", iconKey: "hammerWrench" as const, count: 120 },
+  { name: "Уборка", iconKey: "broomBucket" as const, count: 200 },
+  { name: "Ремонт", iconKey: "hammerWrench" as const, count: 180 },
+  { name: "Грузоперевозки", iconKey: "truckBox" as const, count: 90 },
+  { name: "Красота", iconKey: "camera" as const, count: 110 },
+  { name: "Репетиторство", iconKey: "briefcase" as const, count: 75 },
+  { name: "Фотография", iconKey: "camera" as const, count: 65 }
 ];
 
 const testimonials = [
@@ -244,8 +241,8 @@ export default function Index() {
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="card-content">
-                  <div className="text-heading-md mb-2 group-hover:animate-bounce-gentle">
-                    {category.icon}
+                  <div className="w-16 h-16 mx-auto mb-2 group-hover:animate-bounce-gentle">
+                    <Icon3D name={category.iconKey} size="lg" loading="lazy" />
                   </div>
                   <h3 className="card-title text-heading-xs font-semibold mb-2">
                     {category.name}
@@ -292,7 +289,7 @@ export default function Index() {
                     </div>
                     <div className="flex flex-shrink-0">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <Icon3D key={i} name="star" size="sm" className="text-yellow-400" />
                       ))}
                     </div>
                   </div>
