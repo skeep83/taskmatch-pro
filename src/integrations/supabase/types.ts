@@ -1847,6 +1847,7 @@ export type Database = {
           job_id: string
           score: number
           to_user_id: string
+          updated_at: string | null
         }
         Insert: {
           comment?: string | null
@@ -1856,6 +1857,7 @@ export type Database = {
           job_id: string
           score: number
           to_user_id: string
+          updated_at?: string | null
         }
         Update: {
           comment?: string | null
@@ -1865,6 +1867,7 @@ export type Database = {
           job_id?: string
           score?: number
           to_user_id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

@@ -7,6 +7,8 @@ import { JobApplicationsList } from '@/components/JobApplicationsList';
 import { JobResponseForm } from '@/components/JobResponseForm';
 import { PriceProposalForm } from '@/components/PriceProposalForm';
 import { JobStatusProgress } from '@/components/JobStatusProgress';
+import { RatingForm } from '@/components/RatingForm';
+import { RatingDisplay } from '@/components/RatingDisplay';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import interestedInJobImage from '@/assets/interested-in-job.png';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +36,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useEnhancedI18n } from '@/i18n/enhanced';
 
 interface Job {
   id: string;
@@ -81,7 +84,47 @@ const JobDetail = () => {
     start_confirmed: false,
     end_confirmed: false
   });
+  const [existingRating, setExistingRating] = useState<any>(null);
+  const [jobRatings, setJobRatings] = useState<any[]>([]);
+  
   const { formatPrice } = useCurrency();
+
+  // Load job ratings for this specific job
+  const loadJobRatings = async () => {
+    if (!jobId) return;
+    
+    try {
+      const { data: ratings, error } = await supabase
+        .from('ratings')
+        .select(`
+          *,
+          profiles:from_user_id (
+            first_name,
+            last_name,
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('job_id', jobId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      setJobRatings(ratings || []);
+      
+      // Check if current user has already rated
+      if (currentUser) {
+        const userRating = ratings?.find(r => r.from_user_id === currentUser.id);
+        setExistingRating(userRating || null);
+      }
+    } catch (error) {
+      console.error('Error loading job ratings:', error);
+    }
+  };
+
+  const handleRatingUpdated = () => {
+    loadJobRatings();
+  };
 
   useEffect(() => {
     if (jobId) {
@@ -89,8 +132,15 @@ const JobDetail = () => {
       fetchJobPhotos();
       checkPaymentStatus();
       getCurrentUser();
+      loadJobRatings();
     }
   }, [jobId]);
+
+  useEffect(() => {
+    if (currentUser) {
+      loadJobRatings();
+    }
+  }, [currentUser]);
 
   const getCurrentUser = async () => {
     try {
