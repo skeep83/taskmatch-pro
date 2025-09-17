@@ -456,7 +456,7 @@ export default function AdminDashboard() {
           transition={{ delay: 0.6 }}
           className="hover-scale"
         >
-          <div className="card-surface p-6">
+          <div className="card-surface p-6 h-full">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-teal-500/10 rounded-lg">
                 <Shield className="h-5 w-5 text-teal-600" />
@@ -468,7 +468,7 @@ export default function AdminDashboard() {
             </div>
             
             {/* Horizontal neumorphic indicators */}
-            <div className="grid grid-cols-5 gap-4">
+            <div className="grid grid-cols-5 gap-4 h-[300px] content-center">
               {/* Uptime */}
               <div className="flex flex-col items-center space-y-3">
                 <div className="text-xs font-medium text-center text-muted-foreground">
