@@ -265,16 +265,16 @@ const Catalog = () => {
                   </div>
 
                   {/* Buttons positioned higher */}
-                  <div className="space-y-2 mt-2">
+                  <div className="flex gap-2 mt-2">
                     <Link 
                       to={`/pro/${p.user_id}`}
-                      className="block w-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
+                      className="flex-1 border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
                     >
                       {t("catalog.profile")}
                     </Link>
                     <Link 
                       to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
-                      className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
+                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
                     >
                       {t("catalog.order")}
                     </Link>
