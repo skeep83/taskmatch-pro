@@ -344,7 +344,7 @@ const DashboardPro = () => {
               <div className="card-surface p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <Briefcase className="h-10 w-10 text-primary" />
+                    <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
                     <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
                   </div>
                   <div className="text-sm text-muted-foreground">
@@ -355,10 +355,10 @@ const DashboardPro = () => {
                 <div className="space-y-4">
                   {nearbyJobs.length === 0 && (
                     <div className="text-center py-12">
-                      <Briefcase className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
+                      <NeumorphicIcon icon={Briefcase} size={64} variant="behance" className="mb-4 mx-auto" />
                       <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
                       <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
-                      <Link to="/profile/settings" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg">
+                      <Link to="/profile/settings" className="btn-hero px-8 py-4 rounded-xl font-semibold text-lg">
                         Настроить профиль
                       </Link>
                     </div>
@@ -394,15 +394,15 @@ const DashboardPro = () => {
                       <div className="flex items-center gap-3">
                         <Link 
                           to={`/job/${job.id}`}
-                          className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors"
+                          className="btn-ghost px-6 py-3 rounded-xl font-semibold"
                         >
                           Подробнее
                         </Link>
-                        <button className="bg-primary text-white hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold transition-colors">
+                        <button className="btn-hero px-6 py-3 rounded-xl font-semibold">
                           Принять заказ
                         </button>
-                        <button className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors">
-                          <Video className="h-4 w-4" />
+                        <button className="btn-ghost px-3 py-3 rounded-xl">
+                          <NeumorphicIcon icon={Video} size={20} variant="behance" />
                         </button>
                       </div>
                     </div>
@@ -413,14 +413,14 @@ const DashboardPro = () => {
               {/* My Active Jobs */}
               <div className="card-surface p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <Clock className="h-10 w-10 text-primary" />
+                  <NeumorphicIcon icon={Clock} size={48} variant="behance" />
                   <h2 className="text-2xl font-display font-bold">Мои активные заказы</h2>
                 </div>
 
                 <div className="space-y-4">
                   {myActiveJobs.length === 0 && (
                     <div className="text-center py-12">
-                      <Clock className="h-16 w-16 text-gray-400 mb-4 mx-auto" />
+                      <NeumorphicIcon icon={Clock} size={64} variant="behance" className="mb-4 mx-auto" />
                       <p className="text-muted-foreground">У вас нет активных заказов</p>
                     </div>
                   )}
@@ -445,15 +445,15 @@ const DashboardPro = () => {
                       <div className="flex items-center gap-3">
                         <Link 
                           to={`/job/${job.id}`}
-                          className="bg-primary text-white hover:bg-primary/90 px-6 py-3 rounded-xl font-semibold transition-colors"
+                          className="btn-hero px-6 py-3 rounded-xl font-semibold"
                         >
                           Управлять
                         </Link>
                         <Link 
                           to={`/messages?user=${job.client_id}&job=${job.id}`}
-                          className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
+                          className="btn-ghost px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
                         >
-                          <MessageSquare className="h-4 w-4" />
+                          <NeumorphicIcon icon={MessageSquare} size={20} variant="behance" />
                           Чат
                         </Link>
                       </div>
@@ -468,7 +468,7 @@ const DashboardPro = () => {
               {/* Tenders */}
               <div className="card-surface p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <TrendingUp className="h-8 w-8 text-primary" />
+                  <NeumorphicIcon icon={TrendingUp} size={48} variant="behance" />
                   <h3 className="font-bold">Открытые тендеры</h3>
                 </div>
                 
@@ -484,7 +484,7 @@ const DashboardPro = () => {
                         <p className="text-xs text-muted-foreground mb-2">
                           До {new Date(tender.deadline).toLocaleDateString()}
                         </p>
-                        <button className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-semibold transition-colors w-full">
+                        <button className="btn-hero px-4 py-2 rounded-lg text-sm font-semibold w-full">
                           Подать заявку
                         </button>
                       </div>
@@ -496,7 +496,7 @@ const DashboardPro = () => {
               {/* Recent Activity */}
               <div className="card-surface p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <BarChart3 className="h-8 w-8 text-primary" />
+                  <NeumorphicIcon icon={BarChart3} size={48} variant="behance" />
                   <h3 className="font-bold">Активность</h3>
                 </div>
                 
@@ -527,7 +527,7 @@ const DashboardPro = () => {
               {/* Quick Tips */}
               <div className="card-surface p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <Zap className="h-8 w-8 text-primary" />
+                  <NeumorphicIcon icon={Zap} size={48} variant="behance" />
                   <h3 className="font-bold">Советы</h3>
                 </div>
                 
