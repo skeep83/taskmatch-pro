@@ -244,10 +244,10 @@ const Catalog = () => {
                      }}>
                   {/* Content */}
                   <div className="text-center mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 className="text-lg font-bold text-foreground mb-1">
                       {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || t("catalog.specialist_id", { id: String(p.user_id).slice(0,8) })}
                     </h3>
-                    <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
                       {selectedCat ? catById[selectedCat]?.label_ru || t("catalog.professional_bio") : t("catalog.professional_bio")}
                     </p>
                     
