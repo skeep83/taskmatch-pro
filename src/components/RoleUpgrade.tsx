@@ -103,7 +103,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
               </div>
               
               {/* Нижняя секция с контентом - более компактная */}
-              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5">
+              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5 flex flex-col h-full">
                 <div className="text-center mb-4">
                   <h4 className="text-lg font-bold text-gray-900 mb-1">{config.title}</h4>
                   <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
@@ -124,7 +124,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                 {/* Кнопка действия - меньшего размера */}
                 <Button
                   onClick={() => handleUpgradeClick(targetRole)}
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm hover-scale"
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm hover-scale mt-auto"
                 >
                   <ArrowRight className="w-4 h-4 mr-1" />
                   Стать {config.title.toLowerCase()}ом
