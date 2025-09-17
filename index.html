@@ -120,10 +120,7 @@
         height: 100%;
         background: #ffffff;
         z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
+        overflow-y: auto;
       }
       
       .loader-spinner {
@@ -148,6 +145,9 @@
           background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
           background-size: 200% 100%;
         }
+        .bg-white { background-color: #1e293b !important; }
+        .text-gray-900 { color: #f1f5f9 !important; }
+        .border-gray-200 { border-color: #374151 !important; }
       }
       
       /* Responsive grid */
@@ -222,11 +222,46 @@
   </head>
 
   <body>
-    <!-- Initial loading screen for immediate FCP -->
+    <!-- Initial loading screen for immediate FCP and LCP -->
     <div id="initial-loader" class="initial-loader">
-      <div class="loader-spinner"></div>
-      <div style="margin-top: 1rem; font-size: 1.125rem; font-weight: 600; color: #2563eb;">ServiceHub</div>
-      <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #64748b;">Загрузка...</div>
+      <!-- Hero content skeleton for immediate LCP -->
+      <div class="container max-w-6xl mx-auto px-4 py-16">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <!-- Left Column - Critical Text Content -->
+          <div class="text-left">
+            <div class="mb-8">
+              <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <div style="width: 24px; height: 24px; background: #2563eb; border-radius: 3px;"></div>
+                <span class="text-sm font-medium text-primary">Платформа нового поколения</span>
+              </div>
+              <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight text-primary">
+                Соединяем клиентов с проверенными специалистами за секунды
+              </h1>
+              <p class="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-2xl">
+                Escrow платежи, тендеры, чат, видео-оценка и мгновенные выплаты.
+              </p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 mb-12">
+              <div class="bg-primary text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg">
+                🔍 Найти специалиста
+              </div>
+              <div class="bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg">
+                💼 Стать исполнителем
+              </div>
+            </div>
+          </div>
+          <!-- Right Column - Image placeholder -->
+          <div class="relative">
+            <div class="w-full h-96 bg-gray-200 rounded-3xl skeleton"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Loading indicator -->
+      <div style="position: fixed; bottom: 2rem; right: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+        <div class="loader-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+        <div style="font-size: 0.875rem; color: #64748b;">Загрузка приложения...</div>
+      </div>
     </div>
     
     <div id="root"></div>
