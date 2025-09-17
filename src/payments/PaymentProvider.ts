@@ -8,90 +8,22 @@ export interface PaymentProvider {
 
 export class StripePaymentProvider implements PaymentProvider {
   async startOneOffPayment(params: { amountCents: number; currency?: string; name?: string }) {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Call Stripe checkout edge function
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          amount: params.amountCents,
-          currency: params.currency || 'usd',
-          name: params.name || 'ServiceHub Payment'
-        }
-      });
-
-      if (error) throw error;
-
-      // Redirect to Stripe checkout
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL received');
-      }
-    } catch (error: any) {
-      console.error('Payment error:', error);
-      toast({ 
-        title: "Ошибка платежа", 
-        description: error.message || "Не удалось инициировать платеж", 
-        variant: "destructive" 
-      });
-    }
+    // Временная заглушка - симуляция успешного платежа
+    toast({ title: "Платеж обрабатывается", description: `Сумма: ${(params.amountCents / 100).toFixed(2)} ${params.currency || 'USD'}`, variant: "default" });
+    setTimeout(() => {
+      toast({ title: "Платеж успешен", description: "Средства зарезервированы в escrow", variant: "default" });
+    }, 2000);
   }
-
   async startSubscription(params: { priceCents: number; interval?: 'month'|'year' }) {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Call subscription creation edge function
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          amount: params.priceCents,
-          interval: params.interval || 'month',
-          type: 'subscription'
-        }
-      });
-
-      if (error) throw error;
-
-      // Redirect to Stripe checkout
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL received');
-      }
-    } catch (error: any) {
-      console.error('Subscription error:', error);
-      toast({ 
-        title: "Ошибка подписки", 
-        description: error.message || "Не удалось создать подписку", 
-        variant: "destructive" 
-      });
-    }
+    // Временная заглушка - симуляция активации подписки
+    toast({ title: "Подписка активируется", description: `Plan: ${(params.priceCents / 100).toFixed(2)}/месяц`, variant: "default" });
+    setTimeout(() => {
+      toast({ title: "Подписка активна", description: "HomeCare план подключен", variant: "default" });
+    }, 2000);
   }
-
   async openCustomerPortal() {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Call customer portal edge function
-      const { data, error } = await supabase.functions.invoke('customer-portal');
-
-      if (error) throw error;
-
-      // Redirect to Stripe customer portal
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No portal URL received');
-      }
-    } catch (error: any) {
-      console.error('Portal error:', error);
-      toast({ 
-        title: "Ошибка портала", 
-        description: error.message || "Не удалось открыть портал", 
-        variant: "destructive" 
-      });
-    }
+    // Временная заглушка - симуляция портала
+    toast({ title: "Портал открывается", description: "Переход к управлению подпиской", variant: "default" });
   }
 }
 

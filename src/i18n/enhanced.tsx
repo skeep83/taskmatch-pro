@@ -74,26 +74,6 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   // Всегда предоставляем контекст, даже во время загрузки
-  if (!isInitialized && !i18nInstance) {
-    // During initial loading, still provide a basic context
-    const basicValue: EnhancedI18nContextType = {
-      t: (key: string) => key,
-      changeLanguage: async () => {},
-      language: 'ru',
-      ready: false,
-      formatNumber: (num) => num.toString(),
-      formatCurrency: (amount) => `${amount} MDL`,
-      formatDate: (date) => new Date(date).toLocaleDateString(),
-      formatRelativeTime: (date) => new Date(date).toLocaleDateString(),
-    };
-    
-    return (
-      <EnhancedI18nContext.Provider value={basicValue}>
-        {children}
-      </EnhancedI18nContext.Provider>
-    );
-  }
-  
   return <I18nProviderWrapper i18nInstance={i18nInstance} isReady={isInitialized} currentLanguage={currentLanguage}>{children}</I18nProviderWrapper>;
 };
 
@@ -248,9 +228,6 @@ const I18nProviderWrapper: React.FC<{
 export const useEnhancedI18n = () => {
   const context = useContext(EnhancedI18nContext);
   if (!context) {
-    console.error('useEnhancedI18n hook called outside EnhancedI18nProvider context');
-    console.error('Current context value:', context);
-    console.error('Stack trace:', new Error().stack);
     throw new Error('useEnhancedI18n must be used within EnhancedI18nProvider');
   }
   return context;
