@@ -83,7 +83,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
             }}
             className="perspective-1000 group"
           >
-            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d h-64">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d h-80">
               {/* Верхняя секция с градиентом - уменьшена */}
               <div className={`h-20 bg-gradient-to-br ${config.gradient} relative`}>
                 {/* Декоративный оверлей */}
