@@ -8,8 +8,25 @@
     <meta name="author" content="ServiceHub" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preload" href="/assets/hero-dashboard.jpg" as="image" fetchpriority="high">
     <link rel="modulepreload" href="/src/main.tsx">
+    <link rel="modulepreload" href="/src/App.tsx">
+    <link rel="modulepreload" href="/src/integrations/supabase/client.ts">
+    
+    <!-- Early hints for critical resources -->
+    <script>
+      // Early connection establishment for faster resource loading
+      if ('connection' in navigator && navigator.connection && navigator.connection.downlink > 1) {
+        // Only for fast connections to avoid waste on slow networks
+        const linkElem = document.createElement('link');
+        linkElem.rel = 'preload';
+        linkElem.as = 'script';
+        linkElem.href = '/assets/index.js';
+        document.head.appendChild(linkElem);
+      }
+    </script>
     
     <!-- Critical CSS inline for immediate render -->
     <style>
@@ -26,6 +43,10 @@
     <!-- Load Google Fonts asynchronously to prevent render blocking -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Resource hints for faster loading -->
+    <link rel="prefetch" href="/assets/index.css">
+    <link rel="prefetch" href="/assets/index.js">
     <link rel="canonical" href="/" />
 
     <meta property="og:title" content="ServiceHub — маркетплейс услуг" />
