@@ -13,7 +13,8 @@ import {
   AlertTriangle, Clock, Shield, Star, Activity, ArrowUpRight,
   ArrowDownRight, RefreshCw, Calendar, MapPin, Target
 } from "lucide-react";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CategoryDistributionChart } from '@/components/admin/CategoryDistributionChart';
 
 export default function AdminDashboard() {
   const { t } = useEnhancedI18n();
@@ -419,33 +420,7 @@ export default function AdminDashboard() {
                 <p className="text-sm text-muted-foreground">Топ категории услуг</p>
               </div>
             </div>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={charts.category_distribution || []}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {(charts.category_distribution || []).map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={`hsl(${index * 45 + 200}, 70%, 50%)`} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <CategoryDistributionChart data={charts.category_distribution || []} />
           </div>
         </motion.div>
 
