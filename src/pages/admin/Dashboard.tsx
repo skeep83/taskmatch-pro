@@ -466,54 +466,92 @@ export default function AdminDashboard() {
                 <p className="text-sm text-muted-foreground">Ключевые операционные показатели</p>
               </div>
             </div>
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Uptime</span>
-                  <span className="text-sm font-semibold text-green-600">99.9%</span>
+            
+            {/* Horizontal neumorphic indicators */}
+            <div className="grid grid-cols-5 gap-4">
+              {/* Uptime */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="text-xs font-medium text-center text-muted-foreground">
+                  Uptime
                 </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-1000" style={{ width: '99.9%' }} />
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">API Response Time</span>
-                  <span className="text-sm font-semibold">{stats.api_response_time || 120}ms</span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="relative w-8 h-20 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-1000" 
-                    style={{ width: `${Math.max(0, 100 - (stats.api_response_time || 120) / 5)}%` }} 
+                    className="w-full bg-gradient-to-t from-green-500 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
+                    style={{ height: '99.9%' }}
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Error Rate</span>
-                  <span className="text-sm font-semibold">{(stats.error_rate || 0.1).toFixed(2)}%</span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-green-400 to-green-600" />
                 </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="text-xs font-semibold text-green-600">99.9%</div>
+              </div>
+
+              {/* API Response Time */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="text-xs font-medium text-center text-muted-foreground">
+                  API Time
+                </div>
+                <div className="relative w-8 h-20 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-1000" 
-                    style={{ width: `${Math.max(0, 100 - (stats.error_rate || 0.1) * 20)}%` }} 
+                    className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-full transition-all duration-1000 ease-out"
+                    style={{ height: `${Math.max(0, 100 - (stats.api_response_time || 120) / 5)}%` }}
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Queue Health</span>
-                  <span className="text-sm font-semibold text-teal-600">{stats.queue_health || 98}%</span>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-blue-400 to-blue-600" />
                 </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="text-xs font-semibold">{stats.api_response_time || 120}ms</div>
+              </div>
+
+              {/* Error Rate */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="text-xs font-medium text-center text-muted-foreground">
+                  Errors
+                </div>
+                <div className="relative w-8 h-20 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-1000" 
-                    style={{ width: `${stats.queue_health || 98}%` }} 
+                    className="w-full bg-gradient-to-t from-pink-500 to-pink-400 rounded-full transition-all duration-1000 ease-out"
+                    style={{ height: `${Math.max(5, (stats.error_rate || 0.1) * 20)}%` }}
                   />
                 </div>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-pink-400 to-pink-600" />
+                </div>
+                <div className="text-xs font-semibold">{(stats.error_rate || 0.1).toFixed(2)}%</div>
+              </div>
+
+              {/* Queue Health */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="text-xs font-medium text-center text-muted-foreground">
+                  Queue
+                </div>
+                <div className="relative w-8 h-20 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
+                  <div 
+                    className="w-full bg-gradient-to-t from-teal-500 to-cyan-400 rounded-full transition-all duration-1000 ease-out"
+                    style={{ height: `${stats.queue_health || 98}%` }}
+                  />
+                </div>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-teal-400 to-cyan-600" />
+                </div>
+                <div className="text-xs font-semibold text-teal-600">{stats.queue_health || 98}%</div>
+              </div>
+
+              {/* Memory Usage */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="text-xs font-medium text-center text-muted-foreground">
+                  Memory
+                </div>
+                <div className="relative w-8 h-20 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
+                  <div 
+                    className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-full transition-all duration-1000 ease-out"
+                    style={{ height: `${stats.memory_usage || 68}%` }}
+                  />
+                </div>
+                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-green-400 to-green-600" />
+                </div>
+                <div className="text-xs font-semibold">{stats.memory_usage || 68}%</div>
               </div>
             </div>
           </div>
