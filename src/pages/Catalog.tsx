@@ -176,45 +176,56 @@ const Catalog = () => {
 
       {/* Specialists Grid */}
       <section className="container mx-auto pb-20">
-        <div className="text-center mb-12 max-w-4xl mx-auto">
-          <h2 className="text-4xl font-display font-bold mb-4 max-w-[60ch] mx-auto [text-wrap:balance]">{t("catalog.our_specialists")}</h2>
-          <p className="text-muted-foreground max-w-[65ch] mx-auto [text-wrap:balance] break-words hyphens-auto">{t("catalog.verified_professionals")}</p>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-display font-bold mb-4">{t("catalog.our_specialists")}</h2>
+          <p className="text-muted-foreground">{t("catalog.verified_professionals")}</p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto justify-items-center">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto" style={{ perspective: '1000px' }}>
           {pros.map((p, index) => {
             const r = ratingMap[p.user_id] || { avg_score: 0, rating_count: 0 };
             return (
-              <div 
+              <article 
                 key={p.user_id} 
-                className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-lg border transition-all duration-500 animate-fade-in hover-scale"
+                className="group relative h-96 w-full rounded-3xl overflow-hidden transition-all duration-500 animate-fade-in hover-scale"
                 style={{ 
                   animationDelay: `${index * 100}ms`,
-                  height: '420px'
+                  transformStyle: 'preserve-3d',
+                  backfaceVisibility: 'hidden',
+                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
                 }}
               >
-                {/* Gradient Header */}
+                {/* Gradient Header with enhanced depth */}
                 <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600" 
                      style={{ 
                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%)',
+                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.1)'
                      }}>
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/15 to-white/25" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
                 </div>
 
-                {/* Avatar */}
+                {/* Avatar with enhanced 3D effect */}
                 <div className="absolute left-1/2 transform -translate-x-1/2 top-12 z-10">
                   <div className="relative">
-                    <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg">
+                    <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden group-hover:scale-110 group-hover:rotate-12 transition-all duration-300"
+                         style={{ 
+                           boxShadow: '0 20px 40px -8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.9)',
+                           filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2))'
+                         }}>
                       <img 
                         src={p.profiles?.avatar_url || proPlaceholder} 
                         alt={p.profiles?.full_name || p.profiles?.first_name || "Specialist"} 
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    {/* Status indicator */}
+                    {/* Enhanced status indicator */}
                     {r.rating_count > 0 && (
-                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center shadow-md">
+                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center"
+                           style={{ 
+                             boxShadow: '0 4px 12px rgba(34, 197, 94, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.8)',
+                             background: 'linear-gradient(135deg, #10b981, #059669)'
+                           }}>
                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
@@ -223,15 +234,21 @@ const Catalog = () => {
                   </div>
                 </div>
 
-                {/* Content Section */}
-                <div className="pt-16 px-4 h-full bg-white flex flex-col">
+                {/* Content Section with glass morphism effect */}
+                <div className="pt-16 px-6 pb-6 h-full flex flex-col" 
+                     style={{ 
+                       background: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
+                       backdropFilter: 'blur(10px)',
+                       borderTop: '1px solid rgba(255,255,255,0.5)',
+                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)'
+                     }}>
                   {/* Content */}
-                  <div className="text-center mb-6 flex-1">
+                  <div className="text-center mb-4">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || `Специалист ${String(p.user_id).slice(0,8)}`}
+                      {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || t("catalog.specialist_id", { id: String(p.user_id).slice(0,8) })}
                     </h3>
-                    <p className="text-xs text-gray-600 uppercase tracking-wide font-medium">
-                      {selectedCat ? catById[selectedCat]?.label_ru || "Профессионал" : "Профессионал"}
+                    <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      {selectedCat ? catById[selectedCat]?.label_ru || t("catalog.professional_bio") : t("catalog.professional_bio")}
                     </p>
                     
                     <div className="mt-2 flex justify-center">
@@ -242,28 +259,28 @@ const Catalog = () => {
                         readonly
                       />
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">
-                      {r.rating_count > 0 ? `${r.rating_count} отзывов` : "Новый специалист"}
+                    <p className="text-xs text-gray-500 mt-1">
+                      {r.rating_count > 0 ? t("catalog.reviews", { count: r.rating_count }) : t("catalog.new_specialist")}
                     </p>
                   </div>
 
-                  {/* Buttons at bottom */}
-                  <div className="space-y-2 mb-4">
+                  {/* Buttons positioned higher */}
+                  <div className="space-y-2">
                     <Link 
                       to={`/pro/${p.user_id}`}
-                      className="block w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg transition-colors text-center text-sm font-medium"
+                      className="block w-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
                     >
-                      Профиль
+                      {t("catalog.profile")}
                     </Link>
                     <Link 
-                      to={`/job/new?pro_id=${p.user_id}`} 
-                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
+                      to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
+                      className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
                     >
-                      Заказать
+                      {t("catalog.order")}
                     </Link>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
