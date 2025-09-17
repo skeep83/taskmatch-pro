@@ -73,7 +73,12 @@ export function JobStatusProgress({
             className: "h-4 w-4" 
           })}
         </div>
-        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+        <Badge variant={statusInfo.variant} className="flex items-center gap-1">
+          {statusInfo.label}
+          {React.createElement(statusSteps[Math.max(0, currentStepIndex)]?.icon || AlertCircle, { 
+            className: "h-4 w-4" 
+          })}
+        </Badge>
       </div>
 
       {/* Progress Bar */}
