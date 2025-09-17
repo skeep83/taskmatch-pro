@@ -232,9 +232,9 @@ export default function AdminDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="group hover-scale"
+              className="group hover-scale h-full"
             >
-              <div className="card-surface p-6 relative overflow-hidden">
+              <div className="card-surface p-6 relative overflow-hidden h-full flex flex-col min-h-[180px]">
                 {/* Icon and Title */}
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`p-3 rounded-xl ${metric.color.replace('text-', 'bg-')}/10`}>
@@ -248,7 +248,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Value and Change */}
-                <div className="flex items-end justify-between mb-4">
+                <div className="flex items-end justify-between mb-4 flex-grow">
                   <div className="text-3xl font-bold">
                     {metric.value}
                   </div>
