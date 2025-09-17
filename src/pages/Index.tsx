@@ -120,57 +120,57 @@ export default function Index() {
       />
       
       {/* Hero Section */}
-      <section className="hero-section section-spacing">
-        <div className="main-container">
+      <section className="min-h-[70svh] flex items-center">
+        <div className="global-container">
           <div className="responsive-grid lg:grid-cols-2 items-center gap-gap-lg">
             {/* Left Column - Text Content */}
             <div className="text-left">
-              <div className="section-gap animate-fade-in">
+              <div className="animate-fade-in">
                 <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
                   <Rocket size={24} className="text-primary flex-shrink-0" />
-                  <span className="text-sm font-medium text-primary btn-no-wrap">Платформа нового поколения</span>
+                  <span className="text-sm font-medium text-primary whitespace-nowrap">Платформа нового поколения</span>
                 </div>
-                <h1 className="text-heading-xl font-display font-bold mb-6 max-w-heading">
+                <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-wrap-balance max-w-[60ch] mb-3">
                   <span className="text-gradient animate-gradient-shift">{t("hero.title")}</span>
                 </h1>
-                <p className="text-body-lg text-muted-foreground mb-8 max-w-text">
+                <p className="mt-3 text-lg md:text-xl max-w-[65ch] break-words hyphens-auto opacity-90 mb-6">
                   {t("hero.subtitle")}
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-gap mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
-                <Link to="/catalog" className="btn-hero btn-no-wrap">
+              <div className="mt-6 flex flex-wrap gap-3 mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                <Link to="/catalog" className="btn-cta bg-primary text-white hover:bg-primary/90">
                   🔍 Найти специалиста
                 </Link>
-                <Link to="/auth" className="btn-ghost btn-no-wrap">
+                <Link to="/auth" className="btn-cta border border-border hover:bg-muted">
                   💼 Стать исполнителем
                 </Link>
               </div>
 
               {/* Stats with proper spacing */}
-              <div className="responsive-grid grid-cols-3 gap-gap text-center animate-fade-in" style={{ animationDelay: '400ms' }}>
+              <div className="grid grid-cols-3 gap-6 text-center animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <div>
-                  <div className="text-heading-md font-bold text-primary">1000+</div>
-                  <div className="text-sm text-muted-foreground btn-no-wrap">Специалистов</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary">1000+</div>
+                  <div className="text-sm text-muted-foreground whitespace-nowrap">Специалистов</div>
                 </div>
                 <div>
-                  <div className="text-heading-md font-bold text-primary">5000+</div>
-                  <div className="text-sm text-muted-foreground btn-no-wrap">Выполненных работ</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary">5000+</div>
+                  <div className="text-sm text-muted-foreground whitespace-nowrap">Работ выполнено</div>
                 </div>
                 <div>
-                  <div className="text-heading-md font-bold text-primary">4.9</div>
-                  <div className="text-sm text-muted-foreground btn-no-wrap">Средний рейтинг</div>
+                  <div className="text-2xl md:text-3xl font-bold text-primary">4.9</div>
+                  <div className="text-sm text-muted-foreground whitespace-nowrap">Средний рейтинг</div>
                 </div>
               </div>
             </div>
 
             {/* Right Column - Dashboard Image */}
             <div className="relative animate-fade-in lg:animate-float-slow" style={{ animationDelay: '300ms' }}>
-              <div className="relative hero-image-container mx-auto">
+              <div className="relative max-w-lg mx-auto">
                 <img 
                   src={heroDashboard} 
                   alt="ServiceHub Platform" 
-                  className="img-responsive rounded-3xl shadow-2xl"
+                  className="w-full h-auto rounded-3xl shadow-2xl"
                   loading="eager"
                   fetchPriority="high"
                   width={612}
@@ -186,34 +186,34 @@ export default function Index() {
       
       {/* Features Section */}
       <section className="section-spacing">
-        <div className="section-container">
-          <div className="text-center section-gap">
-            <h2 className="text-heading-lg font-display font-bold max-w-heading-lg mx-auto mb-4">
+        <div className="global-container">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold max-w-[60ch] mx-auto mb-4">
               Почему выбирают ServiceHub
             </h2>
-            <p className="text-body-lg text-muted-foreground max-w-text mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-[65ch] mx-auto opacity-90">
               Современная платформа для безопасного поиска и заказа услуг с полной защитой интересов всех сторон
             </p>
           </div>
 
-          <div className="responsive-grid lg:grid-cols-3 gap-gap">
+          <div className="cards-grid">
             {features.map((feature, index) => (
               <div 
                 key={feature.title} 
-                className="card-surface card-equal-height text-center animate-fade-in"
+                className="card-standard text-center animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="card-content">
-                  <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
-                    <feature.icon className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="card-title text-heading-sm font-semibold mb-4">
+                <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
+                  <feature.icon className="w-8 h-8 text-primary" />
+                </div>
+                <div className="card-title-aligned">
+                  <h3 className="text-xl font-semibold mb-4">
                     {feature.title}
                   </h3>
-                  <p className="text-body text-muted-foreground flex-1 max-w-text mx-auto">
-                    {feature.description}
-                  </p>
                 </div>
+                <p className="text-muted-foreground max-w-[65ch] mx-auto break-words hyphens-auto">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
@@ -222,35 +222,35 @@ export default function Index() {
       
       {/* Categories Section */}
       <section className="section-spacing bg-muted/10">
-        <div className="section-container">
-          <div className="text-center section-gap">
-            <h2 className="text-heading-lg font-display font-bold max-w-heading-lg mx-auto mb-4">
+        <div className="global-container">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold max-w-[60ch] mx-auto mb-4">
               {t("section.categories")}
             </h2>
-            <p className="text-body-lg text-muted-foreground max-w-text mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-[65ch] mx-auto opacity-90">
               Найдите нужного специалиста в любой из популярных категорий
             </p>
           </div>
 
-          <div className="responsive-grid lg:grid-cols-4 gap-gap">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {categories.map((category, index) => (
               <Link
                 key={category.name}
                 to={`/catalog?category=${encodeURIComponent(category.name)}`}
-                className="card-surface card-equal-height text-center group animate-fade-in btn-no-wrap"
+                className="card-standard text-center group animate-fade-in hover:shadow-md transition-all"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="card-content">
-                  <div className="w-16 h-16 mx-auto mb-2 group-hover:animate-bounce-gentle">
-                    <Icon3D name={category.iconKey} size="lg" loading="lazy" />
-                  </div>
-                  <h3 className="card-title text-heading-xs font-semibold mb-2">
+                <div className="w-16 h-16 mx-auto mb-4 group-hover:animate-bounce-gentle">
+                  <Icon3D name={category.iconKey} size="lg" loading="lazy" />
+                </div>
+                <div className="card-title-aligned">
+                  <h3 className="text-lg font-semibold mb-2 whitespace-nowrap">
                     {category.name}
                   </h3>
-                  <p className="text-body-sm text-muted-foreground">
-                    {category.count}+ мастеров
-                  </p>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  {category.count}+ мастеров
+                </p>
               </Link>
             ))}
           </div>
@@ -259,44 +259,42 @@ export default function Index() {
       
       {/* Testimonials Section */}
       <section className="section-spacing">
-        <div className="section-container">
-          <div className="text-center section-gap">
-            <h2 className="text-heading-lg font-display font-bold max-w-heading-lg mx-auto mb-4">
+        <div className="global-container">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold max-w-[60ch] mx-auto mb-4">
               {t("section.testimonials")}
             </h2>
-            <p className="text-body-lg text-muted-foreground max-w-text mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-[65ch] mx-auto opacity-90">
               Отзывы наших довольных клиентов и специалистов
             </p>
           </div>
 
-          <div className="responsive-grid lg:grid-cols-3 gap-gap">
+          <div className="cards-grid">
             {filteredTestimonials.map((testimonial, index) => (
               <div 
                 key={index} 
-                className="card-surface card-equal-height animate-fade-in"
+                className="card-standard animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="card-content">
-                  <div className="flex items-center gap-3 mb-4">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.author}
-                      className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold btn-no-wrap">{testimonial.author}</div>
-                      <div className="text-body-sm text-muted-foreground btn-no-wrap">{testimonial.location}</div>
-                    </div>
-                    <div className="flex flex-shrink-0">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Icon3D key={i} name="star" size="sm" className="text-yellow-400" />
-                      ))}
-                    </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <img 
+                    src={testimonial.avatar} 
+                    alt={testimonial.author}
+                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{testimonial.author}</div>
+                    <div className="text-sm text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">{testimonial.location}</div>
                   </div>
-                  <p className="text-body text-muted-foreground flex-1 max-w-text">
-                    "{testimonial.text}"
-                  </p>
+                  <div className="flex flex-shrink-0">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Icon3D key={i} name="star" size="sm" className="text-yellow-400" />
+                    ))}
+                  </div>
                 </div>
+                <p className="text-muted-foreground max-w-[65ch] break-words hyphens-auto line-clamp-3">
+                  "{testimonial.text}"
+                </p>
               </div>
             ))}
           </div>

@@ -59,6 +59,34 @@ export const icons3d = {
     alt: 'Время / Сроки'
   },
 
+  // Функции платформы
+  escrowSafe: {
+    src: '/icons3d/ic3d-escrow-safe.png',
+    alt: 'Escrow платежи'
+  },
+  auctionGavel: {
+    src: '/icons3d/ic3d-auction-gavel.png',
+    alt: 'Тендеры'
+  },
+  videoCall: {
+    src: '/icons3d/ic3d-video-call.png',
+    alt: 'Видео-оценка'
+  },
+  instantPayout: {
+    src: '/icons3d/ic3d-instant-payout.png',
+    alt: 'Мгновенные выплаты'
+  },
+
+  // Финансы/аккаунт
+  wallet: {
+    src: '/icons3d/ic3d-wallet.png',
+    alt: 'Кошелёк / Баланс'
+  },
+  invoice: {
+    src: '/icons3d/ic3d-invoice.png',
+    alt: 'Счёт / Оплата'
+  },
+
   // Категории услуг
   hammerWrench: {
     src: '/icons3d/ic3d-hammer-wrench.png',
