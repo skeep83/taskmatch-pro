@@ -1,10 +1,21 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Rocket } from "lucide-react";
-import { Icon } from "@/ui/icons3d";
+import { 
+  Rocket, 
+  Shield, 
+  Clock, 
+  Users, 
+  Star, 
+  ShieldCheck, 
+  Zap, 
+  Award,
+  CheckCircle,
+  TrendingUp,
+  Smartphone,
+  Globe
+} from "lucide-react";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { Seo } from "@/components/Seo";
-import { Icon3D } from "@/components/ui/Icon3D";
 
 // Images
 import heroDashboard from "@/assets/hero-dashboard.jpg";
@@ -14,46 +25,46 @@ import elenaCahul from "@/assets/testimonials/elena-cahul.jpg";
 
 const features = [
   {
-    iconName: "shield" as const,
+    icon: Shield,
     title: "Безопасные платежи",
     description: "Эскроу-система защищает ваши средства до полного завершения работ"
   },
   {
-    iconName: "payout" as const,
-    title: "Быстрые выплаты",
-    description: "Мгновенные выплаты специалистам после завершения работ"
+    icon: Clock,
+    title: "Быстрые отклики",
+    description: "Специалисты откликаются в течение нескольких минут"
   },
   {
-    iconName: "user" as const,
+    icon: Users,
     title: "Проверенные мастера",
     description: "Все специалисты проходят верификацию и имеют рейтинг"
   },
   {
-    iconName: "star" as const,
+    icon: CheckCircle,
     title: "Гарантия качества",
     description: "Система отзывов и гарантий на выполненные работы"
   },
   {
-    iconName: "auction" as const,
-    title: "Тендерная система",
-    description: "Получайте лучшие предложения через тендеры"
+    icon: TrendingUp,
+    title: "Умное ценообразование",
+    description: "AI-алгоритмы помогают найти оптимальную цену"
   },
   {
-    iconName: "video" as const,
-    title: "Видео-оценка",
-    description: "Предварительная оценка работ через видеозвонок"
+    icon: Smartphone,
+    title: "Мобильное приложение",
+    description: "Управляйте заказами из любой точки мира"
   }
 ];
 
 const categories = [
-  { name: "Сантехника", iconKey: "pipeWrench" as const, count: 150 },
-  { name: "Электрика", iconKey: "hammerWrench" as const, count: 120 },
-  { name: "Уборка", iconKey: "broomBucket" as const, count: 200 },
-  { name: "Ремонт", iconKey: "hammerWrench" as const, count: 180 },
-  { name: "Грузоперевозки", iconKey: "truckBox" as const, count: 90 },
-  { name: "Красота", iconKey: "camera" as const, count: 110 },
-  { name: "Репетиторство", iconKey: "briefcase" as const, count: 75 },
-  { name: "Фотография", iconKey: "camera" as const, count: 65 }
+  { name: "Сантехника", icon: "🔧", count: 150 },
+  { name: "Электрика", icon: "⚡", count: 120 },
+  { name: "Уборка", icon: "🧹", count: 200 },
+  { name: "Ремонт", icon: "🔨", count: 180 },
+  { name: "Грузоперевозки", icon: "🚚", count: 90 },
+  { name: "Красота", icon: "💄", count: 110 },
+  { name: "Репетиторство", icon: "📚", count: 75 },
+  { name: "Фотография", icon: "📸", count: 65 }
 ];
 
 const testimonials = [
@@ -112,57 +123,57 @@ export default function Index() {
       />
       
       {/* Hero Section */}
-      <section className="min-h-[70svh] flex items-center">
-        <div className="global-container">
+      <section className="hero-section section-spacing">
+        <div className="main-container">
           <div className="responsive-grid lg:grid-cols-2 items-center gap-gap-lg">
             {/* Left Column - Text Content */}
             <div className="text-left">
-              <div className="animate-fade-in">
+              <div className="section-gap animate-fade-in">
                 <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
                   <Rocket size={24} className="text-primary flex-shrink-0" />
-                  <span className="text-sm font-medium text-primary whitespace-nowrap">Платформа нового поколения</span>
+                  <span className="text-sm font-medium text-primary btn-no-wrap">Платформа нового поколения</span>
                 </div>
-                <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-wrap-balance max-w-[60ch] mb-3">
+                <h1 className="text-heading-xl font-display font-bold mb-6 max-w-heading">
                   <span className="text-gradient animate-gradient-shift">{t("hero.title")}</span>
                 </h1>
-                <p className="mt-3 text-lg md:text-xl max-w-[65ch] break-words hyphens-auto opacity-90 mb-6">
+                <p className="text-body-lg text-muted-foreground mb-8 max-w-text">
                   {t("hero.subtitle")}
                 </p>
               </div>
 
-              <div className="mt-6 flex flex-wrap gap-3 mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
-                <Link to="/catalog" className="btn-cta bg-primary text-white hover:bg-primary/90">
+              <div className="flex flex-col sm:flex-row gap-gap mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                <Link to="/catalog" className="btn-hero btn-no-wrap">
                   🔍 Найти специалиста
                 </Link>
-                <Link to="/auth" className="btn-cta border border-border hover:bg-muted">
+                <Link to="/auth" className="btn-ghost btn-no-wrap">
                   💼 Стать исполнителем
                 </Link>
               </div>
 
               {/* Stats with proper spacing */}
-              <div className="grid grid-cols-3 gap-6 text-center animate-fade-in" style={{ animationDelay: '400ms' }}>
+              <div className="responsive-grid grid-cols-3 gap-gap text-center animate-fade-in" style={{ animationDelay: '400ms' }}>
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold text-primary">1000+</div>
-                  <div className="text-sm text-muted-foreground whitespace-nowrap">Специалистов</div>
+                  <div className="text-heading-md font-bold text-primary">1000+</div>
+                  <div className="text-sm text-muted-foreground btn-no-wrap">Специалистов</div>
                 </div>
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold text-primary">5000+</div>
-                  <div className="text-sm text-muted-foreground whitespace-nowrap">Работ выполнено</div>
+                  <div className="text-heading-md font-bold text-primary">5000+</div>
+                  <div className="text-sm text-muted-foreground btn-no-wrap">Выполненных работ</div>
                 </div>
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold text-primary">4.9</div>
-                  <div className="text-sm text-muted-foreground whitespace-nowrap">Средний рейтинг</div>
+                  <div className="text-heading-md font-bold text-primary">4.9</div>
+                  <div className="text-sm text-muted-foreground btn-no-wrap">Средний рейтинг</div>
                 </div>
               </div>
             </div>
 
             {/* Right Column - Dashboard Image */}
             <div className="relative animate-fade-in lg:animate-float-slow" style={{ animationDelay: '300ms' }}>
-              <div className="relative max-w-lg mx-auto">
+              <div className="relative hero-image-container mx-auto">
                 <img 
                   src={heroDashboard} 
                   alt="ServiceHub Platform" 
-                  className="w-full h-auto rounded-3xl shadow-2xl"
+                  className="img-responsive rounded-3xl shadow-2xl"
                   loading="eager"
                   fetchPriority="high"
                   width={612}
@@ -178,34 +189,34 @@ export default function Index() {
       
       {/* Features Section */}
       <section className="section-spacing">
-        <div className="global-container">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold max-w-[60ch] mx-auto mb-4">
+        <div className="section-container">
+          <div className="text-center section-gap">
+            <h2 className="text-heading-lg font-display font-bold max-w-heading-lg mx-auto mb-4">
               Почему выбирают ServiceHub
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-[65ch] mx-auto opacity-90">
+            <p className="text-body-lg text-muted-foreground max-w-text mx-auto">
               Современная платформа для безопасного поиска и заказа услуг с полной защитой интересов всех сторон
             </p>
           </div>
 
-          <div className="cards-grid">
+          <div className="responsive-grid lg:grid-cols-3 gap-gap">
             {features.map((feature, index) => (
               <div 
                 key={feature.title} 
-                className="card-standard text-center animate-fade-in"
+                className="card-surface card-equal-height text-center animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
-                  <Icon name={feature.iconName} size={32} />
-                </div>
-                <div className="card-title-aligned">
-                  <h3 className="text-xl font-semibold mb-4">
+                <div className="card-content">
+                  <div className="w-16 h-16 mx-auto mb-6 bg-primary/10 rounded-2xl flex items-center justify-center">
+                    <feature.icon className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="card-title text-heading-sm font-semibold mb-4">
                     {feature.title}
                   </h3>
+                  <p className="text-body text-muted-foreground flex-1 max-w-text mx-auto">
+                    {feature.description}
+                  </p>
                 </div>
-                <p className="text-muted-foreground max-w-[65ch] mx-auto break-words hyphens-auto">
-                  {feature.description}
-                </p>
               </div>
             ))}
           </div>
@@ -214,35 +225,35 @@ export default function Index() {
       
       {/* Categories Section */}
       <section className="section-spacing bg-muted/10">
-        <div className="global-container">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold max-w-[60ch] mx-auto mb-4">
+        <div className="section-container">
+          <div className="text-center section-gap">
+            <h2 className="text-heading-lg font-display font-bold max-w-heading-lg mx-auto mb-4">
               {t("section.categories")}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-[65ch] mx-auto opacity-90">
+            <p className="text-body-lg text-muted-foreground max-w-text mx-auto">
               Найдите нужного специалиста в любой из популярных категорий
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="responsive-grid lg:grid-cols-4 gap-gap">
             {categories.map((category, index) => (
               <Link
                 key={category.name}
                 to={`/catalog?category=${encodeURIComponent(category.name)}`}
-                className="card-standard text-center group animate-fade-in hover:shadow-md transition-all"
+                className="card-surface card-equal-height text-center group animate-fade-in btn-no-wrap"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="w-16 h-16 mx-auto mb-4 group-hover:animate-bounce-gentle">
-                  <Icon name="star" size={64} />
-                </div>
-                <div className="card-title-aligned">
-                  <h3 className="text-lg font-semibold mb-2 whitespace-nowrap">
+                <div className="card-content">
+                  <div className="text-heading-md mb-2 group-hover:animate-bounce-gentle">
+                    {category.icon}
+                  </div>
+                  <h3 className="card-title text-heading-xs font-semibold mb-2">
                     {category.name}
                   </h3>
+                  <p className="text-body-sm text-muted-foreground">
+                    {category.count}+ мастеров
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {category.count}+ мастеров
-                </p>
               </Link>
             ))}
           </div>
@@ -251,42 +262,44 @@ export default function Index() {
       
       {/* Testimonials Section */}
       <section className="section-spacing">
-        <div className="global-container">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold max-w-[60ch] mx-auto mb-4">
+        <div className="section-container">
+          <div className="text-center section-gap">
+            <h2 className="text-heading-lg font-display font-bold max-w-heading-lg mx-auto mb-4">
               {t("section.testimonials")}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-[65ch] mx-auto opacity-90">
+            <p className="text-body-lg text-muted-foreground max-w-text mx-auto">
               Отзывы наших довольных клиентов и специалистов
             </p>
           </div>
 
-          <div className="cards-grid">
+          <div className="responsive-grid lg:grid-cols-3 gap-gap">
             {filteredTestimonials.map((testimonial, index) => (
               <div 
                 key={index} 
-                className="card-standard animate-fade-in"
+                className="card-surface card-equal-height animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <img 
-                    src={testimonial.avatar} 
-                    alt={testimonial.author}
-                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{testimonial.author}</div>
-                    <div className="text-sm text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">{testimonial.location}</div>
+                <div className="card-content">
+                  <div className="flex items-center gap-3 mb-4">
+                    <img 
+                      src={testimonial.avatar} 
+                      alt={testimonial.author}
+                      className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold btn-no-wrap">{testimonial.author}</div>
+                      <div className="text-body-sm text-muted-foreground btn-no-wrap">{testimonial.location}</div>
+                    </div>
+                    <div className="flex flex-shrink-0">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-shrink-0">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Icon key={i} name="star" size={16} />
-                    ))}
-                  </div>
+                  <p className="text-body text-muted-foreground flex-1 max-w-text">
+                    "{testimonial.text}"
+                  </p>
                 </div>
-                <p className="text-muted-foreground max-w-[65ch] break-words hyphens-auto line-clamp-3">
-                  "{testimonial.text}"
-                </p>
               </div>
             ))}
           </div>
