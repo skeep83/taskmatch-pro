@@ -264,8 +264,8 @@ const Catalog = () => {
                     </p>
                   </div>
 
-                  {/* Buttons positioned higher with fixed container */}
-                  <div className="space-y-2 mt-auto px-2">
+                  {/* Buttons positioned higher */}
+                  <div className="space-y-2">
                     <Link 
                       to={`/pro/${p.user_id}`}
                       className="block w-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
