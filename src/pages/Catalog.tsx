@@ -235,7 +235,7 @@ const Catalog = () => {
                 </div>
 
                 {/* Content Section with glass morphism effect */}
-                <div className="pt-16 px-6 pb-6 h-full flex flex-col" 
+                <div className="pt-16 px-4 pb-4 h-full flex flex-col" 
                      style={{ 
                        background: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
                        backdropFilter: 'blur(10px)',
@@ -243,11 +243,11 @@ const Catalog = () => {
                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)'
                      }}>
                   {/* Content */}
-                  <div className="text-center mb-4">
+                  <div className="text-center mb-3 flex-1">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">
                       {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || t("catalog.specialist_id", { id: String(p.user_id).slice(0,8) })}
                     </h3>
-                    <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    <p className="text-xs text-gray-600 uppercase tracking-wide font-medium">
                       {selectedCat ? catById[selectedCat]?.label_ru || t("catalog.professional_bio") : t("catalog.professional_bio")}
                     </p>
                     
@@ -259,16 +259,16 @@ const Catalog = () => {
                         readonly
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       {r.rating_count > 0 ? t("catalog.reviews", { count: r.rating_count }) : t("catalog.new_specialist")}
                     </p>
                   </div>
 
                   {/* Buttons positioned higher */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-auto">
                     <Link 
                       to={`/pro/${p.user_id}`}
-                      className="block w-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
+                      className="block w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
                     >
                       {t("catalog.profile")}
                     </Link>
