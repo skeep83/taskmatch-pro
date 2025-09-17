@@ -220,7 +220,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Main Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metricCards.map((metric, index) => {
           const Icon = metric.icon;
           const isPositive = metric.reverseGood ? metric.change < 0 : metric.change > 0;
@@ -449,10 +449,7 @@ export default function AdminDashboard() {
           </div>
         </motion.div>
 
-      </div>
-
-      {/* System Health - Same size as other sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* System Health */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
