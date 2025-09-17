@@ -60,7 +60,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
 
   return (
     <div className="space-y-8">
-      <div className="text-center mx-auto max-w-lg">
+      <div className="text-center">
         <h3 className="text-2xl font-bold mb-2">Расширьте возможности</h3>
         <p className="text-muted-foreground">Станьте специалистом или создайте бизнес аккаунт</p>
       </div>
@@ -83,43 +83,42 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
             }}
             className="perspective-1000 group"
           >
-            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d h-80 flex flex-col">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d">
               {/* Верхняя секция с градиентом - уменьшена */}
-              <div className={`h-28 bg-gradient-to-br ${config.gradient} relative`}>
+              <div className={`h-20 bg-gradient-to-br ${config.gradient} relative`}>
                 {/* Декоративный оверлей */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                 
-                {/* Иконка */}
-                <div className="absolute left-1/2 top-14 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                {/* Иконка меньшего размера */}
+                <div className="absolute left-1/2 top-10 transform -translate-x-1/2 -translate-y-1/2 z-10">
                   <motion.div
                     whileHover={{ scale: 1.15, rotate: 8 }}
                     transition={{ duration: 0.2 }}
-                    className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/30"
+                    className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/20"
                   >
-                    <IconComponent className="w-10 h-10 text-white" />
+                    <IconComponent className="w-8 h-8 text-gray-700" />
                   </motion.div>
                 </div>
               </div>
               
               {/* Нижняя секция с контентом - более компактная */}
-              <div className="bg-gradient-to-b from-gray-50 to-white pt-18 px-5 pb-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="text-center mb-4">
-                    <h4 className="text-lg font-bold text-foreground mb-1">{config.title}</h4>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-                      {config.description}
-                    </p>
-                  </div>
-                  
-                  {/* Преимущества - более компактные */}
-                  <div className="space-y-1 mb-4">
-                    {config.benefits.slice(0, 2).map((benefit, index) => (
-                      <div key={index} className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Star className="w-3 h-3 text-yellow-500 fill-current flex-shrink-0" />
-                        <span className="truncate">{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
+              <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5">
+                <div className="text-center mb-4">
+                  <h4 className="text-lg font-bold text-gray-900 mb-1">{config.title}</h4>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    {config.description}
+                  </p>
+                </div>
+                
+                {/* Преимущества - более компактные */}
+                <div className="space-y-1 mb-4">
+                  {config.benefits.slice(0, 2).map((benefit, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs text-gray-600">
+                      <Star className="w-3 h-3 text-yellow-500 fill-current flex-shrink-0" />
+                      <span className="truncate">{benefit}</span>
+                    </div>
+                  ))}
                 </div>
                 
                 {/* Кнопка действия - меньшего размера */}

@@ -177,8 +177,8 @@ const Catalog = () => {
       {/* Specialists Grid */}
       <section className="container mx-auto pb-20">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-display font-bold mb-4 mx-auto">{t("catalog.our_specialists")}</h2>
-          <p className="text-muted-foreground mx-auto">{t("catalog.verified_professionals")}</p>
+          <h2 className="text-4xl font-display font-bold mb-4">{t("catalog.our_specialists")}</h2>
+          <p className="text-muted-foreground">{t("catalog.verified_professionals")}</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto" style={{ perspective: '1000px' }}>
@@ -244,10 +244,10 @@ const Catalog = () => {
                      }}>
                   {/* Content */}
                   <div className="text-center mb-4">
-                    <h3 className="text-lg font-bold text-foreground mb-1">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">
                       {p.profiles?.full_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || t("catalog.specialist_id", { id: String(p.user_id).slice(0,8) })}
                     </h3>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+                    <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       {selectedCat ? catById[selectedCat]?.label_ru || t("catalog.professional_bio") : t("catalog.professional_bio")}
                     </p>
                     
@@ -265,16 +265,16 @@ const Catalog = () => {
                   </div>
 
                   {/* Buttons positioned higher */}
-                  <div className="flex gap-2 mt-2">
+                  <div className="space-y-2">
                     <Link 
                       to={`/pro/${p.user_id}`}
-                      className="flex-1 border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
+                      className="block w-full border border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground py-1.5 px-3 rounded-lg transition-colors text-center text-sm font-medium"
                     >
                       {t("catalog.profile")}
                     </Link>
                     <Link 
                       to={`/job/new?${new URLSearchParams({ category_id: selectedCat || '', pro_id: p.user_id })}`} 
-                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
+                      className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1.5 px-3 rounded-lg shadow-sm hover:shadow-md transition-all text-center text-sm font-medium"
                     >
                       {t("catalog.order")}
                     </Link>

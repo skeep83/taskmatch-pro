@@ -12,101 +12,63 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: {
-				DEFAULT: 'clamp(16px, 3vw, 24px)',
-				sm: 'clamp(16px, 3vw, 24px)',
-				md: 'clamp(20px, 4vw, 32px)',
-				lg: 'clamp(24px, 5vw, 40px)',
-				xl: 'clamp(24px, 5vw, 40px)',
-				'2xl': 'clamp(24px, 5vw, 40px)'
-			},
+			padding: '2rem',
 			screens: {
-				sm: '640px',
-				md: '768px', 
-				lg: '1024px',
-				xl: '1280px',
-				'2xl': '1280px' // Ограничиваем максимальную ширину
+				'2xl': '1400px'
 			}
 		},
-		extend: {
-			spacing: {
-				'section': 'clamp(48px, 8vw, 96px)',
-				'gap': 'clamp(16px, 3vw, 32px)',
-				'gap-lg': 'clamp(32px, 6vw, 64px)',
+				extend: {
+				fontFamily: {
+					sans: ['Inter', '-apple-system','BlinkMacSystemFont','SF Pro Text','SF Pro Display','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial','Noto Sans','Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','sans-serif'],
+					display: ['Playfair Display', 'SF Pro Display','-apple-system','BlinkMacSystemFont','SF Pro Text','system-ui','Helvetica Neue','Arial','sans-serif']
+				},
+				colors: {
+				border: 'hsl(var(--border))',
+				input: 'hsl(var(--input))',
+				ring: 'hsl(var(--ring))',
+				background: 'hsl(var(--background))',
+				foreground: 'hsl(var(--foreground))',
+				primary: {
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--primary-foreground))'
+				},
+				secondary: {
+					DEFAULT: 'hsl(var(--secondary))',
+					foreground: 'hsl(var(--secondary-foreground))'
+				},
+				destructive: {
+					DEFAULT: 'hsl(var(--destructive))',
+					foreground: 'hsl(var(--destructive-foreground))'
+				},
+				muted: {
+					DEFAULT: 'hsl(var(--muted))',
+					foreground: 'hsl(var(--muted-foreground))'
+				},
+				accent: {
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))'
+				},
+				popover: {
+					DEFAULT: 'hsl(var(--popover))',
+					foreground: 'hsl(var(--popover-foreground))'
+				},
+				card: {
+					DEFAULT: 'hsl(var(--card))',
+					foreground: 'hsl(var(--card-foreground))'
+				},
+				sidebar: {
+					DEFAULT: 'hsl(var(--sidebar-background))',
+					foreground: 'hsl(var(--sidebar-foreground))',
+					primary: 'hsl(var(--sidebar-primary))',
+					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+					accent: 'hsl(var(--accent))',
+					'accent-foreground': 'hsl(var(--accent-foreground))',
+					success: 'hsl(var(--success))',
+					'success-foreground': 'hsl(var(--success-foreground))',
+					border: 'hsl(var(--sidebar-border))',
+					ring: 'hsl(var(--sidebar-ring))'
+				}
 			},
-			maxWidth: {
-				'text': '65ch',
-				'heading': '45ch',
-				'heading-lg': '50ch',
-				'container': '1280px',
-				'content': '1200px',
-			},
-			fontSize: {
-				'heading-xs': ['clamp(20px, 3vw, 24px)', { lineHeight: '1.4' }],
-				'heading-sm': ['clamp(24px, 3.5vw, 32px)', { lineHeight: '1.3' }],
-				'heading-md': ['clamp(28px, 4vw, 40px)', { lineHeight: '1.3' }],
-				'heading-lg': ['clamp(32px, 5vw, 48px)', { lineHeight: '1.2' }],
-				'heading-xl': ['clamp(40px, 6vw, 64px)', { lineHeight: '1.2' }],
-				'body-sm': ['clamp(14px, 2vw, 16px)', { lineHeight: '1.6' }],
-				'body': ['clamp(16px, 2.5vw, 18px)', { lineHeight: '1.6' }],
-				'body-lg': ['clamp(18px, 3vw, 20px)', { lineHeight: '1.6' }],
-			},
-			aspectRatio: {
-				'4/3': '4 / 3',
-				'3/4': '3 / 4',
-				'21/9': '21 / 9',
-			},
-			fontFamily: {
-				sans: ['Inter', '-apple-system','BlinkMacSystemFont','SF Pro Text','SF Pro Display','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial','Noto Sans','Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','sans-serif'],
-				display: ['Playfair Display', 'SF Pro Display','-apple-system','BlinkMacSystemFont','SF Pro Text','system-ui','Helvetica Neue','Arial','sans-serif']
-			},
-			colors: {
-			border: 'hsl(var(--border))',
-			input: 'hsl(var(--input))',
-			ring: 'hsl(var(--ring))',
-			background: 'hsl(var(--background))',
-			foreground: 'hsl(var(--foreground))',
-			primary: {
-				DEFAULT: 'hsl(var(--primary))',
-				foreground: 'hsl(var(--primary-foreground))'
-			},
-			secondary: {
-				DEFAULT: 'hsl(var(--secondary))',
-				foreground: 'hsl(var(--secondary-foreground))'
-			},
-			destructive: {
-				DEFAULT: 'hsl(var(--destructive))',
-				foreground: 'hsl(var(--destructive-foreground))'
-			},
-			muted: {
-				DEFAULT: 'hsl(var(--muted))',
-				foreground: 'hsl(var(--muted-foreground))'
-			},
-			accent: {
-				DEFAULT: 'hsl(var(--accent))',
-				foreground: 'hsl(var(--accent-foreground))'
-			},
-			popover: {
-				DEFAULT: 'hsl(var(--popover))',
-				foreground: 'hsl(var(--popover-foreground))'
-			},
-			card: {
-				DEFAULT: 'hsl(var(--card))',
-				foreground: 'hsl(var(--card-foreground))'
-			},
-			sidebar: {
-				DEFAULT: 'hsl(var(--sidebar-background))',
-				foreground: 'hsl(var(--sidebar-foreground))',
-				primary: 'hsl(var(--sidebar-primary))',
-				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-				accent: 'hsl(var(--accent))',
-				'accent-foreground': 'hsl(var(--accent-foreground))',
-				success: 'hsl(var(--success))',
-				'success-foreground': 'hsl(var(--success-foreground))',
-				border: 'hsl(var(--sidebar-border))',
-				ring: 'hsl(var(--sidebar-ring))'
-			}
-		},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
