@@ -292,7 +292,7 @@ const DashboardPro = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Время ответа</p>
-                  <p className="text-2xl font-bold">{responseTime}</p>
+                  <p className="text-2xl font-bold text-foreground">{responseTime}</p>
                 </div>
                 <NeumorphicIcon icon={Clock} size={64} variant="behance" />
               </div>
