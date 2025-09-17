@@ -262,15 +262,15 @@ const HowItWorks = () => {
 
       {/* Features Section */}
       <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 max-w-6xl mx-auto px-4">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
             <NeumorphicIcon icon={Heart} size={24} variant="behance" />
             {t("how_it_works.features.badge")}
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient max-w-4xl mx-auto leading-tight break-words hyphens-auto px-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight word-break overflow-wrap-anywhere">
             {t("how_it_works.features.title")}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
             {t("how_it_works.features.subtitle")}
           </p>
         </div>
