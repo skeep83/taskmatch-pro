@@ -251,7 +251,9 @@ const DashboardPro = () => {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
             <div className="card-surface p-6 text-center">
-              <Wallet className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <Wallet className="h-8 w-8 text-white" />
+              </div>
               <div className="text-2xl font-bold text-green-600 mb-1">
                 {formatPrice(walletBalance)}
               </div>
@@ -259,7 +261,9 @@ const DashboardPro = () => {
             </div>
             
             <div className="card-surface p-6 text-center">
-              <Star className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <Star className="h-8 w-8 text-white" />
+              </div>
               <div className="flex flex-col items-center">
                 <StarRating 
                   rating={ratingAvg || 0} 
@@ -273,7 +277,9 @@ const DashboardPro = () => {
             </div>
             
             <div className="card-surface p-6 text-center">
-              <DollarSign className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <DollarSign className="h-8 w-8 text-white" />
+              </div>
               <div className="text-2xl font-bold text-primary mb-1">
                 {formatPrice(monthlyEarnings)}
               </div>
@@ -281,13 +287,17 @@ const DashboardPro = () => {
             </div>
             
             <div className="card-surface p-6 text-center">
-              <Award className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <Award className="h-8 w-8 text-white" />
+              </div>
               <div className="text-2xl font-bold text-accent mb-1">{completedJobs}</div>
               <div className="text-sm text-muted-foreground">Выполнено</div>
             </div>
             
             <div className="card-surface p-6 text-center">
-              <Clock className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
+                <Clock className="h-8 w-8 text-white" />
+              </div>
               <div className="text-2xl font-bold text-purple-500 mb-1">{responseTime}</div>
               <div className="text-sm text-muted-foreground">Время ответа</div>
             </div>
