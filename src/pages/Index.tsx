@@ -377,8 +377,8 @@ const Index = () => {
             </div>
 
             {/* Right Column - Hero Image */}
-            <div className="relative animate-fade-in max-w-[612px] mx-auto" style={{ animationDelay: '300ms' }}>
-              <div className="relative">
+            <div className="relative animate-fade-in max-w-[612px] w-full mx-auto" style={{ animationDelay: '300ms', maxHeight: '408px' }}>
+              <div className="relative hero-image-container">
                 <img 
                   src={heroDashboard} 
                   alt="ServiceHub Platform" 
@@ -387,9 +387,16 @@ const Index = () => {
                   fetchPriority="high"
                   width="612"
                   height="408"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 612px"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 80vw, (max-width: 1024px) 50vw, 612px"
                   decoding="async"
-                  style={{ maxWidth: '612px', height: 'auto', objectFit: 'cover' }}
+                  style={{ 
+                    maxWidth: '612px', 
+                    width: '100%',
+                    height: 'auto', 
+                    objectFit: 'cover',
+                    aspectRatio: '612/408',
+                    maxHeight: '408px'
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-3xl" />
                 

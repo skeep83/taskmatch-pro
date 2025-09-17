@@ -4,7 +4,17 @@
 @import "./styles/ios.css";
 @import "./styles/android.css";
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Image optimization for better performance */
+.hero-image-container {
+  max-width: 612px;
+  max-height: 408px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 612/408;
+  overflow: hidden;
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
 */
 
