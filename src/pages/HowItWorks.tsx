@@ -267,7 +267,7 @@ const HowItWorks = () => {
             <NeumorphicIcon icon={Heart} size={24} variant="behance" />
             {t("how_it_works.features.badge")}
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight word-break overflow-wrap-anywhere max-w-5xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight word-break overflow-wrap-anywhere w-full">
             {t("how_it_works.features.title")}
           </h2>
           <p className="text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
