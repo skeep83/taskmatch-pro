@@ -13,6 +13,7 @@ import { BusinessJobs } from "@/components/business/BusinessJobs";
 import { BusinessInvoices } from "@/components/business/BusinessInvoices";
 import { BusinessAnalytics } from "@/components/business/BusinessAnalytics";
 import { BusinessTenders } from "@/components/business/BusinessTenders";
+import { BusinessStatsOverview } from "@/components/business/BusinessStatsOverview";
 
 export default function DashboardBusiness() {
   const navigate = useNavigate();
@@ -79,7 +80,7 @@ export default function DashboardBusiness() {
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="card-surface p-2 rounded-2xl">
-              <TabsList className="grid w-full grid-cols-6 bg-transparent">
+              <TabsList className="grid w-full grid-cols-7 bg-transparent">
                 <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden sm:inline">Обзор</span>
@@ -113,37 +114,7 @@ export default function DashboardBusiness() {
 
             <TabsContent value="overview" className="space-y-8">
               {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="card-surface p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Общие расходы</p>
-                      <p className="text-2xl font-bold">$0.00</p>
-                    </div>
-                    <BarChart3 className="h-8 w-8 text-primary" />
-                  </div>
-                </div>
-
-                <div className="card-surface p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Сотрудников</p>
-                      <p className="text-2xl font-bold">0</p>
-                    </div>
-                    <Users className="h-8 w-8 text-primary" />
-                  </div>
-                </div>
-
-                <div className="card-surface p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Заказов</p>
-                      <p className="text-2xl font-bold">0</p>
-                    </div>
-                    <Briefcase className="h-8 w-8 text-primary" />
-                  </div>
-                </div>
-              </div>
+              <BusinessStatsOverview />
 
               {/* Quick Actions */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

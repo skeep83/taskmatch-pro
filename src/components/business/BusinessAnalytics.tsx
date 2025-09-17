@@ -167,6 +167,15 @@ export function BusinessAnalytics() {
     return `$${(cents / 100).toFixed(2)}`;
   };
 
+  const formatCurrency = (amount: number, currency = 'USD') => {
+    return new Intl.NumberFormat('ru-RU', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
+
   if (loading) {
     return (
       <Card>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Save, Loader2 } from "lucide-react";
+import { Building2, Save, Loader2, FileText } from "lucide-react";
 
 interface BusinessAccount {
   id?: string;
@@ -189,13 +189,54 @@ export function BusinessAccountForm() {
         </div>
 
         <div>
-          <Label htmlFor="contract_url">Ссылка на договор</Label>
-          <Input
-            id="contract_url"
-            value={account.contract_url || ""}
-            onChange={(e) => setAccount({ ...account, contract_url: e.target.value })}
-            placeholder="https://example.com/contract.pdf"
-          />
+          <Label htmlFor="contract_upload">Загрузить договор</Label>
+          <div className="space-y-2">
+            <Input
+              id="contract_upload"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file || !account.id) return;
+
+                try {
+                  const fileExt = file.name.split('.').pop();
+                  const fileName = `${account.id}_contract.${fileExt}`;
+                  
+                  const { data, error } = await supabase.storage
+                    .from('biz_docs')
+                    .upload(fileName, file, { upsert: true });
+
+                  if (error) throw error;
+
+                  const { data: { publicUrl } } = supabase.storage
+                    .from('biz_docs')
+                    .getPublicUrl(fileName);
+
+                  setAccount({ ...account, contract_url: publicUrl });
+
+                  toast({
+                    title: "Успешно",
+                    description: "Документ загружен"
+                  });
+                } catch (error: any) {
+                  toast({
+                    title: "Ошибка",
+                    description: "Не удалось загрузить документ",
+                    variant: "destructive"
+                  });
+                }
+              }}
+            />
+            {account.contract_url && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <FileText className="h-4 w-4" />
+                <a href={account.contract_url} target="_blank" rel="noopener noreferrer" className="underline">
+                  Просмотреть загруженный документ
+                </a>
+              </div>
+            )}
+          </div>
         </div>
 
         <Button 
