@@ -8,9 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { DraggableMetrics } from "@/components/admin/DraggableMetrics";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
 import { 
   TrendingUp, TrendingDown, Users, Briefcase, DollarSign, 
   AlertTriangle, Clock, Shield, Star, Activity, ArrowUpRight,
@@ -25,7 +22,6 @@ export default function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [timeRange, setTimeRange] = useState('7d');
-  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -101,7 +97,6 @@ export default function AdminDashboard() {
 
   const metricCards = [
     {
-      id: 'gmv',
       title: "GMV (7д)",
       value: `$${(stats.gmv_7d || 0).toLocaleString()}`,
       change: stats.gmv_change || 0,
@@ -109,7 +104,6 @@ export default function AdminDashboard() {
       color: "text-green-600"
     },
     {
-      id: 'mau',
       title: "MAU",
       value: (stats.mau || 0).toLocaleString(),
       change: stats.mau_change || 0,
@@ -117,7 +111,6 @@ export default function AdminDashboard() {
       color: "text-blue-600"
     },
     {
-      id: 'jobs',
       title: "Активные заказы",
       value: (stats.active_jobs || 0).toLocaleString(),
       change: stats.jobs_change || 0,
@@ -125,7 +118,6 @@ export default function AdminDashboard() {
       color: "text-purple-600"
     },
     {
-      id: 'conversion',
       title: "Конверсия",
       value: `${(stats.conversion_rate || 0).toFixed(1)}%`,
       change: stats.conversion_change || 0,
@@ -133,7 +125,6 @@ export default function AdminDashboard() {
       color: "text-orange-600"
     },
     {
-      id: 'response_time',
       title: "Ср. время ответа",
       value: `${(stats.avg_response_time || 0).toFixed(1)}м`,
       change: stats.response_time_change || 0,
@@ -142,7 +133,6 @@ export default function AdminDashboard() {
       reverseGood: true
     },
     {
-      id: 'nps',
       title: "NPS",
       value: (stats.nps || 0).toFixed(1),
       change: stats.nps_change || 0,
@@ -150,7 +140,6 @@ export default function AdminDashboard() {
       color: "text-yellow-600"
     },
     {
-      id: 'disputes',
       title: "Активные споры",
       value: (stats.active_disputes || 0).toLocaleString(),
       change: stats.disputes_change || 0,
@@ -159,52 +148,12 @@ export default function AdminDashboard() {
       reverseGood: true
     },
     {
-      id: 'risk',
       title: "Риск-флаги",
       value: (stats.risk_flags || 0).toLocaleString(),
       change: stats.risk_change || 0,
       icon: Shield,
       color: "text-amber-600",
       reverseGood: true
-    }
-  ];
-
-  const chartCards = [
-    {
-      id: 'gmv_chart',
-      title: "GMV Тренд",
-      description: "Валовый объем сделок за период",
-      icon: TrendingUp,
-      color: "bg-green-500",
-      data: charts.gmv_trend || [],
-      type: 'area' as const
-    },
-    {
-      id: 'activity_chart',
-      title: "Активность пользователей", 
-      description: "MAU, WAU, DAU динамика",
-      icon: Activity,
-      color: "bg-blue-500",
-      data: charts.user_activity || [],
-      type: 'line' as const
-    },
-    {
-      id: 'categories_chart',
-      title: "Распределение по категориям",
-      description: "Топ категории услуг",
-      icon: Briefcase,
-      color: "bg-purple-500",
-      data: charts.category_distribution || [],
-      type: 'pie' as const
-    },
-    {
-      id: 'health_chart',
-      title: "Состояние системы",
-      description: "Мониторинг здоровья сервисов",
-      icon: Shield,
-      color: "bg-emerald-500",
-      data: [],
-      type: 'health' as const
     }
   ];
 
@@ -269,14 +218,6 @@ export default function AdminDashboard() {
           ))}
         </motion.div>
       )}
-
-      {/* Draggable Metrics */}
-      <DraggableMetrics 
-        metricCards={metricCards}
-        chartCards={chartCards}
-        isEditMode={isEditMode}
-        onToggleEditMode={() => setIsEditMode(!isEditMode)}
-      />
 
       {/* Main Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
