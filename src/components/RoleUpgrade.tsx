@@ -85,24 +85,24 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
           >
             <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform preserve-3d card-3d h-80 flex flex-col">
               {/* Верхняя секция с градиентом - уменьшена */}
-              <div className={`h-24 bg-gradient-to-br ${config.gradient} relative`}>
+              <div className={`h-28 bg-gradient-to-br ${config.gradient} relative`}>
                 {/* Декоративный оверлей */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent"></div>
                 
                 {/* Иконка */}
-                <div className="absolute left-1/2 top-12 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                <div className="absolute left-1/2 top-14 transform -translate-x-1/2 -translate-y-1/2 z-10">
                   <motion.div
                     whileHover={{ scale: 1.15, rotate: 8 }}
                     transition={{ duration: 0.2 }}
                     className="w-20 h-20 bg-white rounded-full shadow-2xl flex items-center justify-center ring-4 ring-white/30"
                   >
-                    <IconComponent className="w-10 h-10 text-gray-700" />
+                    <IconComponent className="w-10 h-10 text-white" />
                   </motion.div>
                 </div>
               </div>
               
               {/* Нижняя секция с контентом - более компактная */}
-              <div className="bg-gradient-to-b from-gray-50 to-white pt-16 px-5 pb-5 flex-1 flex flex-col justify-between">
+              <div className="bg-gradient-to-b from-gray-50 to-white pt-18 px-5 pb-5 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="text-center mb-4">
                     <h4 className="text-lg font-bold text-foreground mb-1">{config.title}</h4>
