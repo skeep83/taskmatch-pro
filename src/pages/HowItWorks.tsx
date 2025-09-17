@@ -156,67 +156,71 @@ const HowItWorks = () => {
       />
       
       {/* Hero Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <div className="flex justify-center mb-8">
-            <NeumorphicIcon icon={Sparkles} size={120} variant="behance" />
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-gradient mb-8 leading-tight">
-            {t("how_it_works.hero.title")}<br />
-            <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              {t("how_it_works.hero.subtitle")}
-            </span>
-          </h1>
-          
-          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-10">
-            {t("how_it_works.hero.description")}
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link to="/catalog" className="btn-hero px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
-              <NeumorphicIcon icon={Search} size={24} variant="behance" />
-              {t("how_it_works.hero.find_specialist")}
-              <ArrowRight size={20} />
-            </Link>
-            
-            <button className="btn-ghost px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
-              <NeumorphicIcon icon={Play} size={20} variant="behance" />
-              {t("how_it_works.hero.watch_video")}
-            </button>
-          </div>
-        </div>
-        
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
-          {stats.map((stat, index) => (
-            <div key={index} className="card-surface p-6 text-center">
-              <NeumorphicIcon 
-                icon={stat.icon}
-                size={64} 
-                variant="behance"
-                className="mx-auto mb-3"
-              />
-              <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
+      <section className="py-24">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <div className="flex justify-center mb-8">
+              <NeumorphicIcon icon={Sparkles} size={120} variant="behance" />
             </div>
-          ))}
+            
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-gradient mb-8 leading-tight px-4">
+              {t("how_it_works.hero.title")}<br />
+              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                {t("how_it_works.hero.subtitle")}
+              </span>
+            </h1>
+            
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-10 px-4">
+              {t("how_it_works.hero.description")}
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Link to="/catalog" className="btn-hero px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
+                <NeumorphicIcon icon={Search} size={24} variant="behance" />
+                {t("how_it_works.hero.find_specialist")}
+                <ArrowRight size={20} />
+              </Link>
+              
+              <button className="btn-ghost px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
+                <NeumorphicIcon icon={Play} size={20} variant="behance" />
+                {t("how_it_works.hero.watch_video")}
+              </button>
+            </div>
+          </div>
+          
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+            {stats.map((stat, index) => (
+              <div key={index} className="card-surface p-6 text-center">
+                <NeumorphicIcon 
+                  icon={stat.icon}
+                  size={64} 
+                  variant="behance"
+                  className="mx-auto mb-3"
+                />
+                <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* How It Works Steps */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
-            <NeumorphicIcon icon={Target} size={24} variant="behance" />
-            {t("how_it_works.steps.badge")}
+      <section className="py-24">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
+              <NeumorphicIcon icon={Target} size={24} variant="behance" />
+              {t("how_it_works.steps.badge")}
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight px-4">
+              {t("how_it_works.steps.title")}
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto px-4">
+              {t("how_it_works.steps.subtitle")}
+            </p>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            {t("how_it_works.steps.title")}
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {t("how_it_works.steps.subtitle")}
-          </p>
         </div>
         
         <div className="max-w-7xl mx-auto">
@@ -308,18 +312,20 @@ const HowItWorks = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
-            <NeumorphicIcon icon={Eye} size={24} variant="behance" />
-            {t("how_it_works.faq.badge")}
+      <section className="py-24">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-medium mb-6">
+              <NeumorphicIcon icon={Eye} size={24} variant="behance" />
+              {t("how_it_works.faq.badge")}
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight px-4">
+              {t("how_it_works.faq.title")}
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto px-4">
+              {t("how_it_works.faq.subtitle")}
+            </p>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            {t("how_it_works.faq.title")}
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {t("how_it_works.faq.subtitle")}
-          </p>
         </div>
         
         <div className="max-w-4xl mx-auto space-y-4">
@@ -370,10 +376,10 @@ const HowItWorks = () => {
               </div>
             </div>
             
-            <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 text-gradient">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight px-4">
               {t("how_it_works.cta.title")}
             </h2>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto px-4">
               {t("how_it_works.cta.subtitle")}
             </p>
             
