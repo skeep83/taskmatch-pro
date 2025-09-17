@@ -76,12 +76,48 @@
       .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
     </style>
     
-    <!-- Load Google Fonts asynchronously to prevent render blocking -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Load Google Fonts with better non-blocking strategy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script>
+      // Advanced font loading to prevent render blocking
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
+          document.head.appendChild(link);
+        });
+      } else {
+        setTimeout(() => {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
+          document.head.appendChild(link);
+        }, 100);
+      }
+    </script>
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
     
-    <!-- Defer non-critical CSS for better performance -->
-    <link rel="preload" href="/assets/index.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Defer all non-critical CSS completely -->
+    <script>
+      // Load main CSS after initial render
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = '/assets/index.css';
+          document.head.appendChild(link);
+        });
+      } else {
+        setTimeout(() => {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = '/assets/index.css';
+          document.head.appendChild(link);
+        }, 50);
+      }
+    </script>
     <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
     
     <!-- Resource hints for faster loading -->
