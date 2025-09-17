@@ -53,8 +53,8 @@ export const StarRating: React.FC<StarRatingProps> = ({
             filled 
               ? 'fill-primary text-primary'
               : halfFilled
-              ? 'fill-primary/50 text-primary/50'
-              : 'fill-muted text-muted-foreground/30',
+              ? 'fill-primary/50 text-primary'
+              : 'fill-muted-foreground/20 text-muted-foreground',
             !readonly && 'cursor-pointer hover:text-primary hover:fill-primary/80'
           )}
           onClick={() => !readonly && onRatingChange?.(i)}
