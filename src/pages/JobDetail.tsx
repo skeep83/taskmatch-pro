@@ -28,7 +28,11 @@ import {
   Trash2,
   ZoomIn,
   DollarSign,
-  Send
+  Send,
+  AlertCircle,
+  CheckCircle,
+  PlayCircle,
+  XCircle
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StarRating } from '@/components/ui/star-rating';
@@ -533,8 +537,24 @@ const JobDetail = () => {
       cancelled: { label: 'Отменен', variant: 'destructive' as const }
     };
     
+    const getStatusIcon = (status: string) => {
+      switch (status) {
+        case 'new': return <AlertCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'accepted': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'in_progress': return <PlayCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'done': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'cancelled': return <XCircle className="h-3 w-3 flex-shrink-0" />;
+        default: return <Clock className="h-3 w-3 flex-shrink-0" />;
+      }
+    };
+    
     const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const };
-    return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+    return (
+      <Badge variant={statusInfo.variant} className="flex items-center gap-1">
+        <span>{statusInfo.label}</span>
+        {getStatusIcon(status)}
+      </Badge>
+    );
   };
 
   const isJobOwner = currentUser && job && currentUser.id === job.client_id;

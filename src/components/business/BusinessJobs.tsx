@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Briefcase, Calendar, MapPin, DollarSign } from "lucide-react";
+import { Plus, Briefcase, Calendar, MapPin, DollarSign, AlertCircle, CheckCircle, PlayCircle, XCircle, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface BusinessJob {
@@ -103,8 +103,24 @@ export function BusinessJobs() {
       'cancelled': { label: 'Отменен', variant: 'destructive' as const }
     };
     
+    const getStatusIcon = (status: string) => {
+      switch (status) {
+        case 'new': return <AlertCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'accepted': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'in_progress': return <PlayCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'done': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+        case 'cancelled': return <XCircle className="h-3 w-3 flex-shrink-0" />;
+        default: return <Clock className="h-3 w-3 flex-shrink-0" />;
+      }
+    };
+    
     const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const };
-    return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+    return (
+      <Badge variant={statusInfo.variant} className="flex items-center gap-1">
+        <span>{statusInfo.label}</span>
+        {getStatusIcon(status)}
+      </Badge>
+    );
   };
 
   const formatPrice = (cents: number) => {
