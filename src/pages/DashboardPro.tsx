@@ -221,27 +221,27 @@ const DashboardPro = () => {
 
   return (
     <RoleGuard requiredRole="pro">
-      <main className="min-h-screen">
+      <main className="min-h-screen pb-safe-bottom">
         <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
       
       {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+      <section className="container mx-auto py-8 sm:py-16 px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-16">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-gradient">
             Кабинет специалиста
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Управляйте заказами и развивайте бизнес
           </p>
           
-          <div className="flex justify-center mt-8">
-            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+          <div className="flex justify-center mt-6 sm:mt-8">
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               {kycStatus === 'approved' ? (
-                <CheckCircle className="h-6 w-6 text-green-500" />
+                <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
               ) : (
-                <AlertCircle className="h-6 w-6 text-orange-500" />
+                <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />
               )}
-              <span className="text-sm font-medium">
+              <span className="text-xs sm:text-sm font-medium">
                 KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
               </span>
             </div>
@@ -250,124 +250,125 @@ const DashboardPro = () => {
 
         <div className="max-w-7xl mx-auto">
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div className="card-surface p-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
+            <div className="card-surface p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Баланс</p>
-                  <p className="text-2xl font-bold">{formatPrice(walletBalance)}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Баланс</p>
+                  <p className="text-lg sm:text-2xl font-bold truncate">{formatPrice(walletBalance)}</p>
                 </div>
-                <NeumorphicIcon icon={Wallet} size={64} variant="behance" />
+                <NeumorphicIcon icon={Wallet} size={48} variant="behance" className="flex-shrink-0 ml-2" />
               </div>
             </div>
             
-            <div className="card-surface p-6">
+            <div className="card-surface p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Рейтинг</p>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Рейтинг</p>
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <StarRating 
                       rating={ratingAvg || 0} 
                       size="sm" 
                       showValue 
                       showCount={false}
                     />
-                    <span className="text-sm text-muted-foreground">({ratingCount})</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">({ratingCount})</span>
                   </div>
                 </div>
-                <NeumorphicIcon icon={Star} size={64} variant="behance" />
+                <NeumorphicIcon icon={Star} size={48} variant="behance" className="flex-shrink-0 ml-2" />
               </div>
             </div>
             
-            <div className="card-surface p-6">
+            <div className="card-surface p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Выполнено</p>
-                  <p className="text-2xl font-bold">{completedJobs}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Выполнено</p>
+                  <p className="text-lg sm:text-2xl font-bold">{completedJobs}</p>
                 </div>
-                <NeumorphicIcon icon={Award} size={64} variant="behance" />
+                <NeumorphicIcon icon={Award} size={48} variant="behance" className="flex-shrink-0 ml-2" />
               </div>
             </div>
             
-            <div className="card-surface p-6">
+            <div className="card-surface p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Время ответа</p>
-                  <p className="text-2xl font-bold text-foreground">{responseTime}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Время ответа</p>
+                  <p className="text-lg sm:text-2xl font-bold text-foreground">{responseTime}</p>
                 </div>
-                <NeumorphicIcon icon={Clock} size={64} variant="behance" />
+                <NeumorphicIcon icon={Clock} size={48} variant="behance" className="flex-shrink-0 ml-2" />
               </div>
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/profile/settings" className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                  <UserCog className="h-6 w-6 text-primary" />
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-12">
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <Link to="/profile/settings" className="flex flex-col items-center gap-1 sm:gap-2">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <UserCog className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">Профиль</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Профиль</span>
               </Link>
             </button>
             
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-primary" />
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <Link to="/pro/schedule" className="flex flex-col items-center gap-1 sm:gap-2">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">Расписание</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Расписание</span>
               </Link>
             </button>
             
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/portfolio" className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                  <ImageIcon className="h-6 w-6 text-primary" />
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <Link to="/portfolio" className="flex flex-col items-center gap-1 sm:gap-2">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <ImageIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">Портфолио</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Портфолио</span>
               </Link>
             </button>
             
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/tenders" className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                  <Briefcase className="h-6 w-6 text-primary" />
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <Link to="/tenders" className="flex flex-col items-center gap-1 sm:gap-2">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">Тендеры</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Тендеры</span>
               </Link>
             </button>
             
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <div className="flex flex-col items-center gap-2 w-full">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                  <CreditCard className="h-6 w-6 text-primary" />
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <div className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">Выплата</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Выплата</span>
               </div>
             </button>
             
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/kyc" className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                  <ShieldCheck className="h-6 w-6 text-primary" />
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <Link to="/kyc" className="flex flex-col items-center gap-1 sm:gap-2">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">KYC</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">KYC</span>
               </Link>
             </button>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
             {/* Available Jobs */}
-            <div className="lg:col-span-2 space-y-8">
-              <div className="card-surface p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
-                    <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
+            <div className="lg:col-span-2 space-y-4 sm:space-y-8">
+              <div className="card-surface p-4 sm:p-8">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <NeumorphicIcon icon={Briefcase} size={32} variant="behance" className="sm:hidden" />
+                    <NeumorphicIcon icon={Briefcase} size={48} variant="behance" className="hidden sm:block" />
+                    <h2 className="text-lg sm:text-2xl font-display font-bold">Доступные заказы</h2>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {nearbyJobs.length} заказов поблизости
+                  <div className="text-xs sm:text-sm text-muted-foreground">
+                    {nearbyJobs.length} заказов
                   </div>
                 </div>
 
@@ -384,18 +385,18 @@ const DashboardPro = () => {
                   )}
 
                   {nearbyJobs.slice(0, 5).map((job, index) => (
-                    <div key={job.id} className="card-surface p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold mb-2">{job.description || 'Новый заказ'}</h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                    <div key={job.id} className="card-surface p-4 sm:p-6">
+                      <div className="flex items-start justify-between mb-3 sm:mb-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold mb-2 text-sm sm:text-base line-clamp-2">{job.description || 'Новый заказ'}</h3>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                             <div className="flex items-center gap-1">
-                              <Calendar className="h-5 w-5" />
-                              <span>{job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Не указано'}</span>
+                              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                              <span className="truncate">{job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Не указано'}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <DollarSign className="h-5 w-5" />
-                              <span>
+                              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                              <span className="truncate">
                                 {job.budget_min_cents && job.budget_max_cents
                                   ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
                                   : job.budget_min_cents
@@ -410,17 +411,17 @@ const DashboardPro = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                         <Link 
                           to={`/job/${job.id}`}
-                          className="btn-ghost px-6 py-3 rounded-xl font-semibold"
+                          className="btn-ghost px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold text-sm sm:text-base touch-manipulation text-center"
                         >
                           Подробнее
                         </Link>
-                        <button className="btn-hero px-6 py-3 rounded-xl font-semibold">
+                        <button className="btn-hero px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold text-sm sm:text-base touch-manipulation">
                           Принять заказ
                         </button>
-                        <button className="btn-ghost px-3 py-3 rounded-xl">
+                        <button className="btn-ghost px-3 py-2 sm:py-3 rounded-xl touch-manipulation self-center sm:self-auto">
                           <NeumorphicIcon icon={Video} size={20} variant="behance" />
                         </button>
                       </div>
@@ -430,10 +431,11 @@ const DashboardPro = () => {
               </div>
 
               {/* My Active Jobs */}
-              <div className="card-surface p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <NeumorphicIcon icon={Clock} size={48} variant="behance" />
-                  <h2 className="text-2xl font-display font-bold">Мои активные заказы</h2>
+              <div className="card-surface p-4 sm:p-8">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <NeumorphicIcon icon={Clock} size={32} variant="behance" className="sm:hidden" />
+                  <NeumorphicIcon icon={Clock} size={48} variant="behance" className="hidden sm:block" />
+                  <h2 className="text-lg sm:text-2xl font-display font-bold">Мои активные заказы</h2>
                 </div>
 
                 <div className="space-y-4">
@@ -483,27 +485,28 @@ const DashboardPro = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-8">
+            <div className="space-y-4 sm:space-y-8">
               {/* Tenders */}
-              <div className="card-surface p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <NeumorphicIcon icon={TrendingUp} size={48} variant="behance" />
-                  <h3 className="font-bold">Открытые тендеры</h3>
+              <div className="card-surface p-4 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <NeumorphicIcon icon={TrendingUp} size={32} variant="behance" className="sm:hidden" />
+                  <NeumorphicIcon icon={TrendingUp} size={48} variant="behance" className="hidden sm:block" />
+                  <h3 className="font-bold text-sm sm:text-base">Открытые тендеры</h3>
                 </div>
                 
                 {tenders.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center py-3 sm:py-4">
                     Нет открытых тендеров
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {tenders.slice(0, 3).map((tender) => (
-                      <div key={tender.id} className="card-surface p-4">
-                        <h4 className="font-medium text-sm mb-1">{tender.title}</h4>
+                      <div key={tender.id} className="card-surface p-3 sm:p-4">
+                        <h4 className="font-medium text-xs sm:text-sm mb-1 line-clamp-2">{tender.title}</h4>
                         <p className="text-xs text-muted-foreground mb-2">
                           До {new Date(tender.deadline).toLocaleDateString()}
                         </p>
-                        <button className="btn-hero px-4 py-2 rounded-lg text-sm font-semibold w-full">
+                        <button className="btn-hero px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold w-full touch-manipulation">
                           Подать заявку
                         </button>
                       </div>
@@ -513,28 +516,29 @@ const DashboardPro = () => {
               </div>
 
               {/* Recent Activity */}
-              <div className="card-surface p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <NeumorphicIcon icon={BarChart3} size={48} variant="behance" />
-                  <h3 className="font-bold">Активность</h3>
+              <div className="card-surface p-4 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <NeumorphicIcon icon={BarChart3} size={32} variant="behance" className="sm:hidden" />
+                  <NeumorphicIcon icon={BarChart3} size={48} variant="behance" className="hidden sm:block" />
+                  <h3 className="font-bold text-sm sm:text-base">Активность</h3>
                 </div>
                 
-                <div className="space-y-3">
-                  <div className="text-sm">
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="text-xs sm:text-sm">
                     <div className="flex justify-between mb-1">
                       <span>Откликов сегодня</span>
                       <span className="font-semibold">0</span>
                     </div>
                   </div>
                   
-                  <div className="text-sm">
+                  <div className="text-xs sm:text-sm">
                     <div className="flex justify-between mb-1">
                       <span>Просмотров профиля</span>
                       <span className="font-semibold">12</span>
                     </div>
                   </div>
                   
-                  <div className="text-sm">
+                  <div className="text-xs sm:text-sm">
                     <div className="flex justify-between mb-1">
                       <span>Новых сообщений</span>
                       <span className="font-semibold">3</span>
