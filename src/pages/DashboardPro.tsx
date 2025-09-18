@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Seo } from "@/components/Seo";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
@@ -301,47 +302,59 @@ const DashboardPro = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
               <Link to="/profile/settings" className="flex flex-col items-center gap-2">
-                <NeumorphicIcon icon={UserCog} size={48} variant="behance" />
-                <span className="text-sm font-medium">Профиль</span>
+                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <UserCog className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Профиль</span>
               </Link>
-            </div>
+            </button>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
               <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
-                <NeumorphicIcon icon={Calendar} size={48} variant="behance" />
-                <span className="text-sm font-medium">Расписание</span>
+                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Расписание</span>
               </Link>
-            </div>
+            </button>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
               <Link to="/portfolio" className="flex flex-col items-center gap-2">
-                <NeumorphicIcon icon={ImageIcon} size={48} variant="behance" />
-                <span className="text-sm font-medium">Портфолио</span>
+                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <ImageIcon className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Портфолио</span>
               </Link>
-            </div>
+            </button>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
               <Link to="/tenders" className="flex flex-col items-center gap-2">
-                <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
-                <span className="text-sm font-medium">Тендеры</span>
+                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Briefcase className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Тендеры</span>
               </Link>
-            </div>
+            </button>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
-              <button className="flex flex-col items-center gap-2 w-full">
-                <NeumorphicIcon icon={CreditCard} size={48} variant="behance" />
-                <span className="text-sm font-medium">Выплата</span>
-              </button>
-            </div>
+            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <CreditCard className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Выплата</span>
+              </div>
+            </button>
             
-            <div className="card-surface p-4 text-center cursor-pointer hover:shadow-lg transition-all hover:scale-105">
+            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
               <Link to="/kyc" className="flex flex-col items-center gap-2">
-                <NeumorphicIcon icon={ShieldCheck} size={48} variant="behance" />
-                <span className="text-sm font-medium">KYC</span>
+                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <ShieldCheck className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">KYC</span>
               </Link>
-            </div>
+            </button>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">

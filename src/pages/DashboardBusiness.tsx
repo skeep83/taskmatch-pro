@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -79,35 +80,91 @@ export default function DashboardBusiness() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="card-surface p-2 rounded-2xl">
+            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
               <TabsList className="grid w-full grid-cols-6 bg-transparent">
-                <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="overview" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden sm:inline">Обзор</span>
+                  {activeTab === "overview" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
+                    />
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="company" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="company" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Building2 className="h-4 w-4" />
                   <span className="hidden sm:inline">Компания</span>
+                  {activeTab === "company" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
+                    />
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="employees" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="employees" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <UserPlus className="h-4 w-4" />
                   <span className="hidden sm:inline">Команда</span>
+                  {activeTab === "employees" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
+                    />
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="jobs" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="jobs" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Briefcase className="h-4 w-4" />
                   <span className="hidden sm:inline">Заказы</span>
+                  {activeTab === "jobs" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
+                    />
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="tenders" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="tenders" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <Gavel className="h-4 w-4" />
                   <span className="hidden sm:inline">Тендеры</span>
+                  {activeTab === "tenders" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
+                    />
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="invoices" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="invoices" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <FileText className="h-4 w-4" />
                   <span className="hidden sm:inline">Инвойсы</span>
+                  {activeTab === "invoices" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
+                    />
+                  )}
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="analytics" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden sm:inline">Аналитика</span>
+                  {activeTab === "analytics" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
+                    />
+                  )}
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -148,57 +205,65 @@ export default function DashboardBusiness() {
 
               {/* Quick Actions */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                <button 
+                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => navigate("/job/new")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <NeumorphicIcon icon={Building2} size={64} variant="behance" />
+                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <Building2 className="h-8 w-8 text-primary" />
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Создать заказ</h3>
-                      <p className="text-sm text-muted-foreground">Для компании</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">Создать заказ</h3>
+                      <p className="text-sm text-gray-600">Для компании</p>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                <button 
+                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => setActiveTab("employees")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <NeumorphicIcon icon={UserPlus} size={64} variant="behance" />
+                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <UserPlus className="h-8 w-8 text-primary" />
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Пригласить сотрудника</h3>
-                      <p className="text-sm text-muted-foreground">Расширить команду</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">Пригласить сотрудника</h3>
+                      <p className="text-sm text-gray-600">Расширить команду</p>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                <button 
+                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => setActiveTab("invoices")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <NeumorphicIcon icon={FileText} size={64} variant="behance" />
+                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <FileText className="h-8 w-8 text-primary" />
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Создать инвойс</h3>
-                      <p className="text-sm text-muted-foreground">Финансы</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">Создать инвойс</h3>
+                      <p className="text-sm text-gray-600">Финансы</p>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                <div 
-                  className="card-surface p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 hover:bg-accent/5"
+                <button 
+                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => setActiveTab("analytics")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <NeumorphicIcon icon={BarChart3} size={64} variant="behance" />
+                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <BarChart3 className="h-8 w-8 text-primary" />
+                    </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Посмотреть отчеты</h3>
-                      <p className="text-sm text-muted-foreground">Аналитика</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">Посмотреть отчеты</h3>
+                      <p className="text-sm text-gray-600">Аналитика</p>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Welcome Message */}
