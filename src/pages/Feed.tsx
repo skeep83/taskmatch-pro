@@ -143,7 +143,8 @@ export default function Feed() {
           </div>
         </div>
       </section>
-          {/* Filters */}
+
+      <div className="container mx-auto px-4">
           <div className="card-surface p-6 mb-8">
             <div className="flex flex-wrap gap-4 items-center">
               <div className="flex-1 min-w-[300px] relative">
