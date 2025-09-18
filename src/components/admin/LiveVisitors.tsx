@@ -217,12 +217,12 @@ export const LiveVisitors = () => {
               {/* Внешний градиентный круг */}
               <defs>
                 <linearGradient id="outerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+                  <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#22D3EE" stopOpacity="0.4" />
                 </linearGradient>
                 <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="hsl(var(--background))" />
-                  <stop offset="100%" stopColor="hsl(var(--muted))" />
+                  <stop offset="0%" stopColor="#f0f9ff" />
+                  <stop offset="100%" stopColor="#e0f2fe" />
                 </radialGradient>
               </defs>
               
@@ -258,9 +258,9 @@ export const LiveVisitors = () => {
                 cy="0"
                 r="100"
                 fill="none"
-                stroke="hsl(var(--primary))"
+                stroke="#22D3EE"
                 strokeWidth="2"
-                opacity="0.3"
+                opacity="0.4"
                 className="animate-ping"
               />
               
