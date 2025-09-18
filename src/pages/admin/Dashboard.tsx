@@ -16,7 +16,6 @@ import {
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CategoryDistributionChart } from '@/components/admin/CategoryDistributionChart';
 import { LiveVisitors } from '@/components/admin/LiveVisitors';
-import { VisitorStats } from '@/components/admin/VisitorStats';
 
 export default function AdminDashboard() {
   const { t } = useEnhancedI18n();
@@ -221,16 +220,6 @@ export default function AdminDashboard() {
           ))}
         </motion.div>
       )}
-
-      {/* Live Visitor Stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="hover-scale"
-      >
-        <LiveVisitors />
-      </motion.div>
 
       {/* Main Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
