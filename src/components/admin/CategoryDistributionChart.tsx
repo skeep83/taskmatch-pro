@@ -110,7 +110,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
           {segments.map((segment, index) => (
             <motion.path
               key={segment.name}
-              d={createPath(segment.startAngle, segment.endAngle, 45, 80)}
+              d={createPath(segment.startAngle, segment.endAngle, 30, 80)}
               fill={segment.color}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
