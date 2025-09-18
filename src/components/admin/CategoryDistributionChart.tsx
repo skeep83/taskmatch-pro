@@ -91,15 +91,15 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
   };
 
   return (
-    <div className="relative w-full h-[600px] flex items-center justify-center">
+    <div className="relative w-full h-[300px] flex items-center justify-center">
       {/* Central donut chart */}
       <div className="relative">
-        <svg width="600" height="600" viewBox="-300 -300 600 600" className="drop-shadow-lg">
+        <svg width="300" height="300" viewBox="-150 -150 300 300" className="drop-shadow-lg">
           {/* Background circle */}
           <circle
             cx="0"
             cy="0"
-            r="255"
+            r="120"
             fill="none"
             stroke="hsl(var(--border))"
             strokeWidth="1"
@@ -110,7 +110,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
           {segments.map((segment, index) => (
             <motion.path
               key={segment.name}
-              d={createPath(segment.startAngle, segment.endAngle, 90, 240)}
+              d={createPath(segment.startAngle, segment.endAngle, 40, 110)}
               fill={segment.color}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -126,7 +126,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
           <circle
             cx="0"
             cy="0"
-            r="120"
+            r="55"
             fill="hsl(var(--background))"
             stroke="hsl(var(--border))"
             strokeWidth="1"
