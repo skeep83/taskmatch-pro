@@ -642,14 +642,20 @@ export default function DashboardClient() {
                   <div className="text-center pt-4">
                     <button 
                       onClick={() => {
-                        setActiveTab("jobs");
-                        // Scroll to tabs section on desktop
-                        setTimeout(() => {
-                          const tabsElement = document.querySelector('[role="tablist"]');
-                          if (tabsElement) {
-                            tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          }
-                        }, 100);
+                        // On mobile, navigate to dedicated jobs page or show all jobs
+                        const isMobile = window.innerWidth < 768;
+                        if (isMobile) {
+                          navigate('/dashboard/client?tab=jobs');
+                        } else {
+                          setActiveTab("jobs");
+                          // Scroll to tabs section on desktop
+                          setTimeout(() => {
+                            const tabsElement = document.querySelector('[role="tablist"]');
+                            if (tabsElement) {
+                              tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }, 100);
+                        }
                       }}
                       className="inline-flex items-center gap-2 px-6 py-3 border border-primary text-primary rounded-xl hover:bg-primary/5 transition-colors"
                     >
