@@ -203,140 +203,96 @@ export const LiveVisitors = () => {
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 flex items-center justify-center">
-        {/* Neumorphic Infographic Container */}
-        <div className="relative w-80 h-80 flex items-center justify-center">
-          {/* Центральный большой круг */}
+      <CardContent className="p-8">
+        {/* Neumorphic Infographic Layout */}
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
+          {/* Большой центральный круг */}
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, type: "spring" }}
-            className="relative w-48 h-48 rounded-full flex flex-col items-center justify-center text-center"
+            className="relative w-48 h-48 rounded-full flex flex-col items-center justify-center"
             style={{
               background: 'linear-gradient(145deg, #f0f0f0, #cacaca)',
               boxShadow: `
                 20px 20px 40px #bebebe,
-                -20px -20px 40px #ffffff,
-                inset 0px 0px 0px #bebebe,
-                inset 0px 0px 0px #ffffff
+                -20px -20px 40px #ffffff
               `,
             }}
           >
-            {/* Внутренний круг с градиентом */}
-            <div
-              className="absolute inset-4 rounded-full flex flex-col items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                boxShadow: 'inset 5px 5px 10px rgba(0,0,0,0.1), inset -5px -5px 10px rgba(255,255,255,0.1)'
-              }}
-            >
+            {/* Внутренний круг с информацией */}
+            <div className="text-center">
               <motion.div
                 key={userStats.total}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3 }}
-                className="text-white text-center"
+                className="text-4xl font-bold text-primary mb-1"
               >
-                <div className="text-3xl font-bold mb-1">{userStats.total}</div>
-                <div className="text-sm uppercase tracking-wider font-medium opacity-90">
-                  АКТИВНЫХ<br />ПОЛЬЗОВАТЕЛЕЙ
-                </div>
+                {userStats.total}
               </motion.div>
+              <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                АКТИВНЫХ<br />ПОЛЬЗОВАТЕЛЕЙ
+              </div>
             </div>
 
-            {/* Индикатор пульсации */}
-            <div className="absolute inset-0 rounded-full border-2 border-green-400/30 animate-ping"></div>
+            {/* Пульсирующий индикатор */}
+            <div className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping"></div>
           </motion.div>
 
-          {/* Маленькие кружки по типам пользователей */}
-          {userTypeInfo.map((userType, index) => {
-            const Icon = userType.icon;
-            return (
-              <motion.div
-                key={userType.type}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: 0.2 * (index + 1),
-                  type: "spring",
-                  stiffness: 150
-                }}
-                className="absolute w-20 h-20 rounded-full flex flex-col items-center justify-center group cursor-pointer"
-                style={{
-                  ...userType.position,
-                  background: 'linear-gradient(145deg, #f0f0f0, #cacaca)',
-                  boxShadow: `
-                    8px 8px 16px #bebebe,
-                    -8px -8px 16px #ffffff
-                  `,
-                  transition: 'all 0.3s ease'
-                }}
-                whileHover={{ 
-                  scale: 1.1,
-                  boxShadow: `
-                    12px 12px 24px #bebebe,
-                    -12px -12px 24px #ffffff
-                  `
-                }}
-              >
-                {/* Внутренний круг с иконкой */}
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-1"
-                  style={{
-                    background: `linear-gradient(135deg, ${userType.color.split(' ')[1]}, ${userType.color.split(' ')[3]})`,
-                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.1)'
-                  }}
-                >
-                  <Icon className="h-5 w-5 text-white" />
-                </div>
-
-                {/* Количество */}
-                <div className="text-xs font-bold text-center">
-                  {userType.count}
-                </div>
-
-                {/* Tooltip на hover */}
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
-                  {userType.label}
-                </div>
-              </motion.div>
-            );
-          })}
-
-          {/* Соединительные линии (опционально) */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: -1 }}>
-            {userTypeInfo.map((_, index) => {
-              const angle = (index * 90) - 45; // Равномерное распределение по кругу
-              const radius = 100;
-              const x1 = 160; // Центр
-              const y1 = 160;
-              const x2 = x1 + Math.cos(angle * Math.PI / 180) * radius;
-              const y2 = y1 + Math.sin(angle * Math.PI / 180) * radius;
-              
+          {/* Правая сторона с типами пользователей */}
+          <div className="flex flex-col space-y-6">
+            {userTypeInfo.slice(0, 3).map((userType, index) => {
+              const Icon = userType.icon;
               return (
-                <motion.line
-                  key={index}
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.3 }}
-                  transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke="url(#gradient)"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                />
+                <motion.div
+                  key={userType.type}
+                  initial={{ x: 50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: 0.2 * (index + 1),
+                    type: "spring"
+                  }}
+                  className="flex items-center space-x-4"
+                >
+                  {/* Маленький neumorphic круг с иконкой */}
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(145deg, #f0f0f0, #cacaca)',
+                      boxShadow: `
+                        8px 8px 16px #bebebe,
+                        -8px -8px 16px #ffffff
+                      `,
+                    }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{
+                        background: `linear-gradient(135deg, ${userType.color.split(' ')[1]}, ${userType.color.split(' ')[3]})`,
+                      }}
+                    >
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Описание и количество */}
+                  <div className="flex-1">
+                    <div className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
+                      INFOGRAPHIC 0{index + 1}
+                    </div>
+                    <div className="text-lg font-bold text-foreground">
+                      {userType.label}: {userType.count}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incid.
+                    </div>
+                  </div>
+                </motion.div>
               );
             })}
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#667eea" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#764ba2" stopOpacity="0.2" />
-              </linearGradient>
-            </defs>
-          </svg>
+          </div>
         </div>
       </CardContent>
     </Card>
