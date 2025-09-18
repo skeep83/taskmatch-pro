@@ -22,6 +22,19 @@ export const usePresenceTracking = () => {
           .eq('id', user.id)
           .single();
 
+        // Получаем роли пользователя
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        let userType = 'guest';
+        if (roles && roles.length > 0) {
+          if (roles.some(r => r.role === 'business')) userType = 'business';
+          else if (roles.some(r => r.role === 'pro')) userType = 'pro';
+          else if (roles.some(r => r.role === 'client')) userType = 'client';
+        }
+
         // Создаем или переиспользуем канал
         if (!channelRef.current) {
           channelRef.current = supabase.channel('platform_visitors', {
@@ -46,7 +59,8 @@ export const usePresenceTracking = () => {
           joined_at: new Date().toISOString(),
           last_seen: new Date().toISOString(),
           user_agent: navigator.userAgent,
-          location: getPageTitle(location.pathname)
+          location: getPageTitle(location.pathname),
+          user_type: userType
         };
 
         // Отправляем данные о присутствии
@@ -120,6 +134,19 @@ export const usePresenceTracking = () => {
             .eq('id', user.id)
             .single();
 
+          // Получаем роли пользователя
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
+
+          let userType = 'guest';
+          if (roles && roles.length > 0) {
+            if (roles.some(r => r.role === 'business')) userType = 'business';
+            else if (roles.some(r => r.role === 'pro')) userType = 'pro';
+            else if (roles.some(r => r.role === 'client')) userType = 'client';
+          }
+
           const presenceData = {
             user_id: user.id,
             username: profile?.full_name || 
@@ -131,7 +158,8 @@ export const usePresenceTracking = () => {
             joined_at: new Date().toISOString(),
             last_seen: new Date().toISOString(),
             user_agent: navigator.userAgent,
-            location: getPageTitle(location.pathname)
+            location: getPageTitle(location.pathname),
+            user_type: userType
           };
 
           await channelRef.current.track(presenceData);
