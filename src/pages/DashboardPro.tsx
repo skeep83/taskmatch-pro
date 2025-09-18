@@ -221,11 +221,40 @@ const DashboardPro = () => {
 
   return (
     <RoleGuard requiredRole="pro">
-      <main className="min-h-screen pb-safe-bottom">
+      <main className="min-h-screen mobile-container">
         <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
       
-      {/* Header Section */}
-      <section className="container mx-auto py-8 sm:py-16 px-4 sm:px-6">
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                <UserCog className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold">Кабинет</h1>
+                <div className="flex items-center gap-1">
+                  {kycStatus === 'approved' ? (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <AlertCircle className="h-3 w-3 text-orange-500" />
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {kycStatus === 'approved' ? 'Верифицирован' : 'Требует KYC'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <button className="p-2 rounded-full bg-secondary/50">
+              <Bell className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Header */}
+      <section className="hidden md:block container mx-auto py-8 sm:py-16 px-4 sm:px-6">
         <div className="text-center mb-8 sm:mb-16">
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-gradient">
             Кабинет специалиста
@@ -247,9 +276,59 @@ const DashboardPro = () => {
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="max-w-7xl mx-auto">
-          {/* Stats Overview */}
+      <div className="container mx-auto px-4">
+        {/* Mobile Stats Cards - Horizontal Scrollable */}
+        <div className="md:hidden mb-6">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center">
+                  <Wallet className="h-4 w-4 text-green-600" />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-1">Баланс</p>
+              <p className="text-lg font-bold">{formatPrice(walletBalance)}</p>
+            </div>
+            
+            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-8 w-8 rounded-lg bg-yellow-100 flex items-center justify-center">
+                  <Star className="h-4 w-4 text-yellow-600" />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-1">Рейтинг</p>
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-bold">{ratingAvg?.toFixed(1) || '—'}</span>
+                <span className="text-xs text-muted-foreground">({ratingCount})</span>
+              </div>
+            </div>
+            
+            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Award className="h-4 w-4 text-blue-600" />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-1">Выполнено</p>
+              <p className="text-lg font-bold">{completedJobs}</p>
+            </div>
+            
+            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <Clock className="h-4 w-4 text-purple-600" />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-1">Ответ</p>
+              <p className="text-sm font-bold">{responseTime}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Stats Grid */}
+        <div className="hidden md:block max-w-7xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
             <div className="card-surface p-4 sm:p-6">
               <div className="flex items-center justify-between">
@@ -299,6 +378,7 @@ const DashboardPro = () => {
               </div>
             </div>
           </div>
+        </div>
 
           {/* Quick Actions */}
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-12">
@@ -357,6 +437,158 @@ const DashboardPro = () => {
             </button>
           </div>
 
+        {/* Mobile Content */}
+        <div className="md:hidden space-y-6">
+          {/* Available Jobs - Mobile Card */}
+          <div className="bg-card rounded-2xl shadow-sm border">
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <Briefcase className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <h2 className="text-lg font-semibold">Доступные заказы</h2>
+                </div>
+                <span className="text-sm text-muted-foreground">{nearbyJobs.length}</span>
+              </div>
+            </div>
+            <div className="p-1">
+              {nearbyJobs.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="h-12 w-12 rounded-full bg-secondary/50 mx-auto mb-3 flex items-center justify-center">
+                    <Briefcase className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-medium mb-1">Нет заказов</h3>
+                  <p className="text-sm text-muted-foreground">Проверьте позже</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {nearbyJobs.slice(0, 3).map((job) => (
+                    <div key={job.id} className="p-3 rounded-xl hover:bg-secondary/30 transition-colors">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-sm line-clamp-2">{job.description}</h4>
+                        <span className="text-xs text-green-600 font-medium ml-2 flex-shrink-0">
+                          {formatPrice(job.budget_min_cents)} - {formatPrice(job.budget_max_cents)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          {job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Сегодня'}
+                        </span>
+                        <button className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full font-medium">
+                          Откликнуться
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {nearbyJobs.length > 3 && (
+                    <div className="p-3 text-center">
+                      <Link to="/feed" className="text-sm text-primary font-medium">
+                        Показать все {nearbyJobs.length} заказов
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* My Active Jobs - Mobile Card */}
+          <div className="bg-card rounded-2xl shadow-sm border">
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center">
+                    <Clock className="h-4 w-4 text-green-600" />
+                  </div>
+                  <h2 className="text-lg font-semibold">Мои заказы</h2>
+                </div>
+                <span className="text-sm text-muted-foreground">{myActiveJobs.length}</span>
+              </div>
+            </div>
+            <div className="p-1">
+              {myActiveJobs.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="h-12 w-12 rounded-full bg-secondary/50 mx-auto mb-3 flex items-center justify-center">
+                    <Clock className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-medium mb-1">Нет активных заказов</h3>
+                  <p className="text-sm text-muted-foreground">Откликнитесь на заказы</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {myActiveJobs.slice(0, 3).map((job) => (
+                    <div key={job.id} className="p-3 rounded-xl hover:bg-secondary/30 transition-colors">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-sm line-clamp-2">{job.description}</h4>
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                          job.status === 'accepted' ? 'bg-yellow-100 text-yellow-800' :
+                          job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {job.status === 'accepted' ? 'Принят' :
+                           job.status === 'in_progress' ? 'В работе' : 'Выполнен'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          {job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Сегодня'}
+                        </span>
+                        <button className="text-xs bg-secondary text-secondary-foreground px-3 py-1 rounded-full font-medium">
+                          Подробнее
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {myActiveJobs.length > 3 && (
+                    <div className="p-3 text-center">
+                      <span className="text-sm text-primary font-medium">
+                        Показать все {myActiveJobs.length} заказов
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Analytics & Tips - Mobile */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-card rounded-2xl p-4 shadow-sm border">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <BarChart3 className="h-4 w-4 text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-sm">Статистика</h3>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Заработок</span>
+                  <span className="font-medium">{formatPrice(monthlyEarnings)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Тендеры</span>
+                  <span className="font-medium">{tenders.length}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card rounded-2xl p-4 shadow-sm border">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center">
+                  <Zap className="h-4 w-4 text-orange-600" />
+                </div>
+                <h3 className="font-semibold text-sm">Советы</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Отвечайте быстро и загружайте фото работ для лучшего рейтинга
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Content */}
+        <div className="hidden md:block max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
             {/* Available Jobs */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-8">
@@ -569,7 +801,7 @@ const DashboardPro = () => {
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </main>
     </RoleGuard>
   );
