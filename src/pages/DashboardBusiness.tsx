@@ -81,7 +81,7 @@ export default function DashboardBusiness() {
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-              <TabsList className="grid w-full grid-cols-6 bg-transparent">
+              <TabsList className="grid w-full grid-cols-5 bg-transparent">
                 <TabsTrigger value="overview" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden sm:inline">Обзор</span>
@@ -98,18 +98,6 @@ export default function DashboardBusiness() {
                   <Building2 className="h-4 w-4" />
                   <span className="hidden sm:inline">Компания</span>
                   {activeTab === "company" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                      style={{ backgroundColor: "#22D3EE" }}
-                    />
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="employees" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800">
-                  <UserPlus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Команда</span>
-                  {activeTab === "employees" && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -204,7 +192,7 @@ export default function DashboardBusiness() {
               </div>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <button 
                   className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => navigate("/job/new")}
@@ -220,20 +208,6 @@ export default function DashboardBusiness() {
                   </div>
                 </button>
 
-                <button 
-                  className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
-                  onClick={() => setActiveTab("employees")}
-                >
-                  <div className="flex flex-col items-center gap-4 text-center">
-                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                      <UserPlus className="h-8 w-8 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-1 text-gray-800">Пригласить сотрудника</h3>
-                      <p className="text-sm text-gray-600">Расширить команду</p>
-                    </div>
-                  </div>
-                </button>
 
                 <button 
                   className="p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
@@ -274,9 +248,9 @@ export default function DashboardBusiness() {
                 </p>
                 <div className="space-y-3">
                   <p className="text-sm"><strong>1.</strong> Настройте данные компании во вкладке "Компания"</p>
-                  <p className="text-sm"><strong>2.</strong> Добавьте сотрудников во вкладке "Команда"</p>
-                  <p className="text-sm"><strong>3.</strong> Создавайте заказы и отслеживайте прогресс</p>
-                  <p className="text-sm"><strong>4.</strong> Контролируйте финансы через инвойсы и аналитику</p>
+                  <p className="text-sm"><strong>2.</strong> Создавайте заказы и отслеживайте прогресс</p>
+                  <p className="text-sm"><strong>3.</strong> Контролируйте финансы через инвойсы и аналитику</p>
+                  
                 </div>
               </div>
             </TabsContent>
@@ -285,9 +259,6 @@ export default function DashboardBusiness() {
               <BusinessAccountForm />
             </TabsContent>
 
-            <TabsContent value="employees">
-              <BusinessMembers />
-            </TabsContent>
 
             <TabsContent value="jobs">
               <BusinessJobs />
