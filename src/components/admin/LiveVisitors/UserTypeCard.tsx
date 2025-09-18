@@ -38,7 +38,7 @@ export const UserTypeCard = ({ userType, index }: UserTypeCardProps) => {
           </h4>
           <div className="flex items-center gap-2">
             <div 
-              className="px-3 py-1 rounded-full text-sm font-medium"
+              className="px-3 py-1 rounded-full text-lg font-semibold"
               style={{ 
                 backgroundColor: `${userType.color.split(' ')[1].replace('from-', '').replace('to-', '')}15`,
                 color: userType.color.split(' ')[1].replace('from-', '').replace('to-', '')
