@@ -200,17 +200,21 @@ export const AppNavigation = () => {
             aria-label={t("app.name")}
           > 
             {platformLogo ? (
-              <img 
-                src={platformLogo} 
-                alt="ServiceHub Logo" 
-                className="h-10 w-10 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
-              />
+              <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] flex items-center justify-center transition-all duration-300 group-hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
+                <img 
+                  src={platformLogo} 
+                  alt="ServiceHub Logo" 
+                  className="h-8 w-8 object-contain transition-all duration-300 group-hover:scale-110" 
+                />
+              </div>
             ) : (
-              <img 
-                src={serviceHubLogo} 
-                alt="ServiceHub Logo" 
-                className="h-10 w-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" 
-              />
+              <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] flex items-center justify-center transition-all duration-300 group-hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
+                <img 
+                  src={serviceHubLogo} 
+                  alt="ServiceHub Logo" 
+                  className="h-8 w-8 transition-all duration-300 group-hover:scale-110" 
+                />
+              </div>
             )}
             <span className="text-xl font-display font-bold text-gradient hidden sm:block">
               {t("app.name")}
