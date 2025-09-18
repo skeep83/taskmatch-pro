@@ -205,39 +205,91 @@ export const LiveVisitors = () => {
       
       <CardContent className="p-8">
         {/* Neumorphic Infographic Layout */}
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
-          {/* Большой центральный круг */}
+        <div className="flex items-center justify-between max-w-5xl mx-auto">
+          {/* Большой центральный круг - увеличенный */}
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, type: "spring" }}
-            className="relative w-48 h-48 rounded-full flex flex-col items-center justify-center"
-            style={{
-              background: 'linear-gradient(145deg, #f0f0f0, #cacaca)',
-              boxShadow: `
-                20px 20px 40px #bebebe,
-                -20px -20px 40px #ffffff
-              `,
-            }}
+            className="relative"
           >
-            {/* Внутренний круг с информацией */}
-            <div className="text-center">
-              <motion.div
-                key={userStats.total}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="text-4xl font-bold text-primary mb-1"
+            <svg width="280" height="280" viewBox="-140 -140 280 280" className="drop-shadow-2xl">
+              {/* Внешний градиентный круг */}
+              <defs>
+                <linearGradient id="outerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+                </linearGradient>
+                <radialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="hsl(var(--background))" />
+                  <stop offset="100%" stopColor="hsl(var(--muted))" />
+                </radialGradient>
+              </defs>
+              
+              {/* Основной круг с neumorphic эффектом */}
+              <circle
+                cx="0"
+                cy="0"
+                r="120"
+                fill="url(#outerGradient)"
+                stroke="hsl(var(--border))"
+                strokeWidth="2"
+                style={{
+                  filter: 'drop-shadow(15px 15px 30px rgba(0,0,0,0.15)) drop-shadow(-15px -15px 30px rgba(255,255,255,0.7))'
+                }}
+              />
+              
+              {/* Внутренний круг */}
+              <circle
+                cx="0"
+                cy="0"
+                r="80"
+                fill="url(#centerGradient)"
+                stroke="hsl(var(--border))"
+                strokeWidth="1"
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.1))'
+                }}
+              />
+              
+              {/* Пульсирующее кольцо */}
+              <circle
+                cx="0"
+                cy="0"
+                r="100"
+                fill="none"
+                stroke="hsl(var(--primary))"
+                strokeWidth="2"
+                opacity="0.3"
+                className="animate-ping"
+              />
+              
+              {/* Центральный текст */}
+              <text
+                x="0"
+                y="-15"
+                textAnchor="middle"
+                className="fill-muted-foreground text-sm font-medium"
+              >
+                АКТИВНЫХ
+              </text>
+              <text
+                x="0"
+                y="5"
+                textAnchor="middle"
+                className="fill-muted-foreground text-sm font-medium"
+              >
+                ПОЛЬЗОВАТЕЛЕЙ
+              </text>
+              <text
+                x="0"
+                y="35"
+                textAnchor="middle"
+                className="fill-foreground text-4xl font-bold"
               >
                 {userStats.total}
-              </motion.div>
-              <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
-                АКТИВНЫХ<br />ПОЛЬЗОВАТЕЛЕЙ
-              </div>
-            </div>
-
-            {/* Пульсирующий индикатор */}
-            <div className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping"></div>
+              </text>
+            </svg>
           </motion.div>
 
           {/* Правая сторона с типами пользователей */}
