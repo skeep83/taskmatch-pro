@@ -547,7 +547,7 @@ export default function AdminDashboard() {
           <LiveVisitors />
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions with Alert Categories */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -560,40 +560,71 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <h3 className="font-semibold">Быстрые действия</h3>
-                <p className="text-sm text-muted-foreground">Часто используемые операции</p>
+                <p className="text-sm text-muted-foreground">Операции и критические алерты</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-700">Пользователи</span>
-              </button>
-              
-              <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                    <Briefcase className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Заказы</span>
-                </button>
-                
-                <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                    <DollarSign className="h-6 w-6 text-green-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Финансы</span>
-                </button>
-                
-                <button className="p-4 rounded-2xl group flex flex-col items-center gap-3 text-center min-h-[120px] bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300">
-                    <AlertTriangle className="h-6 w-6 text-red-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Споры</span>
-                </button>
+            
+            {/* Alert Categories */}
+            <div className="mb-6">
+              <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">Критические алерты</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { icon: AlertTriangle, label: "Финансовые риски", count: 3, color: "text-red-600", bgColor: "bg-red-500/10" },
+                  { icon: Shield, label: "Безопасность", count: 1, color: "text-orange-600", bgColor: "bg-orange-500/10" },
+                  { icon: Clock, label: "SLA нарушения", count: 7, color: "text-amber-600", bgColor: "bg-amber-500/10" },
+                  { icon: Target, label: "Качество услуг", count: 2, color: "text-purple-600", bgColor: "bg-purple-500/10" }
+                ].map((alert, index) => {
+                  const Icon = alert.icon;
+                  return (
+                    <div
+                      key={index}
+                      className="p-3 border border-border/50 rounded-lg hover:border-primary/20 transition-all duration-200 cursor-pointer group"
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <div className={`p-1.5 ${alert.bgColor} rounded-md`}>
+                            <Icon className={`h-3 w-3 ${alert.color}`} />
+                          </div>
+                          <span className="text-xs font-medium">{alert.label}</span>
+                        </div>
+                        <Badge variant="outline" className={`text-xs ${alert.color} border-current`}>
+                          {alert.count}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </motion.div>
+
+            {/* Quick Actions */}
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">Быстрые действия</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { icon: Users, label: "Пользователи", action: () => window.location.href = "/admin/users" },
+                  { icon: Briefcase, label: "Заказы", action: () => window.location.href = "/admin/jobs" },
+                  { icon: DollarSign, label: "Финансы", action: () => window.location.href = "/admin/finance" },
+                  { icon: Calendar, label: "Настройки", action: () => window.location.href = "/admin/settings" }
+                ].map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={index}
+                      onClick={item.action}
+                      className="p-3 rounded-2xl group flex flex-col items-center gap-2 text-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] hover:shadow-[3px_3px_6px_#D1D5DB,-3px_-3px_6px_#F9FAFB] transition-all duration-300"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[3px_3px_6px_#D1D5DB,-3px_-3px_6px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] transition-all duration-300">
+                        <Icon className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <span className="text-xs font-medium text-gray-700">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </motion.div>
         </div>
     </div>
   );
