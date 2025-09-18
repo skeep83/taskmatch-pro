@@ -56,7 +56,7 @@ export const LiveVisitorsContainer = () => {
         {/* Анимированные линии соединения */}
         <svg 
           className="absolute inset-0 w-full h-full pointer-events-none" 
-          style={{ zIndex: 1 }}
+          style={{ zIndex: 3 }}
         >
           <defs>
             <linearGradient id="lineGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
