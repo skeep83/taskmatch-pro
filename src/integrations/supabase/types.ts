@@ -835,6 +835,7 @@ export type Database = {
           note: string | null
           price_cents: number
           pro_id: string
+          status: string
           warranty_days: number | null
         }
         Insert: {
@@ -846,6 +847,7 @@ export type Database = {
           note?: string | null
           price_cents: number
           pro_id: string
+          status?: string
           warranty_days?: number | null
         }
         Update: {
@@ -857,6 +859,7 @@ export type Database = {
           note?: string | null
           price_cents?: number
           pro_id?: string
+          status?: string
           warranty_days?: number | null
         }
         Relationships: [
