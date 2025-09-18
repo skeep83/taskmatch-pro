@@ -6,7 +6,16 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     url: 'https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com?forceHideBadge=true',
-    cleartext: true
+    cleartext: true,
+    allowNavigation: [
+      'https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com'
+    ]
+  },
+  ios: {
+    allowsLinkPreview: false,
+    contentInset: 'automatic',
+    scrollEnabled: true,
+    webSecurity: false
   },
   plugins: {
     SplashScreen: {
