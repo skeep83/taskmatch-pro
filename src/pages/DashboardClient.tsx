@@ -392,6 +392,176 @@ export default function DashboardClient() {
         </section>
         
         <div className="container mx-auto px-4">
+          {/* Mobile Stats */}
+          <div className="md:hidden mb-4">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <Briefcase className="h-3 w-3 text-blue-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Заказы</span>
+                </div>
+                <p className="text-sm font-bold">{stats.totalJobs}</p>
+              </div>
+              
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center">
+                    <CheckCircle className="h-3 w-3 text-green-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Активно</span>
+                </div>
+                <p className="text-sm font-bold">{stats.activeJobs}</p>
+              </div>
+              
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <DollarSign className="h-3 w-3 text-purple-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Потрачено</span>
+                </div>
+                <p className="text-xs font-bold">{formatCurrency(stats.totalSpent)}</p>
+              </div>
+              
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-yellow-100 flex items-center justify-center">
+                    <Star className="h-3 w-3 text-yellow-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Рейтинг</span>
+                </div>
+                <p className="text-sm font-bold">{stats.averageRating || '—'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Quick Actions */}
+          <div className="md:hidden mb-4">
+            <div className="grid grid-cols-4 gap-2">
+              <button 
+                onClick={() => navigate("/job/new")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-1">
+                  <Plus className="h-4 w-4 text-blue-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Заказ</span>
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab("jobs")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mb-1">
+                  <Briefcase className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Мои</span>
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab("tenders")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mb-1">
+                  <Gavel className="h-4 w-4 text-purple-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Тендеры</span>
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab("settings")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center mb-1">
+                  <Settings className="h-4 w-4 text-orange-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Профиль</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Jobs List */}
+          <div className="md:hidden mb-4">
+            <div className="bg-card rounded-xl shadow-sm border">
+              <div className="flex items-center justify-between p-3 border-b">
+                <h2 className="text-sm font-semibold">Мои заказы</h2>
+                <span className="text-xs text-muted-foreground">{jobs.length}</span>
+              </div>
+              <div className="p-2">
+                {jobs.length === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-sm text-muted-foreground">Заказов пока нет</p>
+                    <button 
+                      onClick={() => navigate("/job/new")}
+                      className="text-xs text-primary font-medium mt-1"
+                    >
+                      Создать первый заказ
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    {jobs.slice(0, 3).map((job) => (
+                      <div key={job.id} className="p-2 rounded-lg hover:bg-secondary/30 transition-colors">
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium line-clamp-1">{job.title}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              {getStatusBadge(job.status)}
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(job.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => navigate(`/job/${job.id}`)}
+                            className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full font-medium ml-2 flex-shrink-0"
+                          >
+                            Открыть
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {jobs.length > 3 && (
+                      <div className="pt-2 text-center border-t">
+                        <button 
+                          onClick={() => setActiveTab("jobs")}
+                          className="text-xs text-primary font-medium"
+                        >
+                          Показать все {jobs.length}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Pro Upgrade Card */}
+          {currentRole === 'client' && !hasPendingProRequest && (
+            <div className="md:hidden mb-4">
+              <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-4 border border-primary/20">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Crown className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm">Стать специалистом</h3>
+                    <p className="text-xs text-muted-foreground">Предлагайте свои услуги</p>
+                  </div>
+                  <button 
+                    onClick={() => navigate("/pro-upgrade")}
+                    className="text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded-full font-medium"
+                  >
+                    Подать заявку
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="hidden md:block max-w-7xl mx-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
