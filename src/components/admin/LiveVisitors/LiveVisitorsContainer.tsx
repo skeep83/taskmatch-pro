@@ -52,7 +52,7 @@ export const LiveVisitorsContainer = () => {
         </div>
       </div>
       
-      <div className="relative flex items-center gap-24 h-[420px] ml-8">
+      <div className="relative flex items-center gap-24 h-[420px] ml-8 -mt-6">
         {/* Анимированные линии соединения */}
         <svg 
           className="absolute inset-0 w-full h-full pointer-events-none" 
