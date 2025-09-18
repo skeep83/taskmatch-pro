@@ -19,7 +19,9 @@ import {
   Users,
   ShoppingCart,
   Calendar,
-  BarChart3
+  BarChart3,
+  Settings,
+  Zap
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -208,12 +210,12 @@ export const AppNavigation = () => {
                 />
               </div>
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] flex items-center justify-center transition-all duration-300 group-hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
-                <img 
-                  src={serviceHubLogo} 
-                  alt="ServiceHub Logo" 
-                  className="h-8 w-8 transition-all duration-300 group-hover:scale-110" 
-                />
+              <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] flex items-center justify-center transition-all duration-300 group-hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] relative">
+                <div className="relative">
+                  <Settings className="h-6 w-6 text-primary animate-spin-slow" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
+                  <div className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full bg-primary animate-ping"></div>
+                </div>
               </div>
             )}
             <span className="text-xl font-display font-bold text-gradient hidden sm:block">

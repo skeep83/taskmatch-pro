@@ -342,9 +342,23 @@ All colors MUST be HSL.
     backface-visibility: hidden;
   }
 
+  
   .neumorphic-icon {
     background: linear-gradient(145deg, #f0f0f0, #cacaca);
     box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+  }
+  
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
   }
 }
 
