@@ -585,10 +585,10 @@ export default function AdminDashboard() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
-                            <Icon className={`h-3 w-3 ${alert.color}`} />
+                          <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                            <Icon className={`h-5 w-5 ${alert.color}`} />
                           </div>
-                          <span className="text-xs font-medium text-gray-700">{alert.label}</span>
+                          <span className="text-sm font-medium text-gray-700">{alert.label}</span>
                         </div>
                         <div className="px-2 py-1 rounded-full bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
                           <span className={`text-lg font-bold ${alert.color}`}>{alert.count}</span>
