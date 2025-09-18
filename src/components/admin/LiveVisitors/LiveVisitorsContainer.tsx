@@ -39,7 +39,7 @@ export const LiveVisitorsContainer = () => {
   ];
 
   return (
-    <div className="card-surface p-8">
+    <div className="card-surface p-10">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-cyan-500/10 rounded-lg">
           <Eye className="h-5 w-5 text-cyan-600" />
