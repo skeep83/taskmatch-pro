@@ -591,7 +591,7 @@ export default function AdminDashboard() {
                           <span className="text-xs font-medium text-gray-700">{alert.label}</span>
                         </div>
                         <div className="px-2 py-1 rounded-full bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
-                          <span className={`text-xs font-bold ${alert.color}`}>{alert.count}</span>
+                          <span className={`text-lg font-bold ${alert.color}`}>{alert.count}</span>
                         </div>
                       </div>
                     </div>
