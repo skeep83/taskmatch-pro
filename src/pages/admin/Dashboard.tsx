@@ -552,8 +552,9 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
+          className="hover-scale"
         >
-          <div className="card-surface p-6">
+          <div className="card-surface p-6 h-full">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Activity className="h-5 w-5 text-primary" />
@@ -567,7 +568,7 @@ export default function AdminDashboard() {
             {/* Alert Categories */}
             <div className="mb-6">
               <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">Критические алерты</h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 {[
                   { icon: AlertTriangle, label: "Финансовые риски", count: 3, color: "text-red-600" },
                   { icon: Shield, label: "Безопасность", count: 1, color: "text-orange-600" },
@@ -578,9 +579,9 @@ export default function AdminDashboard() {
                   return (
                     <div
                       key={index}
-                      className="p-3 rounded-2xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] hover:shadow-[3px_3px_6px_#D1D5DB,-3px_-3px_6px_#F9FAFB] transition-all duration-300 cursor-pointer group"
+                      className="p-3 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300 cursor-pointer group"
                     >
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
                             <Icon className={`h-3 w-3 ${alert.color}`} />
@@ -612,9 +613,9 @@ export default function AdminDashboard() {
                     <button
                       key={index}
                       onClick={item.action}
-                      className="p-3 rounded-2xl group flex flex-col items-center gap-2 text-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] hover:shadow-[3px_3px_6px_#D1D5DB,-3px_-3px_6px_#F9FAFB] transition-all duration-300"
+                      className="p-4 rounded-xl group flex flex-col items-center gap-2 text-center bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300"
                     >
-                      <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[3px_3px_6px_#D1D5DB,-3px_-3px_6px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] transition-all duration-300">
+                      <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all duration-300">
                         <Icon className="h-4 w-4 text-gray-600" />
                       </div>
                       <span className="text-xs font-medium text-gray-700">{item.label}</span>
