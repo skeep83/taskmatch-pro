@@ -60,59 +60,60 @@ export default function AdminRisk() {
   const fetchRiskData = async () => {
     try {
       setLoading(true);
+      const { supabase } = await import("@/integrations/supabase/client");
       
-      // Mock data for risk alerts
-      const mockAlerts: RiskAlert[] = [
-        {
-          id: "1",
-          user_id: "user1",
-          user_name: "Иванов И.И.",
-          risk_type: "suspicious_payment",
-          severity: "high",
-          description: "Множественные попытки оплаты с разных карт",
-          score: 85,
-          status: "new",
-          created_at: "2024-01-15T10:30:00Z",
-          metadata: {
-            payment_attempts: 5,
-            cards_used: 3,
-            ip_addresses: ["192.168.1.1", "10.0.0.1"]
+      // Получаем реальные данные по рискам из базы данных
+      // Здесь можно добавить таблицы для риск-алертов и правил
+      
+      // Для демонстрации, получаем некоторые данные из существующих таблиц
+      const { data: auditData } = await supabase
+        .from('admin_audit_log')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      // Анализируем подозрительную активность на основе логов
+      const riskAlerts: RiskAlert[] = [];
+      
+      // Проверяем частые неудачные попытки входа, блокировки и т.д.
+      const suspiciousUsers = new Map();
+      
+      auditData?.forEach(log => {
+        if (log.action.includes('block') || log.action.includes('failed')) {
+          const userId = log.resource_id || 'unknown';
+          if (!suspiciousUsers.has(userId)) {
+            suspiciousUsers.set(userId, {
+              count: 0,
+              actions: [],
+              lastActivity: log.created_at
+            });
           }
-        },
-        {
-          id: "2",
-          user_id: "user2", 
-          user_name: "Петров П.П.",
-          risk_type: "velocity_check",
-          severity: "medium",
-          description: "Необычно высокая активность за последние 24 часа",
-          score: 65,
-          status: "investigating",
-          created_at: "2024-01-15T09:15:00Z",
-          metadata: {
-            jobs_created: 15,
-            payments_made: 8,
-            usual_daily_activity: 2
-          }
-        },
-        {
-          id: "3",
-          user_id: "user3",
-          user_name: "Сидоров С.С.",
-          risk_type: "device_fingerprint",
-          severity: "critical",
-          description: "Использование скомпрометированного устройства",
-          score: 95,
-          status: "new",
-          created_at: "2024-01-15T08:45:00Z",
-          metadata: {
-            device_id: "compromised_device_123",
-            known_fraud_cases: 3
+          
+          const user = suspiciousUsers.get(userId);
+          user.count++;
+          user.actions.push(log.action);
+          
+          if (user.count >= 3) {
+            riskAlerts.push({
+              id: `risk_${userId}_${Date.now()}`,
+              user_id: userId,
+              user_name: `Пользователь ${userId.slice(0, 8)}`,
+              risk_type: 'suspicious_activity',
+              severity: user.count >= 5 ? 'critical' : 'high',
+              description: `Подозрительная активность: ${user.actions.join(', ')}`,
+              score: Math.min(95, 50 + user.count * 10),
+              status: 'new',
+              created_at: user.lastActivity,
+              metadata: {
+                action_count: user.count,
+                actions: user.actions
+              }
+            });
           }
         }
-      ];
+      });
 
-      // Mock data for risk rules
+      // Добавляем базовые правила риска
       const mockRules: RiskRule[] = [
         {
           id: "1",
@@ -150,15 +151,14 @@ export default function AdminRisk() {
         }
       ];
 
-      // Mock stats
       const mockStats: RiskStats = {
-        alerts_today: 12,
-        users_flagged: 8,
-        fraud_prevented_cents: 45000,
+        alerts_today: riskAlerts.length,
+        users_flagged: suspiciousUsers.size,
+        fraud_prevented_cents: riskAlerts.length * 5000, // Примерная оценка
         false_positive_rate: 0.08
       };
 
-      setAlerts(mockAlerts);
+      setAlerts(riskAlerts);
       setRules(mockRules);
       setStats(mockStats);
     } catch (error) {
@@ -175,12 +175,26 @@ export default function AdminRisk() {
 
   const updateAlertStatus = async (alertId: string, status: string) => {
     try {
-      // await adminApi.updateRiskAlert(alertId, { status });
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // В реальной системе здесь была бы таблица risk_alerts
+      // Пока обновляем локально
       setAlerts(prev => 
         prev.map(alert => 
           alert.id === alertId ? { ...alert, status: status as any } : alert
         )
       );
+      
+      // Логируем действие в аудит
+      await supabase.functions.invoke('admin-audit', {
+        body: {
+          action: 'log',
+          resource_type: 'risk_alert',
+          resource_id: alertId,
+          new_values: { status, updated_by: 'admin' }
+        }
+      });
+      
       toast({
         title: "Успешно",
         description: "Статус алерта обновлен"
@@ -196,7 +210,18 @@ export default function AdminRisk() {
 
   const blockUser = async (userId: string) => {
     try {
-      // await adminApi.blockUser(userId, "Risk management decision");
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error } = await supabase.functions.invoke('admin-users', {
+        body: {
+          action: 'block',
+          user_id: userId,
+          reason: "Risk management decision"
+        }
+      });
+
+      if (error) throw error;
+      
       toast({
         title: "Успешно",
         description: "Пользователь заблокирован"
@@ -212,12 +237,25 @@ export default function AdminRisk() {
 
   const toggleRule = async (ruleId: string, enabled: boolean) => {
     try {
-      // await adminApi.updateRiskRule(ruleId, { enabled });
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // В реальной системе здесь была бы таблица risk_rules
       setRules(prev =>
         prev.map(rule =>
           rule.id === ruleId ? { ...rule, enabled } : rule
         )
       );
+      
+      // Логируем изменение правила
+      await supabase.functions.invoke('admin-audit', {
+        body: {
+          action: 'log',
+          resource_type: 'risk_rule',
+          resource_id: ruleId,
+          new_values: { enabled, updated_by: 'admin' }
+        }
+      });
+      
       toast({
         title: "Успешно",
         description: `Правило ${enabled ? "включено" : "отключено"}`
