@@ -93,8 +93,60 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
   return (
     <div className="relative w-full h-[300px] flex items-center justify-center">
       {/* Central donut chart */}
-      <div className="relative">
-        <svg width="300" height="300" viewBox="-150 -150 300 300" className="drop-shadow-lg">
+      <div className="relative flex items-center gap-16">
+        {/* Анимированные линии соединения */}
+        <svg 
+          className="absolute inset-0 w-full h-full pointer-events-none" 
+          style={{ zIndex: 3 }}
+          viewBox="0 0 600 300"
+        >
+          <defs>
+            <linearGradient id="categoryLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          
+          {segments.slice(0, 4).map((segment, index) => {
+            const startX = 150; // Центр диаграммы
+            const startY = 150; // Центр по вертикали
+            const endX = 350; // Начало карточек категорий
+            const endY = 50 + (index * 65); // Позиция каждой карточки
+            
+            return (
+              <g key={index}>
+                {/* Основная линия */}
+                <path
+                  d={`M ${startX} ${startY} Q ${startX + 30} ${startY} ${endX} ${endY}`}
+                  stroke="url(#categoryLineGradient)"
+                  strokeWidth="1.5"
+                  fill="none"
+                  className="animate-fade-in"
+                  style={{ 
+                    animationDelay: `${index * 0.2}s`,
+                    strokeDasharray: '4,4',
+                    animation: `fadeInLine 1s ease-out ${index * 0.2}s forwards, dashFlow 3s linear infinite`
+                  }}
+                />
+                
+                {/* Светящаяся точка на конце */}
+                <circle
+                  cx={endX}
+                  cy={endY}
+                  r="2"
+                  fill={segment.color}
+                  className="animate-pulse"
+                  style={{ 
+                    animationDelay: `${index * 0.2 + 0.5}s`,
+                    filter: `drop-shadow(0 0 4px ${segment.color})`
+                  }}
+                />
+              </g>
+            );
+          })}
+        </svg>
+
+        <svg width="300" height="300" viewBox="-150 -150 300 300" className="drop-shadow-lg" style={{ zIndex: 2 }}>
           {/* Background circle */}
           <circle
             cx="0"
@@ -151,47 +203,42 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
             {total}
           </text>
         </svg>
+
+        {/* Category labels connected by lines */}
+        <div className="space-y-4" style={{ zIndex: 2 }}>
+          {segments.slice(0, 4).map((segment, index) => {
+            const IconComponent = categoryIcons[segment.name] || Package;
+
+            return (
+              <motion.div
+                key={segment.name}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                className="flex items-center gap-3 p-3 rounded-xl card-surface min-w-[180px] border border-border/50"
+              >
+                <div 
+                  className="p-2 rounded-lg shadow-sm flex-shrink-0"
+                  style={{ backgroundColor: `${segment.color}20` }}
+                >
+                  <IconComponent 
+                    className="h-4 w-4" 
+                    style={{ color: segment.color }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-foreground">
+                    {segment.name}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {segment.value} ({segment.percentage.toFixed(1)}%)
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
-
-      {/* Category labels around the chart */}
-      {segments.slice(0, 4).map((segment, index) => {
-        const IconComponent = categoryIcons[segment.name] || Package;
-        const positions = [
-          { top: '10%', left: '10%' }, // Top-left
-          { top: '10%', right: '10%' }, // Top-right  
-          { bottom: '10%', left: '10%' }, // Bottom-left
-          { bottom: '10%', right: '10%' }, // Bottom-right
-        ];
-
-        return (
-          <motion.div
-            key={segment.name}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 + index * 0.1 }}
-            className="absolute flex flex-col items-center gap-2 p-3 rounded-xl card-surface min-w-[100px]"
-            style={positions[index]}
-          >
-            <div 
-              className="p-2 rounded-lg shadow-sm"
-              style={{ backgroundColor: `${segment.color}20` }}
-            >
-              <IconComponent 
-                className="h-4 w-4" 
-                style={{ color: segment.color }}
-              />
-            </div>
-            <div className="text-center">
-              <div className="text-xs font-medium text-foreground">
-                {segment.name}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {segment.value} ({segment.percentage.toFixed(1)}%)
-              </div>
-            </div>
-          </motion.div>
-        );
-      })}
     </div>
   );
 }
