@@ -534,11 +534,22 @@ export default function AdminDashboard() {
         </motion.div>
       </div>
 
-      {/* Quick Actions */}
+
+      {/* Live Visitors Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
+        className="hover-scale"
+      >
+        <LiveVisitors />
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
       >
         <div className="card-surface p-6">
           <div className="flex items-center gap-3 mb-6">
@@ -580,16 +591,6 @@ export default function AdminDashboard() {
             </button>
           </div>
         </div>
-      </motion.div>
-
-      {/* Live Visitors Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="hover-scale"
-      >
-        <LiveVisitors />
       </motion.div>
     </div>
   );
