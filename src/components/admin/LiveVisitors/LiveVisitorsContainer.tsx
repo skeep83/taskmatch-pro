@@ -59,7 +59,7 @@ export const LiveVisitorsContainer = () => {
         </div>
         
         {/* Категории справа в стиле навигации */}
-        <div className="flex-1 space-y-3">
+        <div className="w-80 space-y-3">
           {userTypeInfo.map((userType, index) => (
             <UserTypeCard 
               key={userType.type}
