@@ -203,9 +203,8 @@ export const LiveVisitors = () => {
         </div>
       </CardHeader>
       
-      <CardContent className="p-8">
-        {/* Neumorphic Infographic Layout */}
-        <div className="flex items-center justify-between max-w-5xl mx-auto">
+      <CardContent className="p-6">
+        <div className="relative w-full h-[350px] flex items-center justify-center">
           {/* Большой центральный круг - увеличенный */}
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
@@ -292,59 +291,44 @@ export const LiveVisitors = () => {
             </svg>
           </motion.div>
 
-          {/* Правая сторона с типами пользователей */}
-          <div className="flex flex-col space-y-6">
-            {userTypeInfo.slice(0, 3).map((userType, index) => {
-              const Icon = userType.icon;
-              return (
-                <motion.div
-                  key={userType.type}
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ 
-                    duration: 0.6, 
-                    delay: 0.2 * (index + 1),
-                    type: "spring"
-                  }}
-                  className="flex items-center space-x-4"
-                >
-                  {/* Маленький neumorphic круг с иконкой */}
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center"
-                    style={{
-                      background: 'linear-gradient(145deg, #f0f0f0, #cacaca)',
-                      boxShadow: `
-                        8px 8px 16px #bebebe,
-                        -8px -8px 16px #ffffff
-                      `,
-                    }}
-                  >
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{
-                        background: `linear-gradient(135deg, ${userType.color.split(' ')[1]}, ${userType.color.split(' ')[3]})`,
-                      }}
-                    >
-                      <Icon className="h-5 w-5 text-white" />
-                    </div>
-                  </div>
+          {/* Информационные блоки вокруг диаграммы */}
+          {userTypeInfo.slice(0, 3).map((userType, index) => {
+            const Icon = userType.icon;
+            const positions = [
+              { top: '10%', right: '10%' }, // Top-right
+              { bottom: '15%', right: '5%' }, // Bottom-right  
+              { bottom: '15%', left: '5%' }, // Bottom-left
+            ];
 
-                  {/* Описание и количество */}
-                  <div className="flex-1">
-                    <div className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
-                      INFOGRAPHIC 0{index + 1}
-                    </div>
-                    <div className="text-lg font-bold text-foreground">
-                      {userType.label}: {userType.count}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incid.
-                    </div>
+            return (
+              <motion.div
+                key={userType.type}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                className="absolute flex flex-col items-center gap-2 p-3 rounded-xl card-surface min-w-[120px]"
+                style={positions[index]}
+              >
+                <div 
+                  className="p-2 rounded-lg shadow-sm"
+                  style={{ backgroundColor: `${userType.color.split(' ')[1].replace('from-', '').replace('to-', '')}20` }}
+                >
+                  <Icon 
+                    className="h-4 w-4" 
+                    style={{ color: userType.color.split(' ')[1].replace('from-', '').replace('to-', '') }}
+                  />
+                </div>
+                <div className="text-center">
+                  <div className="text-xs font-medium text-foreground">
+                    {userType.label}
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                  <div className="text-xs text-muted-foreground">
+                    {userType.count} активных
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
