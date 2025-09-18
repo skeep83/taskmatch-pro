@@ -569,27 +569,27 @@ export default function AdminDashboard() {
               <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">Критические алерты</h4>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { icon: AlertTriangle, label: "Финансовые риски", count: 3, color: "text-red-600", bgColor: "bg-red-500/10" },
-                  { icon: Shield, label: "Безопасность", count: 1, color: "text-orange-600", bgColor: "bg-orange-500/10" },
-                  { icon: Clock, label: "SLA нарушения", count: 7, color: "text-amber-600", bgColor: "bg-amber-500/10" },
-                  { icon: Target, label: "Качество услуг", count: 2, color: "text-purple-600", bgColor: "bg-purple-500/10" }
+                  { icon: AlertTriangle, label: "Финансовые риски", count: 3, color: "text-red-600" },
+                  { icon: Shield, label: "Безопасность", count: 1, color: "text-orange-600" },
+                  { icon: Clock, label: "SLA нарушения", count: 7, color: "text-amber-600" },
+                  { icon: Target, label: "Качество услуг", count: 2, color: "text-purple-600" }
                 ].map((alert, index) => {
                   const Icon = alert.icon;
                   return (
                     <div
                       key={index}
-                      className="p-3 border border-border/50 rounded-lg hover:border-primary/20 transition-all duration-200 cursor-pointer group"
+                      className="p-3 rounded-2xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] hover:shadow-[3px_3px_6px_#D1D5DB,-3px_-3px_6px_#F9FAFB] transition-all duration-300 cursor-pointer group"
                     >
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <div className={`p-1.5 ${alert.bgColor} rounded-md`}>
+                          <div className="w-6 h-6 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
                             <Icon className={`h-3 w-3 ${alert.color}`} />
                           </div>
-                          <span className="text-xs font-medium">{alert.label}</span>
+                          <span className="text-xs font-medium text-gray-700">{alert.label}</span>
                         </div>
-                        <Badge variant="outline" className={`text-xs ${alert.color} border-current`}>
-                          {alert.count}
-                        </Badge>
+                        <div className="px-2 py-1 rounded-full bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
+                          <span className={`text-xs font-bold ${alert.color}`}>{alert.count}</span>
+                        </div>
                       </div>
                     </div>
                   );
