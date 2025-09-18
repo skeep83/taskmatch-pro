@@ -52,17 +52,22 @@ export const LiveVisitorsContainer = () => {
         </div>
       </div>
       
-      <div className="relative w-full h-[350px] flex items-center justify-center">
-        <CentralStatsCircle userStats={userStats} />
+      <div className="flex items-center gap-8 h-[350px]">
+        {/* Большой шар слева */}
+        <div className="flex-shrink-0">
+          <CentralStatsCircle userStats={userStats} />
+        </div>
         
-        {/* Информационные блоки вокруг диаграммы */}
-        {userTypeInfo.map((userType, index) => (
-          <UserTypeCard 
-            key={userType.type}
-            userType={userType}
-            index={index}
-          />
-        ))}
+        {/* Категории справа в стиле навигации */}
+        <div className="flex-1 space-y-3">
+          {userTypeInfo.map((userType, index) => (
+            <UserTypeCard 
+              key={userType.type}
+              userType={userType}
+              index={index}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

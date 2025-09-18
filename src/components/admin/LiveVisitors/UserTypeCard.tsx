@@ -8,37 +8,49 @@ interface UserTypeCardProps {
 
 export const UserTypeCard = ({ userType, index }: UserTypeCardProps) => {
   const Icon = userType.icon;
-  const positions = [
-    { top: '10%', right: '10%' }, // Top-right
-    { bottom: '15%', right: '5%' }, // Bottom-right  
-    { bottom: '15%', left: '5%' }, // Bottom-left
-    { top: '10%', left: '10%' }, // Top-left
-  ];
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.3 + index * 0.1 }}
-      className="absolute flex flex-col items-center gap-2 p-3 rounded-xl card-surface min-w-[120px]"
-      style={positions[index]}
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.1 + index * 0.1 }}
+      className="group flex items-center gap-4 p-4 rounded-2xl card-surface hover:shadow-lg transition-all duration-300 cursor-pointer"
     >
+      {/* Круглая иконка */}
       <div 
-        className="p-2 rounded-lg shadow-sm"
-        style={{ backgroundColor: `${userType.color.split(' ')[1].replace('from-', '').replace('to-', '')}20` }}
+        className="w-14 h-14 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300"
+        style={{ 
+          backgroundColor: `${userType.color.split(' ')[1].replace('from-', '').replace('to-', '')}15`,
+          border: `2px solid ${userType.color.split(' ')[1].replace('from-', '').replace('to-', '')}30`
+        }}
       >
         <Icon 
-          className="h-4 w-4" 
+          className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" 
           style={{ color: userType.color.split(' ')[1].replace('from-', '').replace('to-', '') }}
         />
       </div>
-      <div className="text-center">
-        <div className="text-xs font-medium text-foreground">
-          {userType.label}
+      
+      {/* Информация */}
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <h4 className="font-medium text-foreground group-hover:text-primary transition-colors duration-300">
+            {userType.label}
+          </h4>
+          <div className="flex items-center gap-2">
+            <div 
+              className="px-3 py-1 rounded-full text-sm font-medium"
+              style={{ 
+                backgroundColor: `${userType.color.split(' ')[1].replace('from-', '').replace('to-', '')}15`,
+                color: userType.color.split(' ')[1].replace('from-', '').replace('to-', '')
+              }}
+            >
+              {userType.count}
+            </div>
+          </div>
         </div>
-        <div className="text-xs text-muted-foreground">
-          {userType.count} активных
-        </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          Активных пользователей
+        </p>
       </div>
     </motion.div>
   );
