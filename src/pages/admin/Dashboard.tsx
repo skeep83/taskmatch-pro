@@ -544,7 +544,7 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="hover-scale"
+          className="hover-scale h-full"
         >
           <LiveVisitors />
         </motion.div>
@@ -554,9 +554,9 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="hover-scale"
+          className="hover-scale h-full"
         >
-          <div className="card-surface p-6 h-full">
+          <div className="card-surface p-6 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Activity className="h-5 w-5 text-primary" />
