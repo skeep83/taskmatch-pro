@@ -259,6 +259,57 @@ const DashboardPro = () => {
     }
   };
 
+  const handleTakeJob = async (jobId: string) => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const uid = session.session?.user?.id;
+      
+      if (!uid) {
+        toast({
+          title: "Ошибка",
+          description: "Пользователь не авторизован",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create job application
+      const { error: applicationError } = await supabase
+        .from("job_applications")
+        .insert({
+          job_id: jobId,
+          pro_id: uid,
+          price_cents: 0, // You might want to add a price input dialog
+          status: 'pending'
+        });
+
+      if (applicationError) {
+        console.error('Error creating job application:', applicationError);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось откликнуться на заказ",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Успешно",
+        description: "Вы откликнулись на заказ"
+      });
+
+      // Refresh the nearby jobs to remove the taken job
+      await loadNearbyJobs(uid);
+    } catch (error) {
+      console.error('Error taking job:', error);
+      toast({
+        title: "Ошибка",
+        description: "Произошла ошибка при отклике на заказ",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Loading State
   if (loading || currencyLoading) {
     return (
@@ -492,7 +543,10 @@ const DashboardPro = () => {
                               </span>
                             </div>
                           </div>
-                          <button className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full font-medium ml-2 flex-shrink-0">
+                          <button 
+                            onClick={() => handleTakeJob(job.id)}
+                            className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full font-medium ml-2 flex-shrink-0 hover:bg-primary/90 transition-colors"
+                          >
                             Взять
                           </button>
                         </div>

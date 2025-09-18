@@ -2214,33 +2214,39 @@ export type Database = {
           created_at: string
           id: string
           is_pluralized: boolean | null
+          key: string | null
           language_code: string
           namespace: string | null
           translation_key: string
           translation_value: string
           updated_at: string
+          value: string | null
         }
         Insert: {
           context?: string | null
           created_at?: string
           id?: string
           is_pluralized?: boolean | null
+          key?: string | null
           language_code: string
           namespace?: string | null
           translation_key: string
           translation_value: string
           updated_at?: string
+          value?: string | null
         }
         Update: {
           context?: string | null
           created_at?: string
           id?: string
           is_pluralized?: boolean | null
+          key?: string | null
           language_code?: string
           namespace?: string | null
           translation_key?: string
           translation_value?: string
           updated_at?: string
+          value?: string | null
         }
         Relationships: []
       }
