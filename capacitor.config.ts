@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.6e55eb01313b440fa7fe90daae1051fc',
+  appId: 'com.lovable.servicehub',
   appName: 'ServiceHub',
   webDir: 'dist',
   server: {
