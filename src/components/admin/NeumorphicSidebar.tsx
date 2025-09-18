@@ -158,7 +158,7 @@ export function NeumorphicSidebar() {
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                          style={{ backgroundColor: item.color }}
+                          style={{ backgroundColor: "#22D3EE" }}
                         />
                       )}
                     </div>
@@ -184,7 +184,7 @@ export function NeumorphicSidebar() {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         className="w-1 h-8 rounded-full"
-                        style={{ backgroundColor: item.color }}
+                        style={{ backgroundColor: "#22D3EE" }}
                       />
                     )}
                   </>
