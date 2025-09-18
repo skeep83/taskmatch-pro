@@ -52,7 +52,7 @@ export const LiveVisitorsContainer = () => {
         </div>
       </div>
       
-      <div className="relative flex items-center gap-16 h-[420px]">
+      <div className="relative flex items-center gap-24 h-[420px]">
         {/* Анимированные линии соединения */}
         <svg 
           className="absolute inset-0 w-full h-full pointer-events-none" 
@@ -72,7 +72,7 @@ export const LiveVisitorsContainer = () => {
           {userTypeInfo.map((_, index) => {
             const startX = 170; // Позиция центрального шара
             const startY = 210; // Центр по вертикали
-            const endX = 320; // Начало карточек (увеличено для нового gap)
+            const endX = 360; // Начало карточек (еще больше увеличено)
             const endY = 80 + (index * 85); // Позиция каждой карточки
             
             return (
