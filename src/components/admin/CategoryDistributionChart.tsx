@@ -94,7 +94,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
     <div className="relative w-full h-[300px] flex items-center justify-center">
       {/* Central donut chart */}
       <div className="relative">
-        <svg width="200" height="200" viewBox="-100 -100 200 200" className="drop-shadow-lg">
+        <svg width="250" height="250" viewBox="-125 -125 250 250" className="drop-shadow-lg">
           {/* Background circle */}
           <circle
             cx="0"
