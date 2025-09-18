@@ -191,18 +191,32 @@ const DashboardPro = () => {
 
   const loadRatings = async (uid: string) => {
     try {
-      const { data: ratings, error } = await supabase
-        .from("job_ratings")
-        .select("rating")
-        .eq("pro_id", uid);
+      // Use pro_rating_stats table for better performance
+      const { data: ratingStats, error } = await supabase
+        .from("pro_rating_stats")
+        .select("avg_score, rating_count")
+        .eq("pro_id", uid)
+        .single();
 
-      if (error) throw error;
-      
-      if (ratings && ratings.length > 0) {
-        const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
-        setRatingAvg(avg);
-        setRatingCount(ratings.length);
-        console.log('DashboardPro: Loaded ratings:', avg, ratings.length);
+      if (error && error.code !== 'PGRST116') {
+        // If no rating stats, get from ratings table directly
+        const { data: ratings, error: ratingsError } = await supabase
+          .from("ratings")
+          .select("score")
+          .eq("to_user_id", uid);
+          
+        if (ratingsError) throw ratingsError;
+        
+        if (ratings && ratings.length > 0) {
+          const avg = ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length;
+          setRatingAvg(avg);
+          setRatingCount(ratings.length);
+          console.log('DashboardPro: Loaded ratings from ratings table:', avg, ratings.length);
+        }
+      } else if (ratingStats) {
+        setRatingAvg(ratingStats.avg_score);
+        setRatingCount(ratingStats.rating_count);
+        console.log('DashboardPro: Loaded ratings from stats:', ratingStats.avg_score, ratingStats.rating_count);
       }
     } catch (error) {
       console.error('Error loading ratings:', error);
@@ -213,7 +227,7 @@ const DashboardPro = () => {
   const loadKycStatus = async (uid: string) => {
     try {
       const { data: kyc, error } = await supabase
-        .from("pro_kyc_documents")
+        .from("kyc_documents")
         .select("status")
         .eq("user_id", uid)
         .single();
