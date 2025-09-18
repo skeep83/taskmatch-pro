@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
-import { Building2, User, Calendar, Settings, BarChart3, Users, FileText, Briefcase, UserPlus, Gavel } from "lucide-react";
+import { Building2, User, Calendar, Settings, BarChart3, Users, FileText, Briefcase, UserPlus, Gavel, Bell, Plus, DollarSign, ArrowRight } from "lucide-react";
 import { BusinessAccountForm } from "@/components/business/BusinessAccountForm";
 import { BusinessMembers } from "@/components/business/BusinessMembers";
 import { BusinessJobs } from "@/components/business/BusinessJobs";
@@ -76,37 +76,37 @@ export default function DashboardBusiness() {
                   <Building2 className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-semibold">Бизнес-панель</h1>
-                  <p className="text-xs text-muted-foreground">Управление компанией</p>
+                  <h1 className="text-lg font-semibold">Кабинет</h1>
+                  <span className="text-xs text-muted-foreground">Бизнес</span>
                 </div>
               </div>
               <button className="p-2 rounded-full bg-secondary/50">
-                <Settings className="h-5 w-5" />
+                <Bell className="h-5 w-5" />
               </button>
             </div>
           </div>
         </div>
 
         {/* Desktop Header */}
-        <section className="hidden md:block container mx-auto py-24 px-6">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+        <section className="hidden md:block container mx-auto py-8 sm:py-16 px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-16">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-gradient">
               Бизнес-панель
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
               Управление корпоративным аккаунтом
             </p>
           </div>
         </section>
 
         <div className="container mx-auto px-4">
-          {/* Mobile Stats */}
+          {/* Mobile Stats Cards - Compact Version */}
           <div className="md:hidden mb-4">
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
                 <div className="flex items-center gap-1 mb-1">
                   <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <BarChart3 className="h-3 w-3 text-blue-600" />
+                    <DollarSign className="h-3 w-3 text-blue-600" />
                   </div>
                   <span className="text-xs text-muted-foreground">Расходы</span>
                 </div>
@@ -132,52 +132,126 @@ export default function DashboardBusiness() {
                 </div>
                 <p className="text-sm font-bold">0</p>
               </div>
+              
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-orange-100 flex items-center justify-center">
+                    <FileText className="h-3 w-3 text-orange-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Инвойсы</span>
+                </div>
+                <p className="text-sm font-bold">0</p>
+              </div>
             </div>
           </div>
 
-          {/* Mobile Quick Actions */}
-          <div className="md:hidden mb-4">
-            <div className="grid grid-cols-4 gap-2">
-              <button 
-                onClick={() => navigate("/job/new")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
-              >
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-1">
-                  <Briefcase className="h-4 w-4 text-blue-600" />
+          {/* Quick Actions */}
+          <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-12">
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => navigate("/job/new")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-xs font-medium text-center">Заказ</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Заказ</span>
               </button>
-              
-              <button 
-                onClick={() => setActiveTab("company")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
-              >
-                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mb-1">
-                  <Building2 className="h-4 w-4 text-green-600" />
+            </button>
+            
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => setActiveTab("company")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-xs font-medium text-center">Компания</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Компания</span>
               </button>
-              
-              <button 
-                onClick={() => setActiveTab("analytics")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
-              >
-                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mb-1">
-                  <BarChart3 className="h-4 w-4 text-purple-600" />
+            </button>
+            
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => setActiveTab("analytics")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-xs font-medium text-center">Отчеты</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Отчеты</span>
               </button>
-              
-              <button 
-                onClick={() => setActiveTab("invoices")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
-              >
-                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center mb-1">
-                  <FileText className="h-4 w-4 text-orange-600" />
+            </button>
+            
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => setActiveTab("invoices")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 </div>
-                <span className="text-xs font-medium text-center">Инвойсы</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Инвойсы</span>
               </button>
+            </button>
+          </div>
+
+          {/* Mobile Tabs - Simplified */}
+          <div className="md:hidden mb-6">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {[
+                { key: "overview", label: "Обзор", icon: BarChart3 },
+                { key: "company", label: "Компания", icon: Building2 },
+                { key: "jobs", label: "Заказы", icon: Briefcase },
+                { key: "analytics", label: "Отчеты", icon: BarChart3 }
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    activeTab === tab.key
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
+                >
+                  <tab.icon className="h-4 w-4" />
+                  {tab.label}
+                </button>
+              ))}
             </div>
+          </div>
+
+          {/* Mobile Content based on activeTab */}
+          <div className="md:hidden space-y-4">
+            {activeTab === "overview" && (
+              <div className="space-y-4">
+                <div className="bg-card rounded-xl p-4 shadow-sm border">
+                  <h3 className="font-semibold text-lg mb-3">Быстрые действия</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={() => navigate("/job/new")}
+                      className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      <Plus className="h-6 w-6 text-blue-600" />
+                      <span className="text-sm font-medium">Создать заказ</span>
+                    </button>
+                    <button 
+                      onClick={() => setActiveTab("analytics")}
+                      className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+                    >
+                      <BarChart3 className="h-6 w-6 text-purple-600" />
+                      <span className="text-sm font-medium">Отчеты</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "company" && (
+              <div className="space-y-4">
+                <BusinessAccountForm />
+              </div>
+            )}
+
+            {activeTab === "jobs" && (
+              <div className="space-y-4">
+                <BusinessJobs />
+              </div>
+            )}
+
+            {activeTab === "analytics" && (
+              <div className="space-y-4">
+                <BusinessAnalytics />
+              </div>
+            )}
           </div>
 
           {/* Desktop Content */}
