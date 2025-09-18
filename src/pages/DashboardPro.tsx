@@ -637,7 +637,10 @@ const DashboardPro = () => {
                             </div>
                           </div>
                           <div className="flex flex-col gap-2">
-                            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                            <button 
+                              onClick={() => navigate(`/job/${job.id}`)}
+                              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                            >
                               Откликнуться
                             </button>
                             <Link 
