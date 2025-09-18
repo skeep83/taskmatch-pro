@@ -350,25 +350,46 @@ export default function DashboardClient() {
   return (
     <RoleGuard requiredRole="client">
       <Seo title={`${t('app.name')} — ${t('client.dashboard.title')}`} description={t('client.dashboard.description')} canonical="/dashboard/client" />
-      <main className="min-h-screen">
-        {/* Header Section */}
-        <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            {t('client.dashboard.title')}
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {t('client.dashboard.welcome')}, {
-              userProfile?.full_name || 
-              (userProfile?.first_name && userProfile?.last_name 
-                ? `${userProfile.first_name} ${userProfile.last_name}` 
-                : user?.email)
-            }
-          </p>
+      <main className="min-h-screen mobile-container">
+        
+        {/* Mobile Header */}
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-semibold">Кабинет клиента</h1>
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {userProfile?.full_name || user?.email}
+                  </p>
+                </div>
+              </div>
+              <button className="p-2 rounded-full bg-secondary/50">
+                <Bell className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Main Content with Tabs */}
-        <div className="max-w-7xl mx-auto">
+        {/* Desktop Header */}
+        <section className="hidden md:block container mx-auto py-24 px-6">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+              {t('client.dashboard.title')}
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              {t('client.dashboard.welcome')}, {
+                userProfile?.full_name || 
+                (userProfile?.first_name && userProfile?.last_name 
+                  ? `${userProfile.first_name} ${userProfile.last_name}` 
+                  : user?.email)
+              }
+            </p>
+          </div>
+        </section>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
               <TabsList className="grid w-full grid-cols-7 bg-transparent">
@@ -950,7 +971,7 @@ export default function DashboardClient() {
             </TabsContent>
           </Tabs>
         </div>
-      </section>
+      </div>
     </main>
     </RoleGuard>
   );

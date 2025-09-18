@@ -65,20 +65,123 @@ export default function DashboardBusiness() {
 
   return (
     <RoleGuard requiredRole="business">
-      <main className="min-h-screen">
-        {/* Header Section */}
-        <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Бизнес-панель
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Управление корпоративным аккаунтом
-          </p>
+      <main className="min-h-screen mobile-container">
+        
+        {/* Mobile Header */}
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                  <Building2 className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-semibold">Бизнес-панель</h1>
+                  <p className="text-xs text-muted-foreground">Управление компанией</p>
+                </div>
+              </div>
+              <button className="p-2 rounded-full bg-secondary/50">
+                <Settings className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Main Content with Tabs */}
-        <div className="max-w-7xl mx-auto">
+        {/* Desktop Header */}
+        <section className="hidden md:block container mx-auto py-24 px-6">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+              Бизнес-панель
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Управление корпоративным аккаунтом
+            </p>
+          </div>
+        </section>
+
+        <div className="container mx-auto px-4">
+          {/* Mobile Stats */}
+          <div className="md:hidden mb-4">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <BarChart3 className="h-3 w-3 text-blue-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Расходы</span>
+                </div>
+                <p className="text-sm font-bold">$0.00</p>
+              </div>
+              
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center">
+                    <Users className="h-3 w-3 text-green-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Команда</span>
+                </div>
+                <p className="text-sm font-bold">0</p>
+              </div>
+              
+              <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-1">
+                  <div className="h-6 w-6 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <Briefcase className="h-3 w-3 text-purple-600" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Заказы</span>
+                </div>
+                <p className="text-sm font-bold">0</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Quick Actions */}
+          <div className="md:hidden mb-4">
+            <div className="grid grid-cols-4 gap-2">
+              <button 
+                onClick={() => navigate("/job/new")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-1">
+                  <Briefcase className="h-4 w-4 text-blue-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Заказ</span>
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab("company")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mb-1">
+                  <Building2 className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Компания</span>
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab("analytics")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mb-1">
+                  <BarChart3 className="h-4 w-4 text-purple-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Отчеты</span>
+              </button>
+              
+              <button 
+                onClick={() => setActiveTab("invoices")}
+                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+              >
+                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center mb-1">
+                  <FileText className="h-4 w-4 text-orange-600" />
+                </div>
+                <span className="text-xs font-medium text-center">Инвойсы</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Content */}
+          <div className="hidden md:block max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
               <TabsList className="grid w-full grid-cols-5 bg-transparent">
@@ -277,7 +380,7 @@ export default function DashboardBusiness() {
             </TabsContent>
           </Tabs>
         </div>
-      </section>
+      </div>
     </main>
     </RoleGuard>
   );
