@@ -641,7 +641,16 @@ export default function DashboardClient() {
                 {jobs.length > 3 && (
                   <div className="text-center pt-4">
                     <button 
-                      onClick={() => setActiveTab("jobs")}
+                      onClick={() => {
+                        setActiveTab("jobs");
+                        // Scroll to tabs section on desktop
+                        setTimeout(() => {
+                          const tabsElement = document.querySelector('[role="tablist"]');
+                          if (tabsElement) {
+                            tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }, 100);
+                      }}
                       className="inline-flex items-center gap-2 px-6 py-3 border border-primary text-primary rounded-xl hover:bg-primary/5 transition-colors"
                     >
                       Показать все {jobs.length} заказов
