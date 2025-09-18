@@ -1,5 +1,6 @@
 @import "./styles/ios.css";
 @import "./styles/android.css";
+@import "./styles/mobile-optimized.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
