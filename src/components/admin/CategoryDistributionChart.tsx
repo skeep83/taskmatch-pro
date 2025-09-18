@@ -91,14 +91,16 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
   };
 
   return (
-    <div className="relative w-full h-[300px] flex items-center justify-center">
+    <div className="relative w-full h-[400px] flex items-center justify-center">
       {/* Central donut chart */}
-      <div className="relative flex items-center gap-16">
+      <div className="relative flex items-center gap-20 w-full max-w-4xl">
         {/* Анимированные линии соединения */}
         <svg 
           className="absolute inset-0 w-full h-full pointer-events-none" 
           style={{ zIndex: 3 }}
-          viewBox="0 0 600 300"
+          viewBox="0 0 800 400"
+          width="800"
+          height="400"
         >
           <defs>
             <linearGradient id="categoryLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -108,10 +110,10 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
           </defs>
           
           {segments.slice(0, 4).map((segment, index) => {
-            const startX = 150; // Центр диаграммы
-            const startY = 150; // Центр по вертикали
-            const endX = 350; // Начало карточек категорий
-            const endY = 50 + (index * 65); // Позиция каждой карточки
+            const startX = 200; // Центр диаграммы
+            const startY = 200; // Центр по вертикали
+            const endX = 450; // Начало карточек категорий
+            const endY = 80 + (index * 80); // Позиция каждой карточки
             
             return (
               <g key={index}>
@@ -146,7 +148,8 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
           })}
         </svg>
 
-        <svg width="300" height="300" viewBox="-150 -150 300 300" className="drop-shadow-lg" style={{ zIndex: 2 }}>
+        <div className="flex-shrink-0">
+          <svg width="300" height="300" viewBox="-150 -150 300 300" className="drop-shadow-lg" style={{ zIndex: 2 }}>
           {/* Background circle */}
           <circle
             cx="0"
@@ -202,7 +205,8 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
           >
             {total}
           </text>
-        </svg>
+          </svg>
+        </div>
 
         {/* Category labels connected by lines */}
         <div className="space-y-4" style={{ zIndex: 2 }}>
