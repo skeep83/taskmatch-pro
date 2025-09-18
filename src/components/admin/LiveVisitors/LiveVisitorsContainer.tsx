@@ -30,11 +30,11 @@ export const LiveVisitorsContainer = () => {
       color: 'from-purple-500 to-purple-600',
     },
     {
-      type: 'guest',
-      count: userStats.guest,
-      label: 'Гости',
+      type: 'unregistered',
+      count: userStats.unregistered,
+      label: 'Не зарегистрированы',
       icon: UserX,
-      color: 'from-gray-500 to-gray-600',
+      color: 'from-orange-500 to-orange-600',
     }
   ];
 
@@ -56,7 +56,7 @@ export const LiveVisitorsContainer = () => {
         <CentralStatsCircle userStats={userStats} />
         
         {/* Информационные блоки вокруг диаграммы */}
-        {userTypeInfo.slice(0, 3).map((userType, index) => (
+        {userTypeInfo.map((userType, index) => (
           <UserTypeCard 
             key={userType.type}
             userType={userType}

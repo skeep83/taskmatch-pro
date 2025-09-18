@@ -17,6 +17,7 @@ export interface UserTypeStats {
   pro: number;
   business: number;
   guest: number;
+  unregistered: number;
   total: number;
 }
 

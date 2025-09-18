@@ -9,6 +9,7 @@ export const useLiveVisitors = () => {
     pro: 0,
     business: 0,
     guest: 0,
+    unregistered: 0,
     total: 0
   });
   const [channel, setChannel] = useState<any>(null);
@@ -35,6 +36,7 @@ export const useLiveVisitors = () => {
           pro: 0,
           business: 0,
           guest: 0,
+          unregistered: 0,
           total: 0
         };
 
@@ -47,13 +49,21 @@ export const useLiveVisitors = () => {
             
             // Считаем активными пользователей, которые были онлайн в последние 5 минут
             if (minutesAgo <= 5) {
-              uniqueUsers.add(presence.user_id);
+              uniqueUsers.add(presence.user_id || presence.username || 'anonymous');
               
-              const userType = presence.user_type || 'guest';
-              if (userType === 'client') stats.client++;
-              else if (userType === 'pro') stats.pro++;
-              else if (userType === 'business') stats.business++;
-              else stats.guest++;
+              const userType = presence.user_type;
+              // Если пользователь не имеет user_id (анонимный) или user_type не определен
+              if (!presence.user_id || !userType) {
+                stats.unregistered++;
+              } else if (userType === 'client') {
+                stats.client++;
+              } else if (userType === 'pro') {
+                stats.pro++;
+              } else if (userType === 'business') {
+                stats.business++;
+              } else {
+                stats.guest++;
+              }
             }
           });
         });

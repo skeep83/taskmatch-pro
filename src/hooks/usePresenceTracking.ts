@@ -13,26 +13,32 @@ export const usePresenceTracking = () => {
         // Получаем данные пользователя
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (!user) return;
+        let userType = 'unregistered';
+        let profile = null;
+        
+        if (user) {
 
-        // Получаем дополнительную информацию о пользователе
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, full_name, avatar_url')
-          .eq('id', user.id)
-          .single();
+          // Получаем дополнительную информацию о пользователе
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, full_name, avatar_url')
+            .eq('id', user.id)
+            .single();
 
-        // Получаем роли пользователя
-        const { data: roles } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id);
+          profile = profileData;
 
-        let userType = 'guest';
-        if (roles && roles.length > 0) {
-          if (roles.some(r => r.role === 'business')) userType = 'business';
-          else if (roles.some(r => r.role === 'pro')) userType = 'pro';
-          else if (roles.some(r => r.role === 'client')) userType = 'client';
+          // Получаем роли пользователя
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
+
+          userType = 'guest';
+          if (roles && roles.length > 0) {
+            if (roles.some(r => r.role === 'business')) userType = 'business';
+            else if (roles.some(r => r.role === 'pro')) userType = 'pro';
+            else if (roles.some(r => r.role === 'client')) userType = 'client';
+          }
         }
 
         // Создаем или переиспользуем канал
@@ -127,12 +133,18 @@ export const usePresenceTracking = () => {
       } else {
         // Пользователь вернулся на вкладку
         const { data: { user } } = await supabase.auth.getUser();
+        
+        let userType = 'unregistered';
+        let profile = null;
+        
         if (user && channelRef.current) {
-          const { data: profile } = await supabase
+          const { data: profileData } = await supabase
             .from('profiles')
             .select('first_name, last_name, full_name, avatar_url')
             .eq('id', user.id)
             .single();
+
+          profile = profileData;
 
           // Получаем роли пользователя
           const { data: roles } = await supabase
@@ -140,7 +152,7 @@ export const usePresenceTracking = () => {
             .select('role')
             .eq('user_id', user.id);
 
-          let userType = 'guest';
+          userType = 'guest';
           if (roles && roles.length > 0) {
             if (roles.some(r => r.role === 'business')) userType = 'business';
             else if (roles.some(r => r.role === 'pro')) userType = 'pro';
@@ -148,18 +160,39 @@ export const usePresenceTracking = () => {
           }
 
           const presenceData = {
-            user_id: user.id,
-            username: profile?.full_name || 
-                     `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() ||
-                     user.email?.split('@')[0] ||
-                     'Пользователь',
-            avatar_url: profile?.avatar_url,
+            user_id: user?.id || null,
+            username: user ? (
+              profile?.full_name || 
+              `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() ||
+              user.email?.split('@')[0] ||
+              'Пользователь'
+            ) : `Guest_${Date.now()}`,
+            avatar_url: profile?.avatar_url || null,
             page: location.pathname,
             joined_at: new Date().toISOString(),
             last_seen: new Date().toISOString(),
             user_agent: navigator.userAgent,
             location: getPageTitle(location.pathname),
-            user_type: userType
+            user_type: userType,
+            is_authenticated: !!user
+          };
+
+          if (channelRef.current) {
+            await channelRef.current.track(presenceData);
+          }
+        } else if (!user && channelRef.current) {
+          // Незарегистрированный пользователь вернулся на вкладку
+          const presenceData = {
+            user_id: null,
+            username: `Guest_${Date.now()}`,
+            avatar_url: null,
+            page: location.pathname,
+            joined_at: new Date().toISOString(),
+            last_seen: new Date().toISOString(),
+            user_agent: navigator.userAgent,
+            location: getPageTitle(location.pathname),
+            user_type: 'unregistered',
+            is_authenticated: false
           };
 
           await channelRef.current.track(presenceData);

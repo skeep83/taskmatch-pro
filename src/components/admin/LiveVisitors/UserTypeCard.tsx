@@ -12,6 +12,7 @@ export const UserTypeCard = ({ userType, index }: UserTypeCardProps) => {
     { top: '10%', right: '10%' }, // Top-right
     { bottom: '15%', right: '5%' }, // Bottom-right  
     { bottom: '15%', left: '5%' }, // Bottom-left
+    { top: '10%', left: '10%' }, // Top-left
   ];
 
   return (
