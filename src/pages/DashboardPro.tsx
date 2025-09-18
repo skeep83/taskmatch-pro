@@ -279,50 +279,50 @@ const DashboardPro = () => {
       </section>
 
       <div className="container mx-auto px-4">
-        {/* Mobile Stats Cards - Horizontal Scrollable */}
-        <div className="md:hidden mb-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center">
-                  <Wallet className="h-4 w-4 text-green-600" />
+        {/* Mobile Stats Cards - Compact Version */}
+        <div className="md:hidden mb-4">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+              <div className="flex items-center gap-1 mb-1">
+                <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center">
+                  <Wallet className="h-3 w-3 text-green-600" />
                 </div>
+                <span className="text-xs text-muted-foreground">Баланс</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-1">Баланс</p>
-              <p className="text-lg font-bold">{formatPrice(walletBalance)}</p>
+              <p className="text-sm font-bold">{formatPrice(walletBalance)}</p>
             </div>
             
-            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-8 w-8 rounded-lg bg-yellow-100 flex items-center justify-center">
-                  <Star className="h-4 w-4 text-yellow-600" />
+            <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+              <div className="flex items-center gap-1 mb-1">
+                <div className="h-6 w-6 rounded-lg bg-yellow-100 flex items-center justify-center">
+                  <Star className="h-3 w-3 text-yellow-600" />
                 </div>
+                <span className="text-xs text-muted-foreground">Рейтинг</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-1">Рейтинг</p>
               <div className="flex items-center gap-1">
-                <span className="text-lg font-bold">{ratingAvg?.toFixed(1) || '—'}</span>
+                <span className="text-sm font-bold">{ratingAvg?.toFixed(1) || '—'}</span>
                 <span className="text-xs text-muted-foreground">({ratingCount})</span>
               </div>
             </div>
             
-            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Award className="h-4 w-4 text-blue-600" />
+            <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+              <div className="flex items-center gap-1 mb-1">
+                <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Award className="h-3 w-3 text-blue-600" />
                 </div>
+                <span className="text-xs text-muted-foreground">Выполнено</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-1">Выполнено</p>
-              <p className="text-lg font-bold">{completedJobs}</p>
+              <p className="text-sm font-bold">{completedJobs}</p>
             </div>
             
-            <div className="flex-shrink-0 w-36 bg-card rounded-2xl p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                  <Clock className="h-4 w-4 text-purple-600" />
+            <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
+              <div className="flex items-center gap-1 mb-1">
+                <div className="h-6 w-6 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <Clock className="h-3 w-3 text-purple-600" />
                 </div>
+                <span className="text-xs text-muted-foreground">Ответ</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-1">Ответ</p>
-              <p className="text-sm font-bold">{responseTime}</p>
+              <p className="text-xs font-bold">{responseTime}</p>
             </div>
           </div>
         </div>
@@ -437,54 +437,53 @@ const DashboardPro = () => {
             </button>
           </div>
 
-        {/* Mobile Content */}
-        <div className="md:hidden space-y-6">
-          {/* Available Jobs - Mobile Card */}
-          <div className="bg-card rounded-2xl shadow-sm border">
-            <div className="p-4 border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <Briefcase className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <h2 className="text-lg font-semibold">Доступные заказы</h2>
+        {/* Mobile Content - Streamlined */}
+        <div className="md:hidden space-y-4">
+          {/* Available Jobs */}
+          <div className="bg-card rounded-xl shadow-sm border">
+            <div className="flex items-center justify-between p-3 border-b">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Briefcase className="h-3 w-3 text-blue-600" />
                 </div>
-                <span className="text-sm text-muted-foreground">{nearbyJobs.length}</span>
+                <h2 className="text-sm font-semibold">Доступные заказы</h2>
               </div>
+              <span className="text-xs text-muted-foreground">{nearbyJobs.length}</span>
             </div>
-            <div className="p-1">
+            <div className="p-2">
               {nearbyJobs.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="h-12 w-12 rounded-full bg-secondary/50 mx-auto mb-3 flex items-center justify-center">
-                    <Briefcase className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <h3 className="font-medium mb-1">Нет заказов</h3>
-                  <p className="text-sm text-muted-foreground">Проверьте позже</p>
+                <div className="text-center py-6">
+                  <p className="text-sm text-muted-foreground">Нет новых заказов</p>
+                  <Link to="/feed" className="text-xs text-primary font-medium mt-1 inline-block">
+                    Посмотреть все
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-1">
-                  {nearbyJobs.slice(0, 3).map((job) => (
-                    <div key={job.id} className="p-3 rounded-xl hover:bg-secondary/30 transition-colors">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-sm line-clamp-2">{job.description}</h4>
-                        <span className="text-xs text-green-600 font-medium ml-2 flex-shrink-0">
-                          {formatPrice(job.budget_min_cents)} - {formatPrice(job.budget_max_cents)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Сегодня'}
-                        </span>
-                        <button className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full font-medium">
-                          Откликнуться
+                  {nearbyJobs.slice(0, 2).map((job) => (
+                    <div key={job.id} className="p-2 rounded-lg hover:bg-secondary/30 transition-colors">
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium line-clamp-1">{job.description}</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-green-600 font-medium">
+                              {formatPrice(job.budget_min_cents)}-{formatPrice(job.budget_max_cents)}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Сегодня'}
+                            </span>
+                          </div>
+                        </div>
+                        <button className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full font-medium ml-2 flex-shrink-0">
+                          Взять
                         </button>
                       </div>
                     </div>
                   ))}
-                  {nearbyJobs.length > 3 && (
-                    <div className="p-3 text-center">
-                      <Link to="/feed" className="text-sm text-primary font-medium">
-                        Показать все {nearbyJobs.length} заказов
+                  {nearbyJobs.length > 2 && (
+                    <div className="pt-2 text-center border-t">
+                      <Link to="/feed" className="text-xs text-primary font-medium">
+                        Еще {nearbyJobs.length - 2} заказов
                       </Link>
                     </div>
                   )}
@@ -493,57 +492,56 @@ const DashboardPro = () => {
             </div>
           </div>
 
-          {/* My Active Jobs - Mobile Card */}
-          <div className="bg-card rounded-2xl shadow-sm border">
-            <div className="p-4 border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center">
-                    <Clock className="h-4 w-4 text-green-600" />
-                  </div>
-                  <h2 className="text-lg font-semibold">Мои заказы</h2>
+          {/* My Active Jobs */}
+          <div className="bg-card rounded-xl shadow-sm border">
+            <div className="flex items-center justify-between p-3 border-b">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center">
+                  <Clock className="h-3 w-3 text-green-600" />
                 </div>
-                <span className="text-sm text-muted-foreground">{myActiveJobs.length}</span>
+                <h2 className="text-sm font-semibold">В работе</h2>
               </div>
+              <span className="text-xs text-muted-foreground">{myActiveJobs.length}</span>
             </div>
-            <div className="p-1">
+            <div className="p-2">
               {myActiveJobs.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="h-12 w-12 rounded-full bg-secondary/50 mx-auto mb-3 flex items-center justify-center">
-                    <Clock className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <h3 className="font-medium mb-1">Нет активных заказов</h3>
-                  <p className="text-sm text-muted-foreground">Откликнитесь на заказы</p>
+                <div className="text-center py-6">
+                  <p className="text-sm text-muted-foreground">Нет активных заказов</p>
                 </div>
               ) : (
                 <div className="space-y-1">
-                  {myActiveJobs.slice(0, 3).map((job) => (
-                    <div key={job.id} className="p-3 rounded-xl hover:bg-secondary/30 transition-colors">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-sm line-clamp-2">{job.description}</h4>
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          job.status === 'accepted' ? 'bg-yellow-100 text-yellow-800' :
-                          job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {job.status === 'accepted' ? 'Принят' :
-                           job.status === 'in_progress' ? 'В работе' : 'Выполнен'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Сегодня'}
-                        </span>
-                        <button className="text-xs bg-secondary text-secondary-foreground px-3 py-1 rounded-full font-medium">
-                          Подробнее
-                        </button>
+                  {myActiveJobs.slice(0, 2).map((job) => (
+                    <div key={job.id} className="p-2 rounded-lg hover:bg-secondary/30 transition-colors">
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium line-clamp-1">{job.description}</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                              job.status === 'accepted' ? 'bg-yellow-100 text-yellow-800' :
+                              job.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {job.status === 'accepted' ? 'Принят' :
+                               job.status === 'in_progress' ? 'В работе' : 'Выполнен'}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {job.scheduled_at ? new Date(job.scheduled_at).toLocaleDateString() : 'Сегодня'}
+                            </span>
+                          </div>
+                        </div>
+                        <Link 
+                          to={`/job/${job.id}`}
+                          className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full font-medium ml-2 flex-shrink-0"
+                        >
+                          Открыть
+                        </Link>
                       </div>
                     </div>
                   ))}
-                  {myActiveJobs.length > 3 && (
-                    <div className="p-3 text-center">
-                      <span className="text-sm text-primary font-medium">
-                        Показать все {myActiveJobs.length} заказов
+                  {myActiveJobs.length > 2 && (
+                    <div className="pt-2 text-center border-t">
+                      <span className="text-xs text-primary font-medium">
+                        Еще {myActiveJobs.length - 2} заказов
                       </span>
                     </div>
                   )}
@@ -552,39 +550,33 @@ const DashboardPro = () => {
             </div>
           </div>
 
-          {/* Analytics & Tips - Mobile */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-card rounded-2xl p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                  <BarChart3 className="h-4 w-4 text-purple-600" />
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-card rounded-xl p-3 shadow-sm border">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <BarChart3 className="h-3 w-3 text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-sm">Статистика</h3>
+                <h3 className="text-sm font-semibold">Статистика</h3>
               </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Заработок</span>
-                  <span className="font-medium">{formatPrice(monthlyEarnings)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Тендеры</span>
-                  <span className="font-medium">{tenders.length}</span>
-                </div>
+              <div className="text-xs text-muted-foreground">
+                Заработок: <span className="font-medium text-foreground">{formatPrice(monthlyEarnings)}</span>
               </div>
             </div>
 
-            <div className="bg-card rounded-2xl p-4 shadow-sm border">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center">
-                  <Zap className="h-4 w-4 text-orange-600" />
+            <div className="bg-card rounded-xl p-3 shadow-sm border">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-6 w-6 rounded-lg bg-orange-100 flex items-center justify-center">
+                  <Zap className="h-3 w-3 text-orange-600" />
                 </div>
-                <h3 className="font-semibold text-sm">Советы</h3>
+                <h3 className="text-sm font-semibold">Тендеры</h3>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Отвечайте быстро и загружайте фото работ для лучшего рейтинга
-              </p>
+              <div className="text-xs text-muted-foreground">
+                Активных: <span className="font-medium text-foreground">{tenders.length}</span>
+              </div>
             </div>
           </div>
+        </div>
         </div>
 
         {/* Desktop Content */}
@@ -798,7 +790,6 @@ const DashboardPro = () => {
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </div>
       </div>

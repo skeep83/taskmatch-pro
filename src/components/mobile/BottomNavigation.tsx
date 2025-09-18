@@ -25,9 +25,9 @@ export const BottomNavigation = () => {
     },
     {
       icon: Search,
-      label: "Поиск",
-      href: "/catalog",
-      isActive: location.pathname === "/catalog"
+      label: "Заказы",
+      href: "/feed",
+      isActive: location.pathname === "/feed"
     },
     {
       icon: Plus,
@@ -37,7 +37,7 @@ export const BottomNavigation = () => {
     },
     {
       icon: MessageCircle,
-      label: "Сообщения",
+      label: "Чаты",
       href: "/messages",
       badge: unreadCount > 0 ? unreadCount.toString() : undefined,
       isActive: location.pathname === "/messages"
@@ -46,7 +46,7 @@ export const BottomNavigation = () => {
       icon: User,
       label: "Профиль",
       href: "/profile/settings",
-      isActive: location.pathname.startsWith("/profile")
+      isActive: location.pathname.startsWith("/profile") || location.pathname.startsWith("/dashboard")
     }
   ];
 
