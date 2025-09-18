@@ -300,7 +300,7 @@ const HowItWorks = () => {
                     icon={feature.icon}
                     size={80}
                     variant="behance"
-                    className="mx-auto animate-spin-slow"
+                    className="mx-auto animate-bounce"
                   />
                 </div>
                 
