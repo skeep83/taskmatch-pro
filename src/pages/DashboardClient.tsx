@@ -45,8 +45,12 @@ import {
   XCircle,
   Zap,
   Edit,
-  Trash2
+  Trash2,
+  UserCog,
+  ArrowRight,
+  Search
 } from "lucide-react";
+import { StarRating } from "@/components/ui/star-rating";
 interface Job {
   id: string;
   title: string;
@@ -349,8 +353,8 @@ export default function DashboardClient() {
 
   return (
     <RoleGuard requiredRole="client">
-      <Seo title={`${t('app.name')} — ${t('client.dashboard.title')}`} description={t('client.dashboard.description')} canonical="/dashboard/client" />
       <main className="min-h-screen mobile-container">
+        <Seo title={`${t('app.name')} — Кабинет клиента`} description="Client dashboard" canonical="/dashboard/client" />
         
         {/* Mobile Header */}
         <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
@@ -358,13 +362,11 @@ export default function DashboardClient() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary-foreground" />
+                  <UserCog className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-semibold">Кабинет клиента</h1>
-                  <p className="text-xs text-muted-foreground line-clamp-1">
-                    {userProfile?.full_name || user?.email}
-                  </p>
+                  <h1 className="text-lg font-semibold">Кабинет</h1>
+                  <span className="text-xs text-muted-foreground">Клиент</span>
                 </div>
               </div>
               <button className="p-2 rounded-full bg-secondary/50">
@@ -375,24 +377,19 @@ export default function DashboardClient() {
         </div>
 
         {/* Desktop Header */}
-        <section className="hidden md:block container mx-auto py-24 px-6">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-              {t('client.dashboard.title')}
+        <section className="hidden md:block container mx-auto py-8 sm:py-16 px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-16">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-gradient">
+              Кабинет клиента
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              {t('client.dashboard.welcome')}, {
-                userProfile?.full_name || 
-                (userProfile?.first_name && userProfile?.last_name 
-                  ? `${userProfile.first_name} ${userProfile.last_name}` 
-                  : user?.email)
-              }
+            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Управляйте заказами и находите специалистов
             </p>
           </div>
         </section>
-        
+
         <div className="container mx-auto px-4">
-          {/* Mobile Stats */}
+          {/* Mobile Stats Cards - Compact Version */}
           <div className="md:hidden mb-4">
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
@@ -400,9 +397,9 @@ export default function DashboardClient() {
                   <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
                     <Briefcase className="h-3 w-3 text-blue-600" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Заказы</span>
+                  <span className="text-xs text-muted-foreground">Активные</span>
                 </div>
-                <p className="text-sm font-bold">{stats.totalJobs}</p>
+                <p className="text-sm font-bold">{stats.activeJobs}</p>
               </div>
               
               <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
@@ -410,9 +407,9 @@ export default function DashboardClient() {
                   <div className="h-6 w-6 rounded-lg bg-green-100 flex items-center justify-center">
                     <CheckCircle className="h-3 w-3 text-green-600" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Активно</span>
+                  <span className="text-xs text-muted-foreground">Готово</span>
                 </div>
-                <p className="text-sm font-bold">{stats.activeJobs}</p>
+                <p className="text-sm font-bold">{stats.completedJobs}</p>
               </div>
               
               <div className="flex-shrink-0 w-28 bg-card rounded-xl p-3 shadow-sm border">
@@ -432,53 +429,249 @@ export default function DashboardClient() {
                   </div>
                   <span className="text-xs text-muted-foreground">Рейтинг</span>
                 </div>
-                <p className="text-sm font-bold">{stats.averageRating || '—'}</p>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-bold">{stats.averageRating?.toFixed(1) || '—'}</span>
+                  <span className="text-xs text-muted-foreground">(0)</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Mobile Quick Actions */}
-          <div className="md:hidden mb-4">
-            <div className="grid grid-cols-4 gap-2">
-              <button 
-                onClick={() => navigate("/job/new")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
-              >
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-1">
-                  <Plus className="h-4 w-4 text-blue-600" />
+          {/* Desktop Stats Grid */}
+          <div className="hidden md:block max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
+              <div className="card-surface p-4 sm:p-6">
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Активные заказы</p>
+                    <p className="text-lg sm:text-2xl font-bold">{stats.activeJobs}</p>
+                  </div>
+                  <NeumorphicIcon icon={Briefcase} size={48} variant="behance" className="flex-shrink-0 ml-2" />
                 </div>
-                <span className="text-xs font-medium text-center">Заказ</span>
-              </button>
+              </div>
               
+              <div className="card-surface p-4 sm:p-6">
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Завершено</p>
+                    <p className="text-lg sm:text-2xl font-bold">{stats.completedJobs}</p>
+                  </div>
+                  <NeumorphicIcon icon={CheckCircle} size={48} variant="behance" className="flex-shrink-0 ml-2" />
+                </div>
+              </div>
+              
+              <div className="card-surface p-4 sm:p-6">
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Потрачено</p>
+                    <p className="text-lg sm:text-2xl font-bold truncate">{formatCurrency(stats.totalSpent)}</p>
+                  </div>
+                  <NeumorphicIcon icon={DollarSign} size={48} variant="behance" className="flex-shrink-0 ml-2" />
+                </div>
+              </div>
+              
+              <div className="card-surface p-4 sm:p-6">
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Рейтинг</p>
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <StarRating 
+                        rating={stats.averageRating || 0} 
+                        size="sm" 
+                        showValue 
+                        showCount={false}
+                      />
+                      <span className="text-xs sm:text-sm text-muted-foreground">(0)</span>
+                    </div>
+                  </div>
+                  <NeumorphicIcon icon={Star} size={48} variant="behance" className="flex-shrink-0 ml-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-12">
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => navigate("/catalog")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Search className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Поиск</span>
+              </button>
+            </button>
+            
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => navigate("/job/new")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Заказ</span>
+              </button>
+            </button>
+            
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => navigate("/messages")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Чаты</span>
+              </button>
+            </button>
+            
+            <button className="p-3 sm:p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl touch-manipulation">
+              <button onClick={() => navigate("/profile/settings")} className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Настройки</span>
+              </button>
+            </button>
+          </div>
+
+          {/* My Jobs Section */}
+          <div className="mb-8 sm:mb-12">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-display font-bold">Мои заказы</h2>
               <button 
                 onClick={() => setActiveTab("jobs")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
+                className="text-sm sm:text-base text-primary hover:underline flex items-center gap-1"
               >
-                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mb-1">
-                  <Briefcase className="h-4 w-4 text-green-600" />
-                </div>
-                <span className="text-xs font-medium text-center">Мои</span>
+                Все заказы
+                <motion.div whileHover={{ x: 2 }}>
+                  <NeumorphicIcon icon={ArrowRight} size={16} />
+                </motion.div>
               </button>
-              
-              <button 
-                onClick={() => setActiveTab("tenders")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
-              >
-                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mb-1">
-                  <Gavel className="h-4 w-4 text-purple-600" />
+            </div>
+            
+            {jobs.length === 0 ? (
+              <div className="card-surface p-8 sm:p-12 text-center">
+                <NeumorphicIcon icon={Briefcase} size={64} className="mx-auto mb-4" />
+                <h3 className="text-lg sm:text-xl font-display font-bold mb-2">У вас пока нет заказов</h3>
+                <p className="text-muted-foreground mb-6">Создайте свой первый заказ и найдите идеального специалиста</p>
+                <button 
+                  onClick={() => navigate("/job/new")}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                >
+                  <Plus className="h-5 w-5" />
+                  Создать заказ
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4 sm:space-y-6">
+                {jobs.slice(0, 3).map(job => (
+                  <motion.div
+                    key={job.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="md:hidden"
+                  >
+                    <div className="bg-card rounded-xl p-4 shadow-sm border">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm truncate">{job.title}</h3>
+                          <p className="text-xs text-muted-foreground">{job.categories?.label_ru}</p>
+                        </div>
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          job.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                          job.status === 'accepted' ? 'bg-orange-100 text-orange-700' :
+                          job.status === 'in_progress' ? 'bg-purple-100 text-purple-700' :
+                          job.status === 'done' ? 'bg-green-100 text-green-700' :
+                          'bg-gray-100 text-gray-700'
+                        }`}>
+                          {job.status === 'new' ? 'Новый' :
+                           job.status === 'accepted' ? 'Принят' :
+                           job.status === 'in_progress' ? 'В работе' :
+                           job.status === 'done' ? 'Готов' : job.status}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold">
+                          {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                        </span>
+                        <button 
+                          onClick={() => navigate(`/job/${job.id}`)}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Подробнее
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                <div className="hidden md:block space-y-4">
+                  {jobs.slice(0, 3).map(job => (
+                    <motion.div
+                      key={job.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="card-surface p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => navigate(`/job/${job.id}`)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-display font-bold text-lg mb-2 truncate">{job.title}</h3>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span>{job.categories?.label_ru}</span>
+                            <span>•</span>
+                            <span>{formatPrice(job.budget_min_cents, job.budget_max_cents)}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 ml-4">
+                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            job.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                            job.status === 'accepted' ? 'bg-orange-100 text-orange-700' :
+                            job.status === 'in_progress' ? 'bg-purple-100 text-purple-700' :
+                            job.status === 'done' ? 'bg-green-100 text-green-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {job.status === 'new' ? 'Новый' :
+                             job.status === 'accepted' ? 'Принят' :
+                             job.status === 'in_progress' ? 'В работе' :
+                             job.status === 'done' ? 'Готов' : job.status}
+                          </div>
+                          <NeumorphicIcon icon={ArrowRight} size={24} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <span className="text-xs font-medium text-center">Тендеры</span>
-              </button>
-              
-              <button 
-                onClick={() => setActiveTab("settings")}
-                className="flex flex-col items-center p-2 rounded-lg hover:bg-secondary/50 transition-colors touch-manipulation"
-              >
-                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center mb-1">
-                  <Settings className="h-4 w-4 text-orange-600" />
+
+                {jobs.length > 3 && (
+                  <div className="text-center pt-4">
+                    <button 
+                      onClick={() => setActiveTab("jobs")}
+                      className="inline-flex items-center gap-2 px-6 py-3 border border-primary text-primary rounded-xl hover:bg-primary/5 transition-colors"
+                    >
+                      Показать все {jobs.length} заказов
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Upgrade to Pro Card */}
+          <div className="mb-8 sm:mb-12">
+            <div className="card-surface p-6 sm:p-8 bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20">
+              <div className="flex items-start gap-4">
+                <NeumorphicIcon icon={Star} size={48} className="flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg sm:text-xl font-display font-bold mb-2">Станьте специалистом</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4">
+                    Получайте заказы и зарабатывайте на своих навыках. Присоединяйтесь к тысячам профессионалов на ServiceHub.
+                  </p>
+                  <button 
+                    onClick={() => navigate("/role/upgrade?target=pro")}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    <Zap className="h-5 w-5" />
+                    Стать специалистом
+                  </button>
                 </div>
-                <span className="text-xs font-medium text-center">Профиль</span>
-              </button>
+              </div>
             </div>
           </div>
 
