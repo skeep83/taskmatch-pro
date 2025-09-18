@@ -18,6 +18,7 @@ import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
 import { DatabaseI18nProvider } from "./i18n/DatabaseI18n";
 import Diagnostics from "./components/Diagnostics";
+import { usePresenceTracking } from "./hooks/usePresenceTracking";
 
 // Lazy-loaded pages for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
@@ -63,6 +64,9 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
+  
+  // Отслеживаем присутствие пользователя на платформе
+  usePresenceTracking();
   
   return (
     <>
