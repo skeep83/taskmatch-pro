@@ -379,7 +379,7 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-blue-500"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
                     />
                   )}
                 </TabsTrigger>
@@ -390,7 +390,7 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-purple-500"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
                     />
                   )}
                 </TabsTrigger>
@@ -401,7 +401,7 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-500"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
                     />
                   )}
                 </TabsTrigger>
@@ -412,7 +412,7 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-yellow-500"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
                     />
                   )}
                 </TabsTrigger>
@@ -423,7 +423,7 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-500"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
                     />
                   )}
                 </TabsTrigger>
@@ -434,7 +434,7 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-pink-500"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
                     />
                   )}
                 </TabsTrigger>
@@ -445,7 +445,7 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gray-500"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
                     />
                   )}
                 </TabsTrigger>
