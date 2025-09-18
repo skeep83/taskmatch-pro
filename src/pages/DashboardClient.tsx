@@ -379,7 +379,8 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
                     />
                   )}
                 </TabsTrigger>
@@ -390,7 +391,8 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
                     />
                   )}
                 </TabsTrigger>
@@ -401,7 +403,8 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
                     />
                   )}
                 </TabsTrigger>
@@ -412,7 +415,8 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
                     />
                   )}
                 </TabsTrigger>
@@ -423,7 +427,8 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
                     />
                   )}
                 </TabsTrigger>
@@ -434,7 +439,8 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
                     />
                   )}
                 </TabsTrigger>
@@ -445,7 +451,8 @@ export default function DashboardClient() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: "#22D3EE" }}
                     />
                   )}
                 </TabsTrigger>
