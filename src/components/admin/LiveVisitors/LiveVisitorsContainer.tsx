@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, User, Briefcase, Building, UserX } from 'lucide-react';
 import { useLiveVisitors } from '@/hooks/useLiveVisitors';
 import { CentralStatsCircle } from './CentralStatsCircle';
@@ -40,35 +39,31 @@ export const LiveVisitorsContainer = () => {
   ];
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-green-500/10 rounded-lg">
-            <Eye className="h-5 w-5 text-green-600" />
-          </div>
-          <div>
-            <CardTitle className="text-lg">Live Посетители</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Активные пользователи по типам
-            </p>
-          </div>
+    <div className="card-surface p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-cyan-500/10 rounded-lg">
+          <Eye className="h-5 w-5 text-cyan-600" />
         </div>
-      </CardHeader>
+        <div>
+          <h3 className="font-semibold">Live Посетители</h3>
+          <p className="text-sm text-muted-foreground">
+            Активные пользователи по типам
+          </p>
+        </div>
+      </div>
       
-      <CardContent className="p-6">
-        <div className="relative w-full h-[350px] flex items-center justify-center">
-          <CentralStatsCircle userStats={userStats} />
-          
-          {/* Информационные блоки вокруг диаграммы */}
-          {userTypeInfo.slice(0, 3).map((userType, index) => (
-            <UserTypeCard 
-              key={userType.type}
-              userType={userType}
-              index={index}
-            />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+      <div className="relative w-full h-[350px] flex items-center justify-center">
+        <CentralStatsCircle userStats={userStats} />
+        
+        {/* Информационные блоки вокруг диаграммы */}
+        {userTypeInfo.slice(0, 3).map((userType, index) => (
+          <UserTypeCard 
+            key={userType.type}
+            userType={userType}
+            index={index}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
