@@ -9,7 +9,7 @@ import { useState } from "react";
 import { 
   Search, MessageSquare, CreditCard, Star, Users, Shield, Zap, CheckCircle,
   ArrowRight, Sparkles, Globe, Clock, Award, TrendingUp, Heart, Target,
-  ChevronDown, Play, Phone, Mail, MapPin, Eye, Lock, Coins
+  ChevronDown, Play, Phone, Mail, MapPin, Eye, Lock, Coins, Settings
 } from "lucide-react";
 import servicesHero from "@/assets/services-hero.jpg";
 import securityImg from "@/assets/features/security.jpg";
@@ -160,8 +160,12 @@ const HowItWorks = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <div className="flex justify-center mb-8">
-              <div className="w-32 h-32 rounded-3xl bg-[#E5E7EB] shadow-[inset_12px_12px_24px_#D1D5DB,inset_-12px_-12px_24px_#F9FAFB] flex items-center justify-center">
-                <Sparkles className="h-16 w-16 text-primary" />
+              <div className="w-32 h-32 rounded-3xl bg-[#E5E7EB] shadow-[inset_12px_12px_24px_#D1D5DB,inset_-12px_-12px_24px_#F9FAFB] flex items-center justify-center relative">
+                <div className="relative">
+                  <Settings className="h-16 w-16 text-primary animate-spin-slow" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-cyan-400 animate-pulse"></div>
+                  <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full bg-primary animate-ping"></div>
+                </div>
               </div>
             </div>
             
