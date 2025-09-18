@@ -386,5 +386,26 @@ All colors MUST be HSL.
   .animate-heartbeat {
     animation: heartbeat 1.5s ease-in-out infinite;
   }
+  
+  /* Live Visitors Connection Lines */
+  @keyframes fadeInLine {
+    0% {
+      opacity: 0;
+      stroke-dashoffset: 100;
+    }
+    100% {
+      opacity: 1;
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  @keyframes dashFlow {
+    0% {
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dashoffset: 20;
+    }
+  }
 }
 
