@@ -8,6 +8,7 @@ import { JobResponseForm } from '@/components/JobResponseForm';
 import { PriceProposalForm } from '@/components/PriceProposalForm';
 import { JobStatusProgress } from '@/components/JobStatusProgress';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
+import { MobileContainer } from '@/components/mobile/MobileContainer';
 import interestedInJobImage from '@/assets/interested-in-job.png';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -575,15 +576,237 @@ const JobDetail = () => {
   }
 
   return (
-    <main className="min-h-screen">
-      <Seo 
-        title={`Заказ: ${job.title}`} 
-        description={job.description} 
-        canonical={`/job/${job.id}`} 
-      />
+    <MobileContainer withBottomNav={true} className="bg-background">
+      <main className="min-h-screen">
+        <Seo 
+          title={`Заказ: ${job.title}`} 
+          description={job.description} 
+          canonical={`/job/${job.id}`} 
+        />
 
-      {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
+        {/* Mobile Header */}
+        <div className="md:hidden bg-white border-b sticky top-0 z-50">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  if (userRole === 'pro') {
+                    navigate('/dashboard/pro');
+                  } else if (userRole === 'client') {
+                    navigate('/dashboard/client');
+                  } else {
+                    navigate('/feed');
+                  }
+                }}
+                className="h-10 w-10 p-0"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-lg font-semibold line-clamp-1">{job.title}</h1>
+                <div className="flex items-center gap-2">
+                  {getStatusBadge(job.status)}
+                  <span className="text-sm text-muted-foreground">
+                    {formatDistanceToNow(new Date(job.created_at), { 
+                      addSuffix: true, 
+                      locale: ru 
+                    })}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {canEdit && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate(`/job/${job.id}/edit`)}
+                  className="h-8 px-3"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Content */}
+        <div className="md:hidden p-4 space-y-4">
+          {/* Job Description */}
+          <div className="bg-card rounded-xl p-4 shadow-sm border">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
+                <MessageSquare className="h-3 w-3 text-blue-600" />
+              </div>
+              <h2 className="text-sm font-semibold">Описание заказа</h2>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{job.description}</p>
+          </div>
+
+          {/* Job Details */}
+          <div className="grid grid-cols-2 gap-3">
+            {(job.budget_min_cents || job.budget_max_cents) && (
+              <div className="bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-2">
+                  <div className="h-5 w-5 rounded-lg bg-green-100 flex items-center justify-center">
+                    <DollarSign className="h-3 w-3 text-green-600" />
+                  </div>
+                  <h3 className="text-sm font-semibold">Бюджет</h3>
+                </div>
+                <p className="text-sm font-medium text-green-600">
+                  {job.budget_min_cents && job.budget_max_cents
+                    ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
+                    : job.budget_min_cents
+                    ? `от ${formatPrice(job.budget_min_cents)}`
+                    : job.budget_max_cents
+                    ? `до ${formatPrice(job.budget_max_cents)}`
+                    : 'Договорная'}
+                </p>
+              </div>
+            )}
+
+            {job.location_address && (
+              <div className="bg-card rounded-xl p-3 shadow-sm border">
+                <div className="flex items-center gap-1 mb-2">
+                  <div className="h-5 w-5 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <MapPin className="h-3 w-3 text-purple-600" />
+                  </div>
+                  <h3 className="text-sm font-semibold">Адрес</h3>
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2">{job.location_address}</p>
+              </div>
+            )}
+          </div>
+
+          {job.scheduled_at && (
+            <div className="bg-card rounded-xl p-3 shadow-sm border">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-5 w-5 rounded-lg bg-orange-100 flex items-center justify-center">
+                  <Calendar className="h-3 w-3 text-orange-600" />
+                </div>
+                <h3 className="text-sm font-semibold">Запланировано</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {new Date(job.scheduled_at).toLocaleString('ru-RU')}
+              </p>
+            </div>
+          )}
+
+          {/* Client Info - Mobile */}
+          {clientProfile && (
+            <div className="bg-card rounded-xl p-4 shadow-sm border">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-6 w-6 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <User className="h-3 w-3 text-blue-600" />
+                </div>
+                <h3 className="text-sm font-semibold">Заказчик</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage 
+                    src={clientProfile.avatar_url || ''} 
+                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                    {clientProfile.full_name 
+                      ? clientProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                      : (clientProfile.first_name && clientProfile.last_name 
+                        ? `${clientProfile.first_name[0]}${clientProfile.last_name[0]}`.toUpperCase()
+                        : 'К')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm line-clamp-1">
+                      {clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Пользователь'}
+                    </p>
+                    {clientRating && (
+                      <div className="flex items-center gap-1">
+                        <StarRating rating={clientRating.average} size="sm" />
+                        <span className="text-xs text-muted-foreground">({clientRating.count})</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons - Mobile */}
+          <div className="space-y-3">
+            {canApply && (
+              <JobResponseForm 
+                jobId={job.id} 
+                jobTitle={job.title}
+                budgetMinCents={job.budget_min_cents}
+                budgetMaxCents={job.budget_max_cents}
+                onApplicationSubmit={() => {
+                  fetchJob();
+                }} 
+              />
+            )}
+
+            {isAssignedPro && (
+              <div className="space-y-2">
+                {canStartWork && (
+                  <Button 
+                    onClick={handleStartWork} 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    size="lg"
+                  >
+                    <PlayCircle className="w-4 h-4 mr-2" />
+                    Начать работу
+                  </Button>
+                )}
+
+                {canCompleteWork && (
+                  <Button 
+                    onClick={handleCompleteWork} 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    size="lg"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Завершить работу
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {canRate && (
+              <div className="bg-card rounded-xl p-4 shadow-sm border">
+                <h3 className="font-semibold mb-3">Оценить работу специалиста</h3>
+                <div className="space-y-3">
+                  <StarRating 
+                    rating={rating} 
+                    readonly={false}
+                    onRatingChange={setRating}
+                    size="lg"
+                  />
+                  <Textarea
+                    placeholder="Оставьте комментарий (необязательно)"
+                    value={ratingComment}
+                    onChange={(e) => setRatingComment(e.target.value)}
+                    className="min-h-[80px]"
+                  />
+                  <Button 
+                    onClick={handleSubmitRating} 
+                    disabled={rating === 0}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Отправить оценку
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop Header */}
+        <section className="hidden md:block container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-4 mb-6">
             <Button variant="outline" onClick={() => {
@@ -1206,6 +1429,7 @@ const JobDetail = () => {
         </div>
       </section>
     </main>
+    </MobileContainer>
   );
 };
 

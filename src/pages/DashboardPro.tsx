@@ -272,7 +272,7 @@ const DashboardPro = () => {
   }
 
   return (
-    <RoleGuard role="pro">
+    <RoleGuard requiredRole="pro">
       <MobileContainer withBottomNav={true} className="bg-background">
         <motion.div 
           className="min-h-screen"
@@ -664,14 +664,10 @@ const DashboardPro = () => {
                 </FloatingCard>
 
                 {/* My Active Jobs */}
-                <FloatingCard 
-                  variant="glassmorphism" 
-                  className="p-4 sm:p-8"
-                  backgroundImage={proWorkspace}
-                >
+                <FloatingCard className="p-4 sm:p-8">
                   <div className="flex items-center justify-between mb-4 sm:mb-6">
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <NeumorphicIcon icon={Clock} size={48} variant="dribbble" />
+                      <NeumorphicIcon icon={Clock} size={48} />
                       <h2 className="text-lg sm:text-2xl font-display font-bold">Мои заказы</h2>
                     </div>
                     <div className="text-xs sm:text-sm text-muted-foreground">
@@ -722,10 +718,10 @@ const DashboardPro = () => {
               <div className="space-y-4 sm:space-y-8">
                 {/* Stats Cards */}
                 <div className="space-y-4">
-                  <FloatingCard variant="elevated" className="p-4 sm:p-6">
+                  <FloatingCard className="p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <NeumorphicIcon icon={Wallet} size={32} variant="behance" />
+                        <NeumorphicIcon icon={Wallet} size={32} />
                         <h3 className="text-lg font-semibold">Баланс</h3>
                       </div>
                     </div>
@@ -735,10 +731,10 @@ const DashboardPro = () => {
                     <p className="text-sm text-muted-foreground">Доступно для вывода</p>
                   </FloatingCard>
 
-                  <FloatingCard variant="elevated" className="p-4 sm:p-6">
+                  <FloatingCard className="p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <NeumorphicIcon icon={Star} size={32} variant="dribbble" />
+                        <NeumorphicIcon icon={Star} size={32} />
                         <h3 className="text-lg font-semibold">Рейтинг</h3>
                       </div>
                     </div>
@@ -746,14 +742,14 @@ const DashboardPro = () => {
                       <div className="text-2xl sm:text-3xl font-bold text-primary">
                         {ratingAvg ? ratingAvg.toFixed(1) : '--'}
                       </div>
-                      {ratingAvg && <StarRating rating={ratingAvg} readOnly size="sm" />}
+                      {ratingAvg && <StarRating rating={ratingAvg} readonly size="sm" />}
                     </div>
                     <p className="text-sm text-muted-foreground">
                       На основе {ratingCount} отзывов
                     </p>
                   </FloatingCard>
 
-                  <FloatingCard variant="elevated" className="p-4 sm:p-6">
+                  <FloatingCard className="p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                         <NeumorphicIcon icon={TrendingUp} size={32} variant="behance" />
@@ -778,14 +774,10 @@ const DashboardPro = () => {
                 </div>
 
                 {/* Open Tenders */}
-                <FloatingCard 
-                  variant="glassmorphism" 
-                  className="p-4 sm:p-6"
-                  backgroundImage={kycVerification}
-                >
+                <FloatingCard className="p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <NeumorphicIcon icon={Zap} size={32} variant="dribbble" />
+                      <NeumorphicIcon icon={Zap} size={32} />
                       <h3 className="text-lg font-semibold">Открытые тендеры</h3>
                     </div>
                     <span className="text-sm text-muted-foreground">{tenders.length}</span>
