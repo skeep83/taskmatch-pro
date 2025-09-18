@@ -295,9 +295,9 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="hover-scale"
+          className="hover-scale h-full"
         >
-          <div className="card-surface p-6">
+          <div className="card-surface p-6 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-green-500/10 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-green-600" />
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
                 <p className="text-sm text-muted-foreground">Валовый объем сделок за период</p>
               </div>
             </div>
-            <div className="h-[300px]">
+            <div className="flex-1 min-h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={charts.gmv_trend || []}>
                   <defs>
@@ -357,9 +357,9 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="hover-scale"
+          className="hover-scale h-full"
         >
-          <div className="card-surface p-6">
+          <div className="card-surface p-6 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-blue-500/10 rounded-lg">
                 <Activity className="h-5 w-5 text-blue-600" />
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
                 <p className="text-sm text-muted-foreground">MAU, WAU, DAU динамика</p>
               </div>
             </div>
-            <div className="h-[300px]">
+            <div className="flex-1 min-h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={charts.user_activity || []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
@@ -409,9 +409,9 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="hover-scale"
+          className="hover-scale h-full"
         >
-          <div className="card-surface p-6">
+          <div className="card-surface p-6 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-purple-500/10 rounded-lg">
                 <Briefcase className="h-5 w-5 text-purple-600" />
@@ -421,7 +421,9 @@ export default function AdminDashboard() {
                 <p className="text-sm text-muted-foreground">Топ категории услуг</p>
               </div>
             </div>
-            <CategoryDistributionChart data={charts.category_distribution || []} />
+            <div className="flex-1">
+              <CategoryDistributionChart data={charts.category_distribution || []} />
+            </div>
           </div>
         </motion.div>
 
