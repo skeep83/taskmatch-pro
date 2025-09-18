@@ -289,7 +289,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* GMV Trend */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -409,7 +409,7 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="hover-scale"
+          className="hover-scale lg:col-span-1"
         >
           <div className="card-surface p-6">
             <div className="flex items-center gap-3 mb-6">
