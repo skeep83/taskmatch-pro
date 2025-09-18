@@ -13,7 +13,7 @@ export const CentralStatsCircle = ({ userStats }: CentralStatsCircleProps) => {
       transition={{ duration: 0.8, type: "spring" }}
       className="relative"
     >
-      <svg width="280" height="280" viewBox="-140 -140 280 280" className="drop-shadow-2xl">
+      <svg width="240" height="240" viewBox="-120 -120 240 240" className="drop-shadow-2xl">
         {/* Градиенты */}
         <defs>
           <linearGradient id="outerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -30,7 +30,7 @@ export const CentralStatsCircle = ({ userStats }: CentralStatsCircleProps) => {
         <circle
           cx="0"
           cy="0"
-          r="120"
+          r="85"
           fill="url(#outerGradient)"
           stroke="hsl(var(--border))"
           strokeWidth="2"
@@ -43,7 +43,7 @@ export const CentralStatsCircle = ({ userStats }: CentralStatsCircleProps) => {
         <circle
           cx="0"
           cy="0"
-          r="80"
+          r="70"
           fill="url(#centerGradient)"
           stroke="hsl(var(--border))"
           strokeWidth="1"
