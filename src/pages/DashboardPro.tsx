@@ -175,9 +175,9 @@ const DashboardPro = () => {
   const loadWalletBalance = async (uid: string) => {
     try {
       const { data: wallet, error } = await supabase
-        .from("user_wallets")
+        .from("wallets")
         .select("balance_cents")
-        .eq("user_id", uid)
+        .eq("pro_id", uid)
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
