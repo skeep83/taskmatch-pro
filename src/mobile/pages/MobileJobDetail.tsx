@@ -91,7 +91,7 @@ export default function MobileJobDetail() {
         .from('job_photos')
         .select('file_url')
         .eq('job_id', jobId)
-        .order('display_order', { ascending: true });
+        .order('created_at', { ascending: true });
 
       // Add photos to job data
       const jobWithPhotos = {
