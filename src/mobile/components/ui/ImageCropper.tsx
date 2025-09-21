@@ -37,22 +37,25 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       setImage(img);
       
       // Calculate canvas size to fit image while maintaining aspect ratio
-      const maxSize = 400;
+      const maxSize = 350;
       const aspectRatio = img.width / img.height;
       
       let canvasWidth, canvasHeight;
       if (aspectRatio > 1) {
+        // Landscape
         canvasWidth = Math.min(maxSize, img.width);
         canvasHeight = canvasWidth / aspectRatio;
       } else {
+        // Portrait or square
         canvasHeight = Math.min(maxSize, img.height);
         canvasWidth = canvasHeight * aspectRatio;
       }
       
       setCanvasSize({ width: canvasWidth, height: canvasHeight });
       
-      // Set initial crop area to center square
-      const size = Math.min(canvasWidth, canvasHeight) * 0.6;
+      // Set initial crop area to center square (80% of smaller dimension)
+      const minDimension = Math.min(canvasWidth, canvasHeight);
+      const size = minDimension * 0.8;
       setCropArea({
         x: (canvasWidth - size) / 2,
         y: (canvasHeight - size) / 2,
@@ -76,35 +79,38 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
+    // Set canvas display size
     canvas.width = canvasSize.width;
     canvas.height = canvasSize.height;
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw image
+    // Draw image to fill canvas while maintaining aspect ratio
     ctx.drawImage(image, 0, 0, canvasSize.width, canvasSize.height);
 
-    // Draw crop overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    // Draw dark overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Clear crop area
+    // Clear crop area (punch hole effect)
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height);
 
-    // Draw crop border
+    // Reset composite operation
     ctx.globalCompositeOperation = 'source-over';
+
+    // Draw crop border
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
+    ctx.setLineDash([]);
     ctx.strokeRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height);
 
     // Draw corner handles
-    const handleSize = 12;
+    const handleSize = 16;
     ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#4F46E5';
+    ctx.lineWidth = 2;
 
     const corners = [
       { x: cropArea.x - handleSize / 2, y: cropArea.y - handleSize / 2 },
@@ -117,6 +123,29 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       ctx.fillRect(corner.x, corner.y, handleSize, handleSize);
       ctx.strokeRect(corner.x, corner.y, handleSize, handleSize);
     });
+
+    // Draw grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    
+    // Vertical lines
+    for (let i = 1; i < 3; i++) {
+      const x = cropArea.x + (cropArea.width / 3) * i;
+      ctx.beginPath();
+      ctx.moveTo(x, cropArea.y);
+      ctx.lineTo(x, cropArea.y + cropArea.height);
+      ctx.stroke();
+    }
+    
+    // Horizontal lines
+    for (let i = 1; i < 3; i++) {
+      const y = cropArea.y + (cropArea.height / 3) * i;
+      ctx.beginPath();
+      ctx.moveTo(cropArea.x, y);
+      ctx.lineTo(cropArea.x + cropArea.width, y);
+      ctx.stroke();
+    }
 
   }, [image, cropArea, canvasSize]);
 
@@ -137,7 +166,7 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
   }, [cropArea]);
 
   const isOnHandle = useCallback((x: number, y: number) => {
-    const handleSize = 12;
+    const handleSize = 16;
     const handles = [
       { x: cropArea.x - handleSize / 2, y: cropArea.y - handleSize / 2, type: 'nw' },
       { x: cropArea.x + cropArea.width - handleSize / 2, y: cropArea.y - handleSize / 2, type: 'ne' },
@@ -176,13 +205,18 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       
       setCropArea(prev => ({ ...prev, x: newX, y: newY }));
     } else if (isResizing) {
-      // Simple resize from bottom-right corner
-      const newWidth = Math.max(50, Math.min(pos.x - cropArea.x, canvasSize.width - cropArea.x));
-      const newHeight = Math.max(50, Math.min(pos.y - cropArea.y, canvasSize.height - cropArea.y));
+      // Resize while maintaining square aspect ratio
+      const deltaX = pos.x - dragStart.x;
+      const deltaY = pos.y - dragStart.y;
+      const delta = Math.max(deltaX, deltaY);
       
-      // Keep square aspect ratio
-      const size = Math.min(newWidth, newHeight);
-      setCropArea(prev => ({ ...prev, width: size, height: size }));
+      const newSize = Math.max(50, Math.min(
+        cropArea.width + delta,
+        Math.min(canvasSize.width - cropArea.x, canvasSize.height - cropArea.y)
+      ));
+      
+      setCropArea(prev => ({ ...prev, width: newSize, height: newSize }));
+      setDragStart({ x: pos.x, y: pos.y });
     }
 
     // Update cursor
@@ -203,6 +237,67 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     setIsResizing(false);
   }, []);
 
+  // Touch event handlers for mobile
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const pos = {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    };
+
+    const handleType = isOnHandle(pos.x, pos.y);
+
+    if (handleType) {
+      setIsResizing(true);
+      setDragStart({ x: pos.x, y: pos.y });
+    } else if (isInCropArea(pos.x, pos.y)) {
+      setIsDragging(true);
+      setDragStart({ x: pos.x - cropArea.x, y: pos.y - cropArea.y });
+    }
+  }, [isOnHandle, isInCropArea, cropArea]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const pos = {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    };
+
+    if (isDragging) {
+      const newX = Math.max(0, Math.min(pos.x - dragStart.x, canvasSize.width - cropArea.width));
+      const newY = Math.max(0, Math.min(pos.y - dragStart.y, canvasSize.height - cropArea.height));
+      
+      setCropArea(prev => ({ ...prev, x: newX, y: newY }));
+    } else if (isResizing) {
+      const deltaX = pos.x - dragStart.x;
+      const deltaY = pos.y - dragStart.y;
+      const delta = Math.max(deltaX, deltaY);
+      
+      const newSize = Math.max(50, Math.min(
+        cropArea.width + delta,
+        Math.min(canvasSize.width - cropArea.x, canvasSize.height - cropArea.y)
+      ));
+      
+      setCropArea(prev => ({ ...prev, width: newSize, height: newSize }));
+      setDragStart({ x: pos.x, y: pos.y });
+    }
+  }, [isDragging, isResizing, dragStart, cropArea, canvasSize]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+    setIsResizing(false);
+  }, []);
+
   const handleCrop = useCallback(async () => {
     if (!image || !canvasRef.current) return;
 
@@ -211,34 +306,40 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     const tempCtx = tempCanvas.getContext('2d');
     if (!tempCtx) return;
 
-    // Set output size (square for avatar)
-    const outputSize = 300;
+    // Set output size (square for avatar) - higher resolution
+    const outputSize = 400;
     tempCanvas.width = outputSize;
     tempCanvas.height = outputSize;
 
-    // Calculate scale factors
+    // Calculate scale factors from canvas to original image
     const scaleX = image.width / canvasSize.width;
     const scaleY = image.height / canvasSize.height;
 
-    // Draw cropped image
+    // Calculate source rectangle in original image coordinates
+    const sourceX = cropArea.x * scaleX;
+    const sourceY = cropArea.y * scaleY;
+    const sourceWidth = cropArea.width * scaleX;
+    const sourceHeight = cropArea.height * scaleY;
+
+    // Draw cropped and scaled image
     tempCtx.drawImage(
       image,
-      cropArea.x * scaleX,
-      cropArea.y * scaleY,
-      cropArea.width * scaleX,
-      cropArea.height * scaleY,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
       0,
       0,
       outputSize,
       outputSize
     );
 
-    // Convert to blob
+    // Convert to blob with high quality
     tempCanvas.toBlob((blob) => {
       if (blob) {
         onCrop(blob);
       }
-    }, 'image/jpeg', 0.9);
+    }, 'image/jpeg', 0.95);
   }, [image, cropArea, canvasSize, onCrop]);
 
   return (
@@ -252,20 +353,24 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex justify-center">
+          <div className="flex justify-center bg-gray-50 rounded-lg p-4">
             <canvas
               ref={canvasRef}
-              className="border border-gray-200 rounded-lg cursor-crosshair max-w-full"
+              className="border border-gray-200 rounded-lg cursor-crosshair max-w-full shadow-sm"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              style={{ touchAction: 'none' }}
             />
           </div>
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground mb-4">
-              Перетащите область кадрирования или измените её размер
+              Перетащите рамку или углы для изменения области кадрирования
             </p>
 
             <div className="flex gap-3 justify-center">
