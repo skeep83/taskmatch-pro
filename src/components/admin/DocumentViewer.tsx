@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { ZoomIn, ZoomOut, RotateCcw, Move, Download, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageMetadataViewer } from "./ImageMetadataViewer";
 
 interface DocumentViewerProps {
   isOpen: boolean;
@@ -130,16 +131,133 @@ export const DocumentViewer = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[95vh] w-[95vw] p-0">
+      <DialogContent className="max-w-7xl max-h-[95vh] w-[95vw] p-0 flex">
         <DialogDescription className="sr-only">
           Интерактивный просмотр документа для верификации с возможностью увеличения и перемещения
         </DialogDescription>
-        <DialogHeader className="p-3 pb-1">
-          <DialogTitle className="flex items-center justify-between">
-            <span>{getDocumentTitle()}</span>
-            <div className="flex gap-2">
+        
+        {/* Left side - Image viewer */}
+        <div className="flex-1 flex flex-col">
+          <DialogHeader className="p-3 pb-1">
+            <DialogTitle className="flex items-center justify-between">
+              <span>{getDocumentTitle()}</span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleZoomOut}
+                  disabled={scale <= 0.5}
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleZoomIn}
+                  disabled={scale >= 5}
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={downloadImage}
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="relative flex-1 overflow-hidden bg-muted/10">
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm">
+              <Move className="w-4 h-4" />
+              <span>Масштаб: {Math.round(scale * 100)}%</span>
+              {scale > 1 && (
+                <span className="text-muted-foreground">• Перетаскивайте для перемещения</span>
+              )}
+            </div>
+
+            <div 
+              className={`w-full h-[70vh] flex items-center justify-center overflow-hidden ${
+                scale > 1 ? 'cursor-grab' : 'cursor-zoom-in'
+              } ${isDragging ? 'cursor-grabbing' : ''}`}
+              onWheel={handleWheel}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+            >
+              {isLoading && !imageError && (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+                  <span className="ml-3 text-muted-foreground">Загрузка изображения...</span>
+                </div>
+              )}
+              
+              {imageError && (
+                <div className="flex flex-col items-center justify-center text-center p-8">
+                  <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Ошибка загрузки</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Не удалось загрузить изображение документа
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setImageError(false);
+                      setIsLoading(true);
+                      // Retry loading
+                      const img = new Image();
+                      img.onload = () => setIsLoading(false);
+                      img.onerror = () => setImageError(true);
+                      img.src = signedUrl;
+                    }}
+                  >
+                    Повторить попытку
+                  </Button>
+                </div>
+              )}
+
+              {signedUrl && !imageError && (
+                <motion.img
+                  ref={imageRef}
+                  src={signedUrl}
+                  alt={getDocumentTitle()}
+                  className="w-full h-full object-contain select-none"
+                  style={{
+                    transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                    transition: isDragging ? 'none' : 'transform 0.2s ease-out',
+                    display: isLoading ? 'none' : 'block'
+                  }}
+                  draggable={false}
+                  onLoad={() => {
+                    setIsLoading(false);
+                    setImageError(false);
+                    // Reset position when image loads
+                    setPosition({ x: 0, y: 0 });
+                    setScale(1);
+                  }}
+                  onError={() => {
+                    setIsLoading(false);
+                    setImageError(true);
+                    console.error('Failed to load image:', signedUrl);
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Zoom controls overlay for mobile */}
+            <div className="absolute bottom-4 right-4 flex gap-2 md:hidden">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={handleZoomOut}
                 disabled={scale <= 0.5}
@@ -147,7 +265,7 @@ export const DocumentViewer = ({
                 <ZoomOut className="w-4 h-4" />
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={handleZoomIn}
                 disabled={scale >= 5}
@@ -155,139 +273,41 @@ export const DocumentViewer = ({
                 <ZoomIn className="w-4 h-4" />
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={handleReset}
               >
                 <RotateCcw className="w-4 h-4" />
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={downloadImage}
-              >
-                <Download className="w-4 h-4" />
-              </Button>
             </div>
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="relative flex-1 overflow-hidden bg-muted/10">
-          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm">
-            <Move className="w-4 h-4" />
-            <span>Масштаб: {Math.round(scale * 100)}%</span>
-            {scale > 1 && (
-              <span className="text-muted-foreground">• Перетаскивайте для перемещения</span>
-            )}
           </div>
 
-          <div 
-            className={`w-full h-[70vh] flex items-center justify-center overflow-hidden ${
-              scale > 1 ? 'cursor-grab' : 'cursor-zoom-in'
-            } ${isDragging ? 'cursor-grabbing' : ''}`}
-            onWheel={handleWheel}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
-            {isLoading && !imageError && (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
-                <span className="ml-3 text-muted-foreground">Загрузка изображения...</span>
+          <div className="p-4 border-t bg-muted/5">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center gap-4">
+                <span>Тип: {getDocumentTitle()}</span>
+                {fileName && <span>Файл: {fileName}</span>}
               </div>
-            )}
-            
-            {imageError && (
-              <div className="flex flex-col items-center justify-center text-center p-8">
-                <AlertCircle className="w-12 h-12 text-destructive mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Ошибка загрузки</h3>
-                <p className="text-muted-foreground mb-4">
-                  Не удалось загрузить изображение документа
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setImageError(false);
-                    setIsLoading(true);
-                    // Retry loading
-                    const img = new Image();
-                    img.onload = () => setIsLoading(false);
-                    img.onerror = () => setImageError(true);
-                    img.src = signedUrl;
-                  }}
-                >
-                  Повторить попытку
-                </Button>
+              <div className="flex items-center gap-4">
+                <span>Колесо мыши для масштаба</span>
+                <span>Клик и перетаскивание для перемещения</span>
               </div>
-            )}
-
-            {signedUrl && !imageError && (
-              <motion.img
-                ref={imageRef}
-                src={signedUrl}
-                alt={getDocumentTitle()}
-                className="w-full h-full object-contain select-none"
-                style={{
-                  transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
-                  transition: isDragging ? 'none' : 'transform 0.2s ease-out',
-                  display: isLoading ? 'none' : 'block'
-                }}
-                draggable={false}
-                onLoad={() => {
-                  setIsLoading(false);
-                  setImageError(false);
-                  // Reset position when image loads
-                  setPosition({ x: 0, y: 0 });
-                  setScale(1);
-                }}
-                onError={() => {
-                  setIsLoading(false);
-                  setImageError(true);
-                  console.error('Failed to load image:', signedUrl);
-                }}
-              />
-            )}
-          </div>
-
-          {/* Zoom controls overlay for mobile */}
-          <div className="absolute bottom-4 right-4 flex gap-2 md:hidden">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleZoomOut}
-              disabled={scale <= 0.5}
-            >
-              <ZoomOut className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleZoomIn}
-              disabled={scale >= 5}
-            >
-              <ZoomIn className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleReset}
-            >
-              <RotateCcw className="w-4 h-4" />
-            </Button>
+            </div>
           </div>
         </div>
 
-        <div className="p-4 border-t bg-muted/5">
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <div className="flex items-center gap-4">
-              <span>Тип: {getDocumentTitle()}</span>
-              {fileName && <span>Файл: {fileName}</span>}
-            </div>
-            <div className="flex items-center gap-4">
-              <span>Колесо мыши для масштаба</span>
-              <span>Клик и перетаскивание для перемещения</span>
-            </div>
+        {/* Right side - Metadata panel */}
+        <div className="w-96 border-l bg-muted/5 overflow-y-auto">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold mb-4">Анализ метаданных</h3>
+            {signedUrl && (
+              <ImageMetadataViewer 
+                imageUrl={signedUrl} 
+                onMetadataExtracted={(metadata) => {
+                  console.log('Extracted metadata:', metadata);
+                }}
+              />
+            )}
           </div>
         </div>
       </DialogContent>
