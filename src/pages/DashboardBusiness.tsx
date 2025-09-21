@@ -89,22 +89,27 @@ export default function DashboardBusiness() {
       <main className="min-h-screen">
         {/* Mobile Header */}
         {isMobile && (
-          <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b px-4 py-3">
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate(-1)}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <h1 className="text-lg font-semibold">Бизнес-панель</h1>
+          <div className="fixed top-0 left-0 right-0 z-40 bg-[#E5E7EB]" style={{ paddingTop: `env(safe-area-inset-top)` }}>
+            <div className="px-4 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+              <div className="flex items-center justify-between h-12">
+                <div className="flex items-center gap-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => navigate(-1)}
+                    className="p-2 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <h1 className="text-lg font-semibold text-black">Бизнес-панель</h1>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
         {/* Header Section */}
-        <section className="container mx-auto py-4 lg:py-24 px-4 lg:px-6">
+        <section className={`container mx-auto px-4 lg:px-6 ${isMobile ? 'pt-20 pb-4' : 'py-4 lg:py-24'}`}>
         {!isMobile && (
           <div className="text-center mb-16">
             <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
