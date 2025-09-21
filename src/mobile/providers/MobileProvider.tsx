@@ -68,7 +68,7 @@ export function MobileProvider({ children }: MobileProviderProps) {
 
   const contextValue: MobileContextType = {
     ...deviceInfo,
-    bottomNavHeight: 80,
+    bottomNavHeight: 60, // Уменьшенная высота
     safeAreaInsets: {
       top: deviceInfo.isIOS ? 44 : 24,
       bottom: deviceInfo.isIOS ? 34 : 0,

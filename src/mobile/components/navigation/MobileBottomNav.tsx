@@ -17,7 +17,7 @@ const navItems: NavItem[] = [
   { icon: Search, label: 'Поиск', path: '/catalog' },
   { icon: Plus, label: 'Создать', path: '/job/new', color: 'text-primary' },
   { icon: MessageCircle, label: 'Сообщения', path: '/messages' },
-  { icon: User, label: 'Профиль', path: '/profile' },
+  { icon: User, label: 'Профиль', path: '/dashboard/client' },
 ];
 
 export function MobileBottomNav() {
@@ -42,9 +42,9 @@ export function MobileBottomNav() {
         paddingBottom: safeAreaInsets.bottom 
       }}
     >
-      {/* Neumorphic container */}
-      <div className="p-2 h-full bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-        <nav className="flex items-center justify-around h-16">
+      {/* Neumorphic container - уменьшенная высота */}
+      <div className="p-1.5 h-full bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+        <nav className="flex items-center justify-around h-12">
           {navItems.map((item, index) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -54,8 +54,8 @@ export function MobileBottomNav() {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "relative flex flex-col items-center justify-center gap-1",
-                  "min-w-[60px] h-14 rounded-xl transition-all duration-300",
+                  "relative flex flex-col items-center justify-center gap-0.5",
+                  "min-w-[56px] h-12 rounded-xl transition-all duration-300",
                   "touch-manipulation select-none text-gray-700",
                   "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]",
                   isActive && "shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-gray-800"
@@ -77,12 +77,12 @@ export function MobileBottomNav() {
                     whileTap={{ scale: 0.9 }}
                     className={cn(
                       "flex flex-col items-center justify-center",
-                      "w-8 h-8 mb-1 rounded-full",
+                      "w-6 h-6 mb-0.5 rounded-full",
                       "bg-gradient-to-br from-primary to-primary/80",
                       "text-primary-foreground shadow-lg shadow-primary/25"
                     )}
                   >
-                    <Icon size={18} />
+                    <Icon size={14} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -90,8 +90,8 @@ export function MobileBottomNav() {
                     className="flex flex-col items-center justify-center relative z-10"
                   >
                     <Icon 
-                      size={18} 
-                      className="mb-1 transition-all duration-300" 
+                      size={16} 
+                      className="mb-0.5 transition-all duration-300" 
                     />
                   </motion.div>
                 )}
