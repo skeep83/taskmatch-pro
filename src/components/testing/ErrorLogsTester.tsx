@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
+import { adminApi } from "@/lib/adminApi";
 import { AlertTriangle, CheckCircle, Plus, Trash, Database } from 'lucide-react';
 
 interface TestLog {
@@ -130,11 +131,11 @@ export const ErrorLogsTester = () => {
   const clearAllLogs = async () => {
     setIsClearing(true);
     try {
-      // Здесь можно было бы добавить функцию очистки через admin API
+      await adminApi.clearAllLogs();
+
       toast({
-        title: "Функция недоступна",
-        description: "Очистка логов будет добавлена в следующих версиях",
-        variant: "destructive"
+        title: "Логи очищены",
+        description: "Все логи ошибок успешно удалены",
       });
     } catch (error) {
       console.error('Failed to clear logs:', error);

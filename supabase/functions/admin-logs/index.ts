@@ -332,6 +332,30 @@ serve(async (req) => {
         );
       }
 
+    } else if (method === 'DELETE') {
+      if (action === 'clear_all') {
+        // Clear all error logs
+        const { error } = await supabaseAdmin
+          .from('error_logs')
+          .delete()
+          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
+
+        if (error) {
+          console.error('Error clearing logs:', error);
+          return new Response(
+            JSON.stringify({ error: 'Failed to clear logs' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log('All logs cleared successfully');
+
+        return new Response(
+          JSON.stringify({ success: true, message: 'All logs cleared' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
     } else if (method === 'POST') {
       const body = await req.json();
 
