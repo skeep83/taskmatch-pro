@@ -586,30 +586,48 @@ const JobDetail = () => {
       <section className="container mx-auto py-8 md:py-16 lg:py-24 px-4 md:px-6">
         <div className="text-center mb-8 md:mb-16">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <Button variant="outline" onClick={() => {
-              if (userRole === 'pro') {
-                navigate('/dashboard/pro');
-              } else if (userRole === 'client') {
-                navigate('/dashboard/client');
-              } else {
-                navigate('/feed');
-              }
-            }} className="card-surface w-full sm:w-auto">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Назад
-            </Button>
+            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  if (userRole === 'pro') {
+                    navigate('/dashboard/pro');
+                  } else if (userRole === 'client') {
+                    navigate('/dashboard/client');
+                  } else {
+                    navigate('/feed');
+                  }
+                }} 
+                className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black w-full sm:w-auto"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Назад
+              </Button>
+            </div>
             
             {/* Edit and Delete buttons for job owner */}
             {canEdit && (
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <Button variant="outline" onClick={handleEditJob} className="card-surface">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Редактировать
-                </Button>
-                <Button variant="destructive" onClick={handleDeleteJob}>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Удалить
-                </Button>
+                <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                  <Button 
+                    variant="ghost" 
+                    onClick={handleEditJob} 
+                    className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Редактировать
+                  </Button>
+                </div>
+                <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                  <Button 
+                    variant="destructive" 
+                    onClick={handleDeleteJob}
+                    className="bg-red-500 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:bg-red-600 rounded-xl"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Удалить
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -627,7 +645,7 @@ const JobDetail = () => {
 
           {/* Client Info Card */}
           {clientProfile && (
-            <div className="card-surface p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md">
+            <div className="p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
               <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3">
                 <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                 Информация о заказчике
@@ -680,7 +698,7 @@ const JobDetail = () => {
             {/* Job Details */}
             <div className="lg:col-span-2 space-y-6 md:space-y-8">
               {/* Description Card */}
-              <div className="card-surface p-4 md:p-6 lg:p-8">
+              <div className="p-4 md:p-6 lg:p-8 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                 <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                   <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Описание заказа
@@ -691,7 +709,7 @@ const JobDetail = () => {
               {/* Details Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {(job.budget_min_cents || job.budget_max_cents) && (
-                  <div className="card-surface p-4 md:p-6">
+                  <div className="p-4 md:p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-success/10 flex items-center justify-center">
                         <Euro className="w-4 h-4 md:w-5 md:h-5 text-success" />
@@ -711,7 +729,7 @@ const JobDetail = () => {
                 )}
 
                 {job.location_address && (
-                  <div className="card-surface p-4 md:p-6">
+                  <div className="p-4 md:p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center">
                         <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary" />
@@ -723,7 +741,7 @@ const JobDetail = () => {
                 )}
 
                 {job.scheduled_at && (
-                  <div className="card-surface p-4 md:p-6 md:col-span-2">
+                  <div className="p-4 md:p-6 md:col-span-2 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-accent/10 flex items-center justify-center">
                         <Calendar className="w-4 h-4 md:w-5 md:h-5 text-accent" />
@@ -737,7 +755,7 @@ const JobDetail = () => {
 
               {/* Assigned Professional Section */}
               {job.pro_id && assignedPro && (
-                <div className="card-surface p-4 md:p-6">
+                <div className="p-4 md:p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
                       <User className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
@@ -838,23 +856,27 @@ const JobDetail = () => {
                         )}
 
                         <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => navigate(`/pro/${job.pro_id}`)}
-                            className="w-full sm:w-auto"
-                          >
-                            Профиль
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => navigate(`/messages?user=${job.pro_id}&job=${job.id}`)}
-                            className="w-full sm:w-auto"
-                          >
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            Написать
-                          </Button>
+                          <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => navigate(`/pro/${job.pro_id}`)}
+                              className="w-full sm:w-auto bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                            >
+                              Профиль
+                            </Button>
+                          </div>
+                          <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => navigate(`/messages?user=${job.pro_id}&job=${job.id}`)}
+                              className="w-full sm:w-auto bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                            >
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              Написать
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -864,7 +886,7 @@ const JobDetail = () => {
 
               {/* Job Photos */}
               {jobPhotos.length > 0 && (
-                <div className="card-surface pt-6 md:pt-8 px-4 md:px-8 pb-0 overflow-hidden">
+                <div className="pt-6 md:pt-8 px-4 md:px-8 pb-0 overflow-hidden rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Фотографии заказа
@@ -910,7 +932,7 @@ const JobDetail = () => {
             <div className="lg:col-span-1 space-y-6 md:space-y-8">
               {/* Job Status and Statistics Combined - Only show when professional is assigned */}
               {job.pro_id && (
-                <div className="card-surface p-4 md:p-6 relative z-10">
+                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Статус и статистика заказа
@@ -985,15 +1007,17 @@ const JobDetail = () => {
                         />
                       </div>
 
-                      <Button 
-                        onClick={handleSubmitRating}
-                        disabled={rating === 0}
-                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold py-2 md:py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:hover:scale-100 disabled:opacity-50 relative overflow-hidden group"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-                        <Send className="w-4 h-4 md:w-5 md:h-5 mr-2 relative z-10" />
-                        <span className="relative z-10 text-sm md:text-base">Отправить оценку</span>
-                      </Button>
+                      <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                        <Button 
+                          onClick={handleSubmitRating}
+                          disabled={rating === 0}
+                          className="w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] disabled:shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black disabled:opacity-50 font-semibold py-2 md:py-3 transform hover:scale-105 disabled:hover:scale-100 relative overflow-hidden group"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                          <Send className="w-4 h-4 md:w-5 md:h-5 mr-2 relative z-10" />
+                          <span className="relative z-10 text-sm md:text-base">Отправить оценку</span>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ) : null}
@@ -1023,7 +1047,7 @@ const JobDetail = () => {
 
               {/* Applications List for Job Owner - Only show when NO professional is assigned */}
               {isJobOwner && !job.pro_id && (
-                <div className="card-surface p-4 md:p-6 lg:p-8 relative z-20">
+                <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <JobApplicationsList 
                     jobId={job.id}
                     jobStatus={job.status}
@@ -1035,23 +1059,25 @@ const JobDetail = () => {
 
               {/* Professional Action Buttons */}
               {canApply && (
-                <div className="card-surface p-4 md:p-6 lg:p-8 relative z-20">
+                <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <div className="space-y-4">
                     <h3 className="text-lg md:text-xl font-semibold mb-4">
                       Заинтересованы в заказе?
                     </h3>
                     
                     {!showPriceProposal ? (
-                      <Card className="transition-all">
+                      <Card className="transition-all rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
                         <CardHeader className="pb-3">
                           <div className="flex justify-center">
-                            <Button 
-                              className="flex-1 max-w-xs w-full"
-                              onClick={() => setShowPriceProposal(true)}
-                            >
-                              <User className="w-4 h-4 mr-2" />
-                              Откликнуться
-                            </Button>
+                            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                              <Button 
+                                className="flex-1 max-w-xs w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                                onClick={() => setShowPriceProposal(true)}
+                              >
+                                <User className="w-4 h-4 mr-2" />
+                                Откликнуться
+                              </Button>
+                            </div>
                           </div>
                         </CardHeader>
                         <CardContent className="pt-0 space-y-3">
@@ -1111,7 +1137,7 @@ const JobDetail = () => {
                         </CardContent>
                       </Card>
                     ) : (
-                      <Card className="transition-all">
+                      <Card className="transition-all rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
                         <CardContent className="p-4 md:p-6">
                           <PriceProposalForm
                             jobId={job.id}
@@ -1124,13 +1150,15 @@ const JobDetail = () => {
                               loadJobData();
                             }}
                           />
-                          <Button 
-                            variant="outline" 
-                            className="mt-4 w-full"
-                            onClick={() => setShowPriceProposal(false)}
-                          >
-                            Отмена
-                          </Button>
+                          <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] mt-4">
+                            <Button 
+                              variant="ghost" 
+                              className="w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                              onClick={() => setShowPriceProposal(false)}
+                            >
+                              Отмена
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
                     )}
@@ -1140,7 +1168,7 @@ const JobDetail = () => {
 
               {/* Professional Work Management */}
               {isAssignedPro && (
-                <div className="card-surface p-4 md:p-6 relative z-10">
+                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Управление работой
@@ -1154,13 +1182,15 @@ const JobDetail = () => {
                           Нажмите кнопку, когда приступите к выполнению заказа. 
                           Статус заказа изменится на "В работе".
                         </p>
-                        <Button 
-                          onClick={handleStartWork}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-sm md:text-base"
-                        >
-                          <Clock className="w-4 h-4 mr-2" />
-                          Начать выполнение работы
-                        </Button>
+                        <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                          <Button 
+                            onClick={handleStartWork}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-sm md:text-base rounded-xl"
+                          >
+                            <Clock className="w-4 h-4 mr-2" />
+                            Начать выполнение работы
+                          </Button>
+                        </div>
                       </div>
                     )}
 
@@ -1171,13 +1201,15 @@ const JobDetail = () => {
                           Нажмите кнопку, когда закончите выполнение заказа. 
                           Статус заказа изменится на "Выполнен".
                         </p>
-                        <Button 
-                          onClick={handleCompleteWork}
-                          className="w-full bg-green-600 hover:bg-green-700 text-sm md:text-base"
-                        >
-                          <Star className="w-4 h-4 mr-2" />
-                          Завершить работу
-                        </Button>
+                        <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                          <Button 
+                            onClick={handleCompleteWork}
+                            className="w-full bg-green-600 hover:bg-green-700 text-sm md:text-base rounded-xl"
+                          >
+                            <Star className="w-4 h-4 mr-2" />
+                            Завершить работу
+                          </Button>
+                        </div>
                       </div>
                     )}
 
@@ -1196,7 +1228,7 @@ const JobDetail = () => {
 
               {/* Professional Status Card */}
               {isProfessional && !canApply && job.status === 'new' && (
-                <div className="card-surface p-4 md:p-6 text-center relative z-10">
+                <div className="p-4 md:p-6 text-center relative z-10 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <MessageSquare className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mx-auto mb-3 md:mb-4 opacity-50" />
                   <p className="text-muted-foreground text-sm md:text-base">
                     {job.pro_id ? 'Заказ уже принят другим специалистом' : 'Вы уже откликнулись на этот заказ'}
