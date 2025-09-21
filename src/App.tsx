@@ -70,7 +70,8 @@ const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const AdminTesting = lazy(() => import("./pages/admin/Testing"));
 const AdminCurrencies = lazy(() => import("./pages/admin/Currencies"));
 const AdminCategories = lazy(() => import("./pages/admin/Categories"));
-const AdminLogs = lazy(() => import("./pages/admin/Logs"));
+// const AdminLogs = lazy(() => import("./pages/admin/Logs"));
+import AdminLogs from "./pages/admin/Logs";
 const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests"));
 import PageTransition from "./components/PageTransition";
 

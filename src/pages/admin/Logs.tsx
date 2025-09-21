@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function AdminLogs() {
+function AdminLogs() {
   return (
     <div className="space-y-6">
       <Card>
@@ -15,3 +15,5 @@ export default function AdminLogs() {
     </div>
   );
 }
+
+export default AdminLogs;
