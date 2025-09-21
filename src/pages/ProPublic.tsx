@@ -5,9 +5,10 @@ import { StarRating } from "@/components/ui/star-rating";
 import { MediaViewer } from "@/components/media";
 import { useCurrency } from "@/hooks/useCurrency";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import { OptimizedImage } from "@/components/media/OptimizedImage";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 
 const ProPublic = () => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const ProPublic = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [rating, setRating] = useState<{ avg_score: number; rating_count: number }>({ avg_score: 0, rating_count: 0 });
   const [portfolio, setPortfolio] = useState<any[]>([]);
+  const [kycStatus, setKycStatus] = useState<string>('none');
   const { formatPrice } = useCurrency();
 
   useEffect(() => {
@@ -76,6 +78,15 @@ const ProPublic = () => {
         .order("created_at", { ascending: false })
         .limit(6);
       setPortfolio(items || []);
+
+      // Загружаем статус KYC для отображения статуса верификации
+      const { data: kycDocs } = await supabase
+        .from("kyc_documents")
+        .select("status")
+        .eq("user_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      setKycStatus(kycDocs?.[0]?.status || 'none');
     })();
   }, [id, navigate]);
 
@@ -301,7 +312,15 @@ const ProPublic = () => {
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-semibold mb-2">{displayName}</h1>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-2xl font-semibold">{displayName}</h1>
+                  {kycStatus === 'approved' && (
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 border border-emerald-200/50 dark:border-emerald-700/50 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.1)] dark:shadow-[inset_2px_2px_4px_rgba(255,255,255,0.1),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Проверен</span>
+                    </div>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground mb-2">Категории: {catLabels || '—'}</p>
                 <div className="flex items-center gap-2 mb-2">
                   <StarRating 
