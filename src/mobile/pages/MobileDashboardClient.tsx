@@ -196,7 +196,9 @@ export default function MobileDashboardClient() {
       
       setUserProfile(profileData);
 
-      // Load user jobs
+      // Load user jobs with photos
+      console.log('🔍 Loading jobs for user:', user.id);
+      
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")
         .select(`
@@ -211,44 +213,36 @@ export default function MobileDashboardClient() {
           pro_id,
           categories!inner (
             label_ru
+          ),
+          job_photos(
+            id,
+            file_url,
+            display_order
           )
         `)
         .eq("client_id", user.id)
         .order("created_at", { ascending: false })
         .limit(10);
 
-      if (jobsError) throw jobsError;
-      
-      console.log('Jobs loaded:', jobsData);
-      
-      // Load job photos separately
-      if (jobsData && jobsData.length > 0) {
-        const jobIds = jobsData.map(job => job.id);
-        console.log('Loading photos for job IDs:', jobIds);
-        
-        const { data: photosData, error: photosError } = await supabase
-          .from('job_photos')
-          .select('id, job_id, file_url')
-          .in('job_id', jobIds)
-          .order('display_order');
-        
-        if (photosError) {
-          console.error('Error loading photos:', photosError);
-        } else {
-          console.log('Photos loaded:', photosData);
-        }
-        
-        // Attach photos to jobs
-        const jobsWithPhotos = jobsData.map(job => ({
-          ...job,
-          job_photos: photosData?.filter(photo => photo.job_id === job.id) || []
-        }));
-        
-        console.log('Jobs with photos:', jobsWithPhotos);
-        setJobs(jobsWithPhotos || []);
-      } else {
-        setJobs(jobsData || []);
+      if (jobsError) {
+        console.error('❌ Error loading jobs:', jobsError);
+        throw jobsError;
       }
+      
+      console.log('✅ Jobs loaded:', jobsData?.length, 'jobs');
+      
+      // Log each job and its photos
+      jobsData?.forEach(job => {
+        console.log(`📋 Job ${job.id}: "${job.title}"`);
+        console.log(`📸 Photos count: ${job.job_photos?.length || 0}`);
+        if (job.job_photos?.length > 0) {
+          job.job_photos.forEach((photo, index) => {
+            console.log(`  📸 Photo ${index + 1}: ${photo.file_url}`);
+          });
+        }
+      });
+      
+      setJobs(jobsData || []);
 
       // Calculate stats
       const totalJobs = jobsData?.length || 0;
