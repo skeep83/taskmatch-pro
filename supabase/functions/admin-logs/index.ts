@@ -334,8 +334,12 @@ serve(async (req) => {
 
     } else if (method === 'POST') {
       const body = await req.json();
+      
+      // Check action from body first, then from URL params
+      const bodyAction = body.action;
+      const finalAction = bodyAction || action;
 
-      if (action === 'clear_all') {
+      if (finalAction === 'clear_all') {
         // Clear all error logs
         const { error } = await supabaseAdmin
           .from('error_logs')
@@ -357,7 +361,7 @@ serve(async (req) => {
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
-      } else if (action === 'create') {
+      } else if (finalAction === 'create') {
         // Create new log entry
         const logEntry: LogEntry = {
           level: body.level,
@@ -389,7 +393,7 @@ serve(async (req) => {
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
-      } else if (action === 'resolve') {
+      } else if (finalAction === 'resolve') {
         // Mark log as resolved
         const logId = body.log_id;
 
@@ -411,7 +415,7 @@ serve(async (req) => {
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
-      } else if (action === 'bulk_create') {
+      } else if (finalAction === 'bulk_create') {
         // Create multiple log entries at once (for crawler results)
         const logs = body.logs;
         
