@@ -25,13 +25,14 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
   const [loading, setLoading] = useState(true);
   const [resubmitting, setResubmitting] = useState(false);
   const [kycStatus, setKycStatus] = useState<{ approved: boolean; hasDocuments: boolean }>({ approved: false, hasDocuments: false });
+  const [userHasProRole, setUserHasProRole] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     loadUpgradeStatus();
     
-    // Настройка реального времени для отслеживания изменений статуса
-    const channel = supabase
+    // Настройка реального времени для отслеживания изменений статуса заявки
+    const requestsChannel = supabase
       .channel('pro_upgrade_requests_changes')
       .on(
         'postgres_changes',
@@ -42,14 +43,33 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
           filter: `user_id=eq.${userId}`
         },
         (payload) => {
-          console.log('ProUpgradeStatusCard: Status updated:', payload);
+          console.log('ProUpgradeStatusCard: Request status updated:', payload);
           loadUpgradeStatus();
         }
       )
       .subscribe();
 
+    // Настройка реального времени для отслеживания изменений ролей пользователя
+    const rolesChannel = supabase
+      .channel('user_roles_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_roles',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('ProUpgradeStatusCard: User roles updated:', payload);
+          checkUserProRole();
+        }
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(requestsChannel);
+      supabase.removeChannel(rolesChannel);
     };
   }, [userId]);
 
@@ -85,12 +105,30 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
         hasDocuments
       });
 
+      // Проверяем роль пользователя
+      await checkUserProRole();
+
     } catch (error) {
       console.error('Error loading upgrade status:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  const checkUserProRole = async () => {
+    try {
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'pro');
+      
+      setUserHasProRole(!!roles && roles.length > 0);
+    } catch (error) {
+      console.error('Error checking user pro role:', error);
+    }
+  };
+
 
   const submitNewRequest = async () => {
     try {
@@ -150,8 +188,11 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
     );
   }
 
-  // Скрыть карточку если заявка одобрена И все KYC документы одобрены, или если заявки нет
-  if (!request || (request.status === 'approved' && kycStatus.approved)) {
+  // Скрыть карточку если:
+  // 1. Пользователь уже имеет роль 'pro' ИЛИ
+  // 2. Заявки нет ИЛИ 
+  // 3. Заявка одобрена И все KYC документы одобрены
+  if (userHasProRole || !request || (request.status === 'approved' && kycStatus.approved)) {
     return null;
   }
 
