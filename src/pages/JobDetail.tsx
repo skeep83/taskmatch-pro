@@ -9,6 +9,9 @@ import { PriceProposalForm } from '@/components/PriceProposalForm';
 import { JobStatusProgress } from '@/components/JobStatusProgress';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import interestedInJobImage from '@/assets/interested-in-job.png';
+import jobsImage from '@/assets/services-hero.jpg';
+import { AnimatedIcon } from '@/components/ui/animated-icon';
+import { Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -575,17 +578,56 @@ const JobDetail = () => {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-[#E5E7EB]">
       <Seo 
         title={`Заказ: ${job.title}`} 
         description={job.description} 
         canonical={`/job/${job.id}`} 
       />
 
-      {/* Header Section */}
-      <section className="container mx-auto py-8 md:py-16 lg:py-24 px-4 md:px-6">
-        <div className="text-center mb-8 md:mb-16">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={jobsImage} alt="Jobs" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-orange-600/80" />
+        </div>
+        <div className="relative container mx-auto px-4 py-24">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
+              {job.title}
+            </h1>
+            <p className="text-xl text-white/90 mb-8">
+              {job.description?.substring(0, 150)}
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
+                <div className="flex items-center gap-2 text-white">
+                  <AnimatedIcon icon={Shield} className="text-green-300" />
+                  <span>Защита эскроу</span>
+                </div>
+              </div>
+              <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
+                <div className="flex items-center gap-2 text-white">
+                  <AnimatedIcon icon={Clock} className="text-blue-300" />
+                  <span>Быстрое выполнение</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content Section */}
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-[#4B5563]">
+            Детали заказа
+          </h2>
+          <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
+            Подробная информация о заказе
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6 mt-8">
             <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
               <Button 
                 variant="ghost" 
@@ -598,7 +640,7 @@ const JobDetail = () => {
                     navigate('/feed');
                   }
                 }} 
-                className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black w-full sm:w-auto"
+                className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151] w-full sm:w-auto"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Назад
@@ -612,7 +654,7 @@ const JobDetail = () => {
                   <Button 
                     variant="ghost" 
                     onClick={handleEditJob} 
-                    className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                    className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151]"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Редактировать
@@ -632,10 +674,7 @@ const JobDetail = () => {
             )}
           </div>
           
-          <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-display font-bold mb-4 md:mb-6 text-gradient">
-            {job.title}
-          </h1>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm md:text-base lg:text-lg text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm md:text-base lg:text-lg text-[#6B7280] mb-6">
             <span>{job.categories.label_ru}</span>
             <span className="hidden sm:inline">•</span>
             <span>{formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ru })}</span>
@@ -645,8 +684,8 @@ const JobDetail = () => {
 
           {/* Client Info Card */}
           {clientProfile && (
-            <div className="p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
-              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3">
+            <div className="p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md bg-[#E5E7EB] rounded-2xl shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3 text-[#374151]">
                 <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                 Информация о заказчике
               </h3>
@@ -666,7 +705,7 @@ const JobDetail = () => {
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                    <h4 className="font-semibold text-sm md:text-base truncate">
+                    <h4 className="font-semibold text-sm md:text-base truncate text-[#374151]">
                       {clientProfile.full_name || 
                        (clientProfile.first_name && clientProfile.last_name 
                          ? `${clientProfile.first_name} ${clientProfile.last_name}` 
@@ -683,7 +722,7 @@ const JobDetail = () => {
                         readonly 
                       />
                     ) : (
-                      <p className="text-xs text-muted-foreground">Новый клиент</p>
+                      <p className="text-xs text-[#6B7280]">Новый клиент</p>
                     )}
                   </div>
                 </div>
@@ -698,25 +737,22 @@ const JobDetail = () => {
             {/* Job Details */}
             <div className="lg:col-span-2 space-y-6 md:space-y-8">
               {/* Description Card */}
-              <div className="p-4 md:p-6 lg:p-8 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
-                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
-                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+              <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <h2 className="text-2xl font-semibold mb-4 text-[#374151]">
                   Описание заказа
                 </h2>
-                <p className="text-muted-foreground whitespace-pre-wrap text-sm md:text-base lg:text-lg leading-relaxed">{job.description}</p>
+                <p className="text-[#6B7280] whitespace-pre-wrap">{job.description}</p>
               </div>
 
               {/* Details Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {(job.budget_min_cents || job.budget_max_cents) && (
-                  <div className="p-4 md:p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-success/10 flex items-center justify-center">
-                        <Euro className="w-4 h-4 md:w-5 md:h-5 text-success" />
-                      </div>
-                      <span className="font-semibold text-base md:text-lg">Бюджет</span>
+                      <Euro className="w-5 h-5 text-green-500" />
+                      <span className="font-semibold text-lg text-[#374151]">Бюджет</span>
                     </div>
-                    <p className="text-lg md:text-xl lg:text-2xl font-bold text-success">
+                    <p className="text-xl font-bold text-green-600">
                       {job.budget_min_cents && job.budget_max_cents
                         ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
                         : job.budget_min_cents
@@ -729,26 +765,22 @@ const JobDetail = () => {
                 )}
 
                 {job.location_address && (
-                  <div className="p-4 md:p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                      </div>
-                      <span className="font-semibold text-base md:text-lg">Адрес</span>
+                      <MapPin className="w-5 h-5 text-blue-500" />
+                      <span className="font-semibold text-lg text-[#374151]">Адрес</span>
                     </div>
-                    <p className="text-muted-foreground text-sm md:text-base">{job.location_address}</p>
+                    <p className="text-[#6B7280]">{job.location_address}</p>
                   </div>
                 )}
 
                 {job.scheduled_at && (
-                  <div className="p-4 md:p-6 md:col-span-2 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-[#E5E7EB] rounded-2xl p-6 md:col-span-2 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Calendar className="w-4 h-4 md:w-5 md:h-5 text-accent" />
-                      </div>
-                      <span className="font-semibold text-base md:text-lg">Запланировано</span>
+                      <Calendar className="w-5 h-5 text-orange-500" />
+                      <span className="font-semibold text-lg text-[#374151]">Запланировано</span>
                     </div>
-                    <p className="text-muted-foreground text-sm md:text-base">{new Date(job.scheduled_at).toLocaleString('ru-RU')}</p>
+                    <p className="text-[#6B7280]">{new Date(job.scheduled_at).toLocaleString('ru-RU')}</p>
                   </div>
                 )}
               </div>
