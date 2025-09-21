@@ -124,8 +124,20 @@ export default function MobileProfileSettings() {
         .eq('user_id', user.id)
         .single();
 
-      const currentRole = roleData?.role || 'client';
-      console.log('MobileProfileSettings - Current role:', currentRole, 'Role data:', roleData);
+      let currentRole = roleData?.role || 'client';
+      
+      // Also check pro_profiles table for pro status
+      const { data: proData } = await supabase
+        .from('pro_profiles')
+        .select('user_id')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (proData && currentRole === 'client') {
+        currentRole = 'pro';
+      }
+      
+      console.log('MobileProfileSettings - Current role:', currentRole, 'Role data:', roleData, 'Pro data:', proData);
       setUserRole(currentRole);
 
       // Load categories
