@@ -396,7 +396,6 @@ export default function MobileDashboardClient() {
   };
 
   const handleDashboardSwitch = (dashboardType: string) => {
-    setShowDashboardSelector(false);
     if (dashboardType !== 'client') {
       navigate(`/dashboard/${dashboardType}`);
     }
@@ -432,50 +431,11 @@ export default function MobileDashboardClient() {
           title="Панель клиента"
           showBack={false}
           showNotifications={true}
-        >
-          {/* Dashboard Selector in Header */}
-          <div className="relative">
-            <motion.button
-              onClick={() => setShowDashboardSelector(!showDashboardSelector)}
-              className="flex items-center gap-2 px-3 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl"
-              whileTap={{ scale: 0.98 }}
-            >
-              <User className="h-4 w-4 text-primary" />
-              <ChevronDown className={`h-4 w-4 transition-transform ${showDashboardSelector ? 'rotate-180' : ''}`} />
-            </motion.button>
-            
-            {/* Dropdown Menu */}
-            {showDashboardSelector && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full right-0 mt-2 w-64 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl z-50 overflow-hidden"
-              >
-                {getDashboardOptions().map((option) => (
-                  <motion.button
-                    key={option.value}
-                    onClick={() => handleDashboardSwitch(option.value)}
-                    className={`w-full p-4 flex items-center gap-3 text-left transition-all hover:bg-white/20 ${
-                      option.value === 'client' ? 'bg-white/10' : ''
-                    }`}
-                    disabled={!option.available}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <option.icon className="h-5 w-5 text-primary" />
-                    <div className="flex-1">
-                      <h4 className="font-semibold">{option.label}</h4>
-                      <p className="text-sm text-muted-foreground">{option.description}</p>
-                    </div>
-                    {!option.available && (
-                      <Badge variant="secondary">Скоро</Badge>
-                    )}
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
-          </div>
-        </MobileHeader>
+          showDashboardSelector={true}
+          dashboardOptions={getDashboardOptions()}
+          currentDashboard="client"
+          onDashboardChange={handleDashboardSwitch}
+        />
         
         <div 
           className="pt-20 pb-24 px-4 space-y-6"
