@@ -81,11 +81,8 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
             <span>{new Date(job.created_at).toLocaleDateString('ru')}</span>
           </div>
         </div>
-      </div>
-
-      {/* Bottom row */}
-      <div className="flex items-center justify-between">
-        {/* Budget */}
+        
+        {/* Budget moved here */}
         <div className="flex items-center font-semibold text-primary">
           <DollarSign size={16} className="mr-1" />
           <span>
@@ -96,21 +93,21 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
                 : 'Договорная'}
           </span>
         </div>
-
-        {/* Client info */}
-        {job.client_name && (
-          <div className="flex items-center text-sm text-muted-foreground">
-            <User size={14} className="mr-1" />
-            <span className="truncate max-w-[80px]">{job.client_name}</span>
-            {job.client_rating && (
-              <div className="flex items-center ml-2">
-                <Star size={12} className="text-yellow-500 fill-current mr-1" />
-                <span>{job.client_rating.toFixed(1)}</span>
-              </div>
-            )}
-          </div>
-        )}
       </div>
+
+      {/* Client info row */}
+      {job.client_name && (
+        <div className="flex items-center text-sm text-muted-foreground mb-4">
+          <User size={14} className="mr-1" />
+          <span className="truncate max-w-[120px]">{job.client_name}</span>
+          {job.client_rating && (
+            <div className="flex items-center ml-2">
+              <Star size={12} className="text-yellow-500 fill-current mr-1" />
+              <span>{job.client_rating.toFixed(1)}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Status indicator */}
       {job.status && (
