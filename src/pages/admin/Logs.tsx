@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminAPI } from '@/lib/adminApi';
-import { ErrorTrends } from '@/components/admin/ErrorTrends';
+// import { ErrorTrends } from '@/components/admin/ErrorTrends';
 import { RefreshCw, Download, Search, AlertTriangle, Info, XCircle, CheckCircle, BarChart3, List, type LucideIcon } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -160,7 +160,7 @@ export default function AdminLogs() {
         </TabsList>
 
         <TabsContent value="analytics" className="space-y-6">
-          <ErrorTrends />
+          <div>ErrorTrends component temporarily disabled for debugging</div>
         </TabsContent>
 
         <TabsContent value="logs" className="space-y-6">
