@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, Search, Users, UserCheck, UserX, Crown, Shield, Eye, Edit, Ban, CheckCircle, XCircle, MapPin, Calendar, Phone, Mail, Briefcase, Star, Clock, DollarSign, AlertTriangle } from "lucide-react";
+import { Activity, Search, Users, UserCheck, UserX, Crown, Shield, Eye, Edit, Ban, CheckCircle, XCircle, MapPin, Calendar, Phone, Mail, Briefcase, Star, Clock, DollarSign, AlertTriangle, ExternalLink } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface User {
   id: string;
@@ -82,6 +83,57 @@ export default function AdminUsers() {
   const [totalPages, setTotalPages] = useState(1);
   const [actionNote, setActionNote] = useState("");
   const { toast } = useToast();
+
+  // Helper function to generate signed URL for private storage files
+  const getSignedUrl = async (filePath: string, bucket: string = 'kyc') => {
+    try {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
+
+      if (error) {
+        console.error('Error creating signed URL:', error);
+        return null;
+      }
+      
+      return data.signedUrl;
+    } catch (error) {
+      console.error('Error generating signed URL:', error);
+      return null;
+    }
+  };
+
+  // Function to open KYC document
+  const openKycDocument = async (doc: KycDocument) => {
+    try {
+      // Extract file path from URL for private bucket access
+      const urlParts = doc.file_url.split('/');
+      const bucketIndex = urlParts.findIndex(part => part === 'kyc');
+      if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
+        const filePath = urlParts.slice(bucketIndex + 1).join('/');
+        const signedUrl = await getSignedUrl(filePath, 'kyc');
+        if (signedUrl) {
+          window.open(signedUrl, '_blank');
+        } else {
+          toast({
+            title: "Ошибка",
+            description: "Не удалось открыть документ",
+            variant: "destructive"
+          });
+        }
+      } else {
+        // Fallback to original URL if path parsing fails
+        window.open(doc.file_url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error opening document:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось открыть документ",
+        variant: "destructive"
+      });
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -747,8 +799,12 @@ export default function AdminUsers() {
                                           <Badge className={getKycStatusColor(doc.status)}>
                                             {doc.status}
                                           </Badge>
-                                          <Button size="sm" variant="outline">
-                                            <Eye className="w-4 h-4" />
+                                          <Button 
+                                            size="sm" 
+                                            variant="outline"
+                                            onClick={() => openKycDocument(doc)}
+                                          >
+                                            <ExternalLink className="w-4 h-4" />
                                           </Button>
                                         </div>
                                       </div>
