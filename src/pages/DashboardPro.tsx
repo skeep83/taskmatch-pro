@@ -13,7 +13,7 @@ import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
 import { 
   Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, 
   CreditCard, Briefcase, Clock, ShieldCheck, TrendingUp, Award,
-  Settings, Bell, Zap, Video, MapPin, CheckCircle, AlertCircle,
+  Settings, Bell, Zap, Video, MapPin, CheckCircle, AlertCircle, XCircle,
   BarChart3, DollarSign
 } from "lucide-react";
 import { StarRating } from "@/components/ui/star-rating";
@@ -256,10 +256,18 @@ const DashboardPro = () => {
           <div className="flex justify-center mt-8">
             <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] transition-all duration-300">
               <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+                {kycStatus === 'approved' ? (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                ) : kycStatus === 'rejected' ? (
+                  <XCircle className="h-5 w-5 text-red-500" />
+                ) : (
+                  <Clock className="h-5 w-5 text-orange-500" />
+                )}
               </div>
               <span className="text-sm font-medium text-foreground">
-                Статус: Проверенный специалист
+                Статус: {kycStatus === 'approved' ? 'Проверенный специалист' : 
+                         kycStatus === 'rejected' ? 'Документы отклонены' : 
+                         'Ожидает проверки'}
               </span>
             </div>
           </div>
