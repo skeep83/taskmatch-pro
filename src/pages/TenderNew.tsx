@@ -172,172 +172,187 @@ const TenderNew = () => {
 
   return (
     <RoleGuard requiredRole="business">
+      <Seo 
+        title={`${t('app.name')} — Создать тендер`} 
+        description="Создайте тендер для получения предложений от специалистов" 
+        canonical="/tenders/new" 
+      />
       <main className="min-h-screen">
-        <Seo 
-          title={`${t('app.name')} — Создать тендер`} 
-          description="Создайте тендер для получения предложений от специалистов" 
-          canonical="/tenders/new" 
-        />
-        
-        {/* Header */}
-        <section className="container mx-auto py-12 px-6">
-          <div className="max-w-2xl mx-auto">
+        {/* Header Section */}
+        <section className="container mx-auto py-24 px-6">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+              Создать тендер
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Опишите задачу и получите предложения от специалистов
+            </p>
+          </div>
+
+          {/* Main Content */}
+          <div className="max-w-4xl mx-auto">
             
             {!businessAccount && (
-              <Alert className="mb-6">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  Для создания тендеров необходим бизнес-аккаунт. Тендеры доступны только для корпоративных клиентов.
-                  <Button 
-                    variant="link" 
-                    className="p-0 h-auto ml-2"
-                    onClick={() => navigate('/dashboard/business')}
-                  >
-                    Создать бизнес-аккаунт
-                  </Button>
-                </AlertDescription>
-              </Alert>
+              <div className="mb-8 p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <AlertTriangle className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground mb-2">Требуется бизнес-аккаунт</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Для создания тендеров необходим бизнес-аккаунт. Тендеры доступны только для корпоративных клиентов.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/dashboard/business')}
+                      className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0"
+                    >
+                      Создать бизнес-аккаунт
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
 
+            {/* Navigation */}
             <div className="flex items-center gap-4 mb-8">
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate('/dashboard/business?tab=tenders')}
-                className="gap-2"
+                className="gap-2 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Назад к тендерам
               </Button>
-              <div>
-                <h1 className="text-3xl font-display font-bold text-gradient">
-                  Создать тендер
-                </h1>
-                <p className="text-muted-foreground">
-                  Опишите задачу и получите предложения от специалистов
-                </p>
-              </div>
             </div>
 
-            <Card className="card-surface">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gavel className="h-5 w-5 text-primary" />
-                  Информация о тендере
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {businessAccount && (
-                    <div className="p-4 bg-accent/10 rounded-lg border">
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Бизнес-аккаунт:</strong> {businessAccount.company_name}
-                      </p>
-                    </div>
+            {/* Form Card */}
+            <div className="p-8 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <Gavel className="h-6 w-6 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-semibold text-foreground">Информация о тендере</h2>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {businessAccount && (
+                  <div className="p-4 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Бизнес-аккаунт:</strong> {businessAccount.company_name}
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-foreground font-medium">Название тендера *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Например: Ремонт крана в ванной комнате"
+                    maxLength={200}
+                    className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {formData.title.length}/200 символов
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-foreground font-medium">Описание работ *</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Опишите подробно что нужно сделать, требования к материалам, сроки выполнения..."
+                    rows={4}
+                    maxLength={1000}
+                    className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {formData.description.length}/1000 символов
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-foreground font-medium">Категория услуги</Label>
+                  <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
+                    <SelectTrigger className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0">
+                      <SelectValue placeholder="Выберите категорию" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="budget" className="flex items-center gap-2 text-foreground font-medium">
+                    <DollarSign className="h-4 w-4" />
+                    Максимальный бюджет *
+                  </Label>
+                  <Input
+                    id="budget"
+                    type="number"
+                    min="1"
+                    value={formData.budget_max_cents}
+                    onChange={(e) => setFormData(prev => ({ ...prev, budget_max_cents: e.target.value }))}
+                    placeholder="1000"
+                    className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+                  />
+                  {formData.budget_max_cents && (
+                    <p className="text-sm text-muted-foreground">
+                      Сумма: {formatPrice(parseInt(formData.budget_max_cents) * 100)}
+                    </p>
                   )}
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Название тендера *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="Например: Ремонт крана в ванной комнате"
-                      maxLength={200}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {formData.title.length}/200 символов
-                    </p>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="deadline" className="flex items-center gap-2 text-foreground font-medium">
+                    <Calendar className="h-4 w-4" />
+                    Срок подачи заявок *
+                  </Label>
+                  <Input
+                    id="deadline"
+                    type="datetime-local"
+                    value={formData.deadline}
+                    onChange={(e) => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
+                    min={new Date().toISOString().slice(0, 16)}
+                    className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    После этого времени подача заявок будет закрыта
+                  </p>
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Описание работ *</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Опишите подробно что нужно сделать, требования к материалам, сроки выполнения..."
-                      rows={4}
-                      maxLength={1000}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {formData.description.length}/1000 символов
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Категория услуги</Label>
-                    <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Выберите категорию" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="budget" className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Максимальный бюджет *
-                    </Label>
-                    <Input
-                      id="budget"
-                      type="number"
-                      min="1"
-                      value={formData.budget_max_cents}
-                      onChange={(e) => setFormData(prev => ({ ...prev, budget_max_cents: e.target.value }))}
-                      placeholder="1000"
-                    />
-                    {formData.budget_max_cents && (
-                      <p className="text-sm text-muted-foreground">
-                        Сумма: {formatPrice(parseInt(formData.budget_max_cents) * 100)}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="deadline" className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      Срок подачи заявок *
-                    </Label>
-                    <Input
-                      id="deadline"
-                      type="datetime-local"
-                      value={formData.deadline}
-                      onChange={(e) => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
-                      min={new Date().toISOString().slice(0, 16)}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      После этого времени подача заявок будет закрыта
-                    </p>
-                  </div>
-
-                  <div className="flex gap-4 pt-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => navigate('/dashboard/business?tab=tenders')}
-                      className="flex-1"
-                    >
-                      Отмена
-                    </Button>
-                    <Button 
-                      type="submit" 
-                      disabled={loading || !businessAccount}
-                      className="flex-1"
-                    >
-                      {loading ? 'Создание...' : 'Создать тендер'}
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
+                <div className="flex gap-4 pt-6">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => navigate('/dashboard/business?tab=tenders')}
+                    className="flex-1 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0"
+                  >
+                    Отмена
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={loading || !businessAccount}
+                    className="flex-1 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0 text-foreground"
+                  >
+                    {loading ? 'Создание...' : 'Создать тендер'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </section>
       </main>
