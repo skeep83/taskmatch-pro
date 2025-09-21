@@ -37,81 +37,82 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
       onPress={onPress}
       className={cn("mb-4", className)}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-3">
+      {/* Header with title, category and urgency */}
+      <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-lg leading-tight mb-1 truncate">
+          <h3 className="font-semibold text-lg leading-tight text-foreground mb-2">
             {job.title}
           </h3>
-          {job.category_name && (
-            <Badge variant="secondary" className="text-xs">
-              {job.category_name}
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {job.category_name && (
+              <Badge variant="secondary" className="text-xs">
+                {job.category_name}
+              </Badge>
+            )}
+            {job.urgency && (
+              <Badge 
+                variant="outline" 
+                className={cn("text-xs", urgencyColors[job.urgency])}
+              >
+                {job.urgency === 'high' ? 'Срочно' : 
+                 job.urgency === 'medium' ? 'Средне' : 'Обычно'}
+              </Badge>
+            )}
+          </div>
         </div>
-        
-        {job.urgency && (
-          <Badge 
-            variant="outline" 
-            className={cn("ml-2 text-xs", urgencyColors[job.urgency])}
-          >
-            {job.urgency === 'high' ? 'Срочно' : 
-             job.urgency === 'medium' ? 'Средне' : 'Обычно'}
-          </Badge>
-        )}
       </div>
 
       {/* Description */}
-      <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-2">
+      <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
         {job.description}
       </p>
 
-      {/* Info row */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-          {job.location && (
-            <div className="flex items-center">
-              <MapPin size={14} className="mr-1" />
-              <span className="truncate max-w-[100px]">{job.location}</span>
-            </div>
-          )}
-          
+      {/* Location and date */}
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        {job.location && (
           <div className="flex items-center">
-            <Clock size={14} className="mr-1" />
-            <span>{new Date(job.created_at).toLocaleDateString('ru')}</span>
+            <MapPin size={14} className="mr-1.5" />
+            <span className="truncate max-w-[140px]">{job.location}</span>
           </div>
-        </div>
+        )}
         
-        {/* Budget moved here */}
-        <div className="flex items-center font-semibold text-primary">
-          <DollarSign size={16} className="mr-1" />
-          <span>
-            {job.budget_min && job.budget_max 
-              ? `${job.budget_min}-${job.budget_max} MDL`
-              : job.budget_min 
-                ? `от ${job.budget_min} MDL`
-                : 'Договорная'}
-          </span>
+        <div className="flex items-center">
+          <Clock size={14} className="mr-1.5" />
+          <span>{new Date(job.created_at).toLocaleDateString('ru')}</span>
         </div>
       </div>
 
-      {/* Client info row */}
+      {/* Budget */}
+      <div className="flex items-center font-semibold text-primary">
+        <DollarSign size={16} className="mr-1.5" />
+        <span>
+          {job.budget_min && job.budget_max 
+            ? `${job.budget_min}-${job.budget_max} MDL`
+            : job.budget_min 
+              ? `от ${job.budget_min} MDL`
+              : 'Договорная'}
+        </span>
+      </div>
+
+      {/* Client info */}
       {job.client_name && (
-        <div className="flex items-center text-sm text-muted-foreground mb-4">
-          <User size={14} className="mr-1" />
-          <span className="truncate max-w-[120px]">{job.client_name}</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <User size={14} className="mr-1.5" />
+            <span className="truncate max-w-[120px]">{job.client_name}</span>
+          </div>
           {job.client_rating && (
-            <div className="flex items-center ml-2">
+            <div className="flex items-center">
               <Star size={12} className="text-yellow-500 fill-current mr-1" />
-              <span>{job.client_rating.toFixed(1)}</span>
+              <span className="text-sm font-medium">{job.client_rating.toFixed(1)}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* Status indicator */}
+      {/* Status */}
       {job.status && (
-        <div className="mt-3 pt-3 border-t border-border/40">
+        <div className="pt-3 border-t border-border/30">
           <Badge 
             variant={job.status === 'active' ? 'default' : 'secondary'}
             className="text-xs"
