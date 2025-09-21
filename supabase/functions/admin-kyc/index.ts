@@ -66,7 +66,7 @@ serve(async (req) => {
         )
       }
 
-      // Update KYC document status
+      // Update KYC document status (latest document for the user)
       const { error: updateError } = await supabaseClient
         .from('kyc_documents')
         .update({
@@ -75,6 +75,8 @@ serve(async (req) => {
           reviewed_at: new Date().toISOString()
         })
         .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
 
       if (updateError) {
         console.error('Error updating KYC status:', updateError)
