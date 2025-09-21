@@ -92,7 +92,7 @@ export default function Feed() {
       setCategories(categoriesData || []);
     } catch (error: any) {
       console.error(error);
-      toast({ title: t("notifications.error"), variant: "destructive" });
+      toast({ title: "Ошибка загрузки", variant: "destructive" });
     }
   };
 
@@ -112,11 +112,11 @@ export default function Feed() {
         .eq("id", jobId);
         
       if (error) throw error;
-      toast({ title: t("notifications.job_accepted") });
+      toast({ title: "Заказ принят" });
       loadJobs();
     } catch (e: any) {
       console.error(e);
-      toast({ title: t("notifications.error"), description: e?.message, variant: "destructive" });
+      toast({ title: "Ошибка", description: e?.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -127,15 +127,6 @@ export default function Feed() {
     job.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     job.category?.label_ru?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'new': return <AlertCircle className="h-3 w-3 flex-shrink-0" />;
-      case 'accepted': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
-      case 'in_progress': return <PlayCircle className="h-3 w-3 flex-shrink-0" />;
-      default: return <Clock className="h-3 w-3 flex-shrink-0" />;
-    }
-  };
 
   return (
     <main className="min-h-screen">
@@ -374,19 +365,19 @@ export default function Feed() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Радиус (км)</label>
                       <select className="w-full p-3 bg-white/50 border border-white/20 rounded-xl">
-                        <option>5 км</option>
-                        <option>10 км</option>
-                        <option>25 км</option>
-                        <option>50 км</option>
+                        <option value="5">5 км</option>
+                        <option value="10">10 км</option>
+                        <option value="25">25 км</option>
+                        <option value="50">50 км</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Срочность</label>
                       <select className="w-full p-3 bg-white/50 border border-white/20 rounded-xl">
-                        <option>Любая</option>
-                        <option>Обычная</option>
-                        <option>Срочно</option>
-                        <option>В тот же день</option>
+                        <option value="">Любая</option>
+                        <option value="normal">Обычная</option>
+                        <option value="urgent">Срочно</option>
+                        <option value="same_day">В тот же день</option>
                       </select>
                     </div>
                   </div>
