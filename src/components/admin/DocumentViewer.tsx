@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ZoomIn, ZoomOut, RotateCcw, Move, Download } from "lucide-react";
+import { ZoomIn, ZoomOut, RotateCcw, Move, Download, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DocumentViewerProps {
   isOpen: boolean;
@@ -23,7 +24,46 @@ export const DocumentViewer = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [signedUrl, setSignedUrl] = useState<string>("");
+  const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const imageRef = useRef<HTMLImageElement>(null);
+
+  // Generate signed URL for secure image access
+  useEffect(() => {
+    const generateSignedUrl = async () => {
+      if (!imageUrl || !isOpen) return;
+      
+      setIsLoading(true);
+      setImageError(false);
+      
+      try {
+        // Extract the path from the full URL
+        const urlParts = imageUrl.split('/kyc/');
+        if (urlParts.length > 1) {
+          const filePath = urlParts[1];
+          
+          const { data, error } = await supabase.storage
+            .from('kyc')
+            .createSignedUrl(filePath, 300); // 5 minutes
+          
+          if (error) {
+            console.error('Error creating signed URL:', error);
+            setSignedUrl(imageUrl); // Fallback to original URL
+          } else {
+            setSignedUrl(data.signedUrl);
+          }
+        } else {
+          setSignedUrl(imageUrl); // Use original URL if path extraction fails
+        }
+      } catch (error) {
+        console.error('Error generating signed URL:', error);
+        setSignedUrl(imageUrl); // Fallback to original URL
+      }
+    };
+
+    generateSignedUrl();
+  }, [imageUrl, isOpen]);
 
   const handleZoomIn = () => {
     setScale(prev => Math.min(prev * 1.5, 5));
@@ -91,6 +131,9 @@ export const DocumentViewer = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogDescription className="sr-only">
+          Интерактивный просмотр документа для верификации с возможностью увеличения и перемещения
+        </DialogDescription>
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="flex items-center justify-between">
             <span>{getDocumentTitle()}</span>
@@ -148,22 +191,63 @@ export const DocumentViewer = ({
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
           >
-            <motion.img
-              ref={imageRef}
-              src={imageUrl}
-              alt={getDocumentTitle()}
-              className="max-w-none max-h-none object-contain select-none"
-              style={{
-                transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
-                transition: isDragging ? 'none' : 'transform 0.2s ease-out'
-              }}
-              draggable={false}
-              onLoad={() => {
-                // Reset position when image loads
-                setPosition({ x: 0, y: 0 });
-                setScale(1);
-              }}
-            />
+            {isLoading && !imageError && (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+                <span className="ml-3 text-muted-foreground">Загрузка изображения...</span>
+              </div>
+            )}
+            
+            {imageError && (
+              <div className="flex flex-col items-center justify-center text-center p-8">
+                <AlertCircle className="w-12 h-12 text-destructive mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Ошибка загрузки</h3>
+                <p className="text-muted-foreground mb-4">
+                  Не удалось загрузить изображение документа
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setImageError(false);
+                    setIsLoading(true);
+                    // Retry loading
+                    const img = new Image();
+                    img.onload = () => setIsLoading(false);
+                    img.onerror = () => setImageError(true);
+                    img.src = signedUrl;
+                  }}
+                >
+                  Повторить попытку
+                </Button>
+              </div>
+            )}
+
+            {signedUrl && !imageError && (
+              <motion.img
+                ref={imageRef}
+                src={signedUrl}
+                alt={getDocumentTitle()}
+                className="max-w-none max-h-none object-contain select-none"
+                style={{
+                  transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                  transition: isDragging ? 'none' : 'transform 0.2s ease-out',
+                  display: isLoading ? 'none' : 'block'
+                }}
+                draggable={false}
+                onLoad={() => {
+                  setIsLoading(false);
+                  setImageError(false);
+                  // Reset position when image loads
+                  setPosition({ x: 0, y: 0 });
+                  setScale(1);
+                }}
+                onError={() => {
+                  setIsLoading(false);
+                  setImageError(true);
+                  console.error('Failed to load image:', signedUrl);
+                }}
+              />
+            )}
           </div>
 
           {/* Zoom controls overlay for mobile */}
