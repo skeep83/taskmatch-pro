@@ -3,10 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AdminAPI } from '@/lib/adminApi';
 import { RefreshCw, Download, Search, AlertTriangle, Info, XCircle, CheckCircle } from 'lucide-react';
+import { AdminAPI } from '@/lib/adminApi';
 import { formatDistanceToNow, format } from 'date-fns';
 
 interface ErrorLog {
@@ -68,7 +67,11 @@ function AdminLogs() {
       const response = await adminApi.getLogs({
         page,
         limit: 50,
-        ...filters
+        level: filters.level === 'all' ? undefined : filters.level,
+        source: filters.source === 'all' ? undefined : filters.source,
+        search: filters.search || undefined,
+        resolved: filters.resolved === 'all' ? undefined : filters.resolved,
+        timeRange: filters.timeRange
       });
       console.log('Logs response:', response);
       setLogs(response.logs || []);
@@ -206,7 +209,7 @@ function AdminLogs() {
             <select 
               value={filters.level} 
               onChange={(e) => handleFilterChange('level', e.target.value)}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <option value="all">Все уровни</option>
               <option value="critical">Критические</option>
@@ -217,7 +220,7 @@ function AdminLogs() {
             <select 
               value={filters.source} 
               onChange={(e) => handleFilterChange('source', e.target.value)}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <option value="all">Все источники</option>
               <option value="frontend">Frontend</option>
@@ -230,7 +233,7 @@ function AdminLogs() {
             <select 
               value={filters.resolved} 
               onChange={(e) => handleFilterChange('resolved', e.target.value)}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <option value="all">Все</option>
               <option value="false">Не решено</option>
@@ -239,7 +242,7 @@ function AdminLogs() {
             <select 
               value={filters.timeRange} 
               onChange={(e) => handleFilterChange('timeRange', e.target.value)}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <option value="1h">Последний час</option>
               <option value="24h">Последние 24 часа</option>
