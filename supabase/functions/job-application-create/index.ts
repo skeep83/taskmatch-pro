@@ -45,10 +45,15 @@ serve(async (req) => {
       throw new Error("Unauthorized");
     }
 
-    const { jobId, priceCents, etaSlot, note, warrantyDays }: JobApplicationParams = await req.json();
+    const requestBody = await req.json();
+    console.log('Request body received:', JSON.stringify(requestBody, null, 2));
+    
+    const { jobId, priceCents, etaSlot, note, warrantyDays }: JobApplicationParams = requestBody;
 
     // Validate input
+    console.log('Validating input:', { jobId, priceCents, type: typeof priceCents });
     if (!jobId || !priceCents || priceCents <= 0) {
+      console.error('Validation failed:', { jobId, priceCents });
       throw new Error("Invalid job ID or price");
     }
 
@@ -197,12 +202,37 @@ serve(async (req) => {
         errorDetails.user_id = user?.id;
       }
       
-      errorDetails.request_data = await req.clone().json().catch(() => 'Unable to parse request body');
+      const body = await req.clone().json().catch(() => null);
+      errorDetails.request_data = body;
     } catch (logError) {
       console.error('Error getting additional details for logging:', logError);
     }
     
     console.error('Detailed error information:', JSON.stringify(errorDetails, null, 2));
+    
+    // Try to log to admin logs system
+    try {
+      const adminSupabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      
+      await adminSupabase.from('error_logs').insert({
+        level: 'error',
+        source: 'edge_function_job_application_create',
+        message: `Job application creation failed: ${error.message}`,
+        stack_trace: error.stack,
+        user_id: errorDetails.user_id,
+        metadata: {
+          function_name: 'job-application-create',
+          request_data: errorDetails.request_data,
+          error_details: errorDetails,
+          timestamp: errorDetails.timestamp
+        }
+      });
+    } catch (logToDbError) {
+      console.error('Failed to log error to database:', logToDbError);
+    }
     
     return new Response(JSON.stringify({ 
       error: error.message 
