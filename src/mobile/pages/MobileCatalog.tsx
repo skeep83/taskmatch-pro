@@ -92,17 +92,15 @@ export default function MobileCatalog() {
               placeholder="Что вам нужно?"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 text-base rounded-2xl bg-card border-0 shadow-sm"
+              className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
             />
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
           </div>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="h-12 px-4 rounded-2xl"
+            className="h-12 px-4 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]"
           >
-            <SlidersHorizontal size={20} />
+            <SlidersHorizontal size={18} />
           </Button>
         </motion.div>
 
@@ -111,7 +109,7 @@ export default function MobileCatalog() {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center text-muted-foreground mb-6"
+          className="flex items-center text-gray-600 mb-6"
         >
           <MapPin size={16} className="mr-2" />
           <span>Кишинёв, Молдова</span>
@@ -124,15 +122,17 @@ export default function MobileCatalog() {
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <h3 className="text-lg font-semibold mb-3">Категории</h3>
+          <h3 className="text-lg font-semibold mb-3 text-gray-800">Категории</h3>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <Button
                 key={category.id}
-                variant={selectedCategory === category.id ? "default" : "outline"}
-                size="sm"
                 onClick={() => handleCategorySelect(category.id)}
-                className="rounded-full text-sm"
+                className={`rounded-xl text-sm px-4 py-2 h-10 ${
+                  selectedCategory === category.id 
+                    ? 'bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800' 
+                    : 'bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]'
+                }`}
               >
                 <span className="mr-2">{category.icon}</span>
                 {category.name}
@@ -166,10 +166,10 @@ export default function MobileCatalog() {
           transition={{ delay: 0.3 }}
           className="flex items-center justify-between mb-4"
         >
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-lg font-semibold text-gray-800">
             Найдено {jobs.length} заказов
           </h3>
-          <Button variant="ghost" size="sm" className="text-sm">
+          <Button className="text-sm bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB] rounded-xl px-3 py-2">
             <Filter size={16} className="mr-2" />
             Сортировка
           </Button>
@@ -199,7 +199,7 @@ export default function MobileCatalog() {
           transition={{ delay: 0.6 }}
           className="mt-8 text-center"
         >
-          <Button variant="outline" className="w-full h-12 rounded-2xl">
+          <Button className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
             Загрузить еще
           </Button>
         </motion.div>
