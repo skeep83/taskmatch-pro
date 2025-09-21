@@ -186,7 +186,7 @@ const JobNew = () => {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-[#E5E7EB]">
       <Seo title={`${t('app.name')} — Инстант‑бронирование`} description="Создать заказ" canonical="/job/new" />
       
       {/* Hero Section */}
@@ -204,18 +204,18 @@ const JobNew = () => {
               {t("job.new.subtitle")}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
+              <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
                 <div className="flex items-center gap-2 text-white">
                   <AnimatedIcon icon={Zap} className="text-yellow-300" />
                   <span>Мгновенные отклики</span>
                 </div>
-              </FloatingCard>
-              <FloatingCard className="p-3 bg-white/20 backdrop-blur-sm border-white/30">
+              </div>
+              <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
                 <div className="flex items-center gap-2 text-white">
                   <AnimatedIcon icon={Shield} className="text-green-300" />
                   <span>Защита эскроу</span>
                 </div>
-              </FloatingCard>
+              </div>
             </div>
           </div>
         </div>
@@ -224,10 +224,10 @@ const JobNew = () => {
       {/* Form Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-[#4B5563]">
             {t("job.new.title")}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
             {t("job.new.subtitle")}
           </p>
         </div>
@@ -238,36 +238,36 @@ const JobNew = () => {
             <div className="flex items-center space-x-4">
               {[1, 2, 3].map((stepNum) => (
                 <div key={stepNum} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                    stepNum <= step ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] ${
+                    stepNum <= step ? 'bg-primary text-white' : 'bg-[#E5E7EB] text-[#6B7280]'
                   }`}>
                     {stepNum <= step ? <CheckCircle className="w-5 h-5" /> : stepNum}
                   </div>
-                  {stepNum < 3 && <div className={`w-16 h-1 mx-2 transition-all ${
-                    stepNum < step ? 'bg-primary' : 'bg-muted'
+                  {stepNum < 3 && <div className={`w-16 h-1 mx-2 transition-all rounded-full ${
+                    stepNum < step ? 'bg-primary' : 'bg-[#D1D5DB]'
                   }`} />}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="card-surface p-8">
+          <div className="bg-[#E5E7EB] rounded-3xl p-8 shadow-[12px_12px_24px_#D1D5DB,-12px_-12px_24px_#F9FAFB]">
             <form className="space-y-8" onSubmit={onSubmit}>
               
               {/* Step 1: Service Details */}
               <div className="space-y-6">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">1</span>
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
+                  <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">1</span>
                   Детали услуги
                 </h2>
                 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="card-surface p-6">
-                    <label className="block text-sm font-medium mb-3">Категория услуги</label>
+                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                    <label className="block text-sm font-medium mb-3 text-[#374151]">Категория услуги</label>
                     <select 
                       name="category_id" 
                       defaultValue={presetCategory}
-                      className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all" 
+                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]" 
                       required
                     >
                       <option value="" disabled>Выберите категорию</option>
@@ -275,9 +275,9 @@ const JobNew = () => {
                     </select>
                   </div>
 
-                  <div className="card-surface p-6">
-                    <label className="block text-sm font-medium mb-3">Приоритет</label>
-                    <select name="urgency" className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all">
+                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                    <label className="block text-sm font-medium mb-3 text-[#374151]">Приоритет</label>
+                    <select name="urgency" className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]">
                       <option value="normal">Обычный</option>
                       <option value="urgent">Срочно (+30%)</option>
                       <option value="same_day">В тот же день (+50%)</option>
@@ -285,74 +285,74 @@ const JobNew = () => {
                   </div>
                 </div>
 
-                <div className="card-surface p-6">
-                  <label className="block text-sm font-medium mb-3">Описание задачи</label>
+                <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <label className="block text-sm font-medium mb-3 text-[#374151]">Описание задачи</label>
                   <textarea 
                     name="description"
-                    className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all" 
+                    className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]" 
                     rows={4}
                     placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
                     required
                   />
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-[#6B7280] mt-2">
                     Чем подробнее описание, тем точнее будут предложения специалистов
                   </p>
                 </div>
               </div>
 
               {/* Step 2: Budget & Schedule */}
-              <div className="space-y-6 pt-8 border-t border-white/10">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">2</span>
+              <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
+                  <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">2</span>
                   Бюджет и расписание
                 </h2>
                 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="card-surface p-6">
+                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
                           <Euro className="w-4 h-4 text-green-500" />
                           Бюджет от
                         </label>
                         <input 
                           name="budget_min" 
                           type="number" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
+                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                           placeholder="1000"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3">до</label>
+                        <label className="block text-sm font-medium mb-3 text-[#374151]">до</label>
                         <input 
                           name="budget_max" 
                           type="number" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
+                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                           placeholder="5000"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="card-surface p-6">
+                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
                           <Clock className="w-4 h-4 text-blue-500" />
                           Дата
                         </label>
                         <input 
                           name="date" 
                           type="date" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
+                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3">Время</label>
+                        <label className="block text-sm font-medium mb-3 text-[#374151]">Время</label>
                         <input 
                           name="time" 
                           type="time" 
-                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
+                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                         />
                       </div>
                     </div>
@@ -361,16 +361,16 @@ const JobNew = () => {
               </div>
 
               {/* Step 3: Photos */}
-              <div className="space-y-6 pt-8 border-t border-white/10">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">3</span>
+              <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
+                  <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">3</span>
                   Фотографии задачи
                 </h2>
                 
-                <div className="card-surface p-6">
+                <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <div
                     className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
-                      dragActive ? 'border-primary bg-primary/5' : 'border-white/20'
+                      dragActive ? 'border-primary bg-primary/5' : 'border-[#D1D5DB]'
                     }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
@@ -378,8 +378,8 @@ const JobNew = () => {
                     onDrop={handleDrop}
                   >
                     <AnimatedIcon icon={Camera} className="w-12 h-12 text-primary mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Добавьте фотографии</h3>
-                    <p className="text-muted-foreground mb-4">
+                    <h3 className="text-lg font-medium mb-2 text-[#374151]">Добавьте фотографии</h3>
+                    <p className="text-[#6B7280] mb-4">
                       Перетащите фото сюда или выберите файлы
                     </p>
                     <input
@@ -391,7 +391,7 @@ const JobNew = () => {
                       id="photo-upload"
                       name="photos"
                     />
-                    <label htmlFor="photo-upload" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg inline-flex items-center gap-2">
+                    <label htmlFor="photo-upload" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] inline-flex items-center gap-2 cursor-pointer">
                       <Upload className="w-4 h-4" />
                       Выбрать файлы
                     </label>
@@ -400,7 +400,7 @@ const JobNew = () => {
                   {uploadedFiles.length > 0 && (
                     <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map((file, index) => (
-                        <div key={index} className="relative group">
+                        <div key={index} className="relative group bg-[#E5E7EB] rounded-xl p-2 shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
                           <img
                             src={URL.createObjectURL(file)}
                             alt={`Upload ${index + 1}`}
@@ -409,7 +409,7 @@ const JobNew = () => {
                           <button
                             type="button"
                             onClick={() => removeFile(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-[2px_2px_4px_#D1D5DB]"
                           >
                             ×
                           </button>
@@ -421,11 +421,11 @@ const JobNew = () => {
               </div>
 
               {/* Submit */}
-              <div className="flex justify-between items-center pt-8 border-t border-white/10">
-                <button type="button" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg" onClick={() => navigate(-1)}>
+              <div className="flex justify-between items-center pt-8 border-t border-[#D1D5DB]">
+                <button type="button" className="bg-[#E5E7EB] text-[#374151] hover:bg-[#D1D5DB] px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]" onClick={() => navigate(-1)}>
                   Отмена
                 </button>
-                <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg" disabled={loading}>
+                <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]" disabled={loading}>
                   {loading ? 'Создаем заказ...' : 'Создать заказ'}
                 </button>
               </div>
