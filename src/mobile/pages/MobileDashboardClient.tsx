@@ -1,298 +1,859 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
+import { useEnhancedI18n } from "@/i18n/enhanced";
+import { useMobile } from "@/mobile/providers/MobileProvider";
+import { Seo } from "@/components/Seo";
+import { RoleGuard } from "@/components/RoleGuard";
+import { RoleUpgrade } from "@/components/RoleUpgrade";
+import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
+import { getUserRole, UserRole } from "@/lib/userRoles";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
+import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
+import { MobileCard } from "@/mobile/components/ui/MobileCard";
+import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { 
-  User, Briefcase, Gavel, Crown, CreditCard, Gift, Settings, 
-  CheckCircle, Clock, DollarSign, Plus, ChevronRight, Star 
-} from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { StarRating } from '@/components/ui/star-rating';
-import { MobileHeader } from '../components/navigation/MobileHeader';
-import { MobileCard } from '../components/ui/MobileCard';
-import { useMobile } from '../providers/MobileProvider';
-import { useEnhancedI18n } from '@/i18n/enhanced';
-import { RoleGuard } from '@/components/RoleGuard';
-import { Seo } from '@/components/Seo';
-import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
-import { useCurrency } from '@/hooks/useCurrency';
+  Briefcase, 
+  User, 
+  Calendar, 
+  Settings, 
+  Plus,
+  Clock,
+  CheckCircle,
+  MessageSquare,
+  Star,
+  Heart,
+  CreditCard,
+  Shield,
+  Gift,
+  MapPin,
+  Phone,
+  Bell,
+  Gavel,
+  Crown,
+  Video,
+  DollarSign,
+  Eye,
+  AlertCircle,
+  PlayCircle,
+  XCircle,
+  Zap,
+  Edit,
+  Trash2,
+  Copy
+} from "lucide-react";
+
+interface Job {
+  id: string;
+  title: string;
+  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'cancelled';
+  budget_min_cents?: number;
+  budget_max_cents?: number;
+  created_at: string;
+  scheduled_at?: string;
+  urgency: string;
+  pro_id?: string;
+  categories?: {
+    label_ru: string;
+  };
+}
+
+interface Subscription {
+  id: string;
+  plan: 'basic' | 'plus' | 'max';
+  status: 'active' | 'cancelled' | 'expired';
+  expires_at: string;
+  auto_renew: boolean;
+}
 
 export default function MobileDashboardClient() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+  const { formatPrice: formatCurrency } = useCurrency();
   const { t } = useEnhancedI18n();
-  const { bottomNavHeight, safeAreaInsets } = useMobile();
-  const { formatPrice } = useCurrency();
-  const [activeTab, setActiveTab] = useState("overview");
+  const { safeAreaInsets } = useMobile();
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "overview");
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [stats, setStats] = useState({
     totalJobs: 0,
-    activeJobs: 0, 
+    activeJobs: 0,
     completedJobs: 0,
-    totalSpent: 0
+    totalSpent: 0,
+    averageRating: 0,
+    refferalCode: '',
+    subscriptionStatus: 'none' as 'none' | 'basic' | 'plus' | 'max'
   });
-  const [recentJobs, setRecentJobs] = useState<any[]>([]);
+  const [profileData, setProfileData] = useState({
+    phone: '',
+    emailNotifications: true,
+    smsNotifications: false
+  });
+  const [saving, setSaving] = useState(false);
+  const [currentRole, setCurrentRole] = useState<UserRole>('client');
+  const [hasPendingProRequest, setHasPendingProRequest] = useState(false);
 
-  // Load user data and stats - same logic as desktop
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        setUser(user);
-
-        // Get user profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        setUserProfile(profile);
-
-        // Get jobs stats
-        const { data: jobs } = await supabase
-          .from('jobs')
-          .select('status, price_cents')
-          .eq('client_id', user.id);
-
-        if (jobs) {
-          const stats = {
-            totalJobs: jobs.length,
-            activeJobs: jobs.filter(j => ['pending', 'in_progress'].includes(j.status)).length,
-            completedJobs: jobs.filter(j => j.status === 'completed').length,
-            totalSpent: jobs.filter(j => j.status === 'completed').reduce((sum, j) => sum + (j.price_cents || 0), 0)
-          };
-          setStats(stats);
-        }
-
-        // Get recent jobs
-        const { data: recentJobsData } = await supabase
-          .from('jobs')
-          .select(`
-            *,
-            categories(name_ru),
-            job_applications(
-              id,
-              status,
-              profiles(first_name, last_name, avatar_url)
-            )
-          `)
-          .eq('client_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        setRecentJobs(recentJobsData || []);
-      } catch (error) {
-        console.error('Error loading user data:', error);
-      }
-    };
-
-    loadUserData();
+    checkAuth();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadUserData();
+    }
+  }, [user]);
+
+  const checkAuth = async () => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session.session?.user) {
+        navigate("/auth");
+        return;
+      }
+
+      setUser(session.session.user);
+      
+      // Load role data
+      const roleResult = await getUserRole(session.session.user.id);
+      if (roleResult.success) {
+        setCurrentRole(roleResult.role);
+      }
+
+      // Check for pending pro upgrade request
+      const { data: proRequest } = await supabase
+        .from('pro_upgrade_requests')
+        .select('status')
+        .eq('user_id', session.session.user.id)
+        .eq('status', 'pending')
+        .maybeSingle();
+      
+      setHasPendingProRequest(!!proRequest);
+      
+      // Load profile data
+      const { data: profileInfo } = await supabase
+        .from('profiles')
+        .select('phone')
+        .eq('id', session.session.user.id)
+        .single();
+      
+      if (profileInfo) {
+        setProfileData(prev => ({
+          ...prev,
+          phone: profileInfo.phone || ''
+        }));
+      }
+      
+      setLoading(false);
+    } catch (error: any) {
+      toast({ 
+        title: t("common.error"), 
+        description: error.message || t("auth.error.generic"), 
+        variant: "destructive" 
+      });
+      setLoading(false);
+    }
+  };
+
+  const loadUserData = async () => {
+    try {
+      // Load user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, full_name, avatar_url")
+        .eq("id", user.id)
+        .single();
+      
+      setUserProfile(profileData);
+
+      // Load user jobs
+      const { data: jobsData, error: jobsError } = await supabase
+        .from("jobs")
+        .select(`
+          id,
+          title,
+          status,
+          budget_min_cents,
+          budget_max_cents,
+          created_at,
+          scheduled_at,
+          urgency,
+          pro_id,
+          categories!inner (
+            label_ru
+          )
+        `)
+        .eq("client_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (jobsError) throw jobsError;
+      setJobs(jobsData || []);
+
+      // Calculate stats
+      const totalJobs = jobsData?.length || 0;
+      const activeJobs = jobsData?.filter(j => ['accepted', 'in_progress'].includes(j.status)).length || 0;
+      const completedJobs = jobsData?.filter(j => j.status === 'done').length || 0;
+      const totalSpent = jobsData?.reduce((sum, j) => {
+        if (j.budget_min_cents && j.budget_max_cents) {
+          return sum + (j.budget_min_cents + j.budget_max_cents) / 2;
+        }
+        return sum;
+      }, 0) || 0;
+
+      setStats(prev => ({
+        ...prev,
+        totalJobs,
+        activeJobs,
+        completedJobs,
+        totalSpent,
+        refferalCode: `REF${user.id.slice(-8).toUpperCase()}`
+      }));
+
+    } catch (error: any) {
+      console.error('Failed to load user data:', error);
+    }
+  };
+
+  const saveProfile = async () => {
+    if (!user) return;
+    
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          phone: profileData.phone
+        })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: 'Профиль обновлен',
+        description: 'Изменения сохранены успешно'
+      });
+    } catch (error: any) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось сохранить изменения: ${error.message}`,
+        variant: 'destructive'
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const canEditJob = (job: Job) => {
+    return job.status === 'new' && !job.urgency;
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Заказ удален',
+        description: 'Заказ был успешно удален'
+      });
+      
+      loadUserData();
+    } catch (error: any) {
+      console.error('Error deleting job:', error);
+      toast({
+        title: 'Ошибка',
+        description: `Не удалось удалить заказ: ${error.message}`,
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'new': return <AlertCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'accepted': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'in_progress': return <PlayCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'done': return <CheckCircle className="h-3 w-3 flex-shrink-0" />;
+      case 'cancelled': return <XCircle className="h-3 w-3 flex-shrink-0" />;
+      default: return <Clock className="h-3 w-3 flex-shrink-0" />;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusMap = {
+      'new': { label: 'Новый', variant: 'secondary' as const },
+      'accepted': { label: 'Принят', variant: 'default' as const },
+      'in_progress': { label: 'В работе', variant: 'default' as const },
+      'done': { label: 'Выполнен', variant: 'default' as const },
+      'cancelled': { label: 'Отменен', variant: 'destructive' as const }
+    };
+    
+    const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const };
+    return (
+      <Badge variant={statusInfo.variant} className="flex items-center gap-1">
+        <span>{statusInfo.label}</span>
+        {getStatusIcon(status)}
+      </Badge>
+    );
+  };
+
+  const getUrgencyBadge = (urgency: string) => {
+    const urgencyMap = {
+      'normal': { label: 'Обычный', variant: 'outline' as const },
+      'urgent': { label: 'Срочно', variant: 'secondary' as const },
+      'same_day': { label: 'В тот же день', variant: 'destructive' as const }
+    };
+    
+    const urgencyInfo = urgencyMap[urgency as keyof typeof urgencyMap] || { label: urgency, variant: 'outline' as const };
+    return <Badge variant={urgencyInfo.variant}>{urgencyInfo.label}</Badge>;
+  };
+
+  const formatPrice = (minCents?: number, maxCents?: number) => {
+    if (!minCents && !maxCents) return "Не указан";
+    
+    if (minCents && maxCents) {
+      return `${formatCurrency(minCents)} - ${formatCurrency(maxCents)}`;
+    }
+    
+    return formatCurrency(minCents || maxCents || 0);
+  };
+
+  const copyReferralCode = () => {
+    navigator.clipboard.writeText(stats.refferalCode);
+    toast({
+      title: 'Скопировано!',
+      description: 'Реферальный код скопирован в буфер обмена'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <MobileCard className="p-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">{t('client.dashboard.loading')}</h1>
+          <div className="animate-spin">⏳</div>
+        </MobileCard>
+      </div>
+    );
+  }
+
+  const tabItems = [
+    { id: "overview", label: "Обзор", icon: User },
+    { id: "jobs", label: "Заказы", icon: Briefcase },
+    { id: "tenders", label: "Тендеры", icon: Gavel },
+    { id: "subscription", label: "Подписка", icon: Crown },
+    { id: "payments", label: "Платежи", icon: CreditCard },
+    { id: "referrals", label: "Рефералы", icon: Gift },
+    { id: "settings", label: "Настройки", icon: Settings }
+  ];
 
   return (
     <RoleGuard requiredRole="client">
       <Seo title={`${t('app.name')} — ${t('client.dashboard.title')}`} description={t('client.dashboard.description')} canonical="/dashboard/client" />
       
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#E5E7EB]">
         <MobileHeader 
-          title={t('client.dashboard.title')}
+          title="Панель клиента"
+          showBack={false}
+          showNotifications={true}
         />
-
+        
         <div 
-          className="px-4 pt-4"
-          style={{ 
-            paddingTop: 56 + safeAreaInsets.top + 16,
-            paddingBottom: bottomNavHeight + safeAreaInsets.bottom + 16 
-          }}
+          className="pt-20 pb-24 px-4 space-y-6"
+          style={{ paddingTop: `${80 + safeAreaInsets.top}px` }}
         >
-          {/* Mobile Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Horizontal scrollable tabs */}
-            <div className="overflow-x-auto">
-              <TabsList className="flex w-max space-x-2 bg-transparent p-1">
-                <TabsTrigger 
-                  value="overview" 
-                  className="flex items-center gap-2 rounded-xl bg-card shadow-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 whitespace-nowrap"
+          {/* Welcome Section */}
+          <MobileCard className="text-center">
+            <h1 className="text-2xl font-bold mb-2">
+              Добро пожаловать!
+            </h1>
+            <p className="text-muted-foreground">
+              {userProfile?.full_name || 
+               (userProfile?.first_name && userProfile?.last_name 
+                 ? `${userProfile.first_name} ${userProfile.last_name}` 
+                 : user?.email)}
+            </p>
+          </MobileCard>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <MobileCard>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Всего заказов</p>
+                  <p className="text-2xl font-bold">{stats.totalJobs}</p>
+                </div>
+                <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
+              </div>
+            </MobileCard>
+
+            <MobileCard>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Активных</p>
+                  <p className="text-2xl font-bold">{stats.activeJobs}</p>
+                </div>
+                <NeumorphicIcon icon={Clock} size={48} variant="behance" />
+              </div>
+            </MobileCard>
+
+            <MobileCard>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Выполнено</p>
+                  <p className="text-2xl font-bold">{stats.completedJobs}</p>
+                </div>
+                <NeumorphicIcon icon={CheckCircle} size={48} variant="behance" />
+              </div>
+            </MobileCard>
+
+            <MobileCard>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Потрачено</p>
+                  <p className="text-lg font-bold">{formatCurrency(stats.totalSpent)}</p>
+                </div>
+                <NeumorphicIcon icon={DollarSign} size={48} variant="behance" />
+              </div>
+            </MobileCard>
+          </div>
+
+          {/* Horizontal Tab Navigation */}
+          <div className="overflow-x-auto">
+            <div className="flex space-x-2 p-2 min-w-max">
+              {tabItems.map((tab) => (
+                <motion.button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-300 ${
+                    activeTab === tab.id
+                      ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black'
+                      : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600'
+                  }`}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <User size={16} />
-                  <span className="text-sm">{t('client.dashboard.tabs.overview')}</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="jobs" 
-                  className="flex items-center gap-2 rounded-xl bg-card shadow-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 whitespace-nowrap"
-                >
-                  <Briefcase size={16} />
-                  <span className="text-sm">{t('client.dashboard.tabs.jobs')}</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="tenders" 
-                  className="flex items-center gap-2 rounded-xl bg-card shadow-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 whitespace-nowrap"
-                >
-                  <Gavel size={16} />
-                  <span className="text-sm">{t('client.dashboard.tabs.tenders')}</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="subscription" 
-                  className="flex items-center gap-2 rounded-xl bg-card shadow-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 whitespace-nowrap"
-                >
-                  <Crown size={16} />
-                  <span className="text-sm">{t('client.dashboard.tabs.subscription')}</span>
-                </TabsTrigger>
-              </TabsList>
+                  <tab.icon className="h-4 w-4" />
+                  <span className="text-sm font-medium">{tab.label}</span>
+                </motion.button>
+              ))}
             </div>
+          </div>
 
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
-              {/* Quick Stats - Mobile Grid (2x2) */}
+          {/* Tab Content */}
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              {/* Quick Actions */}
               <div className="grid grid-cols-2 gap-4">
-                <MobileCard className="p-4">
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Briefcase size={20} className="text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('client.dashboard.stats.total_jobs')}</p>
-                      <p className="text-xl font-bold">{stats.totalJobs}</p>
-                    </div>
+                <MobileCard 
+                  pressable 
+                  onPress={() => navigate("/job/new")}
+                  className="text-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
+                    <Plus className="h-6 w-6 text-primary" />
                   </div>
+                  <h3 className="font-semibold text-sm">Создать заказ</h3>
                 </MobileCard>
 
-                <MobileCard className="p-4">
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                      <Clock size={20} className="text-orange-500" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('client.dashboard.stats.active_jobs')}</p>
-                      <p className="text-xl font-bold">{stats.activeJobs}</p>
-                    </div>
+                <MobileCard 
+                  pressable 
+                  onPress={() => navigate("/messages")}
+                  className="text-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
+                    <MessageSquare className="h-6 w-6 text-primary" />
                   </div>
+                  <h3 className="font-semibold text-sm">Сообщения</h3>
                 </MobileCard>
 
-                <MobileCard className="p-4">
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                      <CheckCircle size={20} className="text-green-500" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('client.dashboard.stats.completed_jobs')}</p>
-                      <p className="text-xl font-bold">{stats.completedJobs}</p>
-                    </div>
+                <MobileCard 
+                  pressable 
+                  onPress={() => setActiveTab("subscription")}
+                  className="text-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
+                    <Crown className="h-6 w-6 text-primary" />
                   </div>
+                  <h3 className="font-semibold text-sm">Подписка</h3>
                 </MobileCard>
 
-                <MobileCard className="p-4">
-                  <div className="flex flex-col items-center text-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                      <DollarSign size={20} className="text-blue-500" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('client.dashboard.stats.total_spent')}</p>
-                      <p className="text-lg font-bold">{formatPrice(stats.totalSpent)}</p>
-                    </div>
+                <MobileCard className="text-center opacity-50">
+                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
+                    <Gavel className="h-6 w-6 text-muted-foreground" />
                   </div>
+                  <h3 className="font-semibold text-sm text-muted-foreground">Тендеры</h3>
+                  <p className="text-xs text-muted-foreground">Только бизнес</p>
                 </MobileCard>
               </div>
 
-              {/* Quick Actions */}
-              <MobileCard className="p-4">
-                <h3 className="font-semibold mb-4">Быстрые действия</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="h-16 flex flex-col gap-2">
-                    <Plus size={20} />
-                    <span className="text-xs">Создать заказ</span>
-                  </Button>
-                  <Button variant="outline" className="h-16 flex flex-col gap-2">
-                    <Gavel size={20} />
-                    <span className="text-xs">Создать тендер</span>
-                  </Button>
-                </div>
-              </MobileCard>
+              {/* Role Upgrade */}
+              {hasPendingProRequest ? (
+                <ProUpgradeStatusCard userId={user?.id || ''} />
+              ) : (
+                <MobileCard>
+                  <RoleUpgrade
+                    userId={user?.id || ''}
+                    currentRole={currentRole}
+                    onRoleUpgraded={(newRole) => {
+                      setCurrentRole(newRole);
+                      if (newRole === 'pro') {
+                        setHasPendingProRequest(true);
+                      }
+                      toast({
+                        title: "Заявка отправлена",
+                        description: newRole === 'pro' 
+                          ? "Ваша заявка на статус специалиста отправлена на рассмотрение!"
+                          : "Ваша роль была успешно обновлена!"
+                      });
+                    }}
+                  />
+                </MobileCard>
+              )}
 
               {/* Recent Jobs */}
-              <MobileCard className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold">Недавние заказы</h3>
-                  <ChevronRight size={20} className="text-muted-foreground" />
-                </div>
-                <div className="space-y-3">
-                  {recentJobs.slice(0, 3).map((job) => (
-                    <motion.div
-                      key={job.id}
-                      className="flex items-center justify-between p-3 bg-background rounded-lg border"
+              <MobileCard>
+                <h2 className="text-xl font-semibold mb-4">Последние заказы</h2>
+                {jobs.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="mb-2">У вас пока нет заказов</p>
+                    <Button 
+                      onClick={() => navigate("/job/new")}
+                      className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] text-gray-700"
                     >
-                      <div className="flex-1">
-                        <p className="font-medium text-sm truncate">{job.title}</p>
-                        <p className="text-xs text-muted-foreground">{job.categories?.name_ru}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant={
-                            job.status === 'completed' ? 'default' : 
-                            job.status === 'in_progress' ? 'secondary' : 'outline'
-                          } className="text-xs">
-                            {job.status}
-                          </Badge>
-                          {job.price_cents && (
-                            <span className="text-xs text-muted-foreground">
-                              {formatPrice(job.price_cents)}
-                            </span>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Создать заказ
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {jobs.slice(0, 3).map((job) => (
+                      <div key={job.id} className="p-3 border rounded-lg bg-white/50">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-sm">{job.title || "Без названия"}</h4>
+                          {getStatusBadge(job.status)}
+                        </div>
+                        <div className="text-xs text-muted-foreground mb-2">
+                          {job.categories?.label_ru || "Другое"} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate(`/job/${job.id}`)}
+                            className="flex-1"
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Просмотр
+                          </Button>
+                          {job.pro_id && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate("/messages")}
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       </div>
-                      <ChevronRight size={16} className="text-muted-foreground" />
-                    </motion.div>
+                    ))}
+                  </div>
+                )}
+              </MobileCard>
+            </div>
+          )}
+
+          {activeTab === "jobs" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Мои заказы</h2>
+                <Button
+                  onClick={() => navigate("/job/new")}
+                  size="sm"
+                  className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-700"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Создать
+                </Button>
+              </div>
+              
+              {jobs.length === 0 ? (
+                <MobileCard className="text-center py-8">
+                  <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-muted-foreground">У вас пока нет заказов</p>
+                </MobileCard>
+              ) : (
+                <div className="space-y-3">
+                  {jobs.map((job) => (
+                    <MobileCard key={job.id}>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">{job.title}</h4>
+                          {getStatusBadge(job.status)}
+                        </div>
+                        
+                        <div className="text-sm text-muted-foreground">
+                          {job.categories?.label_ru || "Другое"}
+                        </div>
+                        
+                        <div className="text-sm">
+                          <strong>Бюджет:</strong> {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                        </div>
+                        
+                        <div className="text-sm text-muted-foreground">
+                          {new Date(job.created_at).toLocaleDateString('ru-RU')}
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate(`/job/${job.id}`)}
+                            className="flex-1"
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            Просмотр
+                          </Button>
+                          
+                          {canEditJob(job) && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate(`/job/${job.id}/edit`)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          )}
+                          
+                          {canEditJob(job) && (
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleDeleteJob(job.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                          
+                          {job.pro_id && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate("/messages")}
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </MobileCard>
                   ))}
                 </div>
-              </MobileCard>
-            </TabsContent>
+              )}
+            </div>
+          )}
 
-            {/* Jobs Tab */}
-            <TabsContent value="jobs" className="space-y-6">
-              <MobileCard className="p-4">
-                <div className="text-center py-8">
-                  <Briefcase size={48} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-medium mb-2">Мои заказы</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Управляйте вашими заказами</p>
-                  <Button>
-                    <Plus size={16} className="mr-2" />
-                    Создать заказ
+          {activeTab === "tenders" && (
+            <MobileCard className="text-center py-8">
+              <div className="relative inline-block mb-6">
+                <Gavel className="h-16 w-16 mx-auto opacity-30" />
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <span className="text-sm text-white font-bold">B</span>
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Тендеры доступны только для бизнес аккаунтов</h3>
+              <p className="text-muted-foreground mb-4">Для создания тендеров необходимо перейти на бизнес аккаунт</p>
+              <Button 
+                onClick={() => navigate("/dashboard/business")}
+                className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-700"
+              >
+                Перейти к бизнес аккаунту
+              </Button>
+            </MobileCard>
+          )}
+
+          {activeTab === "subscription" && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Планы подписки</h2>
+              
+              {/* Current Plan */}
+              <MobileCard>
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-4">
+                    <User className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Базовый план</h3>
+                  <p className="text-muted-foreground">Текущий план</p>
+                </div>
+              </MobileCard>
+
+              {/* Available Plans */}
+              <div className="space-y-4">
+                <MobileCard>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold">HomeCare Basic</h4>
+                      <p className="text-sm text-muted-foreground">Основные функции</p>
+                      <p className="text-lg font-bold">299 ₽/мес</p>
+                    </div>
+                    <Button variant="outline">Выбрать</Button>
+                  </div>
+                </MobileCard>
+
+                <MobileCard>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold">HomeCare Plus</h4>
+                      <p className="text-sm text-muted-foreground">Расширенные возможности</p>
+                      <p className="text-lg font-bold">599 ₽/мес</p>
+                    </div>
+                    <Button>Выбрать</Button>
+                  </div>
+                </MobileCard>
+
+                <MobileCard>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold">HomeCare Max</h4>
+                      <p className="text-sm text-muted-foreground">Максимальный функционал</p>
+                      <p className="text-lg font-bold">999 ₽/мес</p>
+                    </div>
+                    <Button>Выбрать</Button>
+                  </div>
+                </MobileCard>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "payments" && (
+            <MobileCard className="text-center py-8">
+              <CreditCard className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <h3 className="text-lg font-semibold mb-2">История платежей</h3>
+              <p className="text-muted-foreground">Здесь будет отображаться история ваших платежей</p>
+            </MobileCard>
+          )}
+
+          {activeTab === "referrals" && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Реферальная программа</h2>
+              
+              <MobileCard>
+                <div className="text-center">
+                  <Gift className="h-12 w-12 mx-auto mb-4 text-primary" />
+                  <h3 className="text-lg font-semibold mb-2">Ваш реферальный код</h3>
+                  <div className="flex items-center gap-2 p-3 bg-white/50 rounded-lg mb-4">
+                    <code className="flex-1 text-center font-mono text-lg">{stats.refferalCode}</code>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={copyReferralCode}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Поделитесь кодом с друзьями и получите бонусы за каждого нового пользователя
+                  </p>
+                </div>
+              </MobileCard>
+
+              <MobileCard>
+                <h4 className="font-semibold mb-3">Статистика рефералов</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Приглашено пользователей:</span>
+                    <span className="font-semibold">0</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Заработано бонусов:</span>
+                    <span className="font-semibold">0 ₽</span>
+                  </div>
+                </div>
+              </MobileCard>
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Настройки</h2>
+              
+              <MobileCard>
+                <h4 className="font-semibold mb-4">Профиль</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Телефон</label>
+                    <Input
+                      type="tel"
+                      value={profileData.phone}
+                      onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="+7 (999) 123-45-67"
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={saveProfile} 
+                    disabled={saving}
+                    className="w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-700"
+                  >
+                    {saving ? 'Сохранение...' : 'Сохранить'}
                   </Button>
                 </div>
               </MobileCard>
-            </TabsContent>
 
-            {/* Tenders Tab */}
-            <TabsContent value="tenders" className="space-y-6">
-              <MobileCard className="p-4">
-                <div className="text-center py-8">
-                  <Gavel size={48} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-medium mb-2">Мои тендеры</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Создавайте тендеры и получайте предложения</p>
-                  <Button>
-                    <Plus size={16} className="mr-2" />
-                    Создать тендер
-                  </Button>
+              <MobileCard>
+                <h4 className="font-semibold mb-4">Уведомления</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-medium">Email уведомления</label>
+                      <p className="text-xs text-muted-foreground">Получать уведомления на email</p>
+                    </div>
+                    <Switch
+                      checked={profileData.emailNotifications}
+                      onCheckedChange={(checked) => 
+                        setProfileData(prev => ({ ...prev, emailNotifications: checked }))
+                      }
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-medium">SMS уведомления</label>
+                      <p className="text-xs text-muted-foreground">Получать SMS уведомления</p>
+                    </div>
+                    <Switch
+                      checked={profileData.smsNotifications}
+                      onCheckedChange={(checked) => 
+                        setProfileData(prev => ({ ...prev, smsNotifications: checked }))
+                      }
+                    />
+                  </div>
                 </div>
               </MobileCard>
-            </TabsContent>
-
-            {/* Subscription Tab */}
-            <TabsContent value="subscription" className="space-y-6">
-              <MobileCard className="p-4">
-                <div className="text-center py-8">
-                  <Crown size={48} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-medium mb-2">Подписка</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Управляйте вашей подпиской HomeCare</p>
-                  <Button variant="outline">
-                    Управлять планом
-                  </Button>
-                </div>
-              </MobileCard>
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
         </div>
       </div>
     </RoleGuard>
