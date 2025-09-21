@@ -44,7 +44,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [imageSrc, setImageSrc] = useState(src);
 
-  // Convert Supabase storage path to public URL
+  // Convert Supabase storage path to public URL with optimization
   const publicUrl = useMemo(() => {
     // If it's already a full URL, return as is
     if (src.startsWith('http')) {
@@ -53,7 +53,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     
     // If it's a storage path, convert to public URL
     if (bucket) {
-      return supabase.storage.from(bucket).getPublicUrl(src).data.publicUrl;
+      const url = supabase.storage.from(bucket).getPublicUrl(src).data.publicUrl;
+      // Add quality parameter for optimization
+      return `${url}?quality=${quality}&format=webp`;
     }
     
     // Try to detect bucket from path
@@ -61,12 +63,14 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     if (pathParts.length >= 2) {
       const detectedBucket = pathParts[0];
       const filePath = pathParts.slice(1).join('/');
-      return supabase.storage.from(detectedBucket).getPublicUrl(filePath).data.publicUrl;
+      const url = supabase.storage.from(detectedBucket).getPublicUrl(filePath).data.publicUrl;
+      return `${url}?quality=${quality}&format=webp`;
     }
     
     // Fallback - assume it's in evidence bucket
-    return supabase.storage.from('evidence').getPublicUrl(src).data.publicUrl;
-  }, [src, bucket]);
+    const url = supabase.storage.from('evidence').getPublicUrl(src).data.publicUrl;
+    return `${url}?quality=${quality}&format=webp`;
+  }, [src, bucket, quality]);
 
   const handleLoad = useCallback(() => {
     setImageState('loaded');
@@ -109,6 +113,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         sizes={sizes || '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'}
         loading={priority ? 'eager' : loading}
         decoding="async"
+        fetchPriority={priority ? 'high' : 'auto'}
+        referrerPolicy="no-referrer-when-downgrade"
+        crossOrigin="anonymous"
         className={cn(
           'transition-opacity duration-300',
           objectFit === 'cover' && 'object-cover',

@@ -132,9 +132,13 @@ export default function AdminLayout() {
               
               <div className="flex items-center gap-2">
                 {userRoles.map(role => (
-                  <div key={role} className="px-3 py-1 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
-                    <span className="text-xs font-medium text-gray-700">{role}</span>
-                  </div>
+                  <Badge 
+                    key={role}
+                    variant="secondary" 
+                    className="px-3 py-1 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-xs font-medium text-gray-700"
+                  >
+                    {role}
+                  </Badge>
                 ))}
               </div>
               

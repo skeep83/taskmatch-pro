@@ -239,9 +239,6 @@ class AdvancedErrorLogger {
         observer.observe({ entryTypes: ['longtask'] });
       } catch (e) {
         // Silently ignore if PerformanceObserver not supported
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('PerformanceObserver not supported');
-        }
       }
     }
   }
@@ -257,6 +254,11 @@ class AdvancedErrorLogger {
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
       ).join(' ');
 
+      // Don't log our own logging errors to avoid recursion
+      if (message.includes('Failed to log advanced error')) {
+        return;
+      }
+
       this.logAdvancedError({
         level: 'error',
         source: 'frontend',
@@ -269,11 +271,22 @@ class AdvancedErrorLogger {
     };
 
     console.warn = (...args) => {
-      originalWarn.apply(console, args);
-      
       const message = args.map(arg => 
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
       ).join(' ');
+
+      // Don't log our own logging warnings to avoid spam
+      if (message.includes('Failed to log advanced error') || 
+          message.includes('PerformanceObserver not supported') ||
+          message.includes('Performance observation not supported')) {
+        // Only call original warn in development
+        if (process.env.NODE_ENV === 'development') {
+          originalWarn.apply(console, args);
+        }
+        return;
+      }
+
+      originalWarn.apply(console, args);
 
       this.logAdvancedError({
         level: 'warning',
@@ -454,9 +467,6 @@ class AdvancedErrorLogger {
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
       } catch (e) {
         // Silently ignore if not supported
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('Performance observation not supported');
-        }
       }
     }
   }
