@@ -72,14 +72,12 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin" />
-            <span>Проверяем статус заявки...</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+        <div className="flex items-center gap-2">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          <span>Проверяем статус заявки...</span>
+        </div>
+      </div>
     );
   }
 
@@ -95,32 +93,32 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
           icon: Clock,
           title: "Заявка рассматривается",
           description: "Ваша заявка на статус специалиста находится на рассмотрении у администрации",
-          badge: <Badge variant="outline" className="text-yellow-600"><Clock className="w-3 h-3 mr-1" />Ожидает</Badge>,
-          color: "border-yellow-200 bg-yellow-50"
+          badge: <Badge variant="outline" className="text-yellow-600 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] border-yellow-300"><Clock className="w-3 h-3 mr-1" />Ожидает</Badge>,
+          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
         };
       case 'approved':
         return {
           icon: CheckCircle,
           title: "Заявка одобрена!",
           description: "Поздравляем! Ваша заявка одобрена, и вы получили статус специалиста",
-          badge: <Badge variant="default" className="text-green-600"><CheckCircle className="w-3 h-3 mr-1" />Одобрено</Badge>,
-          color: "border-green-200 bg-green-50"
+          badge: <Badge variant="default" className="text-green-600 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] border-green-300"><CheckCircle className="w-3 h-3 mr-1" />Одобрено</Badge>,
+          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
         };
       case 'rejected':
         return {
           icon: XCircle,
           title: "Заявка отклонена",
           description: "К сожалению, ваша заявка была отклонена",
-          badge: <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Отклонено</Badge>,
-          color: "border-red-200 bg-red-50"
+          badge: <Badge variant="destructive" className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"><XCircle className="w-3 h-3 mr-1" />Отклонено</Badge>,
+          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
         };
       default:
         return {
           icon: AlertCircle,
           title: "Статус неизвестен",
           description: "Не удалось определить статус заявки",
-          badge: <Badge variant="outline">Неизвестно</Badge>,
-          color: "border-gray-200 bg-gray-50"
+          badge: <Badge variant="outline" className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">Неизвестно</Badge>,
+          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
         };
     }
   };
@@ -129,61 +127,61 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
   const IconComponent = config.icon;
 
   return (
-    <Card className={`${config.color} border-2`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <IconComponent className="w-5 h-5" />
-            {config.title}
-          </CardTitle>
-          {config.badge}
+    <div className={`${config.color} rounded-2xl p-8`}>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <IconComponent className="w-6 h-6 text-primary" />
+          </div>
+          <h3 className="text-xl font-display font-bold">{config.title}</h3>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground">
+        {config.badge}
+      </div>
+
+      <div className="space-y-6">
+        <p className="text-muted-foreground">
           {config.description}
         </p>
 
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Подана:</span>
-            <span>{formatDistanceToNow(new Date(request.submitted_at), { addSuffix: true, locale: ru })}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl">
+            <span className="text-muted-foreground block mb-1">Подана:</span>
+            <span className="font-medium">{formatDistanceToNow(new Date(request.submitted_at), { addSuffix: true, locale: ru })}</span>
           </div>
           
           {request.reviewed_at && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Рассмотрена:</span>
-              <span>{formatDistanceToNow(new Date(request.reviewed_at), { addSuffix: true, locale: ru })}</span>
+            <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl">
+              <span className="text-muted-foreground block mb-1">Рассмотрена:</span>
+              <span className="font-medium">{formatDistanceToNow(new Date(request.reviewed_at), { addSuffix: true, locale: ru })}</span>
             </div>
           )}
         </div>
 
         {request.status === 'rejected' && request.rejection_reason && (
-          <div className="p-3 bg-red-100 border border-red-200 rounded-lg">
-            <p className="text-sm font-medium text-red-800 mb-1">Причина отклонения:</p>
+          <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl border-l-4 border-red-400">
+            <p className="text-sm font-medium text-red-800 mb-2">Причина отклонения:</p>
             <p className="text-sm text-red-700">{request.rejection_reason}</p>
           </div>
         )}
 
         {request.status === 'pending' && (
-          <div className="p-3 bg-blue-100 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl border-l-4 border-blue-400">
+            <p className="text-sm text-blue-800 flex items-center gap-2">
               📋 Среднее время рассмотрения: 24 часа
             </p>
           </div>
         )}
 
         <div className="flex justify-end">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <button 
             onClick={loadUpgradeStatus}
+            className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium"
           >
-            <RefreshCw className="w-3 h-3 mr-1" />
+            <RefreshCw className="w-4 h-4" />
             Обновить статус
-          </Button>
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
