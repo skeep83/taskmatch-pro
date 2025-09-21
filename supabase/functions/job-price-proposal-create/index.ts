@@ -60,10 +60,19 @@ serve(async (req) => {
       });
     }
 
-    const { jobId, priceCents, etaSlot, note, warrantyDays }: PriceProposalParams = await req.json();
+    const requestBody = await req.json();
+    console.log('Price proposal request body:', JSON.stringify(requestBody, null, 2));
+    
+    const { jobId, priceCents, etaSlot, note, warrantyDays }: PriceProposalParams = requestBody;
 
+    // Detailed validation logging
+    console.log('Validating price proposal parameters:');
+    console.log('- jobId:', jobId, 'Type:', typeof jobId, 'Valid:', !!jobId);
+    console.log('- priceCents:', priceCents, 'Type:', typeof priceCents, 'Valid number:', typeof priceCents === 'number', 'Greater than 0:', priceCents > 0);
+    
     // Validate input
     if (!jobId || !priceCents || priceCents <= 0) {
+      console.error('Price proposal validation failed:', { jobId, priceCents, typeOfPrice: typeof priceCents });
       return new Response(JSON.stringify({ error: 'Invalid input data' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

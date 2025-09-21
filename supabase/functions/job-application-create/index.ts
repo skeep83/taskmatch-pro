@@ -50,11 +50,32 @@ serve(async (req) => {
     
     const { jobId, priceCents, etaSlot, note, warrantyDays }: JobApplicationParams = requestBody;
 
-    // Validate input
-    console.log('Validating input:', { jobId, priceCents, type: typeof priceCents });
-    if (!jobId || !priceCents || priceCents <= 0) {
-      console.error('Validation failed:', { jobId, priceCents });
-      throw new Error("Invalid job ID or price");
+    // Detailed validation logging
+    console.log('Validating input parameters:');
+    console.log('- jobId:', jobId, 'Type:', typeof jobId, 'Valid:', !!jobId);
+    console.log('- priceCents:', priceCents, 'Type:', typeof priceCents, 'Valid number:', typeof priceCents === 'number', 'Greater than 0:', priceCents > 0);
+    console.log('- etaSlot:', etaSlot);
+    console.log('- note:', note);
+    console.log('- warrantyDays:', warrantyDays);
+    
+    if (!jobId) {
+      console.error('Validation failed: Missing jobId');
+      throw new Error("Missing job ID");
+    }
+    
+    if (!priceCents) {
+      console.error('Validation failed: Missing priceCents');
+      throw new Error("Missing price");
+    }
+    
+    if (typeof priceCents !== 'number') {
+      console.error('Validation failed: priceCents is not a number, received:', typeof priceCents, priceCents);
+      throw new Error("Price must be a number");
+    }
+    
+    if (priceCents <= 0) {
+      console.error('Validation failed: priceCents <= 0, received:', priceCents);
+      throw new Error("Price must be greater than 0");
     }
 
     // Check if user is a professional

@@ -78,10 +78,10 @@ export default function MobileJobRespond() {
       const { data, error } = await supabase.functions.invoke('job-application-create', {
         body: {
           jobId: id,
-          price: Math.round(price * 100), // Convert to cents
-          eta: formData.eta,
-          warranty: parseInt(formData.warranty),
-          notes: formData.notes
+          priceCents: Math.round(price * 100), // Convert to cents
+          etaSlot: formData.eta,
+          warrantyDays: parseInt(formData.warranty),
+          note: formData.notes
         }
       });
 
