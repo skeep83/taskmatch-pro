@@ -12,27 +12,10 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: {
-				DEFAULT: '1rem',
-				sm: '1.5rem',
-				lg: '2rem'
-			},
+			padding: '2rem',
 			screens: {
 				'2xl': '1400px'
 			}
-		},
-		screens: {
-			'xs': '375px',
-			'sm': '640px',
-			'md': '768px',
-			'lg': '1024px',
-			'xl': '1280px',
-			'2xl': '1536px',
-			// Touch device queries
-			'touch': { 'raw': '(hover: none) and (pointer: coarse)' },
-			'mouse': { 'raw': '(hover: hover) and (pointer: fine)' },
-			// Safe area queries  
-			'safe': { 'raw': '(display-mode: standalone)' }
 		},
 				extend: {
 				fontFamily: {
@@ -89,24 +72,7 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)',
-				'touch': '12px', // Оптимальный радиус для touch интерфейсов
-				'mobile': '16px'
-			},
-			spacing: {
-				'safe-top': 'env(safe-area-inset-top)',
-				'safe-bottom': 'env(safe-area-inset-bottom)',
-				'safe-left': 'env(safe-area-inset-left)',
-				'safe-right': 'env(safe-area-inset-right)',
-				'touch': '44px', // Минимальный размер touch target
-				'thumb': '72px'  // Удобная зона для большого пальца
-			},
-			minHeight: {
-				'touch': '44px',
-				'screen-mobile': '100dvh' // Dynamic viewport height
-			},
-			maxWidth: {
-				'mobile': '480px'
+				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
 				'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },

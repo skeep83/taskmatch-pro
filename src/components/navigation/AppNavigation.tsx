@@ -193,8 +193,8 @@ export const AppNavigation = () => {
   return (
     <>
       {/* Desktop Navigation */}
-      <header className="w-full sticky top-0 z-[100] border-0 bg-background/80 backdrop-blur-md shadow-sm safe-area-top">
-        <nav className="container mx-auto flex items-center justify-between py-3 px-4 sm:px-6">
+      <header className="w-full sticky top-0 z-[100] border-0 bg-white/80 backdrop-blur-md shadow-sm">
+        <nav className="container mx-auto flex items-center justify-between py-3 px-6">
           {/* Logo */}
           <Link 
             to="/" 
@@ -218,7 +218,7 @@ export const AppNavigation = () => {
                 </div>
               </div>
             )}
-            <span className="text-lg sm:text-xl font-display font-bold text-gradient hidden sm:block">
+            <span className="text-xl font-display font-bold text-gradient hidden sm:block">
               {t("app.name")}
             </span>
           </Link>
@@ -283,7 +283,7 @@ export const AppNavigation = () => {
           <div className="flex items-center gap-3">
             {/* Quick Actions for Authenticated Users */}
             {isAuthenticated && (
-              <div className="hidden sm:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2">
                 {serviceActions.map((action) => (
                   <Button
                     key={action.href}
@@ -362,11 +362,10 @@ export const AppNavigation = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden touch-manipulation"
+              className="lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
             >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </nav>

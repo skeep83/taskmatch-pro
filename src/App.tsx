@@ -14,7 +14,6 @@ import HowItWorks from "./pages/HowItWorks";
 // UI components loaded immediately
 import { AppNavigation } from "./components/navigation/AppNavigation";
 import { FloatingActionButton } from "./components/navigation/FloatingActionButton";
-import { BottomNavigation } from "./components/mobile/BottomNavigation";
 import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
 import { DatabaseI18nProvider } from "./i18n/DatabaseI18n";
@@ -130,7 +129,6 @@ const AppContent = () => {
         </Suspense>
       </PageTransition>
       <FloatingActionButton />
-      <BottomNavigation />
       <Footer />
     </>
   );

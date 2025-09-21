@@ -20,9 +20,7 @@ import {
   MapPin,
   Globe,
   Settings,
-  Briefcase,
-  Bell,
-  UserCog
+  Briefcase
 } from "lucide-react";
 
 interface Profile {
@@ -156,6 +154,7 @@ export default function ProfileSettings() {
   const handleRoleUpgraded = (newRole: UserRole) => {
     setUserRole(newRole);
     setShowProSettings(newRole === 'pro');
+    // Reload profile data for new role
     if (user) {
       loadProfile(user.id);
     }
@@ -178,6 +177,7 @@ export default function ProfileSettings() {
 
   const loadProProfile = async (userId: string) => {
     try {
+      // Load pro profile
       const { data: proData, error: proError } = await supabase
         .from('pro_profiles')
         .select('*')
@@ -195,6 +195,7 @@ export default function ProfileSettings() {
         });
       }
 
+      // Load selected categories
       const { data: catData, error: catError } = await supabase
         .from('pro_categories')
         .select('category_id')
@@ -213,8 +214,10 @@ export default function ProfileSettings() {
     
     setSaving(true);
     try {
+      // Update full_name based on first_name and last_name
       const fullName = `${profile.first_name?.trim() || ''} ${profile.last_name?.trim() || ''}`.trim();
       
+      // Update basic profile
       const { error: profileError } = await supabase
         .from("profiles")
         .upsert({
@@ -230,6 +233,7 @@ export default function ProfileSettings() {
 
       if (profileError) throw profileError;
 
+      // Update pro profile if user is a pro
       if (showProSettings) {
         await saveProProfile();
       }
@@ -253,6 +257,7 @@ export default function ProfileSettings() {
   const saveProProfile = async () => {
     if (!user) return;
 
+    // Upsert pro profile
     const payload: any = { 
       user_id: user.id, 
       bio: proProfile.bio, 
@@ -273,6 +278,7 @@ export default function ProfileSettings() {
 
     if (proError) throw proError;
 
+    // Sync categories
     const { data: existing } = await supabase
       .from('pro_categories')
       .select('category_id')
@@ -344,37 +350,10 @@ export default function ProfileSettings() {
   }
 
   return (
-    <main className="min-h-screen mobile-container">
-      {/* Mobile Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => navigate(-1)}
-                className="p-2 rounded-full bg-secondary/50 hover:bg-secondary/70 transition-colors"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <div>
-                <h1 className="text-lg font-semibold">Профиль</h1>
-                <span className="text-xs text-muted-foreground">Настройки</span>
-              </div>
-            </div>
-            <button 
-              onClick={handleSave}
-              disabled={saving}
-              className="p-2 rounded-full bg-primary text-primary-foreground disabled:opacity-50"
-            >
-              <Save className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop Header Section */}
-      <section className="hidden md:block container mx-auto py-8 sm:py-16 px-4 sm:px-6">
-        <div className="text-center mb-8 sm:mb-16">
+    <main className="min-h-screen">
+      {/* Header Section */}
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-4 mb-6">
             <Button variant="outline" onClick={() => navigate(-1)} className="card-surface">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -382,25 +361,23 @@ export default function ProfileSettings() {
             </Button>
           </div>
           
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-gradient">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Настройки профиля
           </h1>
-          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Управляйте своими личными данными и настройками
           </p>
         </div>
-      </section>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4">
+        {/* Main Content */}
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+          <div className="grid lg:grid-cols-3 gap-8">
             {/* Profile Form */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-8">
+            <div className="lg:col-span-2 space-y-8">
               {/* Avatar */}
-              <div className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-4 md:p-8 text-center">
-                <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center justify-center gap-2 md:gap-3">
-                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+              <div className="card-surface p-8 text-center">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center justify-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Фото профиля
                 </h2>
                 <AvatarUpload
@@ -412,39 +389,37 @@ export default function ProfileSettings() {
               </div>
 
               {/* Basic Information */}
-              <div className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-4 md:p-8">
-                <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
-                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Основная информация
                 </h2>
                 
-                <div className="space-y-4 md:space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="first_name" className="text-sm">Имя</Label>
+                      <Label htmlFor="first_name">Имя</Label>
                       <Input
                         id="first_name"
                         placeholder="Введите ваше имя"
                         value={profile.first_name}
                         onChange={(e) => updateProfile('first_name', e.target.value)}
-                        className="text-sm md:text-base"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="last_name" className="text-sm">Фамилия</Label>
+                      <Label htmlFor="last_name">Фамилия</Label>
                       <Input
                         id="last_name"
                         placeholder="Введите вашу фамилию"
                         value={profile.last_name}
                         onChange={(e) => updateProfile('last_name', e.target.value)}
-                        className="text-sm md:text-base"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm">Телефон</Label>
+                    <Label htmlFor="phone">Телефон</Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -452,7 +427,7 @@ export default function ProfileSettings() {
                         placeholder="+373 XX XXX XXX"
                         value={profile.phone}
                         onChange={(e) => updateProfile('phone', e.target.value)}
-                        className="pl-10 text-sm md:text-base"
+                        className="pl-10"
                       />
                     </div>
                   </div>
@@ -460,16 +435,16 @@ export default function ProfileSettings() {
               </div>
 
               {/* Location Information */}
-              <div className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-4 md:p-8">
-                <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
-                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Местоположение
                 </h2>
                 
-                <div className="space-y-4 md:space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="city" className="text-sm">Город</Label>
+                      <Label htmlFor="city">Город</Label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
@@ -477,13 +452,13 @@ export default function ProfileSettings() {
                           placeholder="Кишинёв"
                           value={profile.city}
                           onChange={(e) => updateProfile('city', e.target.value)}
-                          className="pl-10 text-sm md:text-base"
+                          className="pl-10"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="country" className="text-sm">Страна</Label>
+                      <Label htmlFor="country">Страна</Label>
                       <div className="relative">
                         <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
@@ -491,7 +466,7 @@ export default function ProfileSettings() {
                           placeholder="Молдова"
                           value={profile.country}
                           onChange={(e) => updateProfile('country', e.target.value)}
-                          className="pl-10 text-sm md:text-base"
+                          className="pl-10"
                         />
                       </div>
                     </div>
@@ -500,9 +475,9 @@ export default function ProfileSettings() {
               </div>
 
               {/* Role Upgrade */}
-              <div className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-4 md:p-8">
-                <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
-                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+              <div className="card-surface p-8">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Статус аккаунта
                 </h2>
                 <RoleUpgrade 
@@ -514,107 +489,141 @@ export default function ProfileSettings() {
 
               {/* Professional Settings */}
               {showProSettings && (
-                <div className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-4 md:p-8">
-                  <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
-                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                    <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                <div className="card-surface p-8">
+                  <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
+                    <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                    <Briefcase className="w-6 h-6 text-primary" />
                     Настройки специалиста
                   </h2>
                   
-                  <div className="space-y-4 md:space-y-6">
+                  <div className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="bio" className="text-sm">О себе</Label>
+                      <Label htmlFor="bio">О себе</Label>
                       <Textarea
                         id="bio"
-                        placeholder="Расскажите о своем опыте и навыках..."
+                        placeholder="Расскажите о своем опыте и услугах..."
                         value={proProfile.bio}
                         onChange={(e) => updateProProfile('bio', e.target.value)}
-                        rows={3}
-                        className="text-sm md:text-base"
+                        className="min-h-[120px]"
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div className="grid md:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="hourly_rate" className="text-sm">Почасовая ставка (лей)</Label>
+                        <Label htmlFor="radius">Радиус работы (км)</Label>
                         <Input
-                          id="hourly_rate"
+                          id="radius"
                           type="number"
-                          placeholder="300"
-                          value={proProfile.hourly_rate_cents}
-                          onChange={(e) => updateProProfile('hourly_rate_cents', e.target.value)}
-                          className="text-sm md:text-base"
+                          min="1"
+                          value={proProfile.radius_km}
+                          onChange={(e) => updateProProfile('radius_km', Number(e.target.value))}
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="radius" className="text-sm">Радиус работы (км)</Label>
+                        <Label htmlFor="hourly">Ставка (¢/час)</Label>
                         <Input
-                          id="radius"
+                          id="hourly"
                           type="number"
-                          placeholder="10"
-                          value={proProfile.radius_km}
-                          onChange={(e) => updateProProfile('radius_km', parseInt(e.target.value) || 10)}
-                          className="text-sm md:text-base"
+                          min="0"
+                          value={proProfile.hourly_rate_cents}
+                          onChange={(e) => updateProProfile('hourly_rate_cents', e.target.value === '' ? '' : Number(e.target.value))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="fixed">Фикс. цена (¢)</Label>
+                        <Input
+                          id="fixed"
+                          type="number"
+                          min="0"
+                          value={proProfile.fixed_price_cents}
+                          onChange={(e) => updateProProfile('fixed_price_cents', e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </div>
                     </div>
+
+                    {categories.length > 0 && (
+                      <div className="space-y-3">
+                        <Label>Категории услуг</Label>
+                        <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto p-3 border rounded-md">
+                          {categories.map((category) => (
+                            <div key={category.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`category-${category.id}`}
+                                checked={selectedCategories.includes(category.id)}
+                                onCheckedChange={() => toggleCategory(category.id)}
+                              />
+                              <Label 
+                                htmlFor={`category-${category.id}`}
+                                className="text-sm cursor-pointer flex-1"
+                              >
+                                {category.name || category.name_ro}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Save Button - Mobile */}
-              <div className="md:hidden">
-                <Button
-                  onClick={handleSave}
+              {/* Save Button */}
+              <div className="card-surface p-6">
+                <Button 
+                  onClick={handleSave} 
                   disabled={saving}
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 rounded-xl font-semibold text-lg"
+                  className="btn-hero w-full text-lg py-3"
                 >
+                  <Save className="w-5 h-5 mr-2" />
                   {saving ? 'Сохранение...' : 'Сохранить изменения'}
                 </Button>
               </div>
             </div>
 
-            {/* Sidebar - Desktop only */}
-            <div className="hidden lg:block space-y-6">
-              <Card className="card-surface p-6">
-                <CardHeader className="p-0 mb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Settings className="w-5 h-5 text-primary" />
-                    Действия
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 space-y-3">
-                  <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="w-full"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {saving ? 'Сохранение...' : 'Сохранить'}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="card-surface p-6">
-                <CardHeader className="p-0 mb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <User className="w-5 h-5 text-primary" />
-                    Советы
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="text-sm text-muted-foreground space-y-2">
-                    <p>• Добавьте фото для повышения доверия</p>
-                    <p>• Заполните все поля профиля</p>
-                    <p>• Местоположение поможет в поиске заказов поблизости</p>
+            {/* Sidebar */}
+            <div className="space-y-8 mt-8">
+              {/* Account Info */}
+              <div className="card-surface p-6">
+                <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
+                  <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                  Информация об аккаунте
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-3 border-b border-border/50">
+                    <span className="text-muted-foreground">Email:</span>
+                    <span className="font-medium text-sm">{user?.email}</span>
                   </div>
-                </CardContent>
-              </Card>
+                  
+                  <div className="flex items-center justify-between py-3 border-b border-border/50">
+                    <span className="text-muted-foreground">ID:</span>
+                    <span className="font-medium text-sm font-mono">{user?.id.slice(-8)}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-muted-foreground">Статус:</span>
+                    <span className="font-medium text-sm text-success">Активен</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tips */}
+              <div className="card-surface p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <User className="w-5 h-5 text-primary" />
+                  Советы
+                </h3>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <p>• Указание реального имени и фамилии поможет клиентам узнать вас</p>
+                  <p>• Корректный номер телефона важен для связи</p>
+                  <p>• Местоположение поможет в поиске заказов поблизости</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

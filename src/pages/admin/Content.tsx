@@ -142,87 +142,89 @@ export default function AdminContent() {
     try {
       setLoading(true);
       
-      // Получаем реальные данные из базы
-      const { data: postsData } = await supabase
-        .from('posts')
-        .select('*, profiles(first_name, last_name)')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      const { data: commentsData } = await supabase
-        .from('comments')
-        .select('*, profiles(first_name, last_name)')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      const { data: portfolioData } = await supabase
-        .from('portfolio_items')
-        .select('*, profiles(first_name, last_name)')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      // Объединяем данные в единый массив контента
-      const contentItems: ContentItem[] = [];
-
-      // Добавляем посты
-      postsData?.forEach(post => {
-        contentItems.push({
-          id: post.id,
+      // Mock content items data
+      const mockContent: ContentItem[] = [
+        {
+          id: "1",
           type: "post",
-          author_id: post.author_id,
-          author_name: `${post.profiles?.first_name || ''} ${post.profiles?.last_name || ''}`.trim() || 'Неизвестный автор',
-          title: post.title,
-          content: post.content,
-          status: post.status || "approved",
-          created_at: post.created_at,
-          reports_count: 0, // Можно добавить подсчет жалоб
-          images: post.images || []
-        });
-      });
-
-      // Добавляем комментарии
-      commentsData?.forEach(comment => {
-        contentItems.push({
-          id: comment.id,
-          type: "comment",
-          author_id: comment.author_id,
-          author_name: `${comment.profiles?.first_name || ''} ${comment.profiles?.last_name || ''}`.trim() || 'Неизвестный автор',
-          content: comment.content,
-          status: "approved", // Комментарии обычно сразу одобряются
-          created_at: comment.created_at,
-          reports_count: 0
-        });
-      });
-
-      // Добавляем портфолио
-      portfolioData?.forEach(portfolio => {
-        contentItems.push({
-          id: portfolio.id,
-          type: "portfolio",
-          author_id: portfolio.pro_id,
-          author_name: `${portfolio.profiles?.first_name || ''} ${portfolio.profiles?.last_name || ''}`.trim() || 'Неизвестный специалист',
-          title: portfolio.title,
-          content: portfolio.description,
-          status: "approved",
-          created_at: portfolio.created_at,
+          author_id: "user1",
+          author_name: "Иванов И.И.",
+          title: "Замена сантехники в ванной",
+          content: "Выполнил качественную замену всей сантехники в ванной комнате. Клиент остался доволен результатом.",
+          status: "pending",
+          created_at: "2024-01-15T10:30:00Z",
           reports_count: 0,
-          images: [] // Можно добавить изображения портфолио
-        });
-      });
+          images: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]
+        },
+        {
+          id: "2",
+          type: "comment",
+          author_id: "user2",
+          author_name: "Петров П.П.",
+          content: "Отличная работа! Рекомендую этого мастера всем.",
+          status: "flagged",
+          created_at: "2024-01-15T09:15:00Z",
+          reports_count: 2
+        },
+        {
+          id: "3",
+          type: "portfolio",
+          author_id: "user3",
+          author_name: "Сидоров С.С.",
+          title: "Электромонтажные работы",
+          content: "Примеры моих работ по электромонтажу в жилых и коммерческих помещениях.",
+          status: "approved",
+          created_at: "2024-01-14T16:20:00Z",
+          reports_count: 0,
+          images: ["https://example.com/portfolio1.jpg"]
+        },
+        {
+          id: "4",
+          type: "post",
+          author_id: "user4",
+          author_name: "Козлов К.К.",
+          title: "Неподобающий контент",
+          content: "Содержит спам и неуместную рекламу сторонних услуг.",
+          status: "rejected",
+          created_at: "2024-01-14T14:10:00Z",
+          reports_count: 3
+        }
+      ];
 
-      // Сортируем по дате создания
-      contentItems.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      // Mock reports data
+      const mockReports: Report[] = [
+        {
+          id: "1",
+          content_id: "2",
+          reporter_id: "user5",
+          reporter_name: "Николаев Н.Н.",
+          reason: "spam",
+          description: "Содержит спам и рекламу",
+          status: "new",
+          created_at: "2024-01-15T11:00:00Z"
+        },
+        {
+          id: "2",
+          content_id: "2", 
+          reporter_id: "user6",
+          reporter_name: "Федоров Ф.Ф.",
+          reason: "inappropriate",
+          description: "Неуместный контент",
+          status: "new",
+          created_at: "2024-01-15T11:15:00Z"
+        }
+      ];
 
-      // Получаем статистику
+      // Mock stats
       const mockStats: ContentStats = {
-        pending_review: contentItems.filter(item => item.status === 'pending').length,
-        flagged_items: contentItems.filter(item => item.status === 'flagged').length,
-        reports_today: 0, // Можно добавить реальные жалобы
+        pending_review: 5,
+        flagged_items: 2,
+        reports_today: 3,
         auto_approved_rate: 0.85
       };
 
-      setContentItems(contentItems);
-      setReports([]); // Пока используем пустой массив для жалоб
+      setContentItems(mockContent);
+      setReports(mockReports);
       setStats(mockStats);
       
       await fetchLanguagesData();
@@ -240,34 +242,7 @@ export default function AdminContent() {
 
   const moderateContent = async (contentId: string, action: "approve" | "reject", note?: string) => {
     try {
-      const contentItem = contentItems.find(item => item.id === contentId);
-      if (!contentItem) return;
-
-      let tableName = '';
-      switch (contentItem.type) {
-        case 'post':
-          tableName = 'posts';
-          break;
-        case 'comment':
-          tableName = 'comments';
-          break;
-        case 'portfolio':
-          tableName = 'portfolio_items';
-          break;
-        default:
-          throw new Error('Unknown content type');
-      }
-
-      const { error } = await supabase
-        .from(tableName)
-        .update({ 
-          status: action === "approve" ? "approved" : "rejected",
-          moderation_note: note 
-        })
-        .eq('id', contentId);
-
-      if (error) throw error;
-
+      // await adminApi.moderateContent(contentId, action, note);
       setContentItems(prev =>
         prev.map(item =>
           item.id === contentId 
@@ -290,8 +265,7 @@ export default function AdminContent() {
 
   const resolveReport = async (reportId: string, action: "dismiss" | "accept") => {
     try {
-      // В реальной системе здесь была бы таблица reports
-      // Пока обновляем локально
+      // await adminApi.resolveReport(reportId, action);
       setReports(prev =>
         prev.map(report =>
           report.id === reportId

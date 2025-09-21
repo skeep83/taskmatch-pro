@@ -109,21 +109,11 @@ export default function Feed() {
   );
 
   return (
-    <main className="min-h-screen mobile-container">
+    <main className="min-h-screen">
       <Seo title="ServiceHub — Лента заказов" description="Доступные заказы для специалистов" canonical="/feed" />
       
-      {/* Mobile Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
-        <div className="px-4 py-3">
-          <h1 className="text-lg font-semibold">Лента заказов</h1>
-          <p className="text-xs text-muted-foreground">
-            {userRole === "pro" ? "Найдите подходящие заказы" : "Доступные услуги"}
-          </p>
-        </div>
-      </div>
-
-      {/* Desktop Header */}
-      <section className="hidden md:block container mx-auto py-24 px-6">
+      {/* Header Section */}
+      <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             {userRole === "pro" ? t("feed.title") : t("feed.title")}
@@ -142,9 +132,9 @@ export default function Feed() {
             </div>
           </div>
         </div>
-      </section>
 
-      <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Filters */}
           <div className="card-surface p-6 mb-8">
             <div className="flex flex-wrap gap-4 items-center">
               <div className="flex-1 min-w-[300px] relative">
@@ -173,59 +163,7 @@ export default function Feed() {
             </div>
           </div>
 
-        {/* Mobile Jobs List */}
-        <div className="md:hidden space-y-3">
-          {filteredJobs.map((job) => (
-            <div key={job.id} className="bg-card rounded-xl p-3 shadow-sm border">
-              <div className="flex items-start justify-between mb-2">
-                <Badge variant="secondary" className="text-xs">
-                  {job.category?.label_ru || "Услуга"}
-                </Badge>
-                {job.scheduled_at && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    {new Date(job.scheduled_at).toLocaleDateString()}
-                  </div>
-                )}
-              </div>
-              
-              <h3 className="font-medium text-sm mb-2 line-clamp-2">{job.description}</h3>
-              
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-1">
-                  <Euro className="w-3 h-3 text-green-500" />
-                  <span className="text-xs font-medium text-green-600">
-                    {job.budget_min_cents && job.budget_max_cents
-                      ? `${formatPrice(job.budget_min_cents)}-${formatPrice(job.budget_max_cents)}`
-                      : 'Договорная'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-blue-500" />
-                  <span className="text-xs text-muted-foreground">5км</span>
-                </div>
-              </div>
-
-              {userRole === "pro" && (
-                <div className="flex gap-2 pt-2 border-t">
-                  <button
-                    onClick={() => acceptJob(job.id)}
-                    disabled={loading}
-                    className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-1"
-                  >
-                    {loading ? "Загрузка..." : "Взять заказ"}
-                  </button>
-                  <button className="bg-secondary text-secondary-foreground px-2 py-1.5 rounded-lg transition-colors">
-                    <Video className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Desktop Jobs Grid */}
-        <div className="hidden md:block">
+          {/* Jobs Grid */}
           <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredJobs.map((job) => (
               <div key={job.id} className="card-surface p-6 group hover:scale-[1.02] transition-all duration-300">
@@ -289,16 +227,16 @@ export default function Feed() {
               </div>
             ))}
           </div>
-        </div>
 
-        {filteredJobs.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🔍</div>
-            <h2 className="text-xl font-semibold mb-2">{t("feed.no_jobs")}</h2>
-            <p className="text-muted-foreground">Попробуйте изменить фильтры или создать новый заказ</p>
-          </div>
-        )}
-      </div>
+          {filteredJobs.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🔍</div>
+              <h2 className="text-xl font-semibold mb-2">{t("feed.no_jobs")}</h2>
+              <p className="text-muted-foreground">Попробуйте изменить фильтры или создать новый заказ</p>
+            </div>
+          )}
+        </div>
+      </section>
     </main>
   );
 }

@@ -41,23 +41,32 @@ export const FloatingActionButton = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // Show only on home page
-  if (location.pathname !== '/') {
+  // Don't show on certain pages
+  if (location.pathname.includes('/admin') || location.pathname === '/auth') {
     return null;
   }
 
   const quickActions = [
     {
+      href: "/",
+      icon: Home,
+      label: "Главная",
+      variant: "secondary" as const,
+      show: location.pathname !== "/"
+    },
+    {
       href: "/catalog",
       icon: Search,
       label: "Поиск",
       variant: "secondary" as const,
+      show: location.pathname !== "/catalog"
     },
     {
       href: "/job/new",
       icon: Plus,
       label: "Заказать",
       variant: "default" as const,
+      show: true,
       primary: true
     },
     {
@@ -66,6 +75,7 @@ export const FloatingActionButton = () => {
       label: "Лента",
       variant: "secondary" as const,
       badge: "5",
+      show: location.pathname !== "/feed"
     },
     {
       href: "/messages",
@@ -73,8 +83,9 @@ export const FloatingActionButton = () => {
       label: "Чат",
       variant: "secondary" as const,
       badge: "2",
+      show: location.pathname !== "/messages"
     }
-  ];
+  ].filter(action => action.show);
 
   return (
     <motion.div
@@ -84,7 +95,7 @@ export const FloatingActionButton = () => {
         y: isVisible ? 0 : 100 
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed bottom-24 right-6 z-50 md:hidden"
+      className="fixed bottom-6 right-6 z-40 md:hidden"
     >
       <div className="flex flex-col items-end gap-3">
         {/* Expanded Actions */}

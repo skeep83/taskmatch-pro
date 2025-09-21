@@ -7,7 +7,7 @@ import { FloatingCard } from "@/components/ui/floating-card";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, ArrowLeft, X } from "lucide-react";
+import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle } from "lucide-react";
 import jobImage from "@/assets/services-hero.jpg";
 
 const JobNew = () => {
@@ -186,31 +186,11 @@ const JobNew = () => {
   };
 
   return (
-    <main className="min-h-screen mobile-container">
+    <main className="min-h-screen">
       <Seo title={`${t('app.name')} — Инстант‑бронирование`} description="Создать заказ" canonical="/job/new" />
       
-      {/* Mobile Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => navigate(-1)}
-                className="p-2 rounded-full bg-secondary/50 hover:bg-secondary/70 transition-colors"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <div>
-                <h1 className="text-lg font-semibold">Создать заказ</h1>
-                <p className="text-xs text-muted-foreground">Шаг {step} из 3</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop Hero Section */}
-      <section className="relative overflow-hidden hidden md:block">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img src={jobImage} alt="Job Creation" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-orange-600/80" />
@@ -242,9 +222,8 @@ const JobNew = () => {
       </section>
 
       {/* Form Section */}
-      <section className="container mx-auto py-6 md:py-24 px-4 md:px-6">
-        {/* Desktop Header */}
-        <div className="text-center mb-8 md:mb-16 hidden md:block">
+      <section className="container mx-auto py-24 px-6">
+        <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             {t("job.new.title")}
           </h2>
@@ -254,17 +233,17 @@ const JobNew = () => {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          {/* Progress Steps - Mobile compact version */}
-          <div className="flex items-center justify-center mb-6 md:mb-8">
-            <div className="flex items-center space-x-2 md:space-x-4">
+          {/* Progress Steps */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="flex items-center space-x-4">
               {[1, 2, 3].map((stepNum) => (
                 <div key={stepNum} className="flex items-center">
-                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold transition-all ${
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
                     stepNum <= step ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'
                   }`}>
-                    {stepNum <= step ? <CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> : stepNum}
+                    {stepNum <= step ? <CheckCircle className="w-5 h-5" /> : stepNum}
                   </div>
-                  {stepNum < 3 && <div className={`w-8 md:w-16 h-1 mx-1 md:mx-2 transition-all ${
+                  {stepNum < 3 && <div className={`w-16 h-1 mx-2 transition-all ${
                     stepNum < step ? 'bg-primary' : 'bg-muted'
                   }`} />}
                 </div>
@@ -272,23 +251,23 @@ const JobNew = () => {
             </div>
           </div>
 
-          <div className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-4 md:p-8">
-            <form className="space-y-6 md:space-y-8" onSubmit={onSubmit}>
+          <div className="card-surface p-8">
+            <form className="space-y-8" onSubmit={onSubmit}>
               
               {/* Step 1: Service Details */}
-              <div className="space-y-4 md:space-y-6">
-                <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-2">
-                  <span className="w-6 h-6 md:w-8 md:h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm md:text-base">1</span>
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">1</span>
                   Детали услуги
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div className="bg-secondary/20 rounded-lg md:rounded-xl p-4 md:p-6 border">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="card-surface p-6">
                     <label className="block text-sm font-medium mb-3">Категория услуги</label>
                     <select 
                       name="category_id" 
                       defaultValue={presetCategory}
-                      className="w-full bg-background border rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 focus:ring-2 focus:ring-primary/50 transition-all text-sm md:text-base" 
+                      className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all" 
                       required
                     >
                       <option value="" disabled>Выберите категорию</option>
@@ -296,9 +275,9 @@ const JobNew = () => {
                     </select>
                   </div>
 
-                  <div className="bg-secondary/20 rounded-lg md:rounded-xl p-4 md:p-6 border">
+                  <div className="card-surface p-6">
                     <label className="block text-sm font-medium mb-3">Приоритет</label>
-                    <select name="urgency" className="w-full bg-background border rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 focus:ring-2 focus:ring-primary/50 transition-all text-sm md:text-base">
+                    <select name="urgency" className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all">
                       <option value="normal">Обычный</option>
                       <option value="urgent">Срочно (+30%)</option>
                       <option value="same_day">В тот же день (+50%)</option>
@@ -306,12 +285,12 @@ const JobNew = () => {
                   </div>
                 </div>
 
-                <div className="bg-secondary/20 rounded-lg md:rounded-xl p-4 md:p-6 border">
+                <div className="card-surface p-6">
                   <label className="block text-sm font-medium mb-3">Описание задачи</label>
                   <textarea 
                     name="description"
-                    className="w-full bg-background border rounded-lg md:rounded-xl px-3 md:px-4 py-3 md:py-4 focus:ring-2 focus:ring-primary/50 transition-all text-sm md:text-base" 
-                    rows={3}
+                    className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all" 
+                    rows={4}
                     placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
                     required
                   />
@@ -322,41 +301,41 @@ const JobNew = () => {
               </div>
 
               {/* Step 2: Budget & Schedule */}
-              <div className="space-y-4 md:space-y-6 pt-6 md:pt-8 border-t border-border">
-                <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-2">
-                  <span className="w-6 h-6 md:w-8 md:h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm md:text-base">2</span>
+              <div className="space-y-6 pt-8 border-t border-white/10">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">2</span>
                   Бюджет и расписание
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div className="bg-secondary/20 rounded-lg md:rounded-xl p-4 md:p-6 border">
-                    <div className="grid grid-cols-2 gap-3 md:gap-4">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="card-surface p-6">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2">
                           <Euro className="w-4 h-4 text-green-500" />
-                          От
+                          Бюджет от
                         </label>
                         <input 
                           name="budget_min" 
                           type="number" 
-                          className="w-full bg-background border rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 focus:ring-2 focus:ring-primary/50 transition-all text-sm md:text-base"
+                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
                           placeholder="1000"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3">До</label>
+                        <label className="block text-sm font-medium mb-3">до</label>
                         <input 
                           name="budget_max" 
                           type="number" 
-                          className="w-full bg-background border rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 focus:ring-2 focus:ring-primary/50 transition-all text-sm md:text-base"
+                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
                           placeholder="5000"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-secondary/20 rounded-lg md:rounded-xl p-4 md:p-6 border">
-                    <div className="grid grid-cols-2 gap-3 md:gap-4">
+                  <div className="card-surface p-6">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2">
                           <Clock className="w-4 h-4 text-blue-500" />
@@ -365,7 +344,7 @@ const JobNew = () => {
                         <input 
                           name="date" 
                           type="date" 
-                          className="w-full bg-background border rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 focus:ring-2 focus:ring-primary/50 transition-all text-sm md:text-base"
+                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
                         />
                       </div>
                       <div>
@@ -373,7 +352,7 @@ const JobNew = () => {
                         <input 
                           name="time" 
                           type="time" 
-                          className="w-full bg-background border rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 focus:ring-2 focus:ring-primary/50 transition-all text-sm md:text-base"
+                          className="w-full bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all"
                         />
                       </div>
                     </div>
@@ -382,25 +361,25 @@ const JobNew = () => {
               </div>
 
               {/* Step 3: Photos */}
-              <div className="space-y-4 md:space-y-6 pt-6 md:pt-8 border-t border-border">
-                <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-2">
-                  <span className="w-6 h-6 md:w-8 md:h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm md:text-base">3</span>
+              <div className="space-y-6 pt-8 border-t border-white/10">
+                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+                  <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold">3</span>
                   Фотографии задачи
                 </h2>
                 
-                <div className="bg-secondary/20 rounded-lg md:rounded-xl p-4 md:p-6 border">
+                <div className="card-surface p-6">
                   <div
-                    className={`border-2 border-dashed rounded-lg md:rounded-xl p-6 md:p-8 text-center transition-all ${
-                      dragActive ? 'border-primary bg-primary/5' : 'border-border'
+                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+                      dragActive ? 'border-primary bg-primary/5' : 'border-white/20'
                     }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
                     onDrop={handleDrop}
                   >
-                    <AnimatedIcon icon={Camera} className="w-10 h-10 md:w-12 md:h-12 text-primary mx-auto mb-3 md:mb-4" />
-                    <h3 className="text-base md:text-lg font-medium mb-2">Добавьте фотографии</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
+                    <AnimatedIcon icon={Camera} className="w-12 h-12 text-primary mx-auto mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Добавьте фотографии</h3>
+                    <p className="text-muted-foreground mb-4">
                       Перетащите фото сюда или выберите файлы
                     </p>
                     <input
@@ -412,27 +391,27 @@ const JobNew = () => {
                       id="photo-upload"
                       name="photos"
                     />
-                    <label htmlFor="photo-upload" className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-8 py-2 md:py-4 rounded-lg md:rounded-xl font-semibold text-sm md:text-lg transition-colors shadow-lg inline-flex items-center gap-2">
+                    <label htmlFor="photo-upload" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg inline-flex items-center gap-2">
                       <Upload className="w-4 h-4" />
                       Выбрать файлы
                     </label>
                   </div>
 
                   {uploadedFiles.length > 0 && (
-                    <div className="mt-4 md:mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                    <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map((file, index) => (
                         <div key={index} className="relative group">
                           <img
                             src={URL.createObjectURL(file)}
                             alt={`Upload ${index + 1}`}
-                            className="w-full h-16 md:h-20 object-cover rounded-lg border"
+                            className="w-full h-20 object-cover rounded-lg"
                           />
                           <button
                             type="button"
                             onClick={() => removeFile(index)}
                             className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            <X className="w-3 h-3" />
+                            ×
                           </button>
                         </div>
                       ))}
@@ -441,31 +420,13 @@ const JobNew = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="flex flex-col md:flex-row gap-3 md:gap-4 pt-6 md:pt-8 border-t border-border">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="w-full md:w-auto px-6 py-3 border border-border rounded-lg md:rounded-xl font-medium hover:bg-secondary/50 transition-colors"
-                >
+              {/* Submit */}
+              <div className="flex justify-between items-center pt-8 border-t border-white/10">
+                <button type="button" className="bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg" onClick={() => navigate(-1)}>
                   Отмена
                 </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg md:rounded-xl font-semibold text-sm md:text-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Создание...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-4 md:w-5 h-4 md:h-5" />
-                      Создать заказ
-                    </>
-                  )}
+                <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg" disabled={loading}>
+                  {loading ? 'Создаем заказ...' : 'Создать заказ'}
                 </button>
               </div>
             </form>

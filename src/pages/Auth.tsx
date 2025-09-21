@@ -105,14 +105,9 @@ const Auth = () => {
       
       <Seo title={`${t('app.name')} — Auth`} description="Sign in or create an account" canonical="/auth" />
       
-      {/* Mobile-optimized container */}
-      <div className="container mx-auto px-4 sm:px-6 relative z-10 w-full">
-        <div className="max-w-sm sm:max-w-lg mx-auto">
-          <GlassMorphism 
-            intensity="strong" 
-            variant="bordered" 
-            className="p-6 sm:p-8 animate-fade-in w-full max-w-full"
-          >
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="max-w-lg mx-auto">
+          <GlassMorphism intensity="strong" variant="bordered" className="p-8 animate-fade-in">
             {/* Header */}
             <div className="text-center mb-8">
               <div className="mb-6">
@@ -147,7 +142,7 @@ const Auth = () => {
                   placeholder="your@email.com" 
                   autoComplete="email" 
                   required 
-                  className="h-14 sm:h-12 px-4 text-base sm:text-lg border-2 border-border/50 focus:border-primary/50 transition-all touch-manipulation"
+                  className="h-12 px-4 text-lg border-2 border-border/50 focus:border-primary/50 transition-all"
                 />
               </div>
 
@@ -165,15 +160,14 @@ const Auth = () => {
                     placeholder="••••••••" 
                     autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} 
                     required 
-                    className="h-14 sm:h-12 px-4 pr-14 text-base sm:text-lg border-2 border-border/50 focus:border-primary/50 transition-all touch-manipulation"
+                    className="h-12 px-4 pr-12 text-lg border-2 border-border/50 focus:border-primary/50 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors p-2 touch-manipulation"
-                    aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
                   >
-                    <AnimatedIcon icon={showPassword ? EyeOff : Eye} size={24} />
+                    <AnimatedIcon icon={showPassword ? EyeOff : Eye} size={20} />
                   </button>
                 </div>
               </div>
@@ -189,7 +183,7 @@ const Auth = () => {
                     id="role" 
                     name="role" 
                     defaultValue="client" 
-                    className="w-full h-14 sm:h-12 rounded-xl border-2 border-border/50 bg-background/80 px-4 text-base sm:text-lg focus:border-primary/50 transition-all touch-manipulation"
+                    className="w-full h-12 rounded-xl border-2 border-border/50 bg-background/80 px-4 text-lg focus:border-primary/50 transition-all"
                   >
                     <option value="client">Клиент — заказываю услуги</option>
                     <option value="pro">Специалист — выполняю заказы</option>
@@ -203,7 +197,7 @@ const Auth = () => {
                 <Button 
                   type="submit" 
                   disabled={loading} 
-                  className="h-14 sm:h-12 text-base sm:text-lg btn-hero w-full touch-manipulation font-semibold"
+                  className="h-12 text-lg btn-hero w-full"
                 >
                   {loading ? (
                     <div className="flex items-center gap-2">
@@ -219,7 +213,7 @@ const Auth = () => {
                   type="button" 
                   variant="ghost" 
                   onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-                  className="h-14 sm:h-12 text-base sm:text-lg touch-manipulation"
+                  className="h-12 text-lg"
                 >
                   {mode === 'signin' ? 'Нет аккаунта? Создать' : 'Уже есть аккаунт? Войти'}
                 </Button>

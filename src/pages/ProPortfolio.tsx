@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Upload, Plus, Image, Trash2, X, Camera, Film, FileImage, ChevronLeft, ChevronRight, ArrowLeft, Bell } from "lucide-react";
+import { Upload, Plus, Image, Trash2, X, Camera, Film, FileImage, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 const ProPortfolio = () => {
@@ -345,62 +345,39 @@ const ProPortfolio = () => {
   };
 
   return (
-    <main className="min-h-screen mobile-container bg-gradient-to-br from-background via-background to-muted/20">
+    <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <Seo title={`${t('app.name')} — Портфолио`} description="Pro portfolio" canonical="/portfolio" />
       
-      {/* Mobile Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b md:hidden">
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => navigate(-1)}
-                className="p-2 rounded-full bg-secondary/50 hover:bg-secondary/70 transition-colors"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <div>
-                <h1 className="text-lg font-semibold">Портфолио</h1>
-                <span className="text-xs text-muted-foreground">{items.length} работ</span>
-              </div>
-            </div>
-            <button className="p-2 rounded-full bg-secondary/50">
-              <Bell className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto py-6 md:py-24 px-4 md:px-6">
-        {/* Desktop Header */}
-        <div className="text-center mb-8 md:mb-16 hidden md:block">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 sm:mb-6 text-gradient">
+      <div className="container mx-auto py-24 px-6">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Мое Портфолио
           </h1>
-          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Демонстрируйте свои лучшие работы и привлекайте больше клиентов
           </p>
         </div>
 
         {/* Add New Item Section */}
-        <div className="max-w-5xl mx-auto mb-8 md:mb-16">
-          <Card className="border-0 bg-gradient-to-br from-card via-card/95 to-card/80 backdrop-blur-sm shadow-sm md:shadow-2xl rounded-xl md:rounded-2xl">
-            <CardHeader className="text-center pb-4 md:pb-6 p-4 md:p-6">
-              <div className="mx-auto mb-3 md:mb-4 w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <Plus className="h-6 w-6 md:h-8 md:w-8 text-primary-foreground" />
+        <div className="max-w-5xl mx-auto mb-16">
+          <Card className="border-0 bg-gradient-to-br from-card via-card/95 to-card/80 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+                <Plus className="h-8 w-8 text-primary-foreground" />
               </div>
-              <CardTitle className="text-lg md:text-2xl font-display font-bold text-gradient">
+              <CardTitle className="text-2xl font-display font-bold text-gradient">
                 Добавить новую работу
               </CardTitle>
-              <p className="text-muted-foreground text-sm md:text-lg">
+              <p className="text-muted-foreground text-lg">
                 Создайте альбом из фотографий и видео ваших лучших проектов
               </p>
             </CardHeader>
             
-            <CardContent className="space-y-6 md:space-y-8 p-4 md:p-6">
+            <CardContent className="space-y-8">
               {/* Form Fields */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-2 md:space-y-3">
+              <div className="grid lg:grid-cols-2 gap-6">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-primary" />
                     Название работы
@@ -409,10 +386,10 @@ const ProPortfolio = () => {
                     placeholder="Например: Ремонт ванной комнаты"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="h-10 md:h-12 border-0 bg-background/50 backdrop-blur-sm shadow-inner text-sm md:text-base"
+                    className="h-12 border-0 bg-background/50 backdrop-blur-sm shadow-inner"
                   />
                 </div>
-                <div className="space-y-2 md:space-y-3">
+                <div className="space-y-3">
                   <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-secondary" />
                     Описание работ
@@ -422,7 +399,7 @@ const ProPortfolio = () => {
                     value={desc}
                     onChange={(e) => setDesc(e.target.value)}
                     rows={3}
-                    className="border-0 bg-background/50 backdrop-blur-sm shadow-inner resize-none text-sm md:text-base"
+                    className="border-0 bg-background/50 backdrop-blur-sm shadow-inner resize-none"
                   />
                 </div>
               </div>
@@ -446,17 +423,17 @@ const ProPortfolio = () => {
                   />
                   <label 
                     htmlFor="file-upload"
-                    className="flex flex-col items-center justify-center p-6 md:p-8 border-2 border-dashed border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 cursor-pointer group"
+                    className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 cursor-pointer group"
                   >
-                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-primary/20 transition-colors">
-                      <Camera className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                      <Camera className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-base md:text-lg font-semibold text-foreground mb-2">
+                    <p className="text-lg font-semibold text-foreground mb-2">
                       Перетащите файлы или нажмите для выбора
                     </p>
-                    <p className="text-xs md:text-sm text-muted-foreground text-center">
+                    <p className="text-sm text-muted-foreground text-center">
                       Поддерживаются изображения (JPG, PNG, WebP) и видео (MP4, MOV)
-                      <br className="hidden md:block" />
+                      <br />
                       Максимальный размер файла: 50MB
                     </p>
                   </label>
@@ -464,11 +441,11 @@ const ProPortfolio = () => {
 
                 {/* Selected Files Preview */}
                 {files.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 p-3 md:p-4 bg-muted/30 rounded-xl">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-xl">
                     {files.map((file, index) => (
                       <div key={index} className="relative group">
-                        <div className="aspect-square rounded-lg bg-background/80 border border-border/50 flex flex-col items-center justify-center p-2 md:p-3 hover:bg-background transition-colors">
-                          <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1 md:mb-2">
+                        <div className="aspect-square rounded-lg bg-background/80 border border-border/50 flex flex-col items-center justify-center p-3 hover:bg-background transition-colors">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-2">
                             {getFileIcon(file)}
                           </div>
                           <p className="text-xs font-medium text-center line-clamp-2">
@@ -481,10 +458,10 @@ const ProPortfolio = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          className="absolute -top-1 -right-1 h-5 w-5 md:h-6 md:w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={() => removeFile(index)}
                         >
-                          <X className="h-2 w-2 md:h-3 md:w-3" />
+                          <X className="h-3 w-3" />
                         </Button>
                       </div>
                     ))}
@@ -497,16 +474,16 @@ const ProPortfolio = () => {
                 <Button
                   onClick={addItem}
                   disabled={uploading || files.length === 0 || !title.trim()}
-                  className="btn-hero px-6 md:px-8 py-2 md:py-3 text-base md:text-lg font-semibold min-w-[180px] md:min-w-[200px]"
+                  className="btn-hero px-8 py-3 text-lg font-semibold min-w-[200px]"
                 >
                   {uploading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 md:h-5 md:w-5 border-b-2 border-white mr-2 md:mr-3" />
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
                       Создаём альбом...
                     </>
                   ) : (
                     <>
-                      <Plus className="h-4 w-4 md:h-5 md:w-5 mr-2 md:mr-3" />
+                      <Plus className="h-5 w-5 mr-3" />
                       Создать альбом ({files.length})
                     </>
                   )}
@@ -519,20 +496,20 @@ const ProPortfolio = () => {
         {/* Portfolio Grid */}
         {items.length > 0 ? (
           <div>
-            <div className="text-center mb-6 md:mb-12">
-              <h2 className="text-xl md:text-3xl lg:text-4xl font-display font-bold mb-2 md:mb-4 text-gradient">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl lg:text-4xl font-display font-bold mb-4 text-gradient">
                 Мои работы
               </h2>
-              <p className="text-sm md:text-lg text-muted-foreground">
+              <p className="text-lg text-muted-foreground">
                 {items.length} {items.length === 1 ? 'выполненная работа' : items.length < 5 ? 'выполненные работы' : 'выполненных работ'}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {items.map((item, index) => (
                 <div 
                   key={item.id} 
-                  className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-0 overflow-hidden cursor-pointer group animate-fade-in hover-scale"
+                  className="card-surface p-0 overflow-hidden cursor-pointer group animate-fade-in hover-scale"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className="relative">
@@ -546,7 +523,7 @@ const ProPortfolio = () => {
                     
                     {/* Media Count Badge */}
                     {item.portfolio_media && item.portfolio_media.length > 1 && (
-                      <div className="absolute top-2 md:top-3 left-2 md:left-3 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                      <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                         <Image className="h-3 w-3" />
                         {item.portfolio_media.length}
                       </div>
@@ -556,34 +533,34 @@ const ProPortfolio = () => {
                     <Button
                       variant="destructive"
                       size="sm"
-                      className="absolute top-2 md:top-3 right-2 md:right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 h-7 w-7 md:h-8 md:w-8 p-0 backdrop-blur-sm"
+                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 h-8 w-8 p-0 backdrop-blur-sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteItem(item.id);
                       }}
                     >
-                      <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                   
-                  <div className="p-4 md:p-6 space-y-2 md:space-y-3">
-                    <h3 className="font-semibold text-base md:text-lg group-hover:text-primary transition-colors line-clamp-1">
+                  <div className="p-6 space-y-3">
+                    <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
                       {item.title || 'Без названия'}
                     </h3>
                     {item.description && (
-                      <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                         {item.description}
                       </p>
                     )}
                     
-                    <div className="flex items-center justify-between pt-1 md:pt-2 text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Image className="h-3 w-3" />
-                        <span className="text-xs">{new Date(item.created_at).toLocaleDateString()}</span>
+                        <span>{new Date(item.created_at).toLocaleDateString()}</span>
                       </div>
                       {item.portfolio_media && item.portfolio_media.length > 0 && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs">Альбом</span>
+                          <span>Альбом</span>
                           <Badge variant="secondary" className="text-xs px-2 py-0">
                             {item.portfolio_media.length}
                           </Badge>
@@ -596,14 +573,14 @@ const ProPortfolio = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 md:py-16">
-            <div className="bg-card rounded-xl md:rounded-2xl shadow-sm border p-8 md:p-12 max-w-md mx-auto">
+          <div className="text-center py-16">
+            <div className="card-surface p-12 max-w-md mx-auto">
               <div className="mb-6">
-                <div className="mx-auto w-16 h-16 md:w-24 md:h-24 bg-muted rounded-full flex items-center justify-center mb-4">
-                  <Image className="h-8 w-8 md:h-12 md:w-12 text-muted-foreground" />
+                <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+                  <Image className="h-12 w-12 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg md:text-2xl font-semibold mb-2">Ваше портфолио пусто</h3>
-                <p className="text-sm md:text-base text-muted-foreground">
+                <h3 className="text-2xl font-semibold mb-2">Ваше портфолио пусто</h3>
+                <p className="text-muted-foreground">
                   Добавьте фотографии ваших лучших работ, чтобы привлечь больше клиентов
                 </p>
               </div>
