@@ -207,6 +207,7 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       setDragStart({ x: pos.x, y: pos.y });
     } else if (isInCropArea(pos.x, pos.y)) {
       setIsDragging(true);
+      // Сохраняем смещение мыши относительно центра круга
       const centerX = cropArea.x + cropArea.width / 2;
       const centerY = cropArea.y + cropArea.height / 2;
       setDragStart({ x: pos.x - centerX, y: pos.y - centerY });
@@ -299,6 +300,7 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       setDragStart({ x: pos.x, y: pos.y });
     } else if (isInCropArea(pos.x, pos.y)) {
       setIsDragging(true);
+      // Сохраняем смещение касания относительно центра круга
       const centerX = cropArea.x + cropArea.width / 2;
       const centerY = cropArea.y + cropArea.height / 2;
       setDragStart({ x: pos.x - centerX, y: pos.y - centerY });
