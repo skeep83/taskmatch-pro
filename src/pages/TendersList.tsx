@@ -4,21 +4,29 @@ import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useDeviceDetection } from "@/hooks/useDeviceDetection";
 import { Link } from "react-router-dom";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Clock, Euro, Users, Eye, Gavel, Trophy, Timer, RefreshCw, Filter, Grid, List } from "lucide-react";
 import tendersImage from "@/assets/tenders-auction.jpg";
+import MobileTenders from "@/mobile/pages/MobileTenders";
 
 const TendersList = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
+  const { isMobile } = useDeviceDetection();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("active");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { formatPrice } = useCurrency();
+
+  // Mobile version
+  if (isMobile) {
+    return <MobileTenders />;
+  }
 
   useEffect(() => {
     (async () => {
