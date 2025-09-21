@@ -136,81 +136,146 @@ async function handleGetUsers(supabase: any, url: URL, adminId: string, requestD
 
   switch (action) {
     case 'list': {
-      // First get users from auth schema to get emails
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
-        page,
-        perPage: limit
-      });
+      try {
+        // First get total count from auth schema
+        const { data: authUsersResponse, error: authError } = await supabase.auth.admin.listUsers();
 
-      if (authError) {
-        console.error('Error fetching auth users:', authError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch users' }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        if (authError) {
+          console.error('Error fetching auth users:', authError);
+          return new Response(JSON.stringify({ error: 'Failed to fetch users from auth' }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const allAuthUsers = authUsersResponse.users || [];
+        const totalUsers = allAuthUsers.length;
+        
+        // Apply pagination to auth users
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedAuthUsers = allAuthUsers.slice(startIndex, endIndex);
+        
+        if (paginatedAuthUsers.length === 0) {
+          return new Response(JSON.stringify({ 
+            users: [], 
+            pagination: { page, limit, total: totalUsers }
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const userIds = paginatedAuthUsers.map(u => u.id);
+
+        // Get profile data for these users
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select(`
+            id, full_name, phone, locale, created_at, updated_at
+          `)
+          .in('id', userIds);
+
+        if (profileError) {
+          console.error('Error fetching profiles:', profileError);
+          // Don't fail completely, just continue without profile data
+        }
+
+        // Get user roles
+        const { data: userRoles, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('user_id, role')
+          .in('user_id', userIds);
+
+        if (rolesError) {
+          console.error('Error fetching user roles:', rolesError);
+        }
+
+        // Get KYC documents
+        const { data: kycDocs, error: kycError } = await supabase
+          .from('kyc_documents')
+          .select('user_id, status, created_at')
+          .in('user_id', userIds);
+
+        if (kycError) {
+          console.error('Error fetching KYC documents:', kycError);
+        }
+
+        // Get pro profiles
+        const { data: proProfiles, error: proError } = await supabase
+          .from('pro_profiles')
+          .select('user_id, bio, radius_km, hourly_rate_cents')
+          .in('user_id', userIds);
+
+        if (proError) {
+          console.error('Error fetching pro profiles:', proError);
+        }
+
+        // Get rating stats
+        const { data: ratingStats, error: ratingError } = await supabase
+          .from('pro_rating_stats')
+          .select('pro_id, avg_score, rating_count')
+          .in('pro_id', userIds);
+
+        if (ratingError) {
+          console.error('Error fetching rating stats:', ratingError);
+        }
+
+        // Merge all data
+        const users = paginatedAuthUsers.map(authUser => {
+          const profile = profiles?.find(p => p.id === authUser.id);
+          const roles = userRoles?.filter(r => r.user_id === authUser.id) || [];
+          const kyc = kycDocs?.filter(k => k.user_id === authUser.id) || [];
+          const proProfile = proProfiles?.find(p => p.user_id === authUser.id);
+          const ratings = ratingStats?.find(r => r.pro_id === authUser.id);
+
+          return {
+            id: authUser.id,
+            email: authUser.email,
+            email_confirmed_at: authUser.email_confirmed_at,
+            created_at: authUser.created_at,
+            updated_at: authUser.updated_at,
+            last_sign_in_at: authUser.last_sign_in_at,
+            full_name: profile?.full_name || null,
+            phone: profile?.phone || null,
+            locale: profile?.locale || 'ru',
+            user_roles: roles,
+            kyc_documents: kyc,
+            pro_profiles: proProfile ? [proProfile] : [],
+            pro_rating_stats: ratings ? [ratings] : []
+          };
         });
-      }
 
-      const userIds = authUsers.users.map(u => u.id);
-      
-      if (userIds.length === 0) {
+        // Apply search filter if provided
+        const filteredUsers = users.filter(user => {
+          if (role && (!user.user_roles || !user.user_roles.some(r => r.role === role))) {
+            return false;
+          }
+          if (search) {
+            const searchLower = search.toLowerCase();
+            const emailMatch = user.email && user.email.toLowerCase().includes(searchLower);
+            const nameMatch = user.full_name && user.full_name.toLowerCase().includes(searchLower);
+            const phoneMatch = user.phone && user.phone.toLowerCase().includes(searchLower);
+            if (!emailMatch && !nameMatch && !phoneMatch) {
+              return false;
+            }
+          }
+          return true;
+        });
+
         return new Response(JSON.stringify({ 
-          users: [], 
-          pagination: { page, limit, total: 0 }
+          users: filteredUsers, 
+          pagination: { page, limit, total: totalUsers }
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-      }
 
-      // Get profile data for these users
-      let profileQuery = supabase
-        .from('profiles')
-        .select(`
-          id, full_name, phone, locale, created_at, updated_at,
-          user_roles(role),
-          kyc_documents(status, created_at),
-          pro_profiles(bio, radius_km, hourly_rate_cents),
-          pro_rating_stats(avg_score, rating_count)
-        `)
-        .in('id', userIds);
-
-      if (search) {
-        profileQuery = profileQuery.or(`full_name.ilike.%${search}%,phone.ilike.%${search}%`);
-      }
-
-      const { data: profiles, error: profileError } = await profileQuery;
-
-      if (profileError) {
-        console.error('Error fetching profiles:', profileError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch user profiles' }), {
+      } catch (error) {
+        console.error('Error in list users:', error);
+        return new Response(JSON.stringify({ error: 'Internal server error while fetching users' }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-
-      // Merge auth and profile data
-      const users = authUsers.users.map(authUser => {
-        const profile = profiles?.find(p => p.id === authUser.id);
-        return {
-          id: authUser.id,
-          email: authUser.email,
-          email_confirmed_at: authUser.email_confirmed_at,
-          created_at: authUser.created_at,
-          updated_at: authUser.updated_at,
-          last_sign_in_at: authUser.last_sign_in_at,
-          ...profile
-        };
-      }).filter(user => {
-        if (role && (!user.user_roles || !user.user_roles.some(r => r.role === role))) {
-          return false;
-        }
-        if (search && user.email && !user.email.toLowerCase().includes(search.toLowerCase()) && 
-            (!user.full_name || !user.full_name.toLowerCase().includes(search.toLowerCase()))) {
-          return false;
-        }
-        return true;
-      });
-
-      const total = users.length;
 
       if (error) {
         console.error('Error fetching users:', error);
@@ -273,8 +338,16 @@ async function handleGetUsers(supabase: any, url: URL, adminId: string, requestD
 async function handleUserAction(supabase: any, data: any, adminId: string, req: Request) {
   const { action, userId, ...actionData } = data;
 
+  // For list action via POST, handle it differently
+  if (action === 'list') {
+    return new Response(JSON.stringify({ error: 'Use GET for list action or call handleGetUsers directly' }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   if (!userId || !action) {
-    return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+    return new Response(JSON.stringify({ error: 'Missing required fields: userId and action are required' }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
