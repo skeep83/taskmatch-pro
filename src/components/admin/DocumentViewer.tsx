@@ -134,7 +134,7 @@ export const DocumentViewer = ({
         <DialogDescription className="sr-only">
           Интерактивный просмотр документа для верификации с возможностью увеличения и перемещения
         </DialogDescription>
-        <DialogHeader className="p-6 pb-2">
+        <DialogHeader className="p-3 pb-1">
           <DialogTitle className="flex items-center justify-between">
             <span>{getDocumentTitle()}</span>
             <div className="flex gap-2">
