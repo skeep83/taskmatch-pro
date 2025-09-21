@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AdminAPI } from '@/lib/adminApi';
 import { RefreshCw, Download, Search, AlertTriangle, Info, XCircle, CheckCircle } from 'lucide-react';
@@ -203,53 +203,49 @@ function AdminLogs() {
                 className="pl-10"
               />
             </div>
-            <Select value={filters.level} onValueChange={(value) => handleFilterChange('level', value === 'all' ? '' : value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Уровень" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все уровни</SelectItem>
-                <SelectItem value="critical">Критические</SelectItem>
-                <SelectItem value="error">Ошибки</SelectItem>
-                <SelectItem value="warning">Предупреждения</SelectItem>
-                <SelectItem value="info">Информация</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filters.source} onValueChange={(value) => handleFilterChange('source', value === 'all' ? '' : value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Источник" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все источники</SelectItem>
-                <SelectItem value="frontend">Frontend</SelectItem>
-                <SelectItem value="backend">Backend</SelectItem>
-                <SelectItem value="database">Database</SelectItem>
-                <SelectItem value="payment">Payment</SelectItem>
-                <SelectItem value="auth">Auth</SelectItem>
-                <SelectItem value="notification">Notification</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filters.resolved} onValueChange={(value) => handleFilterChange('resolved', value === 'all' ? '' : value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Статус" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все</SelectItem>
-                <SelectItem value="false">Не решено</SelectItem>
-                <SelectItem value="true">Решено</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filters.timeRange} onValueChange={(value) => handleFilterChange('timeRange', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Период" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1h">Последний час</SelectItem>
-                <SelectItem value="24h">Последние 24 часа</SelectItem>
-                <SelectItem value="7d">Последние 7 дней</SelectItem>
-                <SelectItem value="30d">Последние 30 дней</SelectItem>
-              </SelectContent>
-            </Select>
+            <select 
+              value={filters.level} 
+              onChange={(e) => handleFilterChange('level', e.target.value)}
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">Все уровни</option>
+              <option value="critical">Критические</option>
+              <option value="error">Ошибки</option>
+              <option value="warning">Предупреждения</option>
+              <option value="info">Информация</option>
+            </select>
+            <select 
+              value={filters.source} 
+              onChange={(e) => handleFilterChange('source', e.target.value)}
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">Все источники</option>
+              <option value="frontend">Frontend</option>
+              <option value="backend">Backend</option>
+              <option value="database">Database</option>
+              <option value="payment">Payment</option>
+              <option value="auth">Auth</option>
+              <option value="notification">Notification</option>
+            </select>
+            <select 
+              value={filters.resolved} 
+              onChange={(e) => handleFilterChange('resolved', e.target.value)}
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">Все</option>
+              <option value="false">Не решено</option>
+              <option value="true">Решено</option>
+            </select>
+            <select 
+              value={filters.timeRange} 
+              onChange={(e) => handleFilterChange('timeRange', e.target.value)}
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="1h">Последний час</option>
+              <option value="24h">Последние 24 часа</option>
+              <option value="7d">Последние 7 дней</option>
+              <option value="30d">Последние 30 дней</option>
+            </select>
           </div>
         </CardContent>
       </Card>
