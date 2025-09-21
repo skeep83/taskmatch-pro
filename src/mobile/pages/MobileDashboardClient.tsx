@@ -48,7 +48,9 @@ import {
   Zap,
   Edit,
   Trash2,
-  Copy
+  Copy,
+  ChevronDown,
+  Building2
 } from "lucide-react";
 
 interface Job {
@@ -86,6 +88,8 @@ export default function MobileDashboardClient() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "overview");
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [showDashboardSelector, setShowDashboardSelector] = useState(false);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [stats, setStats] = useState({
     totalJobs: 0,
     activeJobs: 0,
@@ -129,6 +133,16 @@ export default function MobileDashboardClient() {
       const roleResult = await getUserRole(session.session.user.id);
       if (roleResult.success) {
         setCurrentRole(roleResult.role);
+      }
+
+      // Load user roles
+      const { data: rolesData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.session.user.id);
+      
+      if (rolesData) {
+        setUserRoles(rolesData.map(r => r.role));
       }
 
       // Check for pending pro upgrade request
@@ -347,6 +361,47 @@ export default function MobileDashboardClient() {
     });
   };
 
+  const getDashboardOptions = () => {
+    const options = [
+      { 
+        value: 'client', 
+        label: 'Клиент', 
+        icon: User, 
+        description: 'Заказы и услуги',
+        available: true 
+      }
+    ];
+
+    if (userRoles.includes('pro') || hasPendingProRequest) {
+      options.push({ 
+        value: 'pro', 
+        label: 'Специалист', 
+        icon: Briefcase, 
+        description: 'Мои услуги и заказы',
+        available: true 
+      });
+    }
+
+    if (userRoles.includes('business')) {
+      options.push({ 
+        value: 'business', 
+        label: 'Бизнес', 
+        icon: Building2, 
+        description: 'Компания и тендеры',
+        available: true 
+      });
+    }
+
+    return options;
+  };
+
+  const handleDashboardSwitch = (dashboardType: string) => {
+    setShowDashboardSelector(false);
+    if (dashboardType !== 'client') {
+      navigate(`/dashboard/${dashboardType}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -379,9 +434,63 @@ export default function MobileDashboardClient() {
           showNotifications={true}
         />
         
+        {/* Dashboard Selector */}
+        <div 
+          className="fixed top-0 left-0 right-0 z-30 pt-2 px-4"
+          style={{ paddingTop: `${safeAreaInsets.top + 60}px` }}
+        >
+          <MobileCard 
+            pressable 
+            onPress={() => setShowDashboardSelector(!showDashboardSelector)}
+            className="relative"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <User className="h-5 w-5 text-primary" />
+                <div>
+                  <h3 className="font-semibold">Клиент</h3>
+                  <p className="text-sm text-muted-foreground">Заказы и услуги</p>
+                </div>
+              </div>
+              <ChevronDown className={`h-5 w-5 transition-transform ${showDashboardSelector ? 'rotate-180' : ''}`} />
+            </div>
+            
+            {/* Dropdown Menu */}
+            {showDashboardSelector && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl z-50 overflow-hidden"
+              >
+                {getDashboardOptions().map((option) => (
+                  <motion.button
+                    key={option.value}
+                    onClick={() => handleDashboardSwitch(option.value)}
+                    className={`w-full p-4 flex items-center gap-3 text-left transition-all hover:bg-white/20 ${
+                      option.value === 'client' ? 'bg-white/10' : ''
+                    }`}
+                    disabled={!option.available}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <option.icon className="h-5 w-5 text-primary" />
+                    <div>
+                      <h4 className="font-semibold">{option.label}</h4>
+                      <p className="text-sm text-muted-foreground">{option.description}</p>
+                    </div>
+                    {!option.available && (
+                      <Badge variant="secondary" className="ml-auto">Скоро</Badge>
+                    )}
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+          </MobileCard>
+        </div>
+        
         <div 
           className="pt-20 pb-24 px-4 space-y-6"
-          style={{ paddingTop: `${80 + safeAreaInsets.top}px` }}
+          style={{ paddingTop: `${140 + safeAreaInsets.top}px` }}
         >
           {/* Welcome Section */}
           <MobileCard className="text-center">
@@ -709,25 +818,38 @@ export default function MobileDashboardClient() {
                 </div>
               </MobileCard>
 
-              {/* Available Plans */}
               <div className="space-y-4">
                 <MobileCard>
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold">HomeCare Basic</h4>
                       <p className="text-sm text-muted-foreground">Основные функции</p>
-                      <p className="text-lg font-bold">299 ₽/мес</p>
+                      <p className="text-lg font-bold">99 ₽/мес</p>
+                      <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                        <li>• Приоритетная поддержка</li>
+                        <li>• Скидка 5% на заказы</li>
+                        <li>• Расширенная гарантия</li>
+                      </ul>
                     </div>
                     <Button variant="outline">Выбрать</Button>
                   </div>
                 </MobileCard>
 
-                <MobileCard>
+                <MobileCard className="border-2 border-primary bg-primary/5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold">HomeCare Plus</h4>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold">HomeCare Plus</h4>
+                        <Badge>Популярный</Badge>
+                      </div>
                       <p className="text-sm text-muted-foreground">Расширенные возможности</p>
-                      <p className="text-lg font-bold">599 ₽/мес</p>
+                      <p className="text-lg font-bold">199 ₽/мес</p>
+                      <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                        <li>• Все из Basic</li>
+                        <li>• Скидка 10% на заказы</li>
+                        <li>• Бесплатная диагностика</li>
+                        <li>• Мгновенные выплаты</li>
+                      </ul>
                     </div>
                     <Button>Выбрать</Button>
                   </div>
@@ -738,9 +860,15 @@ export default function MobileDashboardClient() {
                     <div>
                       <h4 className="font-semibold">HomeCare Max</h4>
                       <p className="text-sm text-muted-foreground">Максимальный функционал</p>
-                      <p className="text-lg font-bold">999 ₽/мес</p>
+                      <p className="text-lg font-bold">399 ₽/мес</p>
+                      <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                        <li>• Все из Plus</li>
+                        <li>• Скидка 15% на заказы</li>
+                        <li>• Персональный менеджер</li>
+                        <li>• VIP поддержка 24/7</li>
+                      </ul>
                     </div>
-                    <Button>Выбрать</Button>
+                    <Button variant="outline">Выбрать</Button>
                   </div>
                 </MobileCard>
               </div>
