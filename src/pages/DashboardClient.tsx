@@ -339,7 +339,7 @@ export default function DashboardClient() {
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <div className="card-surface p-8 text-center">
+        <div className="p-8 text-center bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
           <h1 className="text-2xl font-bold mb-4">{t('client.dashboard.loading')}</h1>
           <div className="animate-spin">⏳</div>
         </div>
@@ -463,7 +463,7 @@ export default function DashboardClient() {
             <TabsContent value="overview" className="space-y-8">
               {/* Quick Stats */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="card-surface p-6">
+                <div className="p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_jobs')}</p>
@@ -473,7 +473,7 @@ export default function DashboardClient() {
                   </div>
                 </div>
 
-                <div className="card-surface p-6">
+                <div className="p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.active_jobs')}</p>
@@ -483,7 +483,7 @@ export default function DashboardClient() {
                   </div>
                 </div>
 
-                <div className="card-surface p-6">
+                <div className="p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.completed_jobs')}</p>
@@ -493,7 +493,7 @@ export default function DashboardClient() {
                   </div>
                 </div>
 
-                <div className="card-surface p-6">
+                <div className="p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_spent')}</p>
@@ -523,7 +523,7 @@ export default function DashboardClient() {
 
                 {/* Тендеры доступны только для бизнес аккаунтов */}
                 <div 
-                  className="card-surface p-6 opacity-50 cursor-not-allowed border-dashed"
+                  className="p-6 opacity-50 cursor-not-allowed border-dashed bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl"
                   title="Тендеры доступны только для бизнес аккаунтов"
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
@@ -575,7 +575,7 @@ export default function DashboardClient() {
               {hasPendingProRequest ? (
                 <ProUpgradeStatusCard userId={user?.id || ''} />
               ) : (
-                <div className="card-surface p-8">
+                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <RoleUpgrade
                     userId={user?.id || ''}
                     currentRole={currentRole}
@@ -596,7 +596,7 @@ export default function DashboardClient() {
               )}
 
               {/* Recent Jobs */}
-              <div className="card-surface p-8">
+              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                 <h2 className="text-2xl font-semibold mb-6">Последние заказы</h2>
                 {jobs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
@@ -669,7 +669,7 @@ export default function DashboardClient() {
 
             {/* Jobs Tab */}
             <TabsContent value="jobs">
-              <div className="card-surface p-8">
+              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                 <div className="flex flex-row items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold">Мои заказы</h2>
                   <Button onClick={() => navigate("/job/new")}>
@@ -762,7 +762,7 @@ export default function DashboardClient() {
 
             {/* Tenders Tab */}
             <TabsContent value="tenders">
-              <div className="card-surface p-8">
+              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                 <div className="text-center py-12 text-muted-foreground">
                   <div className="relative inline-block mb-6">
                     <Gavel className="h-16 w-16 mx-auto opacity-30" />
@@ -786,7 +786,7 @@ export default function DashboardClient() {
             <TabsContent value="subscription">
               <div className="space-y-6">
                 {/* Current Plan */}
-                <div className="card-surface p-8">
+                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">Подписка HomeCare</h2>
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="border rounded-lg p-6">
@@ -838,7 +838,7 @@ export default function DashboardClient() {
 
             {/* Payments Tab */}
             <TabsContent value="payments">
-              <div className="card-surface p-8">
+              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                 <h2 className="text-2xl font-semibold mb-6">История платежей</h2>
                 <div className="text-center py-8 text-muted-foreground">
                   <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -849,7 +849,7 @@ export default function DashboardClient() {
 
             {/* Referrals Tab */}
             <TabsContent value="referrals">
-              <div className="card-surface p-8">
+              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                 <h2 className="text-2xl font-semibold mb-6">Реферальная программа</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
@@ -882,7 +882,7 @@ export default function DashboardClient() {
             {/* Settings Tab */}
             <TabsContent value="settings">
               <div className="space-y-6">
-                <div className="card-surface p-8">
+                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">Профиль</h2>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
@@ -917,7 +917,7 @@ export default function DashboardClient() {
                   </div>
                 </div>
 
-                <div className="card-surface p-8">
+                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">Уведомления</h2>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
