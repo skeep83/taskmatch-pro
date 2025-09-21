@@ -97,6 +97,7 @@ export default function DashboardClient() {
   });
   const [saving, setSaving] = useState(false);
   const [currentRole, setCurrentRole] = useState<UserRole>('client');
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const [hasPendingProRequest, setHasPendingProRequest] = useState(false);
 
   useEffect(() => {
@@ -124,6 +125,16 @@ export default function DashboardClient() {
       const roleResult = await getUserRole(session.session.user.id);
       if (roleResult.success) {
         setCurrentRole(roleResult.role);
+      }
+
+      // Load all user roles
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.session.user.id);
+      
+      if (roles) {
+        setUserRoles(roles.map(r => r.role));
       }
 
       // Check for pending pro upgrade request
@@ -572,7 +583,7 @@ export default function DashboardClient() {
               </div>
 
               {/* Role Upgrade Section */}
-              {!hasPendingProRequest && (
+              {!hasPendingProRequest && !(userRoles.includes('pro') && userRoles.includes('business')) && (
                 <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <RoleUpgrade
                     userId={user?.id || ''}
