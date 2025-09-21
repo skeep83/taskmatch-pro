@@ -52,11 +52,13 @@ export default function MobileJobDetail() {
   }, [id]);
 
   const openPhotoModal = (index: number) => {
+    console.log('Opening photo modal, index:', index);
     setCurrentPhotoIndex(index);
     setPhotoModalOpen(true);
   };
 
   const closePhotoModal = () => {
+    console.log('Closing photo modal');
     setPhotoModalOpen(false);
     setCurrentPhotoIndex(0);
   };
@@ -187,11 +189,27 @@ export default function MobileJobDetail() {
     <div>
       {/* Photo Modal */}
       {photoModalOpen && job && job.job_photos.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center" onClick={closePhotoModal}>
-          <div className="relative w-full h-full flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center" 
+          onClick={(e) => {
+            console.log('Background clicked');
+            closePhotoModal();
+          }}
+        >
+          <div 
+            className="relative w-full h-full flex items-center justify-center p-4" 
+            onClick={(e) => {
+              console.log('Content area clicked');
+              e.stopPropagation();
+            }}
+          >
             {/* Close Button */}
             <button
-              onClick={closePhotoModal}
+              onClick={(e) => {
+                console.log('Close button clicked');
+                e.stopPropagation();
+                closePhotoModal();
+              }}
               className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black bg-opacity-50 text-white hover:bg-opacity-70 transition-all"
             >
               <X size={24} />
