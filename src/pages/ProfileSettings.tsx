@@ -324,11 +324,14 @@ export default function ProfileSettings() {
   };
 
   const toggleCategory = (categoryId: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId) 
+    console.log('Toggling category:', categoryId, 'Current selected:', selectedCategories);
+    setSelectedCategories(prev => {
+      const newSelection = prev.includes(categoryId) 
         ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
+        : [...prev, categoryId];
+      console.log('New selection:', newSelection);
+      return newSelection;
+    });
   };
 
   const handleAvatarUpdate = (url: string | null) => {

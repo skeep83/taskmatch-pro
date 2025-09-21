@@ -281,11 +281,14 @@ export default function MobileProfileSettings() {
   };
 
   const toggleCategory = (categoryId: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId) 
+    console.log('Mobile - Toggling category:', categoryId, 'Current selected:', selectedCategories);
+    setSelectedCategories(prev => {
+      const newSelection = prev.includes(categoryId) 
         ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
+        : [...prev, categoryId];
+      console.log('Mobile - New selection:', newSelection);
+      return newSelection;
+    });
   };
 
   const handleAvatarUpdate = (url: string | null) => {
