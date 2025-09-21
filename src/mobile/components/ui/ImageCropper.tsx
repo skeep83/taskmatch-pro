@@ -221,9 +221,17 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       const newCenterY = pos.y - dragStart.y;
       const radius = cropArea.width / 2;
       
-      // Ensure crop area stays within canvas bounds
-      const newX = Math.max(radius, Math.min(newCenterX - radius, canvasSize.width - radius));
-      const newY = Math.max(radius, Math.min(newCenterY - radius, canvasSize.height - radius));
+      // Ensure crop area stays within canvas bounds with proper margin
+      const minX = radius;
+      const maxX = canvasSize.width - radius;
+      const minY = radius;
+      const maxY = canvasSize.height - radius;
+      
+      const constrainedCenterX = Math.max(minX, Math.min(maxX, newCenterX));
+      const constrainedCenterY = Math.max(minY, Math.min(maxY, newCenterY));
+      
+      const newX = constrainedCenterX - radius;
+      const newY = constrainedCenterY - radius;
       
       setCropArea(prev => ({ ...prev, x: newX, y: newY }));
     } else if (isResizing) {
@@ -232,13 +240,13 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       
       // Calculate distance from center to mouse position
       const distance = Math.sqrt((pos.x - centerX) ** 2 + (pos.y - centerY) ** 2);
-      const newRadius = Math.max(25, Math.min(distance, 
-        Math.min(
-          Math.min(centerX, canvasSize.width - centerX),
-          Math.min(centerY, canvasSize.height - centerY)
-        )
-      ));
       
+      // Calculate maximum radius based on distance to nearest edge
+      const maxRadiusX = Math.min(centerX, canvasSize.width - centerX);
+      const maxRadiusY = Math.min(centerY, canvasSize.height - centerY);
+      const maxRadius = Math.min(maxRadiusX, maxRadiusY);
+      
+      const newRadius = Math.max(25, Math.min(distance, maxRadius));
       const newSize = newRadius * 2;
       const newX = centerX - newRadius;
       const newY = centerY - newRadius;
@@ -307,9 +315,17 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       const newCenterY = pos.y - dragStart.y;
       const radius = cropArea.width / 2;
       
-      // Ensure crop area stays within canvas bounds
-      const newX = Math.max(radius, Math.min(newCenterX - radius, canvasSize.width - radius));
-      const newY = Math.max(radius, Math.min(newCenterY - radius, canvasSize.height - radius));
+      // Ensure crop area stays within canvas bounds with proper margin
+      const minX = radius;
+      const maxX = canvasSize.width - radius;
+      const minY = radius;
+      const maxY = canvasSize.height - radius;
+      
+      const constrainedCenterX = Math.max(minX, Math.min(maxX, newCenterX));
+      const constrainedCenterY = Math.max(minY, Math.min(maxY, newCenterY));
+      
+      const newX = constrainedCenterX - radius;
+      const newY = constrainedCenterY - radius;
       
       setCropArea(prev => ({ ...prev, x: newX, y: newY }));
     } else if (isResizing) {
@@ -318,13 +334,13 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       
       // Calculate distance from center to touch position
       const distance = Math.sqrt((pos.x - centerX) ** 2 + (pos.y - centerY) ** 2);
-      const newRadius = Math.max(25, Math.min(distance, 
-        Math.min(
-          Math.min(centerX, canvasSize.width - centerX),
-          Math.min(centerY, canvasSize.height - centerY)
-        )
-      ));
       
+      // Calculate maximum radius based on distance to nearest edge
+      const maxRadiusX = Math.min(centerX, canvasSize.width - centerX);
+      const maxRadiusY = Math.min(centerY, canvasSize.height - centerY);
+      const maxRadius = Math.min(maxRadiusX, maxRadiusY);
+      
+      const newRadius = Math.max(25, Math.min(distance, maxRadius));
       const newSize = newRadius * 2;
       const newX = centerX - newRadius;
       const newY = centerY - newRadius;
