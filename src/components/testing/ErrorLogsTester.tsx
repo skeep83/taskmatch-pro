@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { adminApi } from "@/lib/adminApi";
-import { AlertTriangle, CheckCircle, Plus, Trash, Database } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Plus, Trash, Database, RefreshCw, List, TestTube } from 'lucide-react';
+
+interface ErrorLog {
+  id: string;
+  timestamp: string;
+  level: 'error' | 'warning' | 'info' | 'critical';
+  source: string;
+  message: string;
+  user_id?: string;
+  metadata?: any;
+  stack_trace?: string;
+  resolved: boolean;
+}
 
 interface TestLog {
   level: 'critical' | 'error' | 'warning' | 'info';
@@ -22,6 +35,9 @@ export const ErrorLogsTester = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [logsCleared, setLogsCleared] = useState(false);
+  const [realLogs, setRealLogs] = useState<ErrorLog[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<any>(null);
 
   const testLogs: TestLog[] = [
     {
@@ -81,6 +97,31 @@ export const ErrorLogsTester = () => {
     }
   ];
 
+  const fetchRealLogs = async () => {
+    setLoading(true);
+    try {
+      const response = await adminApi.getLogs({
+        page: 1,
+        limit: 50
+      });
+      setRealLogs(response.logs || []);
+      setStats(response.stats || null);
+    } catch (error) {
+      console.error('Error fetching logs:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить логи ошибок",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRealLogs();
+  }, []);
+
   const createTestLogs = async () => {
     setIsCreating(true);
     try {
@@ -117,6 +158,9 @@ export const ErrorLogsTester = () => {
         description: `Создано ${testLogs.length} тестовых записей в логах ошибок`
       });
 
+      // Автоматически обновляем реальные данные
+      await fetchRealLogs();
+
     } catch (error) {
       console.error('Failed to create test logs:', error);
       toast({
@@ -139,6 +183,8 @@ export const ErrorLogsTester = () => {
         description: "Все логи ошибок успешно удалены",
       });
       setLogsCleared(true);
+      // Автоматически обновляем реальные данные
+      await fetchRealLogs();
     } catch (error) {
       console.error('Failed to clear logs:', error);
       toast({
@@ -157,6 +203,36 @@ export const ErrorLogsTester = () => {
         <Database className="h-5 w-5 text-primary" />
         <h3 className="text-lg font-semibold">Тестирование логов ошибок</h3>
       </div>
+
+      {/* Stats */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold">{stats.total}</div>
+              <p className="text-xs text-muted-foreground">Всего логов</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-red-600">{stats.critical}</div>
+              <p className="text-xs text-muted-foreground">Критические</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-orange-600">{stats.errors}</div>
+              <p className="text-xs text-muted-foreground">Ошибки</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-2xl font-bold text-yellow-600">{stats.warnings}</div>
+              <p className="text-xs text-muted-foreground">Предупреждения</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -188,69 +264,164 @@ export const ErrorLogsTester = () => {
               <Trash className="h-4 w-4" />
               {isClearing ? 'Очистка...' : 'Очистить все логи'}
             </Button>
+
+            <Button 
+              onClick={fetchRealLogs} 
+              disabled={loading}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              {loading ? 'Загрузка...' : 'Обновить'}
+            </Button>
           </div>
 
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
-              После создания тестовых логов перейдите на вкладку "Логи" для просмотра результатов.
+              После создания тестовых логов данные автоматически обновятся.
               Тестовые данные помогут проверить работу системы отображения и фильтрации ошибок.
             </AlertDescription>
           </Alert>
         </CardContent>
       </Card>
 
-      {!logsCleared && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Предварительный просмотр тестовых данных</CardTitle>
-            <CardDescription>
-              Эти записи будут созданы в системе логов ошибок
-            </CardDescription>
-          </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-96">
-            <div className="space-y-3">
-              {testLogs.map((log, index) => (
-                <Card key={index} className="p-3">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2 flex-1">
-                      <div className="flex items-center gap-2">
-                        <Badge 
-                          variant={log.level === 'critical' ? 'destructive' : 
-                                  log.level === 'error' ? 'destructive' : 
-                                  log.level === 'warning' ? 'secondary' : 'outline'}
-                          className="text-xs"
-                        >
-                          {log.level.toUpperCase()}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {log.source}
-                        </Badge>
-                      </div>
-                      
-                      <p className="text-sm font-medium">{log.message}</p>
-                      
-                      {log.metadata && (
-                        <div className="text-xs text-muted-foreground">
-                          <strong>Метаданные:</strong> {JSON.stringify(log.metadata, null, 2).slice(0, 100)}...
+      <Tabs defaultValue="real" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="real" className="flex items-center gap-2">
+            <List className="w-4 h-4" />
+            Реальные данные ({realLogs.length})
+          </TabsTrigger>
+          <TabsTrigger value="preview" className="flex items-center gap-2">
+            <TestTube className="w-4 h-4" />
+            Предварительный просмотр тестовых данных
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="real" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Реальные данные из системы логов</CardTitle>
+              <CardDescription>
+                Актуальные записи из базы данных системы логов ошибок
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex items-center justify-center h-32">
+                  <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              ) : realLogs.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Database className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Логи ошибок не найдены</p>
+                  <p className="text-sm">Создайте тестовые данные для проверки системы</p>
+                </div>
+              ) : (
+                <ScrollArea className="h-96">
+                  <div className="space-y-3">
+                    {realLogs.map((log) => (
+                      <Card key={log.id} className="p-3">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <Badge 
+                                variant={log.level === 'critical' ? 'destructive' : 
+                                        log.level === 'error' ? 'destructive' : 
+                                        log.level === 'warning' ? 'secondary' : 'outline'}
+                                className="text-xs"
+                              >
+                                {log.level.toUpperCase()}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {log.source}
+                              </Badge>
+                              {log.resolved && (
+                                <Badge variant="secondary" className="text-xs text-green-700 bg-green-100">
+                                  Решено
+                                </Badge>
+                              )}
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(log.timestamp).toLocaleString('ru')}
+                              </span>
+                            </div>
+                            
+                            <p className="text-sm font-medium">{log.message}</p>
+                            
+                            {log.metadata && (
+                              <div className="text-xs text-muted-foreground">
+                                <strong>Метаданные:</strong> {JSON.stringify(log.metadata, null, 2).slice(0, 100)}...
+                              </div>
+                            )}
+                            
+                            {log.stack_trace && (
+                              <div className="text-xs text-muted-foreground font-mono">
+                                <strong>Stack trace:</strong> {log.stack_trace.split('\n')[0]}...
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-                      
-                      {log.stack_trace && (
-                        <div className="text-xs text-muted-foreground font-mono">
-                          <strong>Stack trace:</strong> {log.stack_trace.split('\n')[0]}...
-                        </div>
-                      )}
-                    </div>
+                      </Card>
+                    ))}
                   </div>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
-      )}
+                </ScrollArea>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="preview" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Предварительный просмотр тестовых данных</CardTitle>
+              <CardDescription>
+                Эти записи будут созданы в системе логов ошибок при нажатии кнопки "Создать тестовые логи"
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-96">
+                <div className="space-y-3">
+                  {testLogs.map((log, index) => (
+                    <Card key={index} className="p-3">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-2">
+                            <Badge 
+                              variant={log.level === 'critical' ? 'destructive' : 
+                                      log.level === 'error' ? 'destructive' : 
+                                      log.level === 'warning' ? 'secondary' : 'outline'}
+                              className="text-xs"
+                            >
+                              {log.level.toUpperCase()}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {log.source}
+                            </Badge>
+                          </div>
+                          
+                          <p className="text-sm font-medium">{log.message}</p>
+                          
+                          {log.metadata && (
+                            <div className="text-xs text-muted-foreground">
+                              <strong>Метаданные:</strong> {JSON.stringify(log.metadata, null, 2).slice(0, 100)}...
+                            </div>
+                          )}
+                          
+                          {log.stack_trace && (
+                            <div className="text-xs text-muted-foreground font-mono">
+                              <strong>Stack trace:</strong> {log.stack_trace.split('\n')[0]}...
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
