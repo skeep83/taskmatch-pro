@@ -24,7 +24,9 @@ import {
   Plus,
   Crown,
   CreditCard,
-  DollarSign
+  DollarSign,
+  MessageSquare,
+  Bell
 } from "lucide-react";
 import { BusinessAccountForm } from "@/components/business/BusinessAccountForm";
 import { BusinessMembers } from "@/components/business/BusinessMembers";
@@ -102,6 +104,35 @@ export default function DashboardBusiness() {
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
                   <h1 className="text-lg font-semibold text-black">Бизнес-панель</h1>
+                </div>
+                
+                {/* Right section */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-2 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]"
+                    onClick={() => navigate("/messages")}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-2 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]"
+                  >
+                    <Bell className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-2 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]"
+                    onClick={() => navigate("/profile/settings")}
+                  >
+                    <User className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </div>
