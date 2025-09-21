@@ -78,18 +78,29 @@ export function useCurrency() {
       || currencies.find(c => c.is_base);
     
     if (!currency) {
-      return `$${(amountCents / 100).toFixed(2)}`;
+      const amount = amountCents / 100;
+      // Remove .00 if amount is a whole number
+      const formatted = amount % 1 === 0 ? amount.toString() : amount.toFixed(2);
+      return `$${formatted}`;
     }
 
     const amount = amountCents / 100;
     const decimalPlaces = currency.decimal_places || 2;
     
-    // Молдавский лей отображается после суммы
-    if (currency.code === 'MDL') {
-      return `${amount.toFixed(decimalPlaces)} ${currency.symbol}`;
+    // Format with proper decimal places, but remove .00 if it's a whole number
+    let formattedAmount;
+    if (amount % 1 === 0) {
+      formattedAmount = amount.toString();
+    } else {
+      formattedAmount = amount.toFixed(decimalPlaces);
     }
     
-    return `${currency.symbol}${amount.toFixed(decimalPlaces)}`;
+    // Молдавский лей отображается после суммы
+    if (currency.code === 'MDL') {
+      return `${formattedAmount} ${currency.symbol}`;
+    }
+    
+    return `${currency.symbol}${formattedAmount}`;
   };
 
   const convertPrice = (amountCents: number, fromCurrency: string, toCurrency: string) => {
