@@ -233,9 +233,8 @@ export default function MobileDashboardClient() {
         
         const { data: photosData, error: photosError } = await supabase
           .from('job_photos')
-          .select('id, job_id, file_url, display_order')
-          .in('job_id', jobIds)
-          .order('display_order');
+          .select('id, job_id, file_url')
+          .in('job_id', jobIds);
         
         if (photosError) {
           console.error('❌ ERROR LOADING PHOTOS:', photosError);
