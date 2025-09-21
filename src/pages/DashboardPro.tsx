@@ -43,7 +43,31 @@ const DashboardPro = () => {
 
   useEffect(() => {
     initializeDashboard();
-  }, []);
+    
+    // Настройка реального времени для отслеживания изменений KYC документов
+    const kycChannel = supabase
+      .channel('kyc_documents_pro_dashboard')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'kyc_documents'
+        },
+        (payload) => {
+          console.log('DashboardPro: KYC document updated:', payload);
+          // Перезагружаем KYC статус при любом обновлении
+          if (userId) {
+            loadKycStatus(userId);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(kycChannel);
+    };
+  }, [userId]);
 
   const initializeDashboard = async () => {
     try {
@@ -185,15 +209,44 @@ const DashboardPro = () => {
 
   const loadKycStatus = async (uid: string) => {
     try {
-      const { data: docs } = await supabase
+      console.log('DashboardPro: Loading KYC status for user:', uid);
+      const { data: docs, error } = await supabase
         .from('kyc_documents')
-        .select('status')
+        .select('status, doc_type, created_at')
         .eq('user_id', uid)
-        .order('created_at', { ascending: false })
-        .limit(1);
-      setKycStatus(docs?.[0]?.status || 'pending');
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('DashboardPro: Error loading KYC documents:', error);
+        setKycStatus('pending');
+        return;
+      }
+      
+      console.log('DashboardPro: KYC documents found:', docs);
+      
+      if (!docs || docs.length === 0) {
+        console.log('DashboardPro: No KYC documents found, setting status to pending');
+        setKycStatus('pending');
+        return;
+      }
+      
+      // Проверяем, есть ли хотя бы один одобренный документ
+      const hasApprovedDoc = docs.some(doc => doc.status === 'approved');
+      const hasRejectedDoc = docs.some(doc => doc.status === 'rejected');
+      const allPending = docs.every(doc => doc.status === 'pending');
+      
+      let finalStatus = 'pending';
+      if (hasApprovedDoc) {
+        finalStatus = 'approved';
+      } else if (hasRejectedDoc && !allPending) {
+        finalStatus = 'rejected';  
+      }
+      
+      console.log('DashboardPro: Final KYC status:', finalStatus);
+      setKycStatus(finalStatus);
     } catch (error) {
       console.error('DashboardPro: Error loading KYC status:', error);
+      setKycStatus('pending');
     }
   };
 
@@ -254,21 +307,31 @@ const DashboardPro = () => {
           </p>
           
           <div className="flex justify-center mt-8">
-            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] transition-all duration-300">
-              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                {kycStatus === 'approved' ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                ) : kycStatus === 'rejected' ? (
-                  <XCircle className="h-5 w-5 text-red-500" />
-                ) : (
-                  <Clock className="h-5 w-5 text-orange-500" />
-                )}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] transition-all duration-300">
+                <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  {kycStatus === 'approved' ? (
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                  ) : kycStatus === 'rejected' ? (
+                    <XCircle className="h-5 w-5 text-red-500" />
+                  ) : (
+                    <Clock className="h-5 w-5 text-orange-500" />
+                  )}
+                </div>
+                <span className="text-sm font-medium text-foreground">
+                  Статус: {kycStatus === 'approved' ? 'Проверенный специалист' : 
+                           kycStatus === 'rejected' ? 'Документы отклонены' : 
+                           'Ожидает проверки'}
+                </span>
               </div>
-              <span className="text-sm font-medium text-foreground">
-                Статус: {kycStatus === 'approved' ? 'Проверенный специалист' : 
-                         kycStatus === 'rejected' ? 'Документы отклонены' : 
-                         'Ожидает проверки'}
-              </span>
+              
+              <button 
+                onClick={() => userId && loadKycStatus(userId)}
+                className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
+                title="Обновить статус KYC"
+              >
+                <TrendingUp className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
