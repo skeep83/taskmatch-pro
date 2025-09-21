@@ -559,24 +559,20 @@ export default function MobileMessages() {
 
       {/* Message input */}
       <div 
-        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-50"
+        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-50 bg-[#E8ECF0] border-t"
         style={{ 
           paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
-          background: 'var(--background-neomorphic)',
-          boxShadow: '0 -10px 30px rgba(174, 187, 204, 0.3)'
+          boxShadow: '0 -8px 20px rgba(0,0,0,0.1)'
         }}
       >
         <div className="flex gap-3 items-end">
           <div 
-            className="flex-1 relative"
+            className="flex-1 bg-white rounded-2xl p-1"
             style={{ 
-              background: 'var(--surface-raised)',
-              boxShadow: 'inset 8px 8px 16px rgba(174, 187, 204, 0.4), inset -8px -8px 16px rgba(255, 255, 255, 0.8)',
-              borderRadius: '20px',
-              padding: '2px'
+              boxShadow: 'inset 6px 6px 12px #D1D5DB, inset -6px -6px 12px #FFFFFF'
             }}
           >
-            <Input
+            <input
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyPress={(e) => {
@@ -586,32 +582,26 @@ export default function MobileMessages() {
                 }
               }}
               placeholder="Написать сообщение..."
-              className="border-0 bg-transparent text-base min-h-[48px] px-4 py-3 rounded-[18px] focus:outline-none focus:ring-0 placeholder:text-gray-500"
+              className="w-full border-0 bg-transparent text-base min-h-[48px] px-4 py-3 rounded-[16px] focus:outline-none placeholder:text-gray-500"
               style={{ fontSize: '16px' }}
             />
           </div>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={sendMessage}
             disabled={!text.trim()}
-            className="w-12 h-12 rounded-2xl text-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200"
+            className="w-12 h-12 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200"
             style={{ 
-              background: text.trim() ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--brand-3)))' : 'var(--surface-raised)',
-              boxShadow: 'var(--shadow-raised)',
-              color: text.trim() ? 'white' : 'hsl(var(--primary))',
-              transition: 'var(--transition-smooth)'
-            }}
-            onMouseEnter={(e) => {
-              if (text.trim()) {
-                e.currentTarget.style.boxShadow = 'var(--shadow-raised-hover)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-raised)';
+              background: text.trim() 
+                ? 'linear-gradient(135deg, #7C3AED, #A855F7)' 
+                : '#E8ECF0',
+              boxShadow: text.trim() 
+                ? '6px 6px 12px #BCBDC1, -6px -6px 12px #FFFFFF' 
+                : 'inset 3px 3px 6px #D1D5DB, inset -3px -3px 6px #FFFFFF',
+              color: text.trim() ? 'white' : '#7C3AED'
             }}
           >
             <Send size={18} />
-          </motion.button>
+          </button>
         </div>
       </div>
     </div>
