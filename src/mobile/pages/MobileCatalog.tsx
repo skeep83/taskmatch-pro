@@ -67,16 +67,17 @@ export default function MobileCatalog() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#E5E7EB]">
       <MobileHeader 
         title="Поиск услуг"
         showBack 
+        showSearch
       />
 
       <div 
         className="px-4 pt-4"
         style={{ 
-          paddingTop: 56 + safeAreaInsets.top + 16,
+          paddingTop: 80 + safeAreaInsets.top + 16,
           paddingBottom: bottomNavHeight + safeAreaInsets.bottom + 16 
         }}
       >

@@ -108,15 +108,28 @@ export default function MobileDashboardPro() {
     <RoleGuard requiredRole="pro">
       <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Управляйте заказами и доходами" canonical="/dashboard/pro" />
       
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#E5E7EB]">
         <MobileHeader 
           title="Кабинет специалиста"
+          showBack={false}
+          showNotifications={true}
+          showDashboardSelector={true}
+          dashboardOptions={[
+            { value: 'client', label: 'Клиент', icon: User, description: 'Заказы и услуги', available: true },
+            { value: 'pro', label: 'Специалист', icon: Briefcase, description: 'Мои услуги и заказы', available: true },
+            { value: 'business', label: 'Бизнес', icon: User, description: 'Компания и тендеры', available: true }
+          ]}
+          currentDashboard="pro"
+          onDashboardChange={(dashboard) => {
+            if (dashboard === 'client') window.location.href = '/dashboard/client';
+            if (dashboard === 'business') window.location.href = '/dashboard/business';
+          }}
         />
 
         <div 
           className="px-4 pt-4"
           style={{ 
-            paddingTop: 56 + safeAreaInsets.top + 16,
+            paddingTop: 80 + safeAreaInsets.top + 16,
             paddingBottom: bottomNavHeight + safeAreaInsets.bottom + 16 
           }}
         >
