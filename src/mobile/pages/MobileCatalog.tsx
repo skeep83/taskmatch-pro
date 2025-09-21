@@ -38,13 +38,19 @@ export default function MobileCatalog() {
         ...(searchQuery && { search: searchQuery })
       });
 
-      const { data, error } = await supabase.functions.invoke('jobs-catalog', {
+      const response = await fetch(`https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/jobs-catalog?${params}`, {
         method: 'GET',
-        body: null
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs',
+          'Content-Type': 'application/json'
+        }
       });
 
-      if (error) {
-        console.error('Error fetching jobs:', error);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Error fetching jobs:', data);
         return;
       }
 
