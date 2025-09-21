@@ -307,32 +307,6 @@ const DashboardPro = () => {
           </p>
           
           <div className="flex justify-center mt-8">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] transition-all duration-300">
-                <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                  {kycStatus === 'approved' ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : kycStatus === 'rejected' ? (
-                    <XCircle className="h-5 w-5 text-red-500" />
-                  ) : (
-                    <Clock className="h-5 w-5 text-orange-500" />
-                  )}
-                </div>
-                <span className="text-sm font-medium text-foreground">
-                  Статус: {kycStatus === 'approved' ? 'Проверенный специалист' : 
-                           kycStatus === 'rejected' ? 'Документы отклонены' : 
-                           'Ожидает проверки'}
-                </span>
-              </div>
-              
-              <button 
-                onClick={() => userId && loadKycStatus(userId)}
-                className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
-                title="Обновить статус KYC"
-              >
-                <TrendingUp className="h-4 w-4" />
-              </button>
-            </div>
           </div>
         </div>
 
@@ -579,6 +553,34 @@ const DashboardPro = () => {
 
             {/* Sidebar */}
             <div className="space-y-8">
+              {/* KYC Status Section */}
+              <div className="flex items-center gap-4 justify-center">
+                <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] transition-all duration-300">
+                  <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    {kycStatus === 'approved' ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : kycStatus === 'rejected' ? (
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    ) : (
+                      <Clock className="h-5 w-5 text-orange-500" />
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-foreground">
+                    Статус: {kycStatus === 'approved' ? 'Проверенный специалист' : 
+                             kycStatus === 'rejected' ? 'Документы отклонены' : 
+                             'Ожидает проверки'}
+                  </span>
+                </div>
+                
+                <button 
+                  onClick={() => userId && loadKycStatus(userId)}
+                  className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
+                  title="Обновить статус KYC"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                </button>
+              </div>
+              
               {/* Tenders */}
               <div className="card-surface p-6">
                 <div className="flex items-center gap-3 mb-4">
