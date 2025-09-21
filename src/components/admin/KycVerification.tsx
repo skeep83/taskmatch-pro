@@ -83,6 +83,27 @@ export const AdminKycVerification = () => {
 
   useEffect(() => {
     loadSubmissions();
+    
+    // Настройка реального времени для отслеживания изменений в KYC документах
+    const kycChannel = supabase
+      .channel('kyc_documents_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'kyc_documents'
+        },
+        () => {
+          console.log('KYC document updated, reloading submissions');
+          loadSubmissions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(kycChannel);
+    };
   }, []);
 
   const loadSubmissions = async () => {
@@ -126,10 +147,18 @@ export const AdminKycVerification = () => {
         description: `KYC документы пользователя ${status === 'approved' ? 'одобрены' : 'отклонены'}`
       });
 
+      // Принудительно обновляем данные после успешной модерации
       await loadSubmissions();
+      
+      // Обновляем выбранную заявку если она есть
       if (selectedSubmission) {
-        const updated = submissions.find(s => s.id === selectedSubmission.id);
-        if (updated) setSelectedSubmission(updated);
+        // Перезагружаем данные и находим обновленную заявку
+        setTimeout(async () => {
+          await loadSubmissions();
+          const currentSubmissions = submissions;
+          const updated = currentSubmissions.find((s: KycSubmission) => s.id === selectedSubmission.id);
+          if (updated) setSelectedSubmission(updated);
+        }, 500);
       }
     } catch (error) {
       console.error('Error moderating document:', error);
