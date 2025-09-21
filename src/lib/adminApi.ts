@@ -336,7 +336,11 @@ class AdminAPI {
   }
 
   async clearAllLogs() {
-    const { data, error } = await supabase.rpc('clear_all_error_logs');
+    const { data, error } = await supabase.functions.invoke('admin-logs', {
+      body: {
+        action: 'clear_all'
+      }
+    });
 
     if (error) {
       console.error('AdminAPI Error (clear logs):', error);
