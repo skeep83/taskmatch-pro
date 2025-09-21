@@ -46,9 +46,8 @@ serve(async (req) => {
       .select('role')
       .eq('user_id', user.id)
       .in('role', ['admin', 'superadmin'])
-      .single()
 
-    if (roleError || !roleData) {
+    if (roleError || !roleData || roleData.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Access denied - admin role required' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
