@@ -49,8 +49,8 @@ export function MobileHeader({
         "flex items-center justify-between px-4 h-14",
         transparent 
           ? "bg-transparent" 
-          : "bg-background/95 backdrop-blur-xl border-b border-border/40",
-        "supports-[backdrop-filter]:bg-background/60",
+          : "bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]",
+        "rounded-b-2xl mx-2 mt-2",
         className
       )}
       style={{ paddingTop: safeAreaInsets.top }}
