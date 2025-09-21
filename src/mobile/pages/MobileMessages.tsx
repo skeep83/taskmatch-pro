@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Send, ArrowLeft, Circle, MoreVertical, Trash2 } from 'lucide-react';
