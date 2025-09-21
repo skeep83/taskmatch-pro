@@ -45,8 +45,7 @@ serve(async (req: Request) => {
           first_name,
           last_name,
           avatar_url
-        ),
-        
+        )
       `)
       .eq("status", "new")
       .order("created_at", { ascending: false })
@@ -72,23 +71,27 @@ serve(async (req: Request) => {
       throw error;
     }
 
-    // Fetch job photos separately
+    // Fetch job photos separately (if table exists)
     let jobPhotos: Record<string, any[]> = {};
     if (jobs && jobs.length > 0) {
-      const jobIds = jobs.map(job => job.id);
-      const { data: photos } = await supabase
-        .from("job_photos")
-        .select("job_id, file_url")
-        .in("job_id", jobIds);
-      
-      if (photos) {
-        jobPhotos = photos.reduce((acc, photo) => {
-          if (!acc[photo.job_id]) {
-            acc[photo.job_id] = [];
-          }
-          acc[photo.job_id].push({ file_url: photo.file_url });
-          return acc;
-        }, {} as Record<string, any[]>);
+      try {
+        const jobIds = jobs.map(job => job.id);
+        const { data: photos } = await supabase
+          .from("job_photos")
+          .select("job_id, file_url")
+          .in("job_id", jobIds);
+        
+        if (photos) {
+          jobPhotos = photos.reduce((acc, photo) => {
+            if (!acc[photo.job_id]) {
+              acc[photo.job_id] = [];
+            }
+            acc[photo.job_id].push({ file_url: photo.file_url });
+            return acc;
+          }, {} as Record<string, any[]>);
+        }
+      } catch (error) {
+        console.warn("job_photos table not found, skipping photos:", error);
       }
     }
 

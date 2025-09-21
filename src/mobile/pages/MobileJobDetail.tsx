@@ -70,8 +70,7 @@ export default function MobileJobDetail() {
             last_name,
             avatar_url,
             phone
-          ),
-          job_photos(file_url)
+          )
         `)
         .eq('id', jobId)
         .single();
