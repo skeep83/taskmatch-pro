@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminAPI } from '@/lib/adminApi';
 import { ErrorTrends } from '@/components/admin/ErrorTrends';
-import { RefreshCw, Download, Search, AlertTriangle, Info, XCircle, CheckCircle, BarChart3, List } from 'lucide-react';
+import { RefreshCw, Download, Search, AlertTriangle, Info, XCircle, CheckCircle, BarChart3, List, type LucideIcon } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -40,7 +40,7 @@ const levelColors = {
   info: 'default',
 } as const;
 
-const levelIcons = {
+const levelIcons: Record<string, LucideIcon> = {
   critical: AlertTriangle,
   error: XCircle,
   warning: AlertTriangle,
