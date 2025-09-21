@@ -197,7 +197,7 @@ export default function MobileJobDetail() {
           }}
         >
           <div 
-            className="relative w-full h-full flex items-center justify-center p-4" 
+            className="relative max-w-full max-h-full flex items-center justify-center p-4" 
             onClick={(e) => {
               console.log('Content area clicked');
               e.stopPropagation();
