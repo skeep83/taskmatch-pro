@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useMobile } from '@/mobile/providers/MobileProvider';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface DashboardOption {
   value: string;
@@ -48,7 +50,9 @@ export function MobileHeader({
   const navigate = useNavigate();
   const location = useLocation();
   const { safeAreaInsets } = useMobile();
+  const { unreadCount } = useNotifications();
   const [selectorOpen, setSelectorOpen] = React.useState(false);
+  const [notificationOpen, setNotificationOpen] = React.useState(false);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -169,19 +173,44 @@ export function MobileHeader({
             )}
             
             {showNotifications && (
-              <motion.button
-                className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300 relative"
-                whileTap={{ scale: 0.95 }}
-              >
-                <Bell size={16} />
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center">
-                  <span className="text-destructive-foreground text-xs font-bold">2</span>
-                </div>
-              </motion.button>
+              <div className="relative">
+                <motion.button
+                  onClick={() => setNotificationOpen(!notificationOpen)}
+                  className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300 relative"
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Bell size={16} className={unreadCount > 0 ? "text-red-500" : ""} />
+                  {unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center">
+                      <span className="text-destructive-foreground text-xs font-bold">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    </div>
+                  )}
+                </motion.button>
+                
+                {/* Notification Panel */}
+                {notificationOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="absolute top-full right-0 mt-2 w-80 max-w-[90vw] bg-background border rounded-lg shadow-lg z-50 overflow-hidden"
+                  >
+                    <div className="max-h-96 overflow-y-auto">
+                      <NotificationCenter />
+                    </div>
+                  </motion.div>
+                )}
+              </div>
             )}
             
             {showMenu && (
               <motion.button
+                onClick={() => {
+                  // Можно добавить меню или навигацию
+                  console.log('Menu clicked');
+                }}
                 className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
@@ -190,6 +219,17 @@ export function MobileHeader({
             )}
           </div>
         </header>
+        
+        {/* Overlay to close dropdowns */}
+        {(selectorOpen || notificationOpen) && (
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => {
+              setSelectorOpen(false);
+              setNotificationOpen(false);
+            }}
+          />
+        )}
       </div>
     </motion.div>
   );
