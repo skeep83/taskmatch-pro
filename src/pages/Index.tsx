@@ -2,7 +2,7 @@ import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
-
+import { ResponsiveComponent } from "@/components/ResponsiveComponent";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -251,7 +251,7 @@ const testimonials = [
   }
 ];
 
-const Index = () => {
+const DesktopIndex = () => {
   const { t, language } = useEnhancedI18n();
   const [currentTestimonials, setCurrentTestimonials] = useState<typeof testimonials>([]);
   const [animatingCards, setAnimatingCards] = useState<boolean[]>([false, false, false]);
@@ -541,4 +541,14 @@ const Index = () => {
   );
 };
 
-export default Index;
+// Use ResponsiveComponent to automatically load mobile or desktop version
+const IndexContent = () => (
+  <ResponsiveComponent
+    mobile={() => import("@/mobile/pages/MobileIndex")}
+    desktop={() => Promise.resolve({ default: DesktopIndex })}
+  />
+);
+
+export default function Index() {
+  return <IndexContent />;
+}

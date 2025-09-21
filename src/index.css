@@ -3,6 +3,7 @@
 @tailwind utilities;
 @import "./styles/ios.css";
 @import "./styles/android.css";
+@import "./styles/mobile.css";
 
 /* Image optimization for better performance */
 .hero-image-container {

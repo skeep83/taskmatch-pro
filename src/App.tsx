@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Suspense, lazy } from "react";
+import { MobileProvider } from "./mobile/providers/MobileProvider";
+import { useDeviceDetection } from "./hooks/useDeviceDetection";
+import { MobileBottomNav } from "./mobile/components/navigation/MobileBottomNav";
 
 // Core pages loaded immediately
 import Index from "./pages/Index";
@@ -64,13 +67,14 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
+  const { isMobile } = useDeviceDetection();
   
   // Отслеживаем присутствие пользователя на платформе
   usePresenceTracking();
   
   return (
     <>
-      <AppNavigation />
+      {!isMobile && <AppNavigation />}
       <PageTransition>
         <Suspense fallback={
           <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
@@ -128,8 +132,9 @@ const AppContent = () => {
           </Routes>
         </Suspense>
       </PageTransition>
-      <FloatingActionButton />
-      <Footer />
+      {!isMobile && <FloatingActionButton />}
+      {!isMobile && <Footer />}
+      {isMobile && <MobileBottomNav />}
     </>
   );
 };
@@ -138,7 +143,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <EnhancedI18nProvider>
       <DatabaseI18nProvider>
-        <TooltipProvider>
+        <MobileProvider>
+          <TooltipProvider>
           <Suspense fallback={
             <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
               <div className="text-center p-8">
@@ -160,7 +166,8 @@ const App = () => (
               </BrowserRouter>
             </div>
           </Suspense>
-        </TooltipProvider>
+          </TooltipProvider>
+        </MobileProvider>
       </DatabaseI18nProvider>
     </EnhancedI18nProvider>
   </QueryClientProvider>

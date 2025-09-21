@@ -1,0 +1,223 @@
+/* Mobile-specific styles for ServiceHub */
+
+/* Touch-optimized interactions */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Mobile scrolling optimization */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Pull-to-refresh styles */
+.pull-to-refresh {
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
+}
+
+.pull-to-refresh.pulling {
+  transform: translateY(60px);
+}
+
+/* Mobile gestures */
+.swipeable {
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* Mobile animations */
+@keyframes mobile-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobile-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes mobile-slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Mobile layout utilities */
+.mobile-container {
+  padding: 16px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+.mobile-header-spacing {
+  padding-top: calc(56px + env(safe-area-inset-top));
+}
+
+/* Mobile cards */
+.mobile-card {
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.mobile-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* Mobile typography */
+.mobile-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mobile-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.mobile-body {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.mobile-caption {
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+/* Mobile spacing */
+.mobile-spacing-xs { margin: 4px; }
+.mobile-spacing-sm { margin: 8px; }
+.mobile-spacing-md { margin: 16px; }
+.mobile-spacing-lg { margin: 24px; }
+.mobile-spacing-xl { margin: 32px; }
+
+/* Mobile responsive visibility */
+@media (max-width: 767px) {
+  .mobile-hidden { display: none !important; }
+  .mobile-visible { display: block !important; }
+  .mobile-flex { display: flex !important; }
+}
+
+@media (min-width: 768px) {
+  .desktop-hidden { display: none !important; }
+  .desktop-visible { display: block !important; }
+  .desktop-flex { display: flex !important; }
+}
+
+/* Mobile bottom navigation styles */
+.mobile-bottom-nav {
+  height: 80px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.mobile-bottom-nav-item {
+  min-width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.mobile-bottom-nav-item.active {
+  background: rgba(var(--primary), 0.1);
+  color: hsl(var(--primary));
+}
+
+/* Mobile haptic feedback simulation */
+.haptic-light:active {
+  animation: haptic-pulse 0.1s ease-out;
+}
+
+@keyframes haptic-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* Mobile safe area utilities */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Mobile optimized forms */
+.mobile-input {
+  height: 48px;
+  border-radius: 16px;
+  font-size: 16px; /* Prevents zoom on iOS */
+  padding: 12px 16px;
+}
+
+.mobile-button {
+  height: 48px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 0 24px;
+}
+
+.mobile-button-large {
+  height: 56px;
+  border-radius: 20px;
+  font-size: 18px;
+  padding: 0 32px;
+}
+
+/* Mobile loading states */
+.mobile-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: mobile-skeleton-loading 1.5s infinite;
+}
+
+@keyframes mobile-skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Mobile performance optimizations */
+.mobile-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Mobile focus styles for accessibility */
+.mobile-focus:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 8px;
+}
