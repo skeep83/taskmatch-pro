@@ -118,11 +118,20 @@ export const PriceProposalForm = ({
       
       console.error('Detailed price proposal error:', errorData);
       
-      toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось отправить предложение",
-        variant: "destructive"
-      });
+      // Special handling for role-related errors
+      if (error.message?.includes('Pro role required')) {
+        toast({
+          title: "Необходима роль специалиста",
+          description: "Чтобы предлагать цены, вам нужно стать специалистом. Перейдите в настройки профиля.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: error.message || "Не удалось отправить предложение",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }

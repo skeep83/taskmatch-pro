@@ -135,11 +135,32 @@ export default function MobileJobRespond() {
       
       console.error('Detailed mobile job response error:', errorData);
       
-      toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось отправить отклик",
-        variant: "destructive"
-      });
+      // Special handling for role-related errors
+      if (error.message?.includes('Only professionals can apply to jobs')) {
+        toast({
+          title: "Необходима роль специалиста",
+          description: "Чтобы откликаться на заказы, вам нужно стать специалистом. Перейдите в настройки профиля.",
+          variant: "destructive"
+        });
+      } else if (error.message?.includes('You do not offer services in this category')) {
+        toast({
+          title: "Услуга недоступна",
+          description: "Вы не предоставляете услуги в этой категории. Добавьте её в своём профиле специалиста.",
+          variant: "destructive"
+        });
+      } else if (error.message?.includes('You have already applied to this job')) {
+        toast({
+          title: "Уже откликнулись",
+          description: "Вы уже подали заявку на этот заказ.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: error.message || "Не удалось отправить отклик",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
