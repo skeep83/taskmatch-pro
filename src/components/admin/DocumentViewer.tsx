@@ -130,7 +130,7 @@ export const DocumentViewer = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-6xl max-h-[95vh] w-[95vw] p-0">
         <DialogDescription className="sr-only">
           Интерактивный просмотр документа для верификации с возможностью увеличения и перемещения
         </DialogDescription>
@@ -182,7 +182,7 @@ export const DocumentViewer = ({
           </div>
 
           <div 
-            className={`w-full h-[60vh] flex items-center justify-center overflow-hidden ${
+            className={`w-full h-[70vh] flex items-center justify-center overflow-hidden ${
               scale > 1 ? 'cursor-grab' : 'cursor-zoom-in'
             } ${isDragging ? 'cursor-grabbing' : ''}`}
             onWheel={handleWheel}
@@ -227,7 +227,7 @@ export const DocumentViewer = ({
                 ref={imageRef}
                 src={signedUrl}
                 alt={getDocumentTitle()}
-                className="max-w-none max-h-none object-contain select-none"
+                className="w-full h-full object-contain select-none"
                 style={{
                   transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
                   transition: isDragging ? 'none' : 'transform 0.2s ease-out',
