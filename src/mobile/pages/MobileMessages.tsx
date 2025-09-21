@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { useSoundSettings } from '@/hooks/useSoundSettings';
+import { notificationSounds } from '@/utils/notificationSounds';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,6 +60,7 @@ export default function MobileMessages() {
   const [searchParams] = useSearchParams();
   const { bottomNavHeight, safeAreaInsets } = useMobile();
   const { toast } = useToast();
+  const { shouldPlaySound, settings } = useSoundSettings();
   
   const [userId, setUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
@@ -171,6 +174,10 @@ export default function MobileMessages() {
           filter: `chat_id=eq.${id}` 
         }, (payload: any) => {
           setMessages(prev => [...prev, payload.new]);
+          // Воспроизводим звук получения сообщения если это не наше сообщение
+          if (payload.new.sender_id !== userId && shouldPlaySound('message')) {
+            notificationSounds.playNotification('message');
+          }
         })
         .subscribe();
       
@@ -294,6 +301,11 @@ export default function MobileMessages() {
       
       setText('');
       setMessages(prev => [...prev, newMessage]);
+      
+      // Воспроизводим звук отправки сообщения
+      if (shouldPlaySound('message')) {
+        notificationSounds.playNotification('message');
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       toast({ title: 'Ошибка отправки сообщения', variant: 'destructive' });
