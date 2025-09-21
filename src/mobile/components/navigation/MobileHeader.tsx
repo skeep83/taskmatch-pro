@@ -89,7 +89,7 @@ export function MobileHeader({
             {showBack && (
               <motion.button
                 onClick={handleBack}
-                className="mr-2 p-2 h-10 w-10 rounded-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300"
+                className="mr-2 px-3 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 <ArrowLeft size={20} />
@@ -161,7 +161,7 @@ export function MobileHeader({
             {showSearch && (
               <motion.button
                 onClick={() => navigate('/catalog')}
-                className="p-2 h-10 w-10 rounded-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300"
+                className="px-3 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 <Search size={20} />
@@ -170,7 +170,7 @@ export function MobileHeader({
             
             {showNotifications && (
               <motion.button
-                className="p-2 h-10 w-10 rounded-full relative bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300"
+                className="px-3 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 relative"
                 whileTap={{ scale: 0.95 }}
               >
                 <Bell size={20} />
@@ -182,7 +182,7 @@ export function MobileHeader({
             
             {showMenu && (
               <motion.button
-                className="p-2 h-10 w-10 rounded-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-300"
+                className="px-3 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 <MoreHorizontal size={20} />
