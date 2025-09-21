@@ -24,6 +24,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
   const [request, setRequest] = useState<ProUpgradeStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [resubmitting, setResubmitting] = useState(false);
+  const [kycStatus, setKycStatus] = useState<{ approved: boolean; hasDocuments: boolean }>({ approved: false, hasDocuments: false });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -56,7 +57,8 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase
+      // Загружаем статус заявки
+      const { data: requestData, error: requestError } = await supabase
         .from('pro_upgrade_requests')
         .select('id, status, submitted_at, reviewed_at, rejection_reason')
         .eq('user_id', userId)
@@ -64,8 +66,25 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
         .limit(1)
         .maybeSingle();
 
-      if (error) throw error;
-      setRequest(data);
+      if (requestError) throw requestError;
+      setRequest(requestData);
+
+      // Проверяем статус KYC документов
+      const { data: kycData, error: kycError } = await supabase
+        .from('kyc_documents')
+        .select('status')
+        .eq('user_id', userId);
+
+      if (kycError) throw kycError;
+
+      const hasDocuments = kycData && kycData.length > 0;
+      const allApproved = hasDocuments && kycData.every(doc => doc.status === 'approved');
+      
+      setKycStatus({
+        approved: allApproved,
+        hasDocuments
+      });
+
     } catch (error) {
       console.error('Error loading upgrade status:', error);
     } finally {
@@ -131,8 +150,8 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
     );
   }
 
-  // Скрыть карточку если заявка одобрена или если заявки нет
-  if (!request || request.status === 'approved') {
+  // Скрыть карточку если заявка одобрена И все KYC документы одобрены, или если заявки нет
+  if (!request || (request.status === 'approved' && kycStatus.approved)) {
     return null;
   }
 
