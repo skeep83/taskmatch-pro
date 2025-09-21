@@ -219,14 +219,24 @@ export default function MobileDashboardClient() {
 
       if (jobsError) throw jobsError;
       
+      console.log('Jobs loaded:', jobsData);
+      
       // Load job photos separately
       if (jobsData && jobsData.length > 0) {
         const jobIds = jobsData.map(job => job.id);
-        const { data: photosData } = await supabase
+        console.log('Loading photos for job IDs:', jobIds);
+        
+        const { data: photosData, error: photosError } = await supabase
           .from('job_photos')
           .select('id, job_id, file_url')
           .in('job_id', jobIds)
           .order('display_order');
+        
+        if (photosError) {
+          console.error('Error loading photos:', photosError);
+        } else {
+          console.log('Photos loaded:', photosData);
+        }
         
         // Attach photos to jobs
         const jobsWithPhotos = jobsData.map(job => ({
@@ -234,6 +244,7 @@ export default function MobileDashboardClient() {
           job_photos: photosData?.filter(photo => photo.job_id === job.id) || []
         }));
         
+        console.log('Jobs with photos:', jobsWithPhotos);
         setJobs(jobsWithPhotos || []);
       } else {
         setJobs(jobsData || []);
@@ -642,7 +653,10 @@ export default function MobileDashboardClient() {
                         </div>
                         
                         {/* Job Photos */}
-                        {job.job_photos && job.job_photos.length > 0 && (
+                        {(() => {
+                          console.log('Job photos for job:', job.id, job.job_photos);
+                          return job.job_photos && job.job_photos.length > 0;
+                        })() && (
                           <div className="mb-3">
                             <div className="flex items-center gap-1 mb-2">
                               <Camera className="h-3 w-3 text-gray-500" />
