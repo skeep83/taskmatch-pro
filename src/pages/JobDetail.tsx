@@ -623,21 +623,21 @@ const JobDetail = () => {
             
             {/* Edit and Delete buttons for job owner */}
             {canEdit && (
-              <div className="flex items-center gap-4 justify-center">
+              <div className="flex items-center gap-2 justify-end ml-auto">
                 <Button 
                   variant="ghost" 
                   onClick={handleEditJob} 
-                  className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none"
+                  className="px-4 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none text-sm"
                 >
-                  <Edit className="w-4 h-4 mr-2" />
+                  <Edit className="w-3 h-3 mr-1" />
                   Редактировать
                 </Button>
                 <Button 
                   variant="destructive" 
                   onClick={handleDeleteJob}
-                  className="px-6 py-3 bg-red-500 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:bg-red-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-white border-none"
+                  className="px-4 py-2 bg-red-500 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:bg-red-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-white border-none text-sm"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-3 h-3 mr-1" />
                   Удалить
                 </Button>
               </div>
