@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
+import { motion } from "framer-motion";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -505,10 +506,10 @@ const Messages = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen" style={{ background: 'var(--background-neomorphic)' }}>
       <Seo title={`${t('app.name')} — ${t('messages.title', 'Сообщения')}`} description="Chat messages" canonical="/messages" />
       
-      <div className="flex h-screen">{/* Основной контейнер с отступом снизу для поля ввода */}
+      <div className="flex h-screen">{/* Основной контейнер с neumorphic фоном */}
         {/* Chat List Sidebar */}
         <div className={cn(
           "border-r bg-muted/30 transition-all duration-300",
@@ -775,27 +776,45 @@ const Messages = () => {
         </div>
         
         {/* ПОЛЕ ВВОДА ВСЕГДА ВИДИМО - ГЛОБАЛЬНОЕ */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg z-50">
+        <div className="fixed bottom-0 left-0 right-0 p-4 z-50"
+             style={{ 
+               background: 'var(--background-neomorphic)',
+               boxShadow: '0 -10px 30px rgba(174, 187, 204, 0.3)'
+             }}>
           <div className="max-w-4xl mx-auto">
-            <div className="mb-2 text-xs text-center text-gray-500">
-              Chat ID: {selectedChatId || 'Не выбран'} | User ID: {userId || 'Не загружен'} | Чатов: {chats.length}
-            </div>
-            <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
-              <input
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Введите сообщение здесь..."
-                className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-h-[44px] text-base"
-                style={{ fontSize: '16px' }} // Предотвращает zoom на iOS
-              />
-              <button 
+            <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-3">
+              <div 
+                className="flex-1 relative"
+                style={{ 
+                  background: 'var(--surface-raised)',
+                  boxShadow: 'inset 8px 8px 16px rgba(174, 187, 204, 0.4), inset -8px -8px 16px rgba(255, 255, 255, 0.8)',
+                  borderRadius: '20px',
+                  padding: '2px'
+                }}
+              >
+                <input
+                  type="text"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Введите сообщение здесь..."
+                  className="w-full px-4 py-3 bg-transparent rounded-[18px] focus:outline-none text-base placeholder:text-gray-500"
+                  style={{ fontSize: '16px' }}
+                />
+              </div>
+              <motion.button 
                 type="submit" 
                 disabled={!text.trim()}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 rounded-2xl disabled:opacity-50 flex items-center justify-center transition-all duration-200"
+                style={{ 
+                  background: text.trim() ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--brand-3)))' : 'var(--surface-raised)',
+                  boxShadow: 'var(--shadow-raised)',
+                  color: text.trim() ? 'white' : 'hsl(var(--primary))'
+                }}
               >
-                <Send className="h-4 w-4" />
-              </button>
+                <Send className="h-5 w-5" />
+              </motion.button>
             </form>
           </div>
         </div>
