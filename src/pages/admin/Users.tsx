@@ -805,7 +805,7 @@ export default function AdminUsers() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-4xl">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Профиль пользователя</DialogTitle>
                             <DialogDescription>
