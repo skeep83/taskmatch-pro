@@ -369,7 +369,7 @@ export default function AdminUsers() {
 
   const moderateKyc = async (userId: string, status: "approved" | "rejected", notes?: string) => {
     try {
-      // await adminApi.moderateKyc(userId, status, notes);
+      await adminApi.moderateKyc(userId, status, notes);
       setUsers(prev =>
         prev.map(user =>
           user.id === userId ? { ...user, kyc_status: status } : user

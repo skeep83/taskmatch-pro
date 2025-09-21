@@ -109,8 +109,14 @@ class AdminAPI {
   }
 
   async resetKYC(userId: string, reason: string) {
-    return this.makeRequest('admin-users', {
-      body: { action: 'reset_kyc', userId, reason }
+    return this.makeRequest('admin-kyc', {
+      body: { action: 'reset', userId, notes: reason }
+    });
+  }
+
+  async moderateKyc(userId: string, status: 'approved' | 'rejected', notes?: string) {
+    return this.makeRequest('admin-kyc', {
+      body: { action: 'moderate', userId, status, notes }
     });
   }
 
