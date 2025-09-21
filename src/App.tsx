@@ -31,6 +31,7 @@ const JobNew = lazy(() => import("./pages/JobNew"));
 const JobDetail = lazy(() => import("./pages/JobDetail"));
 const JobEdit = lazy(() => import("./pages/JobEdit"));
 const DashboardClient = lazy(() => import("./pages/DashboardClient"));
+const MobileDashboardClient = lazy(() => import("./mobile/pages/MobileDashboardClient"));
 const DashboardPro = lazy(() => import("./pages/DashboardPro"));
 const DashboardBusiness = lazy(() => import("./pages/DashboardBusiness"));
 const Messages = lazy(() => import("./pages/Messages"));
@@ -97,7 +98,9 @@ const AppContent = () => {
             <Route path="/job/:id" element={<JobDetail />} />
             <Route path="/job/:id/edit" element={<JobEdit />} />
             <Route path="/job/new" element={<JobNew />} />
-            <Route path="/dashboard/client" element={<DashboardClient />} />
+            <Route path="/dashboard/client" element={
+              isMobile ? <MobileDashboardClient /> : <DashboardClient />
+            } />
             <Route path="/dashboard/pro" element={<DashboardPro />} />
             <Route path="/dashboard/business" element={<DashboardBusiness />} />
             <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
