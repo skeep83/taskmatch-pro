@@ -31,7 +31,8 @@ interface JobDetail {
   job_photos?: Array<{ file_url: string }>;
 }
 
-export default function MobileJobDetail() {
+const MobileJobDetail = React.memo(function MobileJobDetail() {
+  console.log("MobileJobDetail component loading...", { React });
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -330,4 +331,6 @@ export default function MobileJobDetail() {
       </div>
     </div>
   );
-}
+});
+
+export default MobileJobDetail;
