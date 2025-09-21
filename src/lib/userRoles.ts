@@ -18,19 +18,47 @@ export const getUserRole = async (userId: string): Promise<UserRoleResult> => {
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
+      .eq("user_id", userId);
 
     if (error) {
       console.error('Error checking role:', error);
       return { success: false, role: 'client', error: error.message };
     }
 
-    const role = data?.role || 'client';
-    return { success: true, role: role as UserRole };
+    // Если пользователь имеет несколько ролей, выбираем приоритетную
+    if (!data || data.length === 0) {
+      return { success: true, role: 'client' };
+    }
+
+    const roles = data.map(r => r.role);
+    
+    // Иерархия приоритетов ролей
+    if (roles.includes('business')) return { success: true, role: 'business' };
+    if (roles.includes('pro')) return { success: true, role: 'pro' };
+    return { success: true, role: 'client' };
+    
   } catch (error: any) {
     console.error('Unexpected error in getUserRole:', error);
     return { success: false, role: 'client', error: error.message };
+  }
+};
+
+export const getUserRoles = async (userId: string): Promise<UserRole[]> => {
+  try {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error('Error checking roles:', error);
+      return ['client'];
+    }
+
+    return data?.map(r => r.role as UserRole) || ['client'];
+  } catch (error: any) {
+    console.error('Unexpected error in getUserRoles:', error);
+    return ['client'];
   }
 };
 
