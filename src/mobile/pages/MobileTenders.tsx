@@ -137,19 +137,25 @@ const MobileTenders = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 ${
+                className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all duration-300 ${
                   activeTab === tab.id 
                     ? "bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary" 
-                    : "text-muted-foreground hover:text-primary"
+                    : "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-muted-foreground hover:text-primary hover:shadow-[1px_1px_2px_#D1D5DB,-1px_-1px_2px_#F9FAFB]"
                 }`}
               >
-                <tab.icon className="h-4 w-4" />
-                <span className="text-xs font-medium">{tab.label}</span>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                  activeTab === tab.id 
+                    ? "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB]" 
+                    : "bg-transparent"
+                }`}>
+                  <tab.icon className="h-4 w-4" />
+                </div>
+                <span className="text-xs font-medium text-center leading-tight">{tab.label}</span>
                 {activeTab === tab.id && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary"
+                    className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary shadow-[1px_1px_2px_#D1D5DB]"
                   />
                 )}
               </button>
