@@ -99,7 +99,7 @@ export default function DashboardBusiness() {
       label: 'Специалист',
       icon: Briefcase,
       description: 'Кабинет специалиста',
-      available: false,
+      available: true,
     },
     {
       value: 'business',
