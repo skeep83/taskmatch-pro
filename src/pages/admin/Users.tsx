@@ -86,111 +86,147 @@ export default function AdminUsers() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const params = {
-        page: currentPage,
-        limit: 20,
-        search: searchTerm || undefined,
-        role: roleFilter !== "all" ? roleFilter : undefined,
-        kyc_status: kycFilter !== "all" ? kycFilter : undefined,
-        status: statusFilter !== "all" ? statusFilter : undefined,
-      };
+      const { supabase } = await import("@/integrations/supabase/client");
       
-      // Note: These would be real API calls in production
-      // const data = await adminApi.getUsers(params);
+      // Get user stats
+      const { data: profilesCount } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true });
       
-      // Mock users data for demonstration
-      const mockUsers: User[] = [
-        {
-          id: "1",
-          email: "ivanov@example.com",
-          first_name: "Иван",
-          last_name: "Иванов",
-          phone: "+373 69 123 456",
-          city: "Кишинев",
-          created_at: "2024-01-01T10:00:00Z",
-          last_sign_in_at: "2024-01-15T14:30:00Z",
-          roles: ["client", "pro"],
-          kyc_status: "approved",
-          is_blocked: false,
-          profile_completion: 95,
-          pro_data: {
-            bio: "Опытный сантехник с 10-летним стажем",
-            hourly_rate_cents: 5000,
-            fixed_price_cents: 15000,
-            radius_km: 15,
-            categories: ["Сантехника", "Отопление"],
-            avg_rating: 4.8,
-            rating_count: 127,
-            jobs_completed: 89,
-            response_time_hours: 2,
-            verification_level: "verified"
-          }
-        },
-        {
-          id: "2", 
-          email: "petrov@example.com",
-          first_name: "Петр",
-          last_name: "Петров",
-          phone: "+373 68 987 654",
-          city: "Бельцы",
-          created_at: "2024-01-05T09:15:00Z",
-          last_sign_in_at: "2024-01-14T16:45:00Z",
-          roles: ["client"],
-          kyc_status: "none",
-          is_blocked: false,
-          profile_completion: 60
-        },
-        {
-          id: "3",
-          email: "sidorov@example.com", 
-          first_name: "Сидор",
-          last_name: "Сидоров",
-          phone: "+373 67 555 123",
-          city: "Кишинев",
-          created_at: "2024-01-10T11:20:00Z",
-          last_sign_in_at: "2024-01-12T09:10:00Z",
-          roles: ["pro"],
-          kyc_status: "pending",
-          is_blocked: false,
-          profile_completion: 85,
-          pro_data: {
-            bio: "Электрик с большим опытом работы",
-            hourly_rate_cents: 4500,
-            radius_km: 20,
-            categories: ["Электрика"],
-            avg_rating: 4.5,
-            rating_count: 43,
-            jobs_completed: 35,
-            response_time_hours: 4,
-            verification_level: "basic"
-          }
-        },
-        {
-          id: "4",
-          email: "blocked@example.com",
-          first_name: "Заблокированный",
-          last_name: "Пользователь",
-          created_at: "2024-01-08T15:30:00Z",
-          roles: ["client"],
-          kyc_status: "rejected",
-          is_blocked: true,
-          profile_completion: 40
-        }
-      ];
+      const { data: activeUsersCount } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+      
+      const { data: proUsersCount } = await supabase
+        .from('user_roles')
+        .select('user_id', { count: 'exact', head: true })
+        .eq('role', 'pro');
+      
+      const { data: pendingKycCount } = await supabase
+        .from('kyc_documents')
+        .select('user_id', { count: 'exact', head: true })
+        .eq('status', 'pending');
 
-      // Mock stats
-      const mockStats: UserStats = {
-        total_users: 2485,
-        active_users: 1923,
-        pro_users: 756,
-        pending_kyc: 23,
-        blocked_users: 12,
-        new_signups_today: 8
-      };
+      const { data: todaySignupsCount } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', new Date().toISOString().split('T')[0]);
 
-      setUsers(mockUsers);
-      setStats(mockStats);
-      setTotalPages(Math.ceil(mockUsers.length / 20));
+      // Get users with profiles and roles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          first_name,
+          last_name,
+          full_name,
+          phone,
+          city,
+          created_at,
+          updated_at
+        `)
+        .range((currentPage - 1) * 20, currentPage * 20 - 1)
+        .order('created_at', { ascending: false });
+
+      if (profilesError) throw profilesError;
+
+      // Get auth users for emails
+      const { data: authUsers } = await supabase.auth.admin.listUsers();
+      
+      // Get user roles
+      const userIds = profiles?.map(p => p.id) || [];
+      const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('user_id', userIds);
+
+      // Get KYC statuses
+      const { data: kycDocs } = await supabase
+        .from('kyc_documents')
+        .select('user_id, status')
+        .in('user_id', userIds);
+
+      // Get pro profiles for additional data
+      const { data: proProfiles } = await supabase
+        .from('pro_profiles')
+        .select('user_id, bio, hourly_rate_cents, fixed_price_cents, radius_km')
+        .in('user_id', userIds);
+
+      // Get pro services for categories
+      const { data: proServices } = await supabase
+        .from('pro_services')
+        .select('pro_id, base_price_cents, hourly_rate_cents, coverage_radius_km')
+        .in('pro_id', userIds);
+
+      // Get ratings stats
+      const { data: ratings } = await supabase
+        .from('ratings')
+        .select('to_user_id, score')
+        .in('to_user_id', userIds);
+
+      // Transform data to match UI interface
+      const users: User[] = profiles?.map(profile => {
+        const authUser = authUsers?.users?.find(u => u.id === profile.id);
+        const roles = userRoles?.filter(r => r.user_id === profile.id).map(r => r.role) || [];
+        const kycDoc = kycDocs?.find(k => k.user_id === profile.id);
+        const proProfile = proProfiles?.find(p => p.user_id === profile.id);
+        const proService = proServices?.find(s => s.pro_id === profile.id);
+        const userRatings = ratings?.filter(r => r.to_user_id === profile.id) || [];
+        
+        const avgRating = userRatings.length > 0 
+          ? userRatings.reduce((sum, r) => sum + r.score, 0) / userRatings.length 
+          : 0;
+
+        // Calculate profile completion
+        let completion = 0;
+        if (profile.first_name) completion += 20;
+        if (profile.last_name) completion += 20;
+        if (profile.phone) completion += 15;
+        if (profile.city) completion += 15;
+        if (authUser?.email) completion += 30;
+
+        return {
+          id: profile.id,
+          email: authUser?.email || '',
+          first_name: profile.first_name || '',
+          last_name: profile.last_name || '',
+          phone: profile.phone || '',
+          city: profile.city || '',
+          created_at: profile.created_at,
+          last_sign_in_at: authUser?.last_sign_in_at,
+          roles,
+          kyc_status: kycDoc?.status as any || 'none',
+          is_blocked: false, // Note: would need a separate blocked_users table
+          profile_completion: completion,
+          pro_data: roles.includes('pro') ? {
+            bio: proProfile?.bio,
+            hourly_rate_cents: proProfile?.hourly_rate_cents || proService?.hourly_rate_cents,
+            fixed_price_cents: proProfile?.fixed_price_cents || proService?.base_price_cents,
+            radius_km: proProfile?.radius_km || proService?.coverage_radius_km || 10,
+            categories: [], // Would need to join with categories table
+            avg_rating: avgRating,
+            rating_count: userRatings.length,
+            jobs_completed: 0, // Would need to count from jobs table
+            response_time_hours: 2, // Would need to calculate from job responses
+            verification_level: kycDoc?.status === 'approved' ? 'verified' : 'none'
+          } : undefined
+        };
+      }) || [];
+
+      // Update stats
+      setStats({
+        total_users: profilesCount?.count || 0,
+        active_users: activeUsersCount?.count || 0,
+        pro_users: proUsersCount?.count || 0,
+        pending_kyc: pendingKycCount?.count || 0,
+        blocked_users: 0, // Would need blocked_users table
+        new_signups_today: todaySignupsCount?.count || 0
+      });
+
+      setUsers(users);
+      setTotalPages(Math.ceil((profilesCount?.count || 0) / 20));
+      
     } catch (error) {
       console.error("Failed to fetch users:", error);
       toast({
@@ -205,40 +241,61 @@ export default function AdminUsers() {
 
   const fetchUserKyc = async (userId: string) => {
     try {
-      // Mock KYC documents
-      const mockDocs: KycDocument[] = [
-        {
-          id: "1",
-          user_id: userId,
-          doc_type: "passport",
-          file_url: "/uploads/passport_scan.jpg",
-          status: "pending",
-          created_at: "2024-01-10T12:00:00Z"
-        },
-        {
-          id: "2",
-          user_id: userId,
-          doc_type: "address_proof",
-          file_url: "/uploads/utility_bill.pdf",
-          status: "approved",
-          created_at: "2024-01-10T12:05:00Z",
-          reviewed_at: "2024-01-11T10:00:00Z"
-        }
-      ];
-      setKycDocuments(mockDocs);
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { data: kycDocs, error } = await supabase
+        .from('kyc_documents')
+        .select(`
+          id,
+          user_id,
+          doc_type,
+          file_url,
+          status,
+          created_at,
+          reviewed_at
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      const documents: KycDocument[] = kycDocs?.map(doc => ({
+        id: doc.id,
+        user_id: doc.user_id,
+        doc_type: doc.doc_type,
+        file_url: doc.file_url,
+        status: doc.status as any,
+        created_at: doc.created_at,
+        reviewed_at: doc.reviewed_at,
+        reviewer_notes: undefined // Could add this field to table
+      })) || [];
+      
+      setKycDocuments(documents);
     } catch (error) {
       console.error("Failed to fetch KYC documents:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить KYC документы",
+        variant: "destructive"
+      });
     }
   };
 
   const blockUser = async (userId: string, reason: string) => {
     try {
-      // await adminApi.blockUser(userId, reason);
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // In a real app, you'd have a blocked_users table or a blocked field
+      // For now, we'll just show the UI change
       setUsers(prev =>
         prev.map(user =>
           user.id === userId ? { ...user, is_blocked: true } : user
         )
       );
+      
+      // Log admin action
+      console.log(`Admin blocked user ${userId}: ${reason}`);
+      
       toast({
         title: "Успешно",
         description: "Пользователь заблокирован"
