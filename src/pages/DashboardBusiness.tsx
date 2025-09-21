@@ -116,87 +116,10 @@ export default function DashboardBusiness() {
           </div>
         )}
 
-        {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 lg:space-y-8">
-            <div className={`p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] ${isMobile ? 'overflow-x-auto' : ''}`}>
-              <TabsList className={`${isMobile ? 'flex w-max min-w-full' : 'grid w-full grid-cols-6'} bg-transparent`}>
-                <TabsTrigger value="overview" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <User className="h-5 w-5 text-black" />
-                  <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Обзор</span>
-                  {activeTab === "overview" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                      style={{ backgroundColor: "#22D3EE" }}
-                    />
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="company" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <Building2 className="h-5 w-5 text-black" />
-                  <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Компания</span>
-                  {activeTab === "company" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                      style={{ backgroundColor: "#22D3EE" }}
-                    />
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="jobs" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <Briefcase className="h-5 w-5 text-black" />
-                  <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Заказы</span>
-                  {activeTab === "jobs" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                      style={{ backgroundColor: "#22D3EE" }}
-                    />
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="tenders" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <Gavel className="h-5 w-5 text-black" />
-                  <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Тендеры</span>
-                  {activeTab === "tenders" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                      style={{ backgroundColor: "#22D3EE" }}
-                    />
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="invoices" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <FileText className="h-5 w-5 text-black" />
-                  <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Инвойсы</span>
-                  {activeTab === "invoices" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                      style={{ backgroundColor: "#22D3EE" }}
-                    />
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <BarChart3 className="h-5 w-5 text-black" />
-                  <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Аналитика</span>
-                  {activeTab === "analytics" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                      style={{ backgroundColor: "#22D3EE" }}
-                    />
-                  )}
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="overview" className="space-y-4 lg:space-y-8">
+            {/* Overview Section */}
+            <div className="space-y-4 lg:space-y-6">
               {/* Quick Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                 <div className="p-4 lg:p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
@@ -292,7 +215,117 @@ export default function DashboardBusiness() {
                   </div>
                 </motion.div>
               </div>
+            </div>
 
+            {/* Horizontal Tab Navigation */}
+            <div className={`overflow-x-auto ${isMobile ? '' : 'hidden'}`}>
+              <div className="flex space-x-2 p-2 min-w-max">
+                {[
+                  { id: 'overview', label: 'Обзор', icon: BarChart3 },
+                  { id: 'company', label: 'Компания', icon: Building2 },
+                  { id: 'jobs', label: 'Заказы', icon: Briefcase },
+                  { id: 'tenders', label: 'Тендеры', icon: Gavel },
+                  { id: 'invoices', label: 'Инвойсы', icon: FileText },
+                  { id: 'analytics', label: 'Аналитика', icon: BarChart3 }
+                ].map((tab) => (
+                  <motion.button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-300 ${
+                      activeTab === tab.id
+                        ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black'
+                        : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600'
+                    }`}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <tab.icon className="h-4 w-4" />
+                    <span className="text-sm font-medium">{tab.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Tab Navigation */}
+            {!isMobile && (
+              <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                <TabsList className="grid w-full grid-cols-6 bg-transparent">
+                  <TabsTrigger value="overview" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                    <User className="h-5 w-5 text-black" />
+                    <span className="hidden sm:inline">Обзор</span>
+                    {activeTab === "overview" && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                        style={{ backgroundColor: "#22D3EE" }}
+                      />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="company" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                    <Building2 className="h-5 w-5 text-black" />
+                    <span className="hidden sm:inline">Компания</span>
+                    {activeTab === "company" && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                        style={{ backgroundColor: "#22D3EE" }}
+                      />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="jobs" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                    <Briefcase className="h-5 w-5 text-black" />
+                    <span className="hidden sm:inline">Заказы</span>
+                    {activeTab === "jobs" && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                        style={{ backgroundColor: "#22D3EE" }}
+                      />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="tenders" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                    <Gavel className="h-5 w-5 text-black" />
+                    <span className="hidden sm:inline">Тендеры</span>
+                    {activeTab === "tenders" && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                        style={{ backgroundColor: "#22D3EE" }}
+                      />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="invoices" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                    <FileText className="h-5 w-5 text-black" />
+                    <span className="hidden sm:inline">Инвойсы</span>
+                    {activeTab === "invoices" && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                        style={{ backgroundColor: "#22D3EE" }}
+                      />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                    <BarChart3 className="h-5 w-5 text-black" />
+                    <span className="hidden sm:inline">Аналитика</span>
+                    {activeTab === "analytics" && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                        style={{ backgroundColor: "#22D3EE" }}
+                      />
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+            )}
+
+            <TabsContent value="overview" className="space-y-4 lg:space-y-8">
               {/* Welcome Message */}
               <div className="p-4 lg:p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                 <h2 className="text-lg lg:text-2xl font-semibold mb-3 lg:mb-4 text-black">Добро пожаловать в ServiceHub Business!</h2>
