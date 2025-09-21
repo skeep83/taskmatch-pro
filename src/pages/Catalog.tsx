@@ -6,6 +6,7 @@ import { SignatureGradient } from "@/components/SignatureGradient";
 import { Search, Filter, Star, Clock, MapPin, Zap } from "lucide-react";
 import { StarRating } from "@/components/ui/star-rating";
 import { useEnhancedI18n } from "@/i18n/enhanced";
+import { supabase } from "@/integrations/supabase/client";
 import proPlaceholder from "@/assets/pro-placeholder.jpg";
 import servicesHero from "@/assets/services-hero.jpg";
 import cardBgPattern from "@/assets/card-bg-pattern.jpg";
@@ -22,8 +23,7 @@ const Catalog = () => {
   // Load categories
   useEffect(() => {
     (async () => {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data } = await (supabase as any).from("categories").select("id,key,label_ru,label_ro").order("key");
+      const { data } = await supabase.from("categories").select("id,key,label_ru,label_ro").order("key");
       setCategories(data || []);
       const map: Record<string, any> = {};
       (data || []).forEach((c: any) => { map[c.id] = c; });
@@ -31,15 +31,14 @@ const Catalog = () => {
       const cat = searchParams.get("category_id") || "";
       if (cat) setSelectedCat(cat);
     })();
-  }, []);
+  }, [searchParams]);
 
   // Load pros (optionally filtered by category)
   useEffect(() => {
     (async () => {
-      const { supabase } = await import("@/integrations/supabase/client");
       let proIds: string[] | null = null;
       if (selectedCat) {
-        const { data: pc } = await (supabase as any)
+        const { data: pc } = await supabase
           .from("pro_categories")
           .select("user_id")
           .eq("category_id", selectedCat)
@@ -48,25 +47,21 @@ const Catalog = () => {
       }
 
       // Simplified query without foreign key reference
-      let query = (supabase as any)
+      let query = supabase
         .from("pro_profiles")
         .select("user_id,bio,radius_km,hourly_rate_cents,fixed_price_cents")
         .limit(60);
       
       if (proIds && proIds.length > 0) query = query.in("user_id", proIds);
       const { data: proProfiles, error: proError } = await query;
-      console.log('Pro profiles data:', proProfiles, 'error:', proError);
       
       if (proProfiles && proProfiles.length > 0) {
         // Get corresponding profiles
         const userIds = proProfiles.map((p: any) => p.user_id);
-        const { data: profilesData, error: profilesError } = await (supabase as any)
+        const { data: profilesData, error: profilesError } = await supabase
           .from("profiles")
           .select("id,first_name,last_name,full_name,avatar_url")
           .in("id", userIds);
-        
-        console.log('Profiles data:', profilesData, 'error:', profilesError);
-        console.log('User IDs to fetch:', userIds);
         
         // Merge data
         const profileMap: Record<string, any> = {};
@@ -77,11 +72,10 @@ const Catalog = () => {
           profiles: profileMap[pp.user_id] || null
         }));
         
-        console.log('Merged data:', mergedData);
         setPros(mergedData);
 
         // Get ratings
-        const { data: stats } = await (supabase as any)
+        const { data: stats } = await supabase
           .from("pro_rating_stats")
           .select("pro_id,avg_score,rating_count")
           .in("pro_id", userIds);
@@ -89,7 +83,6 @@ const Catalog = () => {
         (stats || []).forEach((s: any) => { map[s.pro_id] = { avg_score: Number(s.avg_score || 0), rating_count: s.rating_count || 0 }; });
         setRatingMap(map);
       } else {
-        console.log('No pro profiles found');
         setPros([]);
         setRatingMap({});
       }

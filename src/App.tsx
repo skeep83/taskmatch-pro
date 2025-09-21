@@ -41,6 +41,7 @@ const TendersList = lazy(() => import("./pages/TendersList"));
 const TenderDetail = lazy(() => import("./pages/TenderDetail"));
 const TenderNew = lazy(() => import("./pages/TenderNew"));
 const Catalog = lazy(() => import("./pages/Catalog"));
+const MobileCatalog = lazy(() => import("./mobile/pages/MobileCatalog"));
 const ProPublic = lazy(() => import("./pages/ProPublic"));
 const Feed = lazy(() => import("./pages/Feed"));
 const ProUpgradeStatus = lazy(() => import("./pages/ProUpgradeStatus"));
@@ -89,7 +90,9 @@ const AppContent = () => {
           <Routes location={location}>
             <Route path="/" element={<Index />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/catalog" element={
+              isMobile ? <MobileCatalog /> : <Catalog />
+            } />
             <Route path="/auth" element={<Auth />} />
             <Route path="/job/:id" element={<JobDetail />} />
             <Route path="/job/:id/edit" element={<JobEdit />} />
