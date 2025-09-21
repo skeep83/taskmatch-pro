@@ -577,10 +577,10 @@ export default function MobileDashboardClient() {
                 <MobileCard 
                   pressable 
                   onPress={() => navigate("/job/new")}
-                  className="text-center"
+                  className="flex flex-col items-center justify-center text-center h-24"
                 >
-                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
-                    <Plus className="h-6 w-6 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                    <Plus className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm">Создать заказ</h3>
                 </MobileCard>
@@ -588,10 +588,10 @@ export default function MobileDashboardClient() {
                 <MobileCard 
                   pressable 
                   onPress={() => navigate("/messages")}
-                  className="text-center"
+                  className="flex flex-col items-center justify-center text-center h-24"
                 >
-                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
-                    <MessageSquare className="h-6 w-6 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                    <MessageSquare className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm">Сообщения</h3>
                 </MobileCard>
@@ -599,17 +599,17 @@ export default function MobileDashboardClient() {
                 <MobileCard 
                   pressable 
                   onPress={() => setActiveTab("subscription")}
-                  className="text-center"
+                  className="flex flex-col items-center justify-center text-center h-24"
                 >
-                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
-                    <Crown className="h-6 w-6 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                    <Crown className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm">Подписка</h3>
                 </MobileCard>
 
-                <MobileCard className="text-center opacity-50">
-                  <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mx-auto mb-2">
-                    <Gavel className="h-6 w-6 text-muted-foreground" />
+                <MobileCard className="flex flex-col items-center justify-center text-center h-24 opacity-50">
+                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                    <Gavel className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <h3 className="font-semibold text-sm text-muted-foreground">Тендеры</h3>
                   <p className="text-xs text-muted-foreground">Только бизнес</p>
