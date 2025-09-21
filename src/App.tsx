@@ -39,6 +39,7 @@ const Messages = lazy(() => import("./pages/Messages"));
 const MobileMessages = lazy(() => import("./mobile/pages/MobileMessages"));
 const MobileJobNew = lazy(() => import("./mobile/pages/MobileJobNew"));
 const MobileJobDetail = lazy(() => import("./mobile/pages/MobileJobDetail"));
+const MobileJobRespond = lazy(() => import("./mobile/pages/MobileJobRespond"));
 const Kyc = lazy(() => import("./pages/Kyc"));
 const ProSchedule = lazy(() => import("./pages/ProSchedule"));
 const ProPortfolio = lazy(() => import("./pages/ProPortfolio"));
@@ -102,6 +103,7 @@ const AppContent = () => {
             <Route path="/job/:id" element={
               isMobile ? <MobileJobDetail /> : <JobDetail />
             } />
+            <Route path="/job/:id/respond" element={<MobileJobRespond />} />
             <Route path="/job/:id/edit" element={<JobEdit />} />
             <Route path="/job/new" element={
               <>

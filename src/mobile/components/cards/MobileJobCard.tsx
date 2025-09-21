@@ -21,6 +21,7 @@ interface MobileJobCardProps {
     client_avatar?: string;
     urgency?: 'low' | 'medium' | 'high';
     status?: string;
+    job_photos?: Array<{ file_url: string }>;
   };
   onPress?: () => void;
   className?: string;
@@ -68,6 +69,29 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
       <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
         {job.description}
       </p>
+
+      {/* Photos preview */}
+      {job.job_photos && job.job_photos.length > 0 && (
+        <div className="flex items-center space-x-2">
+          <div className="flex -space-x-1">
+            {job.job_photos.slice(0, 3).map((photo, index) => (
+              <div key={index} className="w-8 h-8 rounded border-2 border-white overflow-hidden shadow-sm">
+                <img
+                  src={`https://adstlhdgegtkvtgklkyx.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
+                  alt={`Фото ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {job.job_photos.length} фото
+          </span>
+        </div>
+      )}
 
       {/* Location and date */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground">

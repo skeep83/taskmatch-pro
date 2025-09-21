@@ -45,7 +45,8 @@ serve(async (req: Request) => {
           first_name,
           last_name,
           avatar_url
-        )
+        ),
+        job_photos(file_url)
       `)
       .eq("status", "new")
       .order("created_at", { ascending: false })
@@ -119,7 +120,8 @@ serve(async (req: Request) => {
         client_avatar: profile?.avatar_url || null,
         client_rating: avgRating ? Number(avgRating.toFixed(1)) : null,
         urgency: job.urgency || 'medium',
-        status: job.status || 'active'
+        status: job.status || 'active',
+        job_photos: job.job_photos || []
       };
     }) || [];
 
