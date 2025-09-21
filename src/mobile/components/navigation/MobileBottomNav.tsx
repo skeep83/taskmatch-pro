@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Search, MessageCircle, User, Briefcase, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,6 +23,98 @@ const navItems: NavItem[] = [
 export function MobileBottomNav() {
   const location = useLocation();
   const { bottomNavHeight, safeAreaInsets, isKeyboardOpen } = useMobile();
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Загружаем количество непрочитанных сообщений
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: session } = await supabase.auth.getSession();
+        const uid = session.session?.user?.id;
+        
+        if (!uid) {
+          setUnreadCount(0);
+          return;
+        }
+        
+        setUserId(uid);
+        
+        // Получаем количество непрочитанных сообщений
+        const { data: unreadMessages } = await supabase
+          .from('chat_messages')
+          .select('id, chat_id')
+          .eq('is_read', false)
+          .neq('sender_id', uid);
+        
+        setUnreadCount(unreadMessages?.length || 0);
+        
+        // Подписываемся на новые сообщения
+        const channel = supabase
+          .channel('unread-messages-counter')
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'chat_messages'
+            },
+            (payload: any) => {
+              // Увеличиваем счетчик если сообщение не от нас
+              if (payload.new.sender_id !== uid) {
+                setUnreadCount(prev => prev + 1);
+              }
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'chat_messages'
+            },
+            (payload: any) => {
+              // Уменьшаем счетчик если сообщение прочитано
+              if (payload.new.is_read && !payload.old.is_read && payload.new.sender_id !== uid) {
+                setUnreadCount(prev => Math.max(0, prev - 1));
+              }
+            }
+          )
+          .subscribe();
+        
+        return () => supabase.removeChannel(channel);
+      } catch (error) {
+        console.error('Error loading unread count:', error);
+      }
+    };
+    
+    loadUnreadCount();
+  }, []);
+
+  // Обнуляем счетчик когда заходим в сообщения
+  useEffect(() => {
+    if (location.pathname.startsWith('/messages') && userId) {
+      const markMessagesAsRead = async () => {
+        try {
+          const { supabase } = await import('@/integrations/supabase/client');
+          
+          // Помечаем все сообщения как прочитанные
+          await supabase
+            .from('chat_messages')
+            .update({ is_read: true })
+            .eq('is_read', false)
+            .neq('sender_id', userId);
+          
+          setUnreadCount(0);
+        } catch (error) {
+          console.error('Error marking messages as read:', error);
+        }
+      };
+      
+      markMessagesAsRead();
+    }
+  }, [location.pathname, userId]);
 
   if (isKeyboardOpen) {
     return null;
@@ -102,11 +194,18 @@ export function MobileBottomNav() {
                   {item.label}
                 </span>
 
-                {/* Notification badge placeholder */}
-                {item.label === 'Сообщения' && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center">
-                    <span className="text-destructive-foreground text-xs font-bold">3</span>
-                  </div>
+                {/* Notification badge for unread messages */}
+                {item.label === 'Сообщения' && unreadCount > 0 && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center"
+                  >
+                    <span className="text-destructive-foreground text-xs font-bold">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  </motion.div>
                 )}
               </NavLink>
             );

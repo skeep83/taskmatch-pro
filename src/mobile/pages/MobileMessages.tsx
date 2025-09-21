@@ -165,6 +165,17 @@ export default function MobileMessages() {
       
       setMessages(data || []);
       
+      // Помечаем сообщения как прочитанные если они не наши
+      if (userId && data) {
+        const unreadMessages = data.filter(msg => !msg.is_read && msg.sender_id !== userId);
+        if (unreadMessages.length > 0) {
+          await supabase
+            .from('chat_messages')
+            .update({ is_read: true })
+            .in('id', unreadMessages.map(msg => msg.id));
+        }
+      }
+      
       // Setup realtime subscription
       const channel = supabase.channel('schema-db-changes')
         .on('postgres_changes', { 
