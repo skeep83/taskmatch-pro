@@ -26,6 +26,7 @@ import { usePresenceTracking } from "./hooks/usePresenceTracking";
 // Lazy-loaded pages for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const MobileFeed = lazy(() => import("./mobile/pages/MobileFeed"));
 const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
 const JobNew = lazy(() => import("./pages/JobNew"));
 const JobDetail = lazy(() => import("./pages/JobDetail"));
@@ -141,7 +142,7 @@ const AppContent = () => {
             <Route path="/pro/:id" element={<ProPublic />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
-            <Route path="/feed" element={<Feed />} />
+            <Route path="/feed" element={isMobile ? <MobileFeed /> : <Feed />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
