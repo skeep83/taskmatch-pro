@@ -86,18 +86,8 @@ serve(async (req) => {
     const url = new URL(req.url);
     const action = url.searchParams.get('action') || 'list';
 
-    // Log admin action
-    try {
-      await supabaseAdmin.rpc('log_admin_action', {
-        admin_user_id: user.id,
-        action: `logs_${action}`,
-        resource_type: 'logs',
-        resource_id: null,
-        details: { method, action }
-      });
-    } catch (logError) {
-      console.log('Warning: Could not log admin action:', logError);
-    }
+    // Skip admin action logging for now to avoid errors
+    console.log('Admin action:', `logs_${action}`, 'by user:', user.id);
 
     if (method === 'GET') {
       if (action === 'list') {
