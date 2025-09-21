@@ -73,6 +73,7 @@ const AdminCurrencies = lazy(() => import("./pages/admin/Currencies"));
 const AdminCategories = lazy(() => import("./pages/admin/Categories"));
 const AdminLogs = lazy(() => import("./pages/admin/Logs"));
 const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests"));
+const AdminKycVerification = lazy(() => import("./pages/admin/KycVerification"));
 import PageTransition from "./components/PageTransition";
 
 
@@ -155,6 +156,7 @@ const AppContent = () => {
               <Route path="tenders" element={<AdminTenders />} />
               <Route path="disputes" element={<AdminDisputes />} />
               <Route path="pro-requests" element={<ProUpgradeRequests />} />
+              <Route path="kyc" element={<AdminKycVerification />} />
               <Route path="finance" element={<AdminFinance />} />
               <Route path="risk" element={<AdminRisk />} />
               <Route path="content" element={<AdminContent />} />

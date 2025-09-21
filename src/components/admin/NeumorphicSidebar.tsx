@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   Activity, Users, Briefcase, Gavel, Shield, DollarSign, 
   AlertTriangle, FileText, Globe, Settings, TestTube,
-  Tag, UserCheck, Home, FileSearch
+  Tag, UserCheck, Home, FileSearch, Camera
 } from "lucide-react";
 
 const navigationItems = [
@@ -43,6 +43,12 @@ const navigationItems = [
     path: "/admin/pro-requests", 
     icon: UserCheck, 
     color: "#10B981" // emerald-500
+  },
+  { 
+    name: "KYC Верификация", 
+    path: "/admin/kyc", 
+    icon: Camera, 
+    color: "#8B5CF6" // violet-500
   },
   { 
     name: "Финансы", 
