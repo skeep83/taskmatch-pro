@@ -226,18 +226,83 @@ class AdminAPI {
     resolved?: string; 
     timeRange?: string; 
   }) {
-    return this.makeRequest('admin-logs', { action: 'list', ...params });
+    const searchParams = new URLSearchParams({
+      action: 'list',
+      ...(params?.page && { page: String(params.page) }),
+      ...(params?.limit && { limit: String(params.limit) }),
+      ...(params?.level && params.level !== 'all' && { level: params.level }),
+      ...(params?.source && params.source !== 'all' && { source: params.source }),
+      ...(params?.search && { search: params.search }),
+      ...(params?.resolved && params.resolved !== 'all' && { resolved: params.resolved }),
+      ...(params?.timeRange && { timeRange: params.timeRange })
+    });
+
+    // For Supabase functions with GET method, we need to construct the full URL with query params
+    const functionUrl = `https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/admin-logs?${searchParams.toString()}`;
+    
+    const response = await fetch(functionUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AdminAPI Error (admin-logs):', response.status, errorText);
+      throw new Error(`Failed to call admin-logs: ${response.status} ${errorText}`);
+    }
+
+    return await response.json();
   }
 
   async markLogAsResolved(logId: string) {
-    return this.makeRequest('admin-logs', { 
-      action: 'resolve', 
-      log_id: logId 
+    const { data, error } = await supabase.functions.invoke('admin-logs', {
+      method: 'POST',
+      body: { 
+        action: 'resolve', 
+        log_id: logId 
+      }
     });
+
+    if (error) {
+      console.error('AdminAPI Error (admin-logs resolve):', error);
+      throw new Error(error.message || 'Failed to resolve log');
+    }
+
+    return data;
   }
 
   async exportLogs(filters?: any) {
-    return this.makeRequest('admin-logs', { action: 'export', ...filters });
+    const searchParams = new URLSearchParams({
+      action: 'export',
+      ...(filters?.level && filters.level !== 'all' && { level: filters.level }),
+      ...(filters?.source && filters.source !== 'all' && { source: filters.source }),
+      ...(filters?.search && { search: filters.search }),
+      ...(filters?.resolved && filters.resolved !== 'all' && { resolved: filters.resolved }),
+      ...(filters?.timeRange && { timeRange: filters.timeRange })
+    });
+
+    const functionUrl = `https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/admin-logs?${searchParams.toString()}`;
+    
+    const response = await fetch(functionUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AdminAPI Error (admin-logs export):', response.status, errorText);
+      throw new Error(`Failed to export logs: ${response.status} ${errorText}`);
+    }
+
+    return await response.text(); // CSV data
   }
 
   async createLog(log: {
@@ -248,7 +313,17 @@ class AdminAPI {
     metadata?: any;
     stack_trace?: string;
   }) {
-    return this.makeRequest('admin-logs', { action: 'create', ...log });
+    const { data, error } = await supabase.functions.invoke('admin-logs', {
+      method: 'POST',
+      body: { action: 'create', ...log }
+    });
+
+    if (error) {
+      console.error('AdminAPI Error (admin-logs create):', error);
+      throw new Error(error.message || 'Failed to create log');
+    }
+
+    return data;
   }
 }
 
