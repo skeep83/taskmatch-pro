@@ -35,23 +35,15 @@ export function MobileBottomNav() {
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={cn(
         "fixed bottom-0 left-0 right-0 z-50",
-        "bg-[#E5E7EB]",
-        "safe-bottom" // Using CSS safe area utility
+        "bg-[#E5E7EB]"
       )}
       style={{ 
-        height: `${bottomNavHeight}px`,
-        paddingBottom: `max(${safeAreaInsets.bottom}px, env(safe-area-inset-bottom))`
+        paddingBottom: `env(safe-area-inset-bottom)`
       }}
     >
-      {/* Neumorphic container with adaptive height */}
-      <div 
-        className="px-2 pt-1.5 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]"
-        style={{ 
-          height: `${bottomNavHeight}px`,
-          paddingBottom: `max(8px, env(safe-area-inset-bottom))`
-        }}
-      >
-        <nav className="flex items-center justify-around" style={{ height: `${bottomNavHeight - 12}px` }}>
+      {/* Компактное neumorphic меню */}
+      <div className="px-2 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+        <nav className="flex items-center justify-around h-14">
           {navItems.map((item, index) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -61,11 +53,11 @@ export function MobileBottomNav() {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "relative flex flex-col items-center justify-center gap-0.5",
-                  "min-w-[56px] h-12 rounded-xl transition-all duration-300",
+                  "relative flex flex-col items-center justify-center gap-1",
+                  "min-w-[60px] h-14 rounded-xl transition-all duration-300",
                   "touch-manipulation select-none text-gray-700",
-                  "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]",
-                  isActive && "shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-gray-800"
+                  "bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB]",
+                  isActive && "shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800"
                 )}
               >
                 {/* Active indicator */}
@@ -84,12 +76,12 @@ export function MobileBottomNav() {
                     whileTap={{ scale: 0.9 }}
                     className={cn(
                       "flex flex-col items-center justify-center",
-                      "w-6 h-6 mb-0.5 rounded-full",
+                      "w-7 h-7 mb-1 rounded-full",
                       "bg-gradient-to-br from-primary to-primary/80",
                       "text-primary-foreground shadow-lg shadow-primary/25"
                     )}
                   >
-                    <Icon size={14} />
+                    <Icon size={16} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -97,8 +89,8 @@ export function MobileBottomNav() {
                     className="flex flex-col items-center justify-center relative z-10"
                   >
                     <Icon 
-                      size={16} 
-                      className="mb-0.5 transition-all duration-300" 
+                      size={18} 
+                      className="mb-1 transition-all duration-300" 
                     />
                   </motion.div>
                 )}
