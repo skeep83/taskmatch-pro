@@ -481,16 +481,16 @@ const Messages = () => {
   const selectedChat = useMemo(() => chats.find((c) => String(c.id) === String(id)) || null, [chats, id]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background">
+    <main className="relative min-h-screen overflow-hidden bg-[#E5E7EB]">
       <Seo title={`${t('app.name')} — Сообщения`} description="Чаты и сообщения" canonical="/messages" />
       
       {/* Header Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gray-800">
             Сообщения
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Общайтесь с клиентами и специалистами в реальном времени
           </p>
         </div>
@@ -501,8 +501,8 @@ const Messages = () => {
             
             {/* Chat List */}
             <div className="lg:col-span-1">
-              <div className="card-surface h-full p-6">
-                <h2 className="text-lg font-semibold mb-6">Активные чаты</h2>
+              <div className="bg-white shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl h-full p-6">
+                <h2 className="text-lg font-semibold mb-6 text-gray-800">Активные чаты</h2>
                 
                 <div className="space-y-3 overflow-y-auto max-h-[580px] pr-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
                   {chats.length === 0 && (
@@ -510,7 +510,7 @@ const Messages = () => {
                       <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/30 flex items-center justify-center">
                         <span className="text-3xl">💬</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">Нет активных чатов</p>
+                      <p className="text-sm text-gray-600">Нет активных чатов</p>
                     </div>
                   )}
                   
@@ -534,10 +534,10 @@ const Messages = () => {
                     return (
                       <div
                         key={c.id}
-                        className={`group relative overflow-hidden rounded-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
+                        className={`group relative overflow-hidden rounded-xl transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
                           String(c.id) === String(id) 
-                            ? 'bg-primary/10 border-2 border-primary/30' 
-                            : 'bg-background/60 border border-border/50 hover:bg-background/80'
+                            ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]' 
+                            : 'bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]'
                         }`}
                         style={{ animationDelay: `${index * 100}ms` }}
                         onClick={() => navigate(`/messages/${c.id}`)}
@@ -560,14 +560,14 @@ const Messages = () => {
                           </Avatar>
                           
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm truncate text-foreground group-hover:text-primary transition-colors">
+                            <div className="font-medium text-sm truncate text-gray-800 group-hover:text-gray-900 transition-colors">
                               {displayName}
                             </div>
-                            <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                            <div className="text-xs text-gray-600 truncate flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                               Заказ #{jobNumber}
                             </div>
-                            <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                            <div className="text-xs text-gray-600 flex items-center gap-1 mt-1">
                               <Clock className="w-3 h-3" />
                               {c.last_message_at ? new Date(c.last_message_at).toLocaleString('ru', { 
                                 hour: '2-digit', 
@@ -615,21 +615,21 @@ const Messages = () => {
 
              {/* Chat Messages - Main Chat Interface */}
              <div className="lg:col-span-3">
-               <div className="card-surface h-full flex flex-col">
+               <div className="bg-white shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl h-full flex flex-col">
                  {!id ? (
                   <div className="flex-1 flex items-center justify-center">
                     <div className="text-center max-w-md">
                       <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
                         <span className="text-4xl">💬</span>
                       </div>
-                      <h3 className="text-2xl font-display font-semibold mb-3 text-foreground">Выберите чат</h3>
-                      <p className="text-muted-foreground leading-relaxed">Выберите чат из списка слева для начала общения с клиентами и специалистами</p>
+                       <h3 className="text-2xl font-display font-semibold mb-3 text-gray-800">Выберите чат</h3>
+                       <p className="text-gray-600 leading-relaxed">Выберите чат из списка слева для начала общения с клиентами и специалистами</p>
                     </div>
                   </div>
                 ) : (
                   <>
                     {/* Chat Header */}
-                    <div className="p-6 border-b border-border/50 flex items-center justify-between bg-background/30 backdrop-blur-sm">
+                    <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-white/50 backdrop-blur-sm">
                       <div className="flex items-center gap-4">
                         {selectedChat ? (() => {
                           const otherUserId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
@@ -655,19 +655,19 @@ const Messages = () => {
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <div className="font-semibold text-lg text-foreground">{displayName}</div>
-                                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
-                                  Заказ #{String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}
-                                </div>
-                                <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
-                                  <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
-                                  {otherTyping ? (
-                                    <span className="text-primary animate-pulse">Печатает…</span>
-                                  ) : (
-                                    <span>{otherOnline ? 'В сети' : 'Не в сети'}</span>
-                                  )}
-                                </div>
+                                 <div className="font-semibold text-lg text-gray-800">{displayName}</div>
+                                 <div className="text-sm text-gray-600 flex items-center gap-2">
+                                   <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                   Заказ #{String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}
+                                 </div>
+                                 <div className="text-xs text-gray-600 flex items-center gap-2 mt-1">
+                                   <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
+                                   {otherTyping ? (
+                                     <span className="text-primary animate-pulse">Печатает…</span>
+                                   ) : (
+                                     <span>{otherOnline ? 'В сети' : 'Не в сети'}</span>
+                                   )}
+                                 </div>
                               </div>
                             </>
                           );
@@ -677,8 +677,8 @@ const Messages = () => {
                               {String(id).slice(0, 2).toUpperCase()}
                             </div>
                             <div>
-                              <div className="font-semibold text-lg text-foreground">Чат</div>
-                              <div className="text-sm text-muted-foreground">Загрузка...</div>
+                               <div className="font-semibold text-lg text-gray-800">Чат</div>
+                               <div className="text-sm text-gray-600">Загрузка...</div>
                             </div>
                           </>
                         )}
@@ -723,18 +723,18 @@ const Messages = () => {
                             
                             <div className={`max-w-[70%] ${m.sender_id === userId ? 'order-2' : ''}`}>
                               {m.sender_id !== userId && (
-                                <div className="text-xs font-medium text-muted-foreground mb-2 px-1">{senderName}</div>
+                                <div className="text-xs font-medium text-gray-600 mb-2 px-1">{senderName}</div>
                               )}
                               
-                              <div className={`relative rounded-2xl p-4 shadow-sm backdrop-blur-sm ${
-                                m.sender_id === userId 
-                                  ? 'bg-gradient-to-r from-primary to-primary/90 text-white rounded-br-md ml-auto' 
-                                  : 'bg-background/80 border border-border/50 text-foreground rounded-bl-md'
-                              }`}>
+                               <div className={`relative rounded-xl p-4 shadow-sm backdrop-blur-sm ${
+                                 m.sender_id === userId 
+                                   ? 'bg-gradient-to-r from-primary to-primary/90 text-white rounded-br-md ml-auto' 
+                                   : 'bg-white border border-gray-200 text-gray-800 rounded-bl-md'
+                               }`}>
                                 <div className="text-sm whitespace-pre-wrap leading-relaxed">{m.content}</div>
-                                <div className={`text-xs mt-2 flex items-center gap-2 ${
-                                  m.sender_id === userId ? 'text-white/70 justify-end' : 'text-muted-foreground'
-                                }`}>
+                                 <div className={`text-xs mt-2 flex items-center gap-2 ${
+                                   m.sender_id === userId ? 'text-white/70 justify-end' : 'text-gray-600'
+                                 }`}>
                                   <span>{new Date(m.created_at).toLocaleTimeString('ru', { 
                                     hour: '2-digit', 
                                     minute: '2-digit' 
@@ -760,7 +760,7 @@ const Messages = () => {
                     </div>
 
                     {/* Message Input */}
-                    <div className="p-6 border-t border-border/50 bg-background/30 backdrop-blur-sm">
+                    <div className="p-6 border-t border-gray-200 bg-white/50 backdrop-blur-sm">
                       <div className="flex gap-3 items-end">
                         <Button variant="ghost" size="sm" className="mb-2 hover:bg-accent/10 hover:text-accent">
                           <Paperclip className="w-4 h-4" />
