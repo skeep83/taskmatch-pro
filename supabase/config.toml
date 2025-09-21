@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.job-application-select]
 verify_jwt = true
+
+[functions.admin-kyc]
+verify_jwt = true

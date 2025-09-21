@@ -7,6 +7,8 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  console.log('Admin KYC function called with method:', req.method)
+  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -54,6 +56,7 @@ serve(async (req) => {
     }
 
     const { action, userId, status, notes } = await req.json()
+    console.log('Received action:', action, 'for user:', userId, 'status:', status)
 
     if (action === 'moderate') {
       if (!userId || !status || !['approved', 'rejected'].includes(status)) {
@@ -90,7 +93,7 @@ serve(async (req) => {
         ? 'Felicitări! Documentele dumneavoastră au fost verificate.'
         : `Documentele dumneavoastră necesită îmbunătățiri. ${notes ? `Motiv: ${notes}` : ''}`
 
-      await supabaseClient.rpc('notify_user', {
+      const { error: notifyError } = await supabaseClient.rpc('notify_user', {
         p_user_id: userId,
         p_type: `kyc_${status}`,
         p_title_ru: status === 'approved' ? 'Документы одобрены' : 'Документы отклонены',
@@ -100,13 +103,21 @@ serve(async (req) => {
         p_data: { reviewer_id: user.id, notes }
       })
 
-      // Log admin action
-      await supabaseClient.rpc('log_admin_action', {
+      if (notifyError) {
+        console.warn('Warning: Failed to send notification:', notifyError)
+      }
+
+      // Log admin action  
+      const { error: logError } = await supabaseClient.rpc('log_admin_action', {
         p_action: `kyc_${status}`,
         p_resource_type: 'kyc_documents',
         p_resource_id: userId,
         p_new_values: { status, reviewer_id: user.id, notes }
       })
+
+      if (logError) {
+        console.warn('Warning: Failed to log admin action:', logError)
+      }
 
       return new Response(
         JSON.stringify({ success: true, message: `KYC ${status} successfully` }),
