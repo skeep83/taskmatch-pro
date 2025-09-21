@@ -50,7 +50,8 @@ import {
   Trash2,
   Copy,
   ChevronDown,
-  Building2
+  Building2,
+  Camera
 } from "lucide-react";
 
 interface Job {
@@ -66,6 +67,10 @@ interface Job {
   categories?: {
     label_ru: string;
   };
+  job_photos?: {
+    id: string;
+    file_url: string;
+  }[];
 }
 
 interface Subscription {
@@ -620,6 +625,41 @@ export default function MobileDashboardClient() {
                         <div className="text-xs text-muted-foreground mb-2">
                           {job.categories?.label_ru || "Другое"} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
                         </div>
+                        
+                        {/* Job Photos */}
+                        {job.job_photos && job.job_photos.length > 0 && (
+                          <div className="mb-3">
+                            <div className="flex items-center gap-1 mb-2">
+                              <Camera className="h-3 w-3 text-gray-500" />
+                              <span className="text-xs text-gray-500">
+                                Фотографии ({job.job_photos.length})
+                              </span>
+                            </div>
+                            <div className="flex gap-1 overflow-x-auto">
+                              {job.job_photos.slice(0, 4).map((photo, index) => (
+                                <div 
+                                  key={photo.id || index} 
+                                  className="w-12 h-12 bg-gray-200 rounded-md overflow-hidden flex-shrink-0"
+                                >
+                                  <img
+                                    src={supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl}
+                                    alt={`Фото ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      console.log("Failed to load image:", photo.file_url);
+                                      e.currentTarget.src = '/placeholder.svg';
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                              {job.job_photos.length > 4 && (
+                                <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
+                                  <span className="text-xs text-gray-600">+{job.job_photos.length - 4}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                         <div className="flex items-center gap-2">
                           <Button 
                             variant="outline" 
