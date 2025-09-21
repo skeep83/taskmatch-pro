@@ -328,6 +328,15 @@
     <link rel="prefetch" href="/src/main.tsx" as="script" crossorigin>
     <link rel="prefetch" href="/assets/index.css" as="style">
     <link rel="canonical" href="https://taskmatch-pro.lovable.app/" />
+    
+    <!-- Additional SEO canonical optimization -->
+    <script>
+      // Ensure canonical URL is always absolute and matches current domain
+      const currentCanonical = document.querySelector('link[rel="canonical"]');
+      if (currentCanonical && !currentCanonical.href.startsWith('http')) {
+        currentCanonical.href = window.location.origin + (window.location.pathname === '/' ? '/' : window.location.pathname);
+      }
+    </script>
 
     <meta property="og:title" content="ServiceHub — маркетплейс услуг" />
     <meta property="og:description" content="Быстро найдите специалиста. Эскроу, чаты, тендеры, мгновенные выплаты." />
