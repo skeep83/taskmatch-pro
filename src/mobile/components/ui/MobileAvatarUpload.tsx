@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Camera, Upload, X, ImagePlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ImageCropper } from './ImageCropper';
 
 interface MobileAvatarUploadProps {
   userId: string;
@@ -17,24 +18,27 @@ interface MobileAvatarUploadProps {
 export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvatarUpdate }: MobileAvatarUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const uploadAvatar = async (file: File) => {
+  const uploadAvatar = async (file: File | Blob) => {
     try {
       setUploading(true);
 
       // Validate file
-      if (!file.type.startsWith('image/')) {
+      if (file instanceof File && !file.type.startsWith('image/')) {
         throw new Error('Файл должен быть изображением');
       }
 
-      if (file.size > 5 * 1024 * 1024) {
+      const fileSize = file instanceof File ? file.size : file.size;
+      if (fileSize > 5 * 1024 * 1024) {
         throw new Error('Размер файла не должен превышать 5MB');
       }
 
       // Create unique filename with user ID folder structure
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file instanceof File ? file.name.split('.').pop() : 'jpg';
       const fileName = `avatars/${userId}/${Date.now()}.${fileExt}`;
 
       // Upload to storage
@@ -115,7 +119,9 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      uploadAvatar(file);
+      setSelectedFile(file);
+      setShowCropper(true);
+      setShowActions(false);
     }
   };
 
@@ -128,6 +134,16 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleCrop = async (croppedBlob: Blob) => {
+    setShowCropper(false);
+    await uploadAvatar(croppedBlob);
+  };
+
+  const handleCropperClose = () => {
+    setShowCropper(false);
+    setSelectedFile(null);
   };
 
   const handleCameraClick = () => {
@@ -267,6 +283,16 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
         onChange={handleFileChange}
         className="hidden"
       />
+
+      {/* Image Cropper */}
+      {selectedFile && (
+        <ImageCropper
+          isOpen={showCropper}
+          onClose={handleCropperClose}
+          onCrop={handleCrop}
+          imageFile={selectedFile}
+        />
+      )}
     </div>
   );
 }
