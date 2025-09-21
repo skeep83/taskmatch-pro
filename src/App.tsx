@@ -69,6 +69,7 @@ const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const AdminTesting = lazy(() => import("./pages/admin/Testing"));
 const AdminCurrencies = lazy(() => import("./pages/admin/Currencies"));
 const AdminCategories = lazy(() => import("./pages/admin/Categories"));
+const AdminLogs = lazy(() => import("./pages/admin/Logs"));
 const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests"));
 import PageTransition from "./components/PageTransition";
 
@@ -154,10 +155,11 @@ const AppContent = () => {
               <Route path="finance" element={<AdminFinance />} />
               <Route path="risk" element={<AdminRisk />} />
               <Route path="content" element={<AdminContent />} />
-              <Route path="currencies" element={<AdminCurrencies />} />
-              <Route path="categories" element={<AdminCategories />} />
-              <Route path="settings" element={<AdminSettings />} />
-              <Route path="testing" element={<AdminTesting />} />
+                    <Route path="currencies" element={<AdminCurrencies />} />
+                    <Route path="categories" element={<AdminCategories />} />
+                    <Route path="logs" element={<AdminLogs />} />
+                    <Route path="settings" element={<AdminSettings />} />
+                    <Route path="testing" element={<AdminTesting />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

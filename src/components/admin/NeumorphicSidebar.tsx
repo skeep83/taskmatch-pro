@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   Activity, Users, Briefcase, Gavel, Shield, DollarSign, 
   AlertTriangle, FileText, Globe, Settings, TestTube,
-  Tag, UserCheck, Home
+  Tag, UserCheck, Home, FileSearch
 } from "lucide-react";
 
 const navigationItems = [
@@ -73,6 +73,12 @@ const navigationItems = [
     path: "/admin/categories", 
     icon: Tag, 
     color: "#EC4899" // pink-500
+  },
+  { 
+    name: "Логи ошибок", 
+    path: "/admin/logs", 
+    icon: FileSearch, 
+    color: "#DC2626" // red-600
   },
   { 
     name: "Настройки", 

@@ -215,6 +215,42 @@ class AdminAPI {
       body: { params: Object.fromEntries(searchParams) }
     });
   }
+
+  // Error Logs Management
+  async getLogs(params?: { 
+    page?: number; 
+    limit?: number; 
+    level?: string; 
+    source?: string; 
+    search?: string; 
+    resolved?: string; 
+    timeRange?: string; 
+  }) {
+    return this.makeRequest('admin-logs', { action: 'list', ...params });
+  }
+
+  async markLogAsResolved(logId: string) {
+    return this.makeRequest('admin-logs', { 
+      action: 'resolve', 
+      log_id: logId 
+    });
+  }
+
+  async exportLogs(filters?: any) {
+    return this.makeRequest('admin-logs', { action: 'export', ...filters });
+  }
+
+  async createLog(log: {
+    level: 'critical' | 'error' | 'warning' | 'info';
+    source: string;
+    message: string;
+    user_id?: string;
+    metadata?: any;
+    stack_trace?: string;
+  }) {
+    return this.makeRequest('admin-logs', { action: 'create', ...log });
+  }
 }
 
+export { AdminAPI };
 export const adminApi = new AdminAPI();
