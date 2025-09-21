@@ -17,14 +17,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    
+    <!-- Preload critical resources -->
     <link rel="preload" href="/assets/hero-dashboard.jpg" as="image" fetchpriority="high">
     <link rel="modulepreload" href="/src/main.tsx">
     <link rel="modulepreload" href="/src/App.tsx">
     <link rel="modulepreload" href="/src/integrations/supabase/client.ts">
     
-    <!-- Additional resource hints for better caching -->
-    <link rel="preload" href="/assets/index.js" as="script" crossorigin>
-    <link rel="preload" href="/assets/index.css" as="style">
+    <!-- Preload font files directly for instant loading -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQZNLo_U2r.woff2" as="font" type="font/woff2" crossorigin>
     
     <!-- Early hints for critical resources -->
     <script>
@@ -158,57 +160,79 @@
         .md\:hidden { display: none; }
       }
       
-      /* Prevent flash of unstyled content */
-      .font-display { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-      .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+      /* Prevent flash of unstyled content with font fallbacks */
+      .font-display { font-family: 'Playfair Display', -apple-system, BlinkMacSystemFont, serif; }
+      .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      
+      /* Ensure smooth transitions when real fonts load */
+      body { font-synthesis: none; text-rendering: optimizeLegibility; }
+      h1, h2, h3, h4, h5, h6 { font-synthesis: none; }
     </style>
     
-    <!-- Load Google Fonts with better non-blocking strategy -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Non-blocking font loading strategy -->
     <script>
-      // Advanced font loading to prevent render blocking
+      // Load fonts asynchronously after critical path
+      function loadFonts() {
+        if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
+          link.media = 'print';
+          link.onload = function() { this.media = 'all'; };
+          document.head.appendChild(link);
+        }
+      }
+      
+      // Load fonts during idle time or after a short delay
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
-          document.head.appendChild(link);
-        });
+        requestIdleCallback(loadFonts, { timeout: 500 });
       } else {
-        setTimeout(() => {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
-          document.head.appendChild(link);
-        }, 100);
+        setTimeout(loadFonts, 100);
       }
     </script>
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
     
-    <!-- Defer all non-critical CSS completely -->
+    <!-- Non-blocking CSS loading strategy -->
     <script>
-      // Load main CSS after initial render
+      // Load main CSS asynchronously to prevent render blocking
+      function loadMainCSS() {
+        if (!document.querySelector('link[href*="index"][href*=".css"]')) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          // Get the actual CSS filename from script tags or use a fallback
+          const scripts = Array.from(document.querySelectorAll('script[src]'));
+          let cssPath = '/assets/index.css'; // fallback
+          
+          // Try to extract CSS filename from module script
+          scripts.forEach(script => {
+            if (script.src && script.src.includes('assets')) {
+              cssPath = script.src.replace('.js', '.css').replace(/index-[^.]+\.js/, 'index.css');
+            }
+          });
+          
+          link.href = cssPath;
+          link.media = 'print';
+          link.onload = function() { 
+            this.media = 'all';
+            if (window.onCSSLoaded) window.onCSSLoaded();
+          };
+          document.head.appendChild(link);
+        }
+      }
+      
+      // Start loading CSS immediately but non-blocking
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = '/assets/index.css';
-          document.head.appendChild(link);
-        });
+        requestIdleCallback(loadMainCSS, { timeout: 100 });
       } else {
-        setTimeout(() => {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = '/assets/index.css';
-          document.head.appendChild(link);
-        }, 50);
+        setTimeout(loadMainCSS, 0);
       }
     </script>
     <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
     
-    <!-- Resource hints for faster loading -->
+    
+    <!-- Additional performance optimizations -->
     <link rel="prefetch" href="/assets/index.js">
+    <link rel="preload" href="/src/main.tsx" as="script" crossorigin>
     <link rel="canonical" href="https://taskmatch-pro.lovable.app/" />
 
     <meta property="og:title" content="ServiceHub — маркетплейс услуг" />
@@ -232,14 +256,34 @@
     <div id="root"></div>
     
     <script>
-      // Hide initial loader when React app starts
-      document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
+      // Enhanced loader management
+      let cssLoaded = false;
+      let domReady = false;
+      
+      function hideLoader() {
+        if (cssLoaded && domReady) {
           const loader = document.getElementById('initial-loader');
           if (loader) {
-            loader.style.display = 'none';
+            loader.style.opacity = '0';
+            loader.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => loader.style.display = 'none', 300);
           }
-        }, 100);
+        }
+      }
+      
+      // CSS loaded callback will be called from the CSS loading script
+      window.onCSSLoaded = function() {
+        cssLoaded = true;
+        hideLoader();
+      };
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        domReady = true;
+        // If CSS hasn't loaded yet, wait a bit more
+        setTimeout(() => {
+          cssLoaded = true;
+          hideLoader();
+        }, 200);
       });
     </script>
     <script type="module" src="/src/main.tsx"></script>
