@@ -557,48 +557,50 @@ export default function MobileMessages() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message input */}
+      {/* ОТЛАДКА: Message input - ВСЕГДА ВИДИМО */}
       <div 
-        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-50 bg-[#E8ECF0] border-t"
+        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-[9999] bg-red-500"
         style={{ 
           paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
-          boxShadow: '0 -8px 20px rgba(0,0,0,0.1)'
+          boxShadow: '0 -8px 20px rgba(0,0,0,0.5)',
+          minHeight: '80px'
         }}
       >
+        <div className="text-white text-xs mb-2 text-center">
+          ОТЛАДКА: sendMessage функция = {typeof sendMessage}, text = "{text}", длина = {text.length}
+        </div>
         <div className="flex gap-3 items-end">
           <div 
             className="flex-1 bg-white rounded-2xl p-1"
             style={{ 
-              boxShadow: 'inset 6px 6px 12px #D1D5DB, inset -6px -6px 12px #FFFFFF'
+              boxShadow: 'inset 6px 6px 12px #D1D5DB, inset -6px -6px 12px #FFFFFF',
+              minHeight: '50px'
             }}
           >
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyPress={(e) => {
+                console.log('Key pressed:', e.key);
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
+                  console.log('Sending message:', text);
                   sendMessage();
                 }
               }}
-              placeholder="Написать сообщение..."
+              placeholder="ТЕСТ поле ввода..."
               className="w-full border-0 bg-transparent text-base min-h-[48px] px-4 py-3 rounded-[16px] focus:outline-none placeholder:text-gray-500"
-              style={{ fontSize: '16px' }}
+              style={{ fontSize: '16px', backgroundColor: 'yellow' }}
             />
           </div>
           <button
-            onClick={sendMessage}
-            disabled={!text.trim()}
-            className="w-12 h-12 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200"
-            style={{ 
-              background: text.trim() 
-                ? 'linear-gradient(135deg, #7C3AED, #A855F7)' 
-                : '#E8ECF0',
-              boxShadow: text.trim() 
-                ? '6px 6px 12px #BCBDC1, -6px -6px 12px #FFFFFF' 
-                : 'inset 3px 3px 6px #D1D5DB, inset -3px -3px 6px #FFFFFF',
-              color: text.trim() ? 'white' : '#7C3AED'
+            onClick={() => {
+              console.log('Button clicked, text:', text);
+              sendMessage();
             }}
+            disabled={false}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 bg-blue-500 text-white"
+            style={{ minHeight: '48px', minWidth: '48px' }}
           >
             <Send size={18} />
           </button>
