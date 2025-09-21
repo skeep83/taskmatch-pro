@@ -79,7 +79,7 @@ export default function MobileCatalog() {
 
   const handleJobPress = (jobId: string) => {
     // Navigate to job detail
-    console.log('Navigate to job:', jobId);
+    window.location.href = `/job/${jobId}`;
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

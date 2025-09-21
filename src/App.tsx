@@ -38,6 +38,7 @@ const DashboardBusiness = lazy(() => import("./pages/DashboardBusiness"));
 const Messages = lazy(() => import("./pages/Messages"));
 const MobileMessages = lazy(() => import("./mobile/pages/MobileMessages"));
 const MobileJobNew = lazy(() => import("./mobile/pages/MobileJobNew"));
+const MobileJobDetail = lazy(() => import("./mobile/pages/MobileJobDetail"));
 const Kyc = lazy(() => import("./pages/Kyc"));
 const ProSchedule = lazy(() => import("./pages/ProSchedule"));
 const ProPortfolio = lazy(() => import("./pages/ProPortfolio"));
@@ -98,7 +99,9 @@ const AppContent = () => {
               isMobile ? <MobileCatalog /> : <Catalog />
             } />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/job/:id" element={<JobDetail />} />
+            <Route path="/job/:id" element={
+              isMobile ? <MobileJobDetail /> : <JobDetail />
+            } />
             <Route path="/job/:id/edit" element={<JobEdit />} />
             <Route path="/job/new" element={
               <>
