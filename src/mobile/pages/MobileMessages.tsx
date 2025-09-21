@@ -534,9 +534,12 @@ export default function MobileMessages() {
 
       {/* Message input */}
       <div 
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3"
-        style={{ paddingBottom: `max(12px, env(safe-area-inset-bottom))` }}
+        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50"
+        style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
       >
+        <div className="mb-2 text-xs text-center text-gray-500">
+          DEBUG: Chat ID: {id || 'Не выбран'} | User ID: {userId || 'Не загружен'} | Messages: {messages.length}
+        </div>
         <div className="flex gap-2 items-end">
           <div className="flex-1">
             <Input
@@ -549,13 +552,14 @@ export default function MobileMessages() {
                 }
               }}
               placeholder="Написать сообщение..."
-              className="rounded-xl border-gray-200 bg-gray-50 shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] text-base"
+              className="rounded-xl border-gray-200 bg-gray-50 shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] text-base min-h-[44px]"
+              style={{ fontSize: '16px' }}
             />
           </div>
           <Button
             onClick={sendMessage}
             disabled={!text.trim()}
-            className="w-12 h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-primary hover:bg-[#E5E7EB] disabled:opacity-50"
+            className="w-12 h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-primary hover:bg-[#E5E7EB] disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <Send size={18} />
           </Button>
