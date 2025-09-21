@@ -123,12 +123,12 @@ export default function MobileCatalog() {
           className="mb-6"
         >
           <h3 className="text-lg font-semibold mb-3 text-gray-800">Категории</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-3">{/* организовал в сетку 2 колонки с равномерными отступами */}
             {categories.map((category) => (
               <Button
                 key={category.id}
                 onClick={() => handleCategorySelect(category.id)}
-                className={`rounded-xl text-sm px-4 py-2 h-10 ${
+                className={`w-full rounded-xl text-sm px-3 py-3 h-12 flex items-center justify-start ${
                   selectedCategory === category.id 
                     ? 'bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800' 
                     : 'bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]'
