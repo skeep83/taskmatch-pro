@@ -239,8 +239,9 @@ export default function MobileJobDetail() {
 
             {/* Swipe gestures for mobile */}
             <div
-              className="absolute inset-0 flex"
+              className="absolute inset-0 flex pointer-events-none"
               onTouchStart={(e) => {
+                e.stopPropagation();
                 const touchStartX = e.touches[0].clientX;
                 const handleTouchEnd = (e: TouchEvent) => {
                   const touchEndX = e.changedTouches[0].clientX;
