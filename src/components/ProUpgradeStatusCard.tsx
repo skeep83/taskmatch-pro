@@ -143,15 +143,15 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
           {config.description}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div className="space-y-3 text-sm">
           <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl">
-            <span className="text-muted-foreground block mb-1">Подана:</span>
+            <span className="text-muted-foreground">Подана: </span>
             <span className="font-medium">{formatDistanceToNow(new Date(request.submitted_at), { addSuffix: true, locale: ru })}</span>
           </div>
           
           {request.reviewed_at && (
             <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl">
-              <span className="text-muted-foreground block mb-1">Рассмотрена:</span>
+              <span className="text-muted-foreground">Рассмотрена: </span>
               <span className="font-medium">{formatDistanceToNow(new Date(request.reviewed_at), { addSuffix: true, locale: ru })}</span>
             </div>
           )}
