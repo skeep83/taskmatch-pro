@@ -242,6 +242,94 @@ serve(async (req) => {
             'Content-Disposition': 'attachment; filename="error_logs.csv"'
           }
         });
+
+      } else if (action === 'trends') {
+        // Get trends data for analytics
+        const timeRange = url.searchParams.get('timeRange') || '7d';
+        
+        let daysBack = 7;
+        switch (timeRange) {
+          case '1d': daysBack = 1; break;
+          case '7d': daysBack = 7; break;
+          case '30d': daysBack = 30; break;
+        }
+        
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - daysBack);
+        
+        // Get trends by day
+        const { data: trendsData } = await supabaseAdmin
+          .from('error_logs')
+          .select('timestamp, level')
+          .gte('timestamp', startDate.toISOString())
+          .order('timestamp', { ascending: true });
+        
+        // Process trends data
+        const trendsByDay = {};
+        trendsData?.forEach(log => {
+          const date = new Date(log.timestamp).toLocaleDateString();
+          if (!trendsByDay[date]) {
+            trendsByDay[date] = { critical: 0, error: 0, warning: 0, info: 0, total: 0 };
+          }
+          trendsByDay[date][log.level] = (trendsByDay[date][log.level] || 0) + 1;
+          trendsByDay[date].total += 1;
+        });
+        
+        const trends = Object.entries(trendsByDay).map(([date, counts]) => ({
+          date,
+          ...counts
+        }));
+        
+        // Get errors by source
+        const { data: sourceData } = await supabaseAdmin
+          .from('error_logs')
+          .select('source')
+          .gte('timestamp', startDate.toISOString());
+        
+        const sourceStats = {};
+        const totalLogs = sourceData?.length || 0;
+        sourceData?.forEach(log => {
+          sourceStats[log.source] = (sourceStats[log.source] || 0) + 1;
+        });
+        
+        const bySource = Object.entries(sourceStats).map(([source, count]) => ({
+          source,
+          count,
+          percentage: totalLogs > 0 ? Math.round((count / totalLogs) * 100) : 0
+        }));
+        
+        // Get top errors (group by message fingerprint)
+        const { data: topErrorsData } = await supabaseAdmin
+          .from('error_logs')
+          .select('message, level, source')
+          .gte('timestamp', startDate.toISOString())
+          .order('timestamp', { ascending: false })
+          .limit(1000);
+        
+        const errorCounts = {};
+        topErrorsData?.forEach(log => {
+          // Create fingerprint from first 100 chars of message
+          const fingerprint = log.message.substring(0, 100);
+          if (!errorCounts[fingerprint]) {
+            errorCounts[fingerprint] = {
+              message: log.message,
+              level: log.level,
+              source: log.source,
+              fingerprint,
+              count: 0
+            };
+          }
+          errorCounts[fingerprint].count += 1;
+        });
+        
+        const topErrors = Object.values(errorCounts)
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+        
+        return new Response(
+          JSON.stringify({ trends, bySource, topErrors }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
     } else if (method === 'POST') {

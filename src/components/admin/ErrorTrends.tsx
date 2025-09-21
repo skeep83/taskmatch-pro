@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { AdminAPI } from '@/lib/adminApi';
+import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, TrendingDown, AlertTriangle, Clock, Target, Zap } from 'lucide-react';
 
 interface ErrorTrend {
@@ -42,15 +43,31 @@ export function ErrorTrends() {
     try {
       setLoading(true);
       
-      // This would be a new endpoint in the admin-logs function
-      const response = await adminApi.makeRequest('admin-logs', { 
+      // Use the new trends endpoint
+      const searchParams = new URLSearchParams({
         action: 'trends',
-        timeRange 
+        timeRange
       });
+
+      const functionUrl = `https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/admin-logs?${searchParams.toString()}`;
       
-      setTrends(response.trends || []);
-      setSourceData(response.bySource || []);
-      setTopErrors(response.topErrors || []);
+      const response = await fetch(functionUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch trends: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setTrends(data.trends || []);
+      setSourceData(data.bySource || []);
+      setTopErrors(data.topErrors || []);
       
     } catch (error) {
       console.error('Error fetching trends:', error);

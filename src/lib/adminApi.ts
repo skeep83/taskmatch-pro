@@ -240,22 +240,31 @@ class AdminAPI {
     // For Supabase functions with GET method, we need to construct the full URL with query params
     const functionUrl = `https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/admin-logs?${searchParams.toString()}`;
     
+    console.log('AdminAPI.getLogs: Making request to:', functionUrl);
+    
+    const session = await supabase.auth.getSession();
+    console.log('AdminAPI.getLogs: Session data:', session.data.session ? 'Present' : 'Missing');
+    
     const response = await fetch(functionUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        'Authorization': `Bearer ${session.data.session?.access_token}`,
         'Content-Type': 'application/json',
         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs'
       }
     });
 
+    console.log('AdminAPI.getLogs: Response status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AdminAPI Error (admin-logs):', response.status, errorText);
+      console.error('AdminAPI.getLogs: Error response:', response.status, errorText);
       throw new Error(`Failed to call admin-logs: ${response.status} ${errorText}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log('AdminAPI.getLogs: Success, logs count:', result.logs?.length || 0);
+    return result;
   }
 
   async markLogAsResolved(logId: string) {
