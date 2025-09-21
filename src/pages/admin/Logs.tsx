@@ -275,7 +275,6 @@ function AdminLogs() {
           </Card>
         ) : (
           logs.map((log) => {
-            const IconComponent = levelIcons[log.level];
             const isExpanded = expandedLog === log.id;
             
             return (
@@ -283,7 +282,8 @@ function AdminLogs() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1">
-                      <IconComponent className={`w-5 h-5 mt-0.5 ${
+                      {/* Temporarily use static icon to isolate the issue */}
+                      <AlertTriangle className={`w-5 h-5 mt-0.5 ${
                         log.level === 'critical' ? 'text-red-600' :
                         log.level === 'error' ? 'text-red-500' :
                         log.level === 'warning' ? 'text-yellow-500' :
@@ -291,7 +291,7 @@ function AdminLogs() {
                       }`} />
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <Badge variant={levelColors[log.level] as any}>
+                          <Badge variant="default">
                             {log.level.toUpperCase()}
                           </Badge>
                           <Badge variant="outline">{log.source}</Badge>
