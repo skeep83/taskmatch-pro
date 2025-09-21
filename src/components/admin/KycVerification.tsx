@@ -77,34 +77,11 @@ export const AdminKycVerification = () => {
     try {
       setLoading(true);
       
-      // Get all pro upgrade requests with user data
-      const { data, error } = await supabase
-        .from('pro_upgrade_requests')
-        .select(`
-          id,
-          user_id,
-          status,
-          submitted_at,
-          reviewed_at,
-          reviewed_by,
-          rejection_reason,
-          profile_data,
-          kyc_documents,
-          user:user_id (
-            email,
-            profiles (
-              first_name,
-              last_name,
-              phone,
-              city,
-              avatar_url
-            )
-          )
-        `)
-        .order('submitted_at', { ascending: false });
+      // Use edge function to get submissions with user data
+      const { data, error } = await supabase.functions.invoke('admin-kyc-submissions');
 
       if (error) throw error;
-      setSubmissions(data || []);
+      setSubmissions(data.submissions || []);
     } catch (error) {
       console.error('Error loading submissions:', error);
       toast({
