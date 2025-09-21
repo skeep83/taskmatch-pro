@@ -340,11 +340,8 @@ serve(async (req) => {
       const finalAction = bodyAction || action;
 
       if (finalAction === 'clear_all') {
-        // Clear all error logs
-        const { error } = await supabaseAdmin
-          .from('error_logs')
-          .delete()
-          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
+        // Clear all error logs using RPC function
+        const { error } = await supabaseAdmin.rpc('clear_all_error_logs');
 
         if (error) {
           console.error('Error clearing logs:', error);
