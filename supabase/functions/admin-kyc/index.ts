@@ -66,6 +66,22 @@ serve(async (req) => {
       }
 
       // Update KYC document status (latest document for the user)
+      const { data: latestDoc, error: fetchError } = await supabaseClient
+        .from('kyc_documents')
+        .select('id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (fetchError || !latestDoc) {
+        console.error('Error finding latest KYC document:', fetchError)
+        return new Response(
+          JSON.stringify({ error: 'KYC document not found' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
       const { error: updateError } = await supabaseClient
         .from('kyc_documents')
         .update({
@@ -73,9 +89,7 @@ serve(async (req) => {
           reviewer_id: user.id,
           reviewed_at: new Date().toISOString()
         })
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(1)
+        .eq('id', latestDoc.id)
 
       if (updateError) {
         console.error('Error updating KYC status:', updateError)
