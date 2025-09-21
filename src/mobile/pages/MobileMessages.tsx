@@ -559,7 +559,7 @@ export default function MobileMessages() {
 
       {/* Message input */}
       <div 
-        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-[9999]"
+        className="fixed bottom-16 left-0 right-0 px-4 py-4 z-40"
         style={{ 
           paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
           background: 'linear-gradient(145deg, #E8ECF0, #D6DCE5)',
