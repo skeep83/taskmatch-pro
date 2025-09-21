@@ -489,25 +489,42 @@ export default function MobileMessages() {
               key={message.id}
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className={`flex gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-3 ${isOwn ? 'justify-end' : 'justify-start'}`}
             >
               {!isOwn && (
-                <Avatar className="w-8 h-8 flex-shrink-0 mt-1">
-                  <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/40 text-primary font-semibold text-xs">
-                    {senderName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
+                <div 
+                  className="w-8 h-8 rounded-full p-0.5 flex-shrink-0 mt-1"
+                  style={{ 
+                    background: 'var(--surface-raised)',
+                    boxShadow: 'var(--shadow-raised)'
+                  }}
+                >
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/40 text-primary font-semibold text-xs">
+                      {senderName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
               )}
               
               <div className={`max-w-[75%] ${isOwn ? 'order-2' : ''}`}>
-                <div className={`p-3 rounded-2xl ${
-                  isOwn 
-                    ? 'bg-primary text-white rounded-br-md ml-auto' 
-                    : 'bg-white text-gray-800 rounded-bl-md shadow-sm'
-                }`}>
+                <div 
+                  className={`p-4 rounded-2xl ${
+                    isOwn 
+                      ? 'text-white rounded-br-md ml-auto' 
+                      : 'text-gray-800 rounded-bl-md'
+                  }`}
+                  style={isOwn ? {
+                    background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--brand-3)))',
+                    boxShadow: 'var(--shadow-raised)'
+                  } : {
+                    background: 'var(--surface-elevated)',
+                    boxShadow: 'var(--shadow-raised)'
+                  }}
+                >
                   <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                  <div className={`text-xs mt-1 ${
+                  <div className={`text-xs mt-2 ${
                     isOwn ? 'text-white/70' : 'text-gray-500'
                   }`}>
                     {new Date(message.created_at).toLocaleTimeString('ru', {
@@ -519,12 +536,20 @@ export default function MobileMessages() {
               </div>
               
               {isOwn && (
-                <Avatar className="w-8 h-8 flex-shrink-0 mt-1 order-3">
-                  <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-semibold text-xs">
-                    {senderName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
+                <div 
+                  className="w-8 h-8 rounded-full p-0.5 flex-shrink-0 mt-1 order-3"
+                  style={{ 
+                    background: 'var(--surface-raised)',
+                    boxShadow: 'var(--shadow-raised)'
+                  }}
+                >
+                  <Avatar className="w-full h-full">
+                    <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-semibold text-xs">
+                      {senderName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
               )}
             </motion.div>
           );
@@ -534,14 +559,23 @@ export default function MobileMessages() {
 
       {/* Message input */}
       <div 
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50"
-        style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
+        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-50"
+        style={{ 
+          paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
+          background: 'var(--background-neomorphic)',
+          boxShadow: '0 -10px 30px rgba(174, 187, 204, 0.3)'
+        }}
       >
-        <div className="mb-2 text-xs text-center text-gray-500">
-          DEBUG: Chat ID: {id || 'Не выбран'} | User ID: {userId || 'Не загружен'} | Messages: {messages.length}
-        </div>
-        <div className="flex gap-2 items-end">
-          <div className="flex-1">
+        <div className="flex gap-3 items-end">
+          <div 
+            className="flex-1 relative"
+            style={{ 
+              background: 'var(--surface-raised)',
+              boxShadow: 'inset 8px 8px 16px rgba(174, 187, 204, 0.4), inset -8px -8px 16px rgba(255, 255, 255, 0.8)',
+              borderRadius: '20px',
+              padding: '2px'
+            }}
+          >
             <Input
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -552,17 +586,32 @@ export default function MobileMessages() {
                 }
               }}
               placeholder="Написать сообщение..."
-              className="rounded-xl border-gray-200 bg-gray-50 shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] text-base min-h-[44px]"
+              className="border-0 bg-transparent text-base min-h-[48px] px-4 py-3 rounded-[18px] focus:outline-none focus:ring-0 placeholder:text-gray-500"
               style={{ fontSize: '16px' }}
             />
           </div>
-          <Button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={sendMessage}
             disabled={!text.trim()}
-            className="w-12 h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-primary hover:bg-[#E5E7EB] disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="w-12 h-12 rounded-2xl text-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200"
+            style={{ 
+              background: text.trim() ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--brand-3)))' : 'var(--surface-raised)',
+              boxShadow: 'var(--shadow-raised)',
+              color: text.trim() ? 'white' : 'hsl(var(--primary))',
+              transition: 'var(--transition-smooth)'
+            }}
+            onMouseEnter={(e) => {
+              if (text.trim()) {
+                e.currentTarget.style.boxShadow = 'var(--shadow-raised-hover)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-raised)';
+            }}
           >
             <Send size={18} />
-          </Button>
+          </motion.button>
         </div>
       </div>
     </div>
