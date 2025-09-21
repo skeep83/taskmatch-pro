@@ -35,7 +35,6 @@ const MobileDashboardClient = lazy(() => import("./mobile/pages/MobileDashboardC
 const DashboardPro = lazy(() => import("./pages/DashboardPro"));
 const MobileDashboardPro = lazy(() => import("./mobile/pages/MobileDashboardPro"));
 const DashboardBusiness = lazy(() => import("./pages/DashboardBusiness"));
-const MobileDashboardBusiness = lazy(() => import("./mobile/pages/MobileDashboardBusiness"));
 const Messages = lazy(() => import("./pages/Messages"));
 const MobileMessages = lazy(() => import("./mobile/pages/MobileMessages"));
 const MobileJobNew = lazy(() => import("./mobile/pages/MobileJobNew"));
@@ -117,9 +116,7 @@ const AppContent = () => {
             <Route path="/dashboard/pro" element={
               isMobile ? <MobileDashboardPro /> : <DashboardPro />
             } />
-            <Route path="/dashboard/business" element={
-              isMobile ? <MobileDashboardBusiness /> : <DashboardBusiness />
-            } />
+            <Route path="/dashboard/business" element={<DashboardBusiness />} />
             <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
             <Route path="/messages" element={
               isMobile ? <MobileMessages /> : <Messages />

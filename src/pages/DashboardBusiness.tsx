@@ -128,6 +128,7 @@ export default function DashboardBusiness() {
         <MobileHeader
           title="Бизнес-панель"
           showNotifications={true}
+          showLogout={true}
           showDashboardSelector={true}
           dashboardOptions={dashboardOptions}
           currentDashboard="business"
