@@ -134,11 +134,11 @@ serve(async (req) => {
           query = query.gte('timestamp', timeFilter);
         }
 
-        if (level) {
+        if (level && level !== 'all') {
           query = query.eq('level', level);
         }
 
-        if (source) {
+        if (source && source !== 'all') {
           query = query.eq('source', source);
         }
 
@@ -146,7 +146,7 @@ serve(async (req) => {
           query = query.ilike('message', `%${search}%`);
         }
 
-        if (resolved !== null && resolved !== '') {
+        if (resolved !== null && resolved !== '' && resolved !== 'all') {
           query = query.eq('resolved', resolved === 'true');
         }
 
@@ -213,10 +213,10 @@ serve(async (req) => {
         }
 
         if (timeFilter) query = query.gte('timestamp', timeFilter);
-        if (level) query = query.eq('level', level);
-        if (source) query = query.eq('source', source);
+        if (level && level !== 'all') query = query.eq('level', level);
+        if (source && source !== 'all') query = query.eq('source', source);
         if (search) query = query.ilike('message', `%${search}%`);
-        if (resolved !== null && resolved !== '') query = query.eq('resolved', resolved === 'true');
+        if (resolved !== null && resolved !== '' && resolved !== 'all') query = query.eq('resolved', resolved === 'true');
 
         const { data: logs } = await query;
 

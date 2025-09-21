@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 class AdminAPI {
-  private async makeRequest(functionName: string, options: any = {}) {
+  public async makeRequest(functionName: string, options: any = {}) {
     const { data, error } = await supabase.functions.invoke(functionName, {
       body: options.body || {},
       headers: options.headers || {}
