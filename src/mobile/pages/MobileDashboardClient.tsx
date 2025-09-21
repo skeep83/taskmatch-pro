@@ -214,7 +214,7 @@ export default function MobileDashboardClient() {
           categories!inner (
             label_ru
           ),
-          job_photos!inner (
+          job_photos (
             id,
             file_url,
             display_order
@@ -229,7 +229,7 @@ export default function MobileDashboardClient() {
         throw jobsError;
       }
       
-      console.log('✅ JOBS LOADED:', jobsData?.length, 'jobs with photos');
+      console.log('✅ JOBS LOADED:', jobsData?.length, 'jobs');
       
       // Log each job and its photos
       jobsData?.forEach(job => {
