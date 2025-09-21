@@ -66,6 +66,29 @@ const Kyc = () => {
     }
   };
 
+  const deleteDocument = async (docId: string) => {
+    try {
+      setUploading(true);
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      // Delete the document from database
+      const { error } = await (supabase as any)
+        .from('kyc_documents')
+        .delete()
+        .eq('id', docId);
+      
+      if (error) throw error;
+      
+      toast({ title: 'Документ удален' });
+      await refreshDocs();
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Ошибка удаления', description: e?.message, variant: 'destructive' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <main className="container mx-auto py-12">
       <Seo title={`${t('app.name')} — KYC`} description="Загрузка документов KYC" canonical="/kyc" />
@@ -92,7 +115,16 @@ const Kyc = () => {
                 <p className="text-sm">{d.doc_type}</p>
                 <p className="text-xs text-muted-foreground">Статус: {d.status} • {new Date(d.created_at).toLocaleString()}</p>
               </div>
-              <a className="text-xs underline" href={d.file_url} target="_blank" rel="noopener noreferrer">Открыть</a>
+              <div className="flex items-center gap-2">
+                <a className="text-xs underline" href={d.file_url} target="_blank" rel="noopener noreferrer">Открыть</a>
+                <button 
+                  onClick={() => deleteDocument(d.id)} 
+                  className="text-xs text-red-600 hover:text-red-800 underline"
+                  disabled={uploading}
+                >
+                  Удалить
+                </button>
+              </div>
             </li>
           ))}
         </ul>
