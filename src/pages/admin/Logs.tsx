@@ -51,10 +51,10 @@ export default function AdminLogs() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
-    level: '',
-    source: '',
+    level: 'all',
+    source: 'all',
     search: '',
-    resolved: '',
+    resolved: 'all',
     timeRange: '24h'
   });
   const [page, setPage] = useState(1);
@@ -202,24 +202,24 @@ export default function AdminLogs() {
                 className="pl-10"
               />
             </div>
-            <Select value={filters.level} onValueChange={(value) => handleFilterChange('level', value)}>
+            <Select value={filters.level} onValueChange={(value) => handleFilterChange('level', value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Уровень" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Все уровни</SelectItem>
+                <SelectItem value="all">Все уровни</SelectItem>
                 <SelectItem value="critical">Критические</SelectItem>
                 <SelectItem value="error">Ошибки</SelectItem>
                 <SelectItem value="warning">Предупреждения</SelectItem>
                 <SelectItem value="info">Информация</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={filters.source} onValueChange={(value) => handleFilterChange('source', value)}>
+            <Select value={filters.source} onValueChange={(value) => handleFilterChange('source', value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Источник" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Все источники</SelectItem>
+                <SelectItem value="all">Все источники</SelectItem>
                 <SelectItem value="frontend">Frontend</SelectItem>
                 <SelectItem value="backend">Backend</SelectItem>
                 <SelectItem value="database">Database</SelectItem>
@@ -228,12 +228,12 @@ export default function AdminLogs() {
                 <SelectItem value="notification">Notification</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={filters.resolved} onValueChange={(value) => handleFilterChange('resolved', value)}>
+            <Select value={filters.resolved} onValueChange={(value) => handleFilterChange('resolved', value === 'all' ? '' : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Статус" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Все</SelectItem>
+                <SelectItem value="all">Все</SelectItem>
                 <SelectItem value="false">Не решено</SelectItem>
                 <SelectItem value="true">Решено</SelectItem>
               </SelectContent>
