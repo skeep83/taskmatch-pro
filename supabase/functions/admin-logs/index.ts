@@ -87,13 +87,17 @@ serve(async (req) => {
     const action = url.searchParams.get('action') || 'list';
 
     // Log admin action
-    await supabaseAdmin.rpc('log_admin_action', {
-      admin_user_id: user.id,
-      action: `logs_${action}`,
-      resource_type: 'logs',
-      resource_id: null,
-      details: { method, action }
-    });
+    try {
+      await supabaseAdmin.rpc('log_admin_action', {
+        admin_user_id: user.id,
+        action: `logs_${action}`,
+        resource_type: 'logs',
+        resource_id: null,
+        details: { method, action }
+      });
+    } catch (logError) {
+      console.log('Warning: Could not log admin action:', logError);
+    }
 
     if (method === 'GET') {
       if (action === 'list') {
