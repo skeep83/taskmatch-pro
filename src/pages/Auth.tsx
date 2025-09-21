@@ -86,7 +86,30 @@ const Auth = () => {
       }
     } catch (err: any) {
       console.error(err);
-      toast({ title: "Ошибка", description: err?.message || "Не удалось выполнить действие", variant: "destructive" });
+      
+      // Better error handling for authentication
+      let errorMessage = err?.message || "Не удалось выполнить действие";
+      let errorTitle = "Ошибка";
+      
+      if (err?.message?.includes("Invalid login credentials")) {
+        errorTitle = "Неверные данные";
+        errorMessage = "Проверьте правильность email и пароля";
+      } else if (err?.message?.includes("Email not confirmed")) {
+        errorTitle = "Email не подтвержден";
+        errorMessage = "Проверьте почту и подтвердите регистрацию";
+      } else if (err?.message?.includes("User already registered")) {
+        errorTitle = "Пользователь уже зарегистрирован";
+        errorMessage = "Этот email уже используется. Попробуйте войти в систему";
+      } else if (err?.message?.includes("Password should be at least")) {
+        errorTitle = "Слабый пароль";
+        errorMessage = "Пароль должен содержать минимум 6 символов";
+      }
+      
+      toast({ 
+        title: errorTitle, 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
