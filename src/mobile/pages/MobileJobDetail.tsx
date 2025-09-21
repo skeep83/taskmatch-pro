@@ -255,9 +255,10 @@ export default function MobileJobDetail() {
               }}
             />
 
-            {/* Swipe gestures for mobile */}
+            {/* Swipe gestures for mobile - covers full screen */}
             <div
-              className="absolute inset-0 flex pointer-events-none"
+              className="fixed inset-0 flex"
+              style={{ zIndex: -1 }}
               onTouchStart={(e) => {
                 e.stopPropagation();
                 const touchStartX = e.touches[0].clientX;
