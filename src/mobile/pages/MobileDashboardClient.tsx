@@ -211,10 +211,6 @@ export default function MobileDashboardClient() {
           pro_id,
           categories!inner (
             label_ru
-          ),
-          job_photos (
-            id,
-            file_url
           )
         `)
         .eq("client_id", user.id)
@@ -222,7 +218,26 @@ export default function MobileDashboardClient() {
         .limit(10);
 
       if (jobsError) throw jobsError;
-      setJobs(jobsData || []);
+      
+      // Load job photos separately
+      if (jobsData && jobsData.length > 0) {
+        const jobIds = jobsData.map(job => job.id);
+        const { data: photosData } = await supabase
+          .from('job_photos')
+          .select('id, job_id, file_url')
+          .in('job_id', jobIds)
+          .order('display_order');
+        
+        // Attach photos to jobs
+        const jobsWithPhotos = jobsData.map(job => ({
+          ...job,
+          job_photos: photosData?.filter(photo => photo.job_id === job.id) || []
+        }));
+        
+        setJobs(jobsWithPhotos || []);
+      } else {
+        setJobs(jobsData || []);
+      }
 
       // Calculate stats
       const totalJobs = jobsData?.length || 0;
