@@ -95,6 +95,26 @@ export default function MobileJobRespond() {
       navigate(`/job/${id}`);
     } catch (error: any) {
       console.error('Error submitting response:', error);
+      
+      // Enhanced error logging for better debugging
+      const errorData = {
+        timestamp: new Date().toISOString(),
+        component: 'MobileJobRespond',
+        jobId: id,
+        formData: {
+          price: Math.round(parseFloat(formData.price) * 100),
+          eta: formData.eta,
+          warranty: parseInt(formData.warranty)
+        },
+        error: {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        }
+      };
+      
+      console.error('Detailed mobile job response error:', errorData);
+      
       toast({
         title: "Ошибка",
         description: error.message || "Не удалось отправить отклик",

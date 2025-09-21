@@ -173,6 +173,37 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Job application error:', error);
+    
+    // Enhanced error logging
+    const errorDetails = {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+      function: 'job-application-create',
+      user_id: undefined,
+      request_data: undefined
+    };
+    
+    try {
+      // Try to get user and request data for better debugging
+      const authHeader = req.headers.get("authorization");
+      if (authHeader) {
+        const userSupabase = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_ANON_KEY")!,
+          { global: { headers: { Authorization: authHeader } } }
+        );
+        const { data: { user } } = await userSupabase.auth.getUser();
+        errorDetails.user_id = user?.id;
+      }
+      
+      errorDetails.request_data = await req.clone().json().catch(() => 'Unable to parse request body');
+    } catch (logError) {
+      console.error('Error getting additional details for logging:', logError);
+    }
+    
+    console.error('Detailed error information:', JSON.stringify(errorDetails, null, 2));
+    
     return new Response(JSON.stringify({ 
       error: error.message 
     }), {

@@ -82,6 +82,26 @@ export const JobResponseForm = ({
 
     } catch (error: any) {
       console.error('Error submitting application:', error);
+      
+      // Enhanced error logging for better debugging
+      const errorData = {
+        timestamp: new Date().toISOString(),
+        component: 'JobResponseForm',
+        jobId: jobId,
+        formData: {
+          priceCents: Math.round(Number(formData.price) * 100),
+          etaSlot: formData.etaSlot,
+          warrantyDays: Number(formData.warrantyDays)
+        },
+        error: {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        }
+      };
+      
+      console.error('Detailed job application error:', errorData);
+      
       toast({
         title: 'Ошибка',
         description: error.message || 'Не удалось отправить отклик',

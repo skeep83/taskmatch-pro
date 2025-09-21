@@ -98,6 +98,26 @@ export const PriceProposalForm = ({
       }
     } catch (error: any) {
       console.error('Error submitting price proposal:', error);
+      
+      // Enhanced error logging for better debugging
+      const errorData = {
+        timestamp: new Date().toISOString(),
+        component: 'PriceProposalForm',
+        jobId: jobId,
+        formData: {
+          priceCents: Math.round(parseFloat(formData.price) * 100),
+          etaSlot: formData.etaSlot,
+          warrantyDays: formData.warrantyDays
+        },
+        error: {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        }
+      };
+      
+      console.error('Detailed price proposal error:', errorData);
+      
       toast({
         title: "Ошибка",
         description: error.message || "Не удалось отправить предложение",
