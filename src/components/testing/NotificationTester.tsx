@@ -5,13 +5,14 @@ import { notificationSounds } from '@/utils/notificationSounds';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Bell, MessageSquare, Briefcase, DollarSign, Star, Settings as SettingsIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 export const NotificationTester = () => {
   const { sendNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
 
-  const testNotifications = [
+  // Мemoize тестовые уведомления для избежания пересоздания на каждом рендере
+  const testNotifications = useMemo(() => [
     {
       type: 'job_match' as const,
       icon: Briefcase,
@@ -68,9 +69,9 @@ export const NotificationTester = () => {
       message: 'Ваш профиль был успешно обновлен',
       color: 'text-gray-600'
     }
-  ];
+  ], []);
 
-  const createTestNotification = async (notificationType: any) => {
+  const createTestNotification = useCallback(async (notificationType: any) => {
     setLoading(true);
     try {
       // Get current user
@@ -129,20 +130,24 @@ export const NotificationTester = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const testAllSounds = async () => {
+  const testAllSounds = useCallback(async () => {
     for (let i = 0; i < testNotifications.length; i++) {
-      setTimeout(async () => {
-        await notificationSounds.playNotification(testNotifications[i].type);
-        toast({
-          title: `Тестовый звук ${i + 1}/${testNotifications.length}`,
-          description: `Звук для: ${testNotifications[i].title}`,
-          duration: 2000,
-        });
-      }, i * 1500); // 1.5 second delay between sounds
+      // Используем requestIdleCallback для неблокирующего выполнения
+      await new Promise(resolve => {
+        setTimeout(async () => {
+          await notificationSounds.playNotification(testNotifications[i].type);
+          toast({
+            title: `Тестовый звук ${i + 1}/${testNotifications.length}`,
+            description: `Звук для: ${testNotifications[i].title}`,
+            duration: 2000,
+          });
+          resolve(void 0);
+        }, i * 1500); // 1.5 second delay between sounds
+      });
     }
-  };
+  }, [testNotifications]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

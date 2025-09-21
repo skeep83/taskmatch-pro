@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +39,8 @@ export const ErrorLogsTester = () => {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
 
-  const testLogs: TestLog[] = [
+  // Мemoize тестовые логи для избежания пересоздания
+  const testLogs: TestLog[] = useMemo(() => [
     {
       level: 'critical',
       source: 'auto-crawler',
@@ -95,9 +96,9 @@ export const ErrorLogsTester = () => {
       message: 'Успешная загрузка страницы',
       metadata: { url: 'https://example.com/about', responseTime: 250, cached: true }
     }
-  ];
+  ], []);
 
-  const fetchRealLogs = async () => {
+  const fetchRealLogs = useCallback(async () => {
     setLoading(true);
     try {
       const response = await adminApi.getLogs({
@@ -116,13 +117,13 @@ export const ErrorLogsTester = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchRealLogs();
   }, []);
 
-  const createTestLogs = async () => {
+  const createTestLogs = useCallback(async () => {
     setIsCreating(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -171,9 +172,9 @@ export const ErrorLogsTester = () => {
     } finally {
       setIsCreating(false);
     }
-  };
+  }, [testLogs, toast, fetchRealLogs]);
 
-  const clearAllLogs = async () => {
+  const clearAllLogs = useCallback(async () => {
     setIsClearing(true);
     try {
       await adminApi.clearAllLogs();
@@ -195,7 +196,7 @@ export const ErrorLogsTester = () => {
     } finally {
       setIsClearing(false);
     }
-  };
+  }, [toast, fetchRealLogs]);
 
   return (
     <div className="space-y-6">

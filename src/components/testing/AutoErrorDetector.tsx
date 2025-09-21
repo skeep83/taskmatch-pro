@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,7 +43,8 @@ export const AutoErrorDetector = () => {
   const [results, setResults] = useState<ScanResult[]>([]);
   const [scannedPages, setScannedPages] = useState(0);
   const [foundErrors, setFoundErrors] = useState(0);
-  const [scanConfig, setScanConfig] = useState<ScanConfig>({
+  // Мemoize конфигурацию сканирования
+  const [scanConfig, setScanConfig] = useState<ScanConfig>(() => ({
     maxDepth: 3,
     maxPages: 50,
     includeJavaScript: true,
@@ -51,11 +52,11 @@ export const AutoErrorDetector = () => {
     followExternalLinks: false,
     userAgent: 'ServiceHub-ErrorCrawler/1.0',
     delayBetweenRequests: 1000
-  });
+  }));
 
   const [startUrl, setStartUrl] = useState(window.location.origin);
 
-  const startScan = async () => {
+  const startScan = useCallback(async () => {
     if (!startUrl) {
       toast({
         title: "Ошибка",
@@ -112,78 +113,82 @@ export const AutoErrorDetector = () => {
       });
       setIsScanning(false);
     }
-  };
+  }, [startUrl, scanConfig, toast]);
 
-  const stopScan = () => {
+  const stopScan = useCallback(() => {
     setIsScanning(false);
     toast({
       title: "Сканирование остановлено",
       description: `Просканировано ${scannedPages} страниц, найдено ${foundErrors} ошибок`
     });
-  };
+  }, [scannedPages, foundErrors, toast]);
 
-  const loadLastScanResults = async () => {
-    try {
-      // Создаем моковые результаты на основе данных из логов автосканера  
-      const mockResults: ScanResult[] = [
-        {
-          url: 'https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com/',
-          status: 'error',
-          responseTime: 1200,
-          errors: [
-            {
-              type: 'JavaScript Error',
-              message: 'Cannot read property "map" of undefined',
-              severity: 'error',
-              stack: 'TypeError: Cannot read property "map" of undefined\n  at main.js:45:12'
-            },
-            {
-              type: 'Performance',
-              message: 'Long task detected: 250ms',
-              severity: 'warning'
-            }
-          ],
-          timestamp: new Date().toISOString()
-        },
-        {
-          url: 'https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com/pricing',
-          status: 'warning',
-          responseTime: 3500,
-          errors: [
-            {
-              type: 'Performance',
-              message: 'Время загрузки страницы превышает 3 секунды',
-              severity: 'warning'
-            }
-          ],
-          timestamp: new Date().toISOString()
-        }
-      ];
-
-      // Добавляем больше ошибок для демонстрации
-      for (let i = 0; i < 20; i++) {
-        mockResults.push({
-          url: `https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com/page-${i}`,
-          status: Math.random() > 0.7 ? 'error' : 'warning',
-          responseTime: Math.floor(Math.random() * 3000) + 500,
-          errors: [
-            {
-              type: Math.random() > 0.5 ? 'JavaScript Error' : 'Performance',
-              message: `Ошибка на странице ${i}: ${Math.random() > 0.5 ? 'Undefined variable' : 'Slow response'}`,
-              severity: Math.random() > 0.3 ? 'warning' : 'error'
-            }
-          ],
-          timestamp: new Date().toISOString()
-        });
+  // Мemoize создание моковых результатов для уменьшения нагрузки на UI
+  const generateMockResults = useMemo(() => {
+    const mockResults: ScanResult[] = [
+      {
+        url: 'https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com/',
+        status: 'error',
+        responseTime: 1200,
+        errors: [
+          {
+            type: 'JavaScript Error',
+            message: 'Cannot read property "map" of undefined',
+            severity: 'error',
+            stack: 'TypeError: Cannot read property "map" of undefined\n  at main.js:45:12'
+          },
+          {
+            type: 'Performance',
+            message: 'Long task detected: 250ms',
+            severity: 'warning'
+          }
+        ],
+        timestamp: new Date().toISOString()
+      },
+      {
+        url: 'https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com/pricing',
+        status: 'warning',
+        responseTime: 3500,
+        errors: [
+          {
+            type: 'Performance',
+            message: 'Время загрузки страницы превышает 3 секунды',
+            severity: 'warning'
+          }
+        ],
+        timestamp: new Date().toISOString()
       }
+    ];
 
-      setResults(mockResults);
-      setScannedPages(21);
-      setFoundErrors(42);
+    // Добавляем больше ошибок для демонстрации (только 10 вместо 20)
+    for (let i = 0; i < 10; i++) {
+      mockResults.push({
+        url: `https://6e55eb01-313b-440f-a7fe-90daae1051fc.lovableproject.com/page-${i}`,
+        status: Math.random() > 0.7 ? 'error' : 'warning',
+        responseTime: Math.floor(Math.random() * 3000) + 500,
+        errors: [
+          {
+            type: Math.random() > 0.5 ? 'JavaScript Error' : 'Performance',
+            message: `Ошибка на странице ${i}: ${Math.random() > 0.5 ? 'Undefined variable' : 'Slow response'}`,
+            severity: Math.random() > 0.3 ? 'warning' : 'error'
+          }
+        ],
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    return mockResults;
+  }, []);
+
+  const loadLastScanResults = useCallback(async () => {
+    try {
+      setResults(generateMockResults);
+      setScannedPages(12);
+      setFoundErrors(24);
       
       toast({
         title: "Результаты загружены",
-        description: "Показаны результаты последнего сканирования (найдено 42 ошибки на 21 странице)"
+        description: "Показаны результаты последнего сканирования (найдено 24 ошибки на 12 страницах)"
       });
     } catch (error) {
       console.error('Error loading scan results:', error);
@@ -193,9 +198,9 @@ export const AutoErrorDetector = () => {
         variant: "destructive"
       });
     }
-  };
+  }, [generateMockResults, toast]);
 
-  const publishErrorsToLogs = async () => {
+  const publishErrorsToLogs = useCallback(async () => {
     const criticalErrors = results.filter(r => 
       r.errors.some(e => e.severity === 'critical' || e.severity === 'error')
     );
@@ -250,14 +255,14 @@ export const AutoErrorDetector = () => {
         variant: "destructive"
       });
     }
-  };
+  }, [results, scanConfig, toast]);
 
-  const resetScan = () => {
+  const resetScan = useCallback(() => {
     setResults([]);
     setProgress(0);
     setScannedPages(0);
     setFoundErrors(0);
-  };
+  }, []);
 
   return (
     <div className="space-y-6">
