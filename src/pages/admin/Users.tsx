@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, Search, Users, UserCheck, UserX, Crown, Shield, Eye, Edit, Ban, CheckCircle, XCircle, MapPin, Calendar, Phone, Mail, Briefcase, Star, Clock, DollarSign, AlertTriangle, ExternalLink } from "lucide-react";
+import { Activity, Search, Users, UserCheck, UserX, Crown, Shield, Eye, Edit, Ban, CheckCircle, XCircle, MapPin, Calendar, Phone, Mail, Briefcase, Star, Clock, DollarSign, AlertTriangle, ExternalLink, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface User {
@@ -377,6 +377,70 @@ export default function AdminUsers() {
       toast({
         title: "Ошибка",
         description: "Не удалось отклонить заявку",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteProUpgradeRequest = async (requestId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error } = await supabase
+        .from('pro_upgrade_requests')
+        .delete()
+        .eq('id', requestId)
+        .eq('status', 'pending'); // Only allow deletion of pending requests
+      
+      if (error) throw error;
+      
+      // Refresh user data and pro upgrade requests
+      if (selectedUser) {
+        fetchUserProUpgradeRequests(selectedUser.id);
+        fetchUsers();
+      }
+      
+      toast({
+        title: "Успешно",
+        description: "Заявка на статус специалиста удалена"
+      });
+    } catch (error) {
+      console.error("Failed to delete pro upgrade request:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить заявку",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteKycDocument = async (docId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error } = await supabase
+        .from('kyc_documents')
+        .delete()
+        .eq('id', docId)
+        .eq('status', 'pending'); // Only allow deletion of pending documents
+      
+      if (error) throw error;
+      
+      // Refresh user data and KYC documents
+      if (selectedUser) {
+        fetchUserKyc(selectedUser.id);
+        fetchUsers();
+      }
+      
+      toast({
+        title: "Успешно",
+        description: "KYC документ удален"
+      });
+    } catch (error) {
+      console.error("Failed to delete KYC document:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить KYC документ",
         variant: "destructive"
       });
     }
@@ -902,6 +966,16 @@ export default function AdminUsers() {
                                           >
                                             <ExternalLink className="w-4 h-4" />
                                           </Button>
+                                          {doc.status === 'pending' && (
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              onClick={() => deleteKycDocument(doc.id)}
+                                              title="Удалить документ"
+                                            >
+                                              <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                          )}
                                         </div>
                                       </div>
                                     ))}
@@ -955,6 +1029,14 @@ export default function AdminUsers() {
                                                 onClick={() => rejectProUpgradeRequest(request.id)}
                                               >
                                                 <XCircle className="w-4 h-4" />
+                                              </Button>
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => deleteProUpgradeRequest(request.id)}
+                                                title="Удалить заявку"
+                                              >
+                                                <Trash2 className="w-4 h-4" />
                                               </Button>
                                             </div>
                                           )}
