@@ -119,6 +119,21 @@
       .btn-secondary { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
       .btn-secondary:hover { background: #f1f5f9; }
       
+      /* Critical LCP element styles - hero subtitle */
+      .hero-subtitle { 
+        font-size: 1.25rem; 
+        line-height: 1.75rem; 
+        color: #64748b; 
+        margin-bottom: 2rem; 
+        line-height: 1.625; 
+        max-width: 42rem; 
+      }
+      
+      /* Ensure text is immediately visible without waiting for full CSS */
+      @media (min-width: 1024px) {
+        .hero-subtitle { font-size: 1.5rem; line-height: 2rem; }
+      }
+      
       /* Loading skeleton styles */
       .skeleton { 
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);

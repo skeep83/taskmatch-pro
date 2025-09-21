@@ -342,7 +342,7 @@ const DesktopIndex = () => {
                 <h1 className="text-5xl lg:text-7xl font-display font-bold mb-6 leading-tight">
                   <span className="text-gradient animate-gradient-shift">{t("hero.title")}</span>
                 </h1>
-                <p className="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-2xl">
+                <p className="hero-subtitle text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-2xl">
                   {t("hero.subtitle")}
                 </p>
               </div>
