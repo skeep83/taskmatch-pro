@@ -229,6 +229,34 @@ export const ImageMetadataViewer = ({ imageUrl, onMetadataExtracted }: ImageMeta
     return reasons;
   };
 
+  const getGpsReasons = (): string[] => {
+    const reasons: string[] = [];
+    
+    if (!metadata?.location?.latitude && !metadata?.location?.longitude) {
+      reasons.push("Координаты полностью отсутствуют");
+      
+      if (metadata?.camera?.make && metadata?.camera?.model) {
+        const cameraInfo = `${metadata.camera.make} ${metadata.camera.model}`.toLowerCase();
+        if (cameraInfo.includes("iphone") || cameraInfo.includes("samsung") || cameraInfo.includes("pixel")) {
+          reasons.push("Современный смартфон обычно записывает GPS");
+        }
+      }
+      
+      if (metadata?.dateTime?.taken) {
+        const takenDate = new Date(metadata.dateTime.taken);
+        const currentYear = new Date().getFullYear();
+        if (takenDate.getFullYear() >= currentYear - 2) {
+          reasons.push("Недавние фото обычно содержат GPS данные");
+        }
+      }
+      
+      reasons.push("GPS данные могли быть удалены при обработке");
+      reasons.push("Возможна съемка в помещении или отключенная геолокация");
+    }
+    
+    return reasons;
+  };
+
   const formatFileSize = (bytes?: number): string => {
     if (!bytes) return 'Неизвестно';
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -379,6 +407,21 @@ export const ImageMetadataViewer = ({ imageUrl, onMetadataExtracted }: ImageMeta
                 {getManipulationReasons().map((reason, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className="text-yellow-600 mt-0.5">•</span>
+                    <span>{reason}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* GPS reasons */}
+          {getGpsReasons().length > 0 && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-medium text-blue-800 mb-2">Отсутствие GPS данных:</h4>
+              <ul className="space-y-1 text-sm text-blue-700">
+                {getGpsReasons().map((reason, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">•</span>
                     <span>{reason}</span>
                   </li>
                 ))}
