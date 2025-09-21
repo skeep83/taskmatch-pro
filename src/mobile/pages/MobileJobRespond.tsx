@@ -54,7 +54,11 @@ export default function MobileJobRespond() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Enhanced validation with detailed logging
+    console.log('MobileJobRespond submission - formData:', formData);
+    
     if (!formData.price) {
+      console.error('Validation failed: empty price field');
       toast({
         title: "Ошибка",
         description: "Пожалуйста, укажите цену",
@@ -64,7 +68,14 @@ export default function MobileJobRespond() {
     }
 
     const price = parseFloat(formData.price);
+    console.log('Price validation:', { 
+      original: formData.price, 
+      converted: price, 
+      valid: !isNaN(price) && price > 0 
+    });
+    
     if (isNaN(price) || price <= 0) {
+      console.error('Validation failed: invalid price number', { price: formData.price, converted: price });
       toast({
         title: "Ошибка", 
         description: "Пожалуйста, укажите корректную цену",
@@ -73,12 +84,21 @@ export default function MobileJobRespond() {
       return;
     }
 
+    const priceCents = Math.round(price * 100);
+    console.log('Final request data:', {
+      jobId: id,
+      priceCents,
+      etaSlot: formData.eta,
+      warrantyDays: parseInt(formData.warranty),
+      note: formData.notes
+    });
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('job-application-create', {
         body: {
           jobId: id,
-          priceCents: Math.round(price * 100), // Convert to cents
+          priceCents, // Convert to cents
           etaSlot: formData.eta,
           warrantyDays: parseInt(formData.warranty),
           note: formData.notes

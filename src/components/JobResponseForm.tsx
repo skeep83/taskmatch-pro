@@ -40,7 +40,28 @@ export const JobResponseForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.price || Number(formData.price) <= 0) {
+    // Enhanced validation with detailed logging
+    console.log('JobResponseForm submission - formData:', formData);
+    
+    if (!formData.price) {
+      console.error('Validation failed: empty price field');
+      toast({
+        title: 'Ошибка',
+        description: 'Введите цену',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    const priceNumber = Number(formData.price);
+    console.log('Price validation:', { 
+      original: formData.price, 
+      converted: priceNumber, 
+      valid: !isNaN(priceNumber) && priceNumber > 0 
+    });
+    
+    if (isNaN(priceNumber) || priceNumber <= 0) {
+      console.error('Validation failed: invalid price number', { price: formData.price, converted: priceNumber });
       toast({
         title: 'Ошибка',
         description: 'Укажите корректную цену',
@@ -49,12 +70,21 @@ export const JobResponseForm = ({
       return;
     }
 
+    const priceCents = Math.round(priceNumber * 100);
+    console.log('Final request data:', {
+      jobId,
+      priceCents,
+      etaSlot: formData.etaSlot || undefined,
+      note: formData.note || undefined,
+      warrantyDays: Number(formData.warrantyDays) || 0
+    });
+
     setLoading(true);
     try {
       const { error } = await supabase.functions.invoke('job-application-create', {
         body: {
           jobId,
-          priceCents: Math.round(Number(formData.price) * 100),
+          priceCents,
           etaSlot: formData.etaSlot || undefined,
           note: formData.note || undefined,
           warrantyDays: Number(formData.warrantyDays) || 0
