@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Clock, DollarSign, User, Star, Camera, MessageCircle, Phone } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, DollarSign, User, Star, Camera, MessageCircle, Phone, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MobileCard } from '../components/ui/MobileCard';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,8 @@ export default function MobileJobDetail() {
   const { t } = useEnhancedI18n();
   
   const [job, setJob] = useState<JobDetail | null>(null);
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState(false);
 
@@ -48,6 +50,28 @@ export default function MobileJobDetail() {
       fetchJobDetail(id);
     }
   }, [id]);
+
+  const openPhotoModal = (index: number) => {
+    setCurrentPhotoIndex(index);
+    setPhotoModalOpen(true);
+  };
+
+  const closePhotoModal = () => {
+    setPhotoModalOpen(false);
+    setCurrentPhotoIndex(0);
+  };
+
+  const nextPhoto = () => {
+    if (job && currentPhotoIndex < job.job_photos.length - 1) {
+      setCurrentPhotoIndex(currentPhotoIndex + 1);
+    }
+  };
+
+  const prevPhoto = () => {
+    if (currentPhotoIndex > 0) {
+      setCurrentPhotoIndex(currentPhotoIndex - 1);
+    }
+  };
 
   const fetchJobDetail = async (jobId: string) => {
     try {
@@ -160,6 +184,87 @@ export default function MobileJobDetail() {
   }
 
   return (
+    <div>
+      {/* Photo Modal */}
+      {photoModalOpen && job && job.job_photos.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+          <div className="relative w-full h-full flex items-center justify-center p-4">
+            {/* Close Button */}
+            <button
+              onClick={closePhotoModal}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black bg-opacity-50 text-white hover:bg-opacity-70 transition-all"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Photo Counter */}
+            <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-black bg-opacity-50 text-white text-sm">
+              {currentPhotoIndex + 1} из {job.job_photos.length}
+            </div>
+
+            {/* Previous Button */}
+            {currentPhotoIndex > 0 && (
+              <button
+                onClick={prevPhoto}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-2 rounded-full bg-black bg-opacity-50 text-white hover:bg-opacity-70 transition-all"
+              >
+                <ChevronLeft size={24} />
+              </button>
+            )}
+
+            {/* Next Button */}
+            {currentPhotoIndex < job.job_photos.length - 1 && (
+              <button
+                onClick={nextPhoto}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-2 rounded-full bg-black bg-opacity-50 text-white hover:bg-opacity-70 transition-all"
+              >
+                <ChevronRight size={24} />
+              </button>
+            )}
+
+            {/* Photo */}
+            <motion.img
+              key={currentPhotoIndex}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              src={supabase.storage.from('evidence').getPublicUrl(job.job_photos[currentPhotoIndex].file_url).data.publicUrl}
+              alt={`Фото ${currentPhotoIndex + 1}`}
+              className="max-w-full max-h-full object-contain rounded-lg"
+              onError={(e) => {
+                console.log("Failed to load image:", job.job_photos[currentPhotoIndex].file_url);
+                e.currentTarget.src = '/placeholder.svg';
+              }}
+            />
+
+            {/* Swipe gestures for mobile */}
+            <div
+              className="absolute inset-0 flex"
+              onTouchStart={(e) => {
+                const touchStartX = e.touches[0].clientX;
+                const handleTouchEnd = (e: TouchEvent) => {
+                  const touchEndX = e.changedTouches[0].clientX;
+                  const diffX = touchStartX - touchEndX;
+                  
+                  if (Math.abs(diffX) > 50) {
+                    if (diffX > 0 && currentPhotoIndex < job.job_photos.length - 1) {
+                      nextPhoto();
+                    } else if (diffX < 0 && currentPhotoIndex > 0) {
+                      prevPhoto();
+                    }
+                  }
+                  
+                  document.removeEventListener('touchend', handleTouchEnd);
+                };
+                
+                document.addEventListener('touchend', handleTouchEnd);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
     <div className="min-h-screen bg-[#E5E7EB]">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-[#E5E7EB] px-4 py-3 border-b border-[#D1D5DB]">
@@ -274,7 +379,11 @@ export default function MobileJobDetail() {
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 {job.job_photos.map((photo, index) => (
-                  <div key={index} className="aspect-square rounded-lg overflow-hidden bg-[#D1D5DB]">
+                  <div 
+                    key={index} 
+                    className="aspect-square rounded-lg overflow-hidden bg-[#D1D5DB] cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => openPhotoModal(index)}
+                  >
                     <img
                       src={supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl}
                       alt={`Фото ${index + 1}`}
@@ -352,6 +461,7 @@ export default function MobileJobDetail() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }
