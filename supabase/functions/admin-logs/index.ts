@@ -332,7 +332,9 @@ serve(async (req) => {
         );
       }
 
-    } else if (method === 'DELETE') {
+    } else if (method === 'POST') {
+      const body = await req.json();
+
       if (action === 'clear_all') {
         // Clear all error logs
         const { error } = await supabaseAdmin
@@ -354,12 +356,8 @@ serve(async (req) => {
           JSON.stringify({ success: true, message: 'All logs cleared' }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
-      }
 
-    } else if (method === 'POST') {
-      const body = await req.json();
-
-      if (action === 'create') {
+      } else if (action === 'create') {
         // Create new log entry
         const logEntry: LogEntry = {
           level: body.level,

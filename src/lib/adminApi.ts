@@ -337,7 +337,6 @@ class AdminAPI {
 
   async clearAllLogs() {
     const { data, error } = await supabase.functions.invoke('admin-logs', {
-      method: 'DELETE',
       body: { action: 'clear_all' }
     });
 
