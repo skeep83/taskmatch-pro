@@ -10,31 +10,30 @@ export const SignatureGradient: React.FC = () => {
     let x = 50, y = 30;
     let cachedRect: DOMRect | null = null;
     let rectUpdateQueued = false;
-    let isInitialized = false;
 
     const updateRect = () => {
-      if (el && !rectUpdateQueued) {
+      if (el) {
+        cachedRect = el.getBoundingClientRect();
+        rectUpdateQueued = false;
+      }
+    };
+
+    const queueRectUpdate = () => {
+      if (!rectUpdateQueued) {
         rectUpdateQueued = true;
-        requestAnimationFrame(() => {
-          cachedRect = el.getBoundingClientRect();
-          rectUpdateQueued = false;
-        });
+        requestAnimationFrame(updateRect);
       }
     };
 
     const onMove = (e: MouseEvent) => {
-      // Use cached rect to avoid forced reflow, only update if needed
-      if (!cachedRect && isInitialized) {
-        updateRect();
-        return;
+      if (!cachedRect) {
+        cachedRect = el.getBoundingClientRect();
       }
       
-      if (cachedRect) {
-        const nx = ((e.clientX - cachedRect.left) / cachedRect.width) * 100;
-        const ny = ((e.clientY - cachedRect.top) / cachedRect.height) * 100;
-        x = nx; y = ny;
-        if (!raf) raf = requestAnimationFrame(update);
-      }
+      const nx = ((e.clientX - cachedRect.left) / cachedRect.width) * 100;
+      const ny = ((e.clientY - cachedRect.top) / cachedRect.height) * 100;
+      x = nx; y = ny;
+      if (!raf) raf = requestAnimationFrame(update);
     };
 
     const update = () => {
@@ -44,24 +43,15 @@ export const SignatureGradient: React.FC = () => {
     };
 
     const onResize = () => {
-      // Debounce resize to prevent excessive rect calculations
-      if (!rectUpdateQueued) {
-        updateRect();
-      }
+      queueRectUpdate();
     };
 
-    // Initial setup with deferred rect calculation
-    const initialize = () => {
-      requestAnimationFrame(() => {
-        cachedRect = el.getBoundingClientRect();
-        isInitialized = true;
-      });
-    };
+    // Initial rect calculation
+    updateRect();
 
     const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (!mql.matches) {
-      initialize();
-      el.addEventListener("mousemove", onMove, { passive: true });
+      el.addEventListener("mousemove", onMove);
       window.addEventListener("resize", onResize, { passive: true });
     }
     

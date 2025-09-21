@@ -134,7 +134,7 @@ export function MobileBottomNav() {
       }}
     >
       {/* Компактное neumorphic меню */}
-      <div className="px-2 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] relative will-change-transform" style={{ transform: 'translateZ(0)' }}>
+      <div className="px-2 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
         <nav className="flex items-center justify-around h-14">
           {navItems.map((item, index) => {
             const isActive = location.pathname === item.path;

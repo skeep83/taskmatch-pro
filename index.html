@@ -7,124 +7,35 @@
     <meta name="description" content="ServiceHub: быстрый подбор проверенных специалистов, эскроу-платежи, тендеры, чаты, мгновенные выплаты." />
     <meta name="author" content="ServiceHub" />
     
-    <!-- Enhanced cache control and performance hints -->
+    <!-- Cache control and performance hints -->
     <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable" />
-    <meta http-equiv="Expires" content="Thu, 31 Dec 2025 23:59:59 GMT" />
-    <meta http-equiv="Pragma" content="public" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    
-    <!-- Resource hints for better caching -->
-    <script>
-      // Set up service worker for aggressive caching if supported
-      if ('serviceWorker' in navigator && 'caches' in window) {
-        navigator.serviceWorker.register('/sw.js').catch(() => {
-          // Silently fail if no service worker available
-        });
-      }
-      
-      // Implement client-side asset caching
-      const cacheAssets = () => {
-        if ('caches' in window) {
-          caches.open('static-assets-v1').then(cache => {
-            cache.addAll([
-              '/assets/index.js',
-              '/assets/index.css',
-              '/assets/hero-dashboard.jpg'
-            ]).catch(() => {
-              // Silently fail if caching not available
-            });
-          });
-        }
-      };
-      
-      // Cache assets after initial load
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', cacheAssets);
-      } else {
-        cacheAssets();
-      }
-    </script>
-    <!-- Critical DNS and connection optimization -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://taskmatch-pro.lovable.app" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="dns-prefetch" href="https://taskmatch-pro.lovable.app">
-    
-    <!-- High-priority critical resource preloading -->
     <link rel="preload" href="/assets/hero-dashboard.jpg" as="image" fetchpriority="high">
-    <link rel="modulepreload" href="/src/main.tsx" fetchpriority="high" crossorigin>
-    <link rel="modulepreload" href="/src/App.tsx" fetchpriority="high" crossorigin>
-    <link rel="modulepreload" href="/src/integrations/supabase/client.ts" crossorigin>
-    <link rel="modulepreload" href="/src/components/layout/Header.tsx" crossorigin>
-    <link rel="modulepreload" href="/src/components/layout/Footer.tsx" crossorigin>
-    <link rel="modulepreload" href="/src/pages/Index.tsx" crossorigin>
+    <link rel="modulepreload" href="/src/main.tsx">
+    <link rel="modulepreload" href="/src/App.tsx">
+    <link rel="modulepreload" href="/src/integrations/supabase/client.ts">
     
-    <!-- Preload critical CSS and JS bundles -->
+    <!-- Additional resource hints for better caching -->
+    <link rel="preload" href="/assets/index.js" as="script" crossorigin>
+    <link rel="preload" href="/assets/index.css" as="style">
+    
+    <!-- Early hints for critical resources -->
     <script>
-      // Early critical resource discovery and preloading
-      const preloadResource = (href, as, fetchpriority = 'high') => {
-        const link = document.createElement('link');
-        link.rel = as === 'script' ? 'modulepreload' : 'preload';
-        link.href = href;
-        if (as !== 'script') link.as = as;
-        if (fetchpriority) link.fetchPriority = fetchpriority;
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
-      };
-      
-      // Preload main bundle immediately
-      preloadResource('/assets/index.js', 'script');
-      preloadResource('/assets/index.css', 'style');
-    </script>
-    
-    <!-- Preload font files directly for instant loading -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQZNLo_U2r.woff2" as="font" type="font/woff2" crossorigin>
-    
-    <!-- Optimized critical resource loading strategy -->
-    <script>
-      // Immediately start parallel loading of only critical resources
-      const criticalResources = [
-        { href: '/src/main.tsx', as: 'script', priority: 'high' }
-      ];
-      
-      const deferredResources = [
-        { href: '/assets/index.css', as: 'style', priority: 'low' }
-      ];
-      
-      // Load critical resources immediately
-      criticalResources.forEach(({ href, as, priority }) => {
-        const link = document.createElement('link');
-        link.rel = 'modulepreload';
-        link.href = href;
-        link.fetchPriority = priority;
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
-      });
-      
-      // Defer non-critical resources until after critical path
-      const loadDeferredResources = () => {
-        deferredResources.forEach(({ href, as, priority }) => {
-          const link = document.createElement('link');
-          link.rel = as === 'script' ? 'modulepreload' : 'preload';
-          link.href = href;
-          if (as !== 'script') link.as = as;
-          link.fetchPriority = priority;
-          link.crossOrigin = 'anonymous';
-          document.head.appendChild(link);
-        });
-      };
-      
-      // Load deferred resources during idle time
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadDeferredResources, { timeout: 1000 });
-      } else {
-        setTimeout(loadDeferredResources, 100);
+      // Early connection establishment for faster resource loading
+      if ('connection' in navigator && navigator.connection && navigator.connection.downlink > 1) {
+        // Only for fast connections to avoid waste on slow networks
+        const linkElem = document.createElement('link');
+        linkElem.rel = 'preload';
+        linkElem.as = 'script';
+        linkElem.href = '/assets/index.js';
+        document.head.appendChild(linkElem);
       }
     </script>
     
@@ -136,7 +47,7 @@
       body { margin: 0; padding: 0; background: #ffffff; color: #0f172a; }
       #root { min-height: 100vh; }
       
-      /* Critical above-the-fold styles - optimized for immediate paint */
+      /* Critical above-the-fold styles */
       .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
       .grid { display: grid; gap: 2rem; grid-template-columns: 1fr; }
       .flex { display: flex; }
@@ -164,7 +75,6 @@
       .text-2xl { font-size: 1.5rem; line-height: 2rem; }
       .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
       .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-      .text-5xl { font-size: 3rem; line-height: 1; }
       .font-medium { font-weight: 500; }
       .font-semibold { font-weight: 600; }
       .font-bold { font-weight: 700; }
@@ -188,68 +98,6 @@
       .absolute { position: absolute; }
       .inset-0 { top: 0px; right: 0px; bottom: 0px; left: 0px; }
       .z-10 { z-index: 10; }
-      
-      /* Additional critical header and navigation styles */
-      header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #ffffff; border-bottom: 1px solid #e2e8f0; }
-      nav { display: flex; align-items: center; gap: 1.5rem; }
-      .logo { font-size: 1.5rem; font-weight: 700; color: #2563eb; }
-      button { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.15s; border: none; cursor: pointer; }
-      .btn-primary { background: #2563eb; color: #ffffff; }
-      .btn-primary:hover { background: #1d4ed8; }
-      .btn-secondary { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
-      .btn-secondary:hover { background: #f1f5f9; }
-      
-      /* Critical LCP element styles - hero subtitle */
-      .hero-subtitle { 
-        font-size: 1.25rem; 
-        line-height: 1.75rem; 
-        color: #64748b; 
-        margin-bottom: 2rem; 
-        line-height: 1.625; 
-        max-width: 42rem; 
-      }
-      
-      /* Hero section critical styles */
-      .text-gradient { 
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-      
-      .animate-fade-in { 
-        animation: fadeIn 0.6s ease-out forwards;
-        opacity: 0;
-      }
-      
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      
-      /* Card and content critical styles */
-      .card { 
-        background: #ffffff; 
-        border-radius: 0.5rem; 
-        padding: 1.5rem; 
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
-      }
-      
-      /* Mobile-first responsive grid */
-      @media (min-width: 768px) {
-        .grid { grid-template-columns: 1fr 1fr; }
-        .text-4xl { font-size: 3rem; line-height: 1; }
-        .text-5xl { font-size: 3.75rem; line-height: 1; }
-        .md\:block { display: block; }
-        .md\:hidden { display: none; }
-      }
-      
-      @media (min-width: 1024px) {
-        .hero-subtitle { font-size: 1.5rem; line-height: 2rem; }
-        .text-5xl { font-size: 4.5rem; line-height: 1; }
-        .lg\:text-7xl { font-size: 4.5rem; line-height: 1; }
-      }
       
       /* Loading skeleton styles */
       .skeleton { 
@@ -310,112 +158,58 @@
         .md\:hidden { display: none; }
       }
       
-      /* Prevent flash of unstyled content with font fallbacks */
-      .font-display { font-family: 'Playfair Display', -apple-system, BlinkMacSystemFont, serif; }
-      .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-      
-      /* Ensure smooth transitions when real fonts load */
-      body { font-synthesis: none; text-rendering: optimizeLegibility; }
-      h1, h2, h3, h4, h5, h6 { font-synthesis: none; }
+      /* Prevent flash of unstyled content */
+      .font-display { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+      .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
     </style>
     
-    <!-- Non-blocking font loading strategy - optimized -->
+    <!-- Load Google Fonts with better non-blocking strategy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script>
-      // Advanced non-blocking font loading
-      function loadFonts() {
-        if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
+      // Advanced font loading to prevent render blocking
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
-          link.media = 'print';
-          link.onload = function() { 
-            this.media = 'all';
-            this.onload = null; // Prevent memory leaks
-          };
-          link.onerror = function() {
-            // Fallback to system fonts if Google Fonts fail
-            this.remove();
-          };
           document.head.appendChild(link);
-        }
-      }
-      
-      // Load fonts after critical path - much faster
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadFonts, { timeout: 200 });
+        });
       } else {
-        setTimeout(loadFonts, 50);
+        setTimeout(() => {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
+          document.head.appendChild(link);
+        }, 100);
       }
     </script>
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
     
-    <!-- Completely non-blocking CSS loading strategy -->
+    <!-- Defer all non-critical CSS completely -->
     <script>
-      // Enhanced CSS loading with immediate rendering
-      function loadMainCSS() {
-        if (!document.querySelector('link[href*="index"][href*=".css"]')) {
+      // Load main CSS after initial render
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = '/assets/index.css';
-          
-          // Use print media and switch to all on load - non-blocking
-          link.media = 'print';
-          link.onload = function() { 
-            this.media = 'all';
-            this.onload = null; // Prevent memory leaks
-            if (window.onCSSLoaded) window.onCSSLoaded();
-          };
-          link.onerror = function() {
-            // Remove failed stylesheet to prevent blocking
-            this.remove();
-          };
           document.head.appendChild(link);
-        }
+        });
+      } else {
+        setTimeout(() => {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = '/assets/index.css';
+          document.head.appendChild(link);
+        }, 50);
       }
-      
-      // Load CSS immediately but non-blocking
-      loadMainCSS();
     </script>
     <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
     
-    
-    <!-- Optimized resource prefetching - defer non-critical JS -->
-    <script>
-      // Intelligent resource prefetching based on user behavior
-      const prefetchNonCritical = () => {
-        const resources = [
-          { href: '/assets/index.js', as: 'script' },
-          { href: '/assets/index.css', as: 'style' }
-        ];
-        
-        resources.forEach(({ href, as }) => {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          link.href = href;
-          if (as !== 'script') link.as = as;
-          link.crossOrigin = 'anonymous';
-          document.head.appendChild(link);
-        });
-      };
-      
-      // Only prefetch after initial critical rendering is complete
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(prefetchNonCritical, { timeout: 2000 });
-      } else {
-        setTimeout(prefetchNonCritical, 1000);
-      }
-    </script>
-    <link rel="prefetch" href="/assets/index.css" as="style">
+    <!-- Resource hints for faster loading -->
+    <link rel="prefetch" href="/assets/index.js">
     <link rel="canonical" href="https://taskmatch-pro.lovable.app/" />
-    
-    <!-- Additional SEO canonical optimization -->
-    <script>
-      // Ensure canonical URL is always absolute and matches current domain
-      const currentCanonical = document.querySelector('link[rel="canonical"]');
-      if (currentCanonical && !currentCanonical.href.startsWith('http')) {
-        currentCanonical.href = window.location.origin + (window.location.pathname === '/' ? '/' : window.location.pathname);
-      }
-    </script>
 
     <meta property="og:title" content="ServiceHub — маркетплейс услуг" />
     <meta property="og:description" content="Быстро найдите специалиста. Эскроу, чаты, тендеры, мгновенные выплаты." />
@@ -438,36 +232,16 @@
     <div id="root"></div>
     
     <script>
-      // Enhanced loader management
-      let cssLoaded = false;
-      let domReady = false;
-      
-      function hideLoader() {
-        if (cssLoaded && domReady) {
+      // Hide initial loader when React app starts
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
           const loader = document.getElementById('initial-loader');
           if (loader) {
-            loader.style.opacity = '0';
-            loader.style.transition = 'opacity 0.2s ease';
-            setTimeout(() => loader.style.display = 'none', 200);
+            loader.style.display = 'none';
           }
-        }
-      }
-      
-      // CSS loaded callback will be called from the CSS loading script
-      window.onCSSLoaded = function() {
-        cssLoaded = true;
-        hideLoader();
-      };
-      
-      document.addEventListener('DOMContentLoaded', function() {
-        domReady = true;
-        // If CSS hasn't loaded yet, wait a shorter time for faster FCP
-        setTimeout(() => {
-          cssLoaded = true;
-          hideLoader();
         }, 100);
       });
     </script>
-    <script type="module" src="/src/main.tsx" defer></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
