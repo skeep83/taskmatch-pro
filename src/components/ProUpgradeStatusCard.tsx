@@ -3,9 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Clock, CheckCircle, XCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, Clock, CheckCircle, XCircle, RefreshCw, Send } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProUpgradeStatus {
   id: string;
@@ -22,6 +23,8 @@ interface ProUpgradeStatusProps {
 export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
   const [request, setRequest] = useState<ProUpgradeStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resubmitting, setResubmitting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     loadUpgradeStatus();
@@ -70,6 +73,53 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
     }
   };
 
+  const submitNewRequest = async () => {
+    try {
+      setResubmitting(true);
+      
+      // Get current profile data
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      // Get current KYC documents
+      const { data: kycDocs } = await supabase
+        .from('kyc_documents')
+        .select('*')
+        .eq('user_id', userId);
+
+      // Submit new upgrade request
+      const { error } = await supabase
+        .from('pro_upgrade_requests')
+        .insert({
+          user_id: userId,
+          profile_data: profile,
+          kyc_documents: kycDocs || []
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Заявка подана!",
+        description: "Ваша новая заявка на статус специалиста подана на рассмотрение"
+      });
+
+      // Refresh status
+      await loadUpgradeStatus();
+    } catch (error) {
+      console.error('Error submitting new request:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось подать заявку. Попробуйте позже.",
+        variant: "destructive"
+      });
+    } finally {
+      setResubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
@@ -108,7 +158,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
         return {
           icon: XCircle,
           title: "Заявка отклонена",
-          description: "К сожалению, ваша заявка была отклонена",
+          description: "К сожалению, ваша заявка была отклонена. Ознакомьтесь с причиной отклонения ниже и подайте новую заявку с исправлениями.",
           badge: <Badge variant="destructive" className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"><XCircle className="w-3 h-3 mr-1" />Отклонено</Badge>,
           color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
         };
@@ -172,7 +222,20 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
           </div>
         )}
 
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <div>
+            {request.status === 'rejected' && (
+              <button 
+                onClick={submitNewRequest}
+                disabled={resubmitting}
+                className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed mr-3"
+              >
+                <Send className="w-4 h-4" />
+                {resubmitting ? 'Подача заявки...' : 'Подать новую заявку'}
+              </button>
+            )}
+          </div>
+          
           <button 
             onClick={loadUpgradeStatus}
             className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium"
