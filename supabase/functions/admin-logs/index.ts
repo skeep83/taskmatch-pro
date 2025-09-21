@@ -341,15 +341,17 @@ serve(async (req) => {
 
       if (finalAction === 'clear_all') {
         // Clear all error logs using RPC function
-        const { error } = await supabaseAdmin.rpc('clear_all_error_logs');
+        const { data, error } = await supabaseAdmin.rpc('clear_all_error_logs');
 
         if (error) {
           console.error('Error clearing logs:', error);
           return new Response(
-            JSON.stringify({ error: 'Failed to clear logs' }),
+            JSON.stringify({ error: 'Failed to clear logs', details: error.message }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
+
+        console.log('Clear logs result:', data);
 
         console.log('All logs cleared successfully');
 
