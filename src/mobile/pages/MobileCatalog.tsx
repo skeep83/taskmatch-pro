@@ -25,27 +25,27 @@ const mockJobs = [
     description: 'Течет кран в ванной комнате, нужна замена картриджа',
     budget_min: 200,
     budget_max: 500,
-    location: 'Кишинев, Ц.',
-    created_at: '2025-09-21T00:00:00.000Z',
+    location: 'Кишинев, Центр',
+    created_at: new Date().toISOString(),
     category_name: 'Сантехника',
     client_name: 'Мария И.',
     client_rating: 4.8,
     urgency: 'high' as const,
-    status: 'Активен'
+    status: 'active'
   },
   {
-    id: '2', 
+    id: '2',
     title: 'Установка розетки',
     description: 'Нужно установить новую розетку в гостиной',
     budget_min: 150,
     budget_max: 300,
-    location: 'Кишинев, Р.',
-    created_at: '2025-09-21T00:00:00.000Z',
+    location: 'Кишинев, Рышкановка',
+    created_at: new Date().toISOString(),
     category_name: 'Электрика',
     client_name: 'Андрей П.',
     client_rating: 4.9,
     urgency: 'medium' as const,
-    status: 'Активен'
+    status: 'active'
   }
 ];
 
@@ -115,35 +115,29 @@ export default function MobileCatalog() {
           <span>Кишинёв, Молдова</span>
         </motion.div>
 
-        {/* Categories - As 2 cards in horizontal row */}
+        {/* Categories */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <div className="grid grid-cols-2 gap-4">
-            <MobileCard 
-              pressable 
-              onPress={() => console.log('Доставка category')}
-              className="flex items-center justify-center p-4 h-16"
-            >
-              <div className="flex items-center">
-                <span className="mr-3 text-2xl">🚚</span>
-                <span className="font-medium text-gray-800">Доставка</span>
-              </div>
-            </MobileCard>
-            
-            <MobileCard 
-              pressable 
-              onPress={() => console.log('Красота category')}
-              className="flex items-center justify-center p-4 h-16"
-            >
-              <div className="flex items-center">
-                <span className="mr-3 text-2xl">💄</span>
-                <span className="font-medium text-gray-800">Красота</span>
-              </div>
-            </MobileCard>
+          <h3 className="text-lg font-semibold mb-3 text-gray-800">Категории</h3>
+          <div className="grid grid-cols-2 gap-3">{/* организовал в сетку 2 колонки с равномерными отступами */}
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                onClick={() => handleCategorySelect(category.id)}
+                className={`w-full rounded-xl text-sm px-3 py-3 h-12 flex items-center justify-start ${
+                  selectedCategory === category.id 
+                    ? 'bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800' 
+                    : 'bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]'
+                }`}
+              >
+                <span className="mr-2">{category.icon}</span>
+                {category.name}
+              </Button>
+            ))}
           </div>
         </motion.div>
 
