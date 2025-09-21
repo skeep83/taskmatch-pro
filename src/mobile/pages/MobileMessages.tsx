@@ -19,16 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 interface Chat {
   id: string;
@@ -68,8 +58,6 @@ function MobileMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [text, setText] = useState('');
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const [presence, setPresence] = useState<Record<string, any>>({});
   const [otherOnline, setOtherOnline] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
@@ -346,16 +334,9 @@ function MobileMessages() {
 
   const handleDeleteChat = (chatId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setChatToDelete(chatId);
-    setDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = () => {
-    if (chatToDelete) {
-      deleteChat(chatToDelete);
+    if (confirm('Удалить чат? Все сообщения будут удалены навсегда.')) {
+      deleteChat(chatId);
     }
-    setDeleteDialogOpen(false);
-    setChatToDelete(null);
   };
 
   const selectedChat = chats.find(c => c.id === id);
@@ -472,25 +453,6 @@ function MobileMessages() {
           )}
         </div>
 
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent className="bg-white border border-gray-200 rounded-xl">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Удалить чат?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Все сообщения в этом чате будут удалены навсегда.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-xl">Отмена</AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={confirmDelete}
-                className="bg-red-600 hover:bg-red-700 rounded-xl"
-              >
-                Удалить
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     );
   }
