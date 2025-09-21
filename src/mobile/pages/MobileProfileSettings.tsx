@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, Camera, MapPin, Phone, Mail, Globe, 
   Briefcase, Clock, DollarSign, Save, CheckCircle2,
-  ArrowLeft, Wrench, Plus, X, Settings, Bell
+  ArrowLeft, Wrench, Plus, X, Settings, Bell, Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,6 +74,7 @@ export default function MobileProfileSettings() {
 
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [availability, setAvailability] = useState<any[]>([]);
   
   const [notifications, setNotifications] = useState({
     newJobs: true,
@@ -160,6 +161,15 @@ export default function MobileProfileSettings() {
           .eq('user_id', user.id);
 
         setSelectedCategories((catData || []).map(c => c.category_id));
+
+        // Load availability schedule
+        const { data: availData } = await supabase
+          .from('pro_availability')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('weekday');
+
+        setAvailability(availData || []);
       }
 
     } catch (error) {
@@ -202,6 +212,7 @@ export default function MobileProfileSettings() {
       // Update pro profile if user is a pro
       if (userRole === 'pro') {
         await saveProProfile();
+        await saveAvailability();
       }
 
       toast({
@@ -275,6 +286,32 @@ export default function MobileProfileSettings() {
     }
   };
 
+  const saveAvailability = async () => {
+    if (!user) return;
+
+    // Delete existing availability
+    await supabase
+      .from('pro_availability')
+      .delete()
+      .eq('user_id', user.id);
+
+    // Insert new availability
+    if (availability.length > 0) {
+      const { error } = await supabase
+        .from('pro_availability')
+        .insert(
+          availability.map(a => ({
+            user_id: user.id,
+            weekday: a.weekday,
+            start_time: a.start_time,
+            end_time: a.end_time
+          }))
+        );
+
+      if (error) throw error;
+    }
+  };
+
   const updateProfile = (field: keyof Profile, value: string) => {
     setProfile(prev => ({
       ...prev,
@@ -313,6 +350,7 @@ export default function MobileProfileSettings() {
     ...(userRole === 'pro' ? [
       { id: 'professional', label: 'Специалист', icon: Briefcase },
       { id: 'categories', label: 'Категории', icon: Wrench },
+      { id: 'schedule', label: 'График', icon: Calendar },
       { id: 'notifications', label: 'Уведомления', icon: Settings }
     ] : [])
   ];
@@ -602,6 +640,114 @@ export default function MobileProfileSettings() {
                   </div>
                 </div>
               )}
+            </MobileCard>
+          </div>
+        )}
+
+        {/* Schedule Tab - График работы */}
+        {activeTab === 'schedule' && userRole === 'pro' && (
+          <div className="space-y-6">
+            <MobileCard>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                График работы
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Укажите дни и время, когда вы доступны для выполнения заказов
+              </p>
+              
+              <div className="space-y-4">
+                {[
+                  { id: 1, name: 'Понедельник', short: 'Пн' },
+                  { id: 2, name: 'Вторник', short: 'Вт' },
+                  { id: 3, name: 'Среда', short: 'Ср' },
+                  { id: 4, name: 'Четверг', short: 'Чт' },
+                  { id: 5, name: 'Пятница', short: 'Пт' },
+                  { id: 6, name: 'Суббота', short: 'Сб' },
+                  { id: 0, name: 'Воскресенье', short: 'Вс' }
+                ].map((day) => {
+                  const schedule = availability.find(a => a.weekday === day.id);
+                  const isActive = !!schedule;
+                  
+                  return (
+                    <div key={day.id} className="p-4 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                            <span className="text-xs font-medium">{day.short}</span>
+                          </div>
+                          <span className="font-medium">{day.name}</span>
+                        </div>
+                        <Switch
+                          checked={isActive}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setAvailability(prev => [...prev, {
+                                weekday: day.id,
+                                start_time: '09:00',
+                                end_time: '18:00'
+                              }]);
+                            } else {
+                              setAvailability(prev => prev.filter(a => a.weekday !== day.id));
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      {isActive && (
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs">Начало</Label>
+                            <Input
+                              type="time"
+                              value={schedule?.start_time || '09:00'}
+                              onChange={(e) => {
+                                setAvailability(prev => 
+                                  prev.map(a => 
+                                    a.weekday === day.id 
+                                      ? { ...a, start_time: e.target.value }
+                                      : a
+                                  )
+                                );
+                              }}
+                              className="mt-1 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Окончание</Label>
+                            <Input
+                              type="time"
+                              value={schedule?.end_time || '18:00'}
+                              onChange={(e) => {
+                                setAvailability(prev => 
+                                  prev.map(a => 
+                                    a.weekday === day.id 
+                                      ? { ...a, end_time: e.target.value }
+                                      : a
+                                  )
+                                );
+                              }}
+                              className="mt-1 text-sm"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <div className="flex items-start gap-2">
+                  <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Время автоматического ответа</p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      Специалисты с быстрым временем ответа получают больше заказов
+                    </p>
+                  </div>
+                </div>
+              </div>
             </MobileCard>
           </div>
         )}
