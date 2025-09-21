@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Bell, Search, MoreHorizontal, ChevronDown, User, Briefcase, Building2 } from 'lucide-react';
+import { ArrowLeft, Bell, Search, MoreHorizontal, ChevronDown, User, Briefcase, Building2, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -23,6 +23,7 @@ interface MobileHeaderProps {
   showSearch?: boolean;
   showNotifications?: boolean;
   showMenu?: boolean;
+  showLogout?: boolean;
   className?: string;
   children?: React.ReactNode;
   transparent?: boolean;
@@ -39,6 +40,7 @@ export function MobileHeader({
   showSearch = false,
   showNotifications = false,
   showMenu = false,
+  showLogout = false,
   className,
   children,
   transparent = false,
@@ -146,6 +148,17 @@ export function MobileHeader({
     }
   }, [location.pathname, userId]);
 
+  // Функция логаута
+  const handleLogout = async () => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      await supabase.auth.signOut();
+      navigate('/auth');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
@@ -182,6 +195,16 @@ export function MobileHeader({
         )}>
           {/* Left section */}
           <div className="flex items-center min-w-0 flex-1">
+            {showLogout && (
+              <motion.button
+                onClick={handleLogout}
+                className="mr-2 w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
+                whileTap={{ scale: 0.95 }}
+              >
+                <LogOut size={16} className="text-red-500" />
+              </motion.button>
+            )}
+            
             {showBack && (
               <motion.button
                 onClick={handleBack}

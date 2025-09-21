@@ -430,6 +430,7 @@ export default function MobileDashboardClient() {
         <MobileHeader 
           title="Панель клиента"
           showBack={false}
+          showLogout={true}
           showNotifications={true}
           showDashboardSelector={true}
           dashboardOptions={getDashboardOptions()}
