@@ -200,15 +200,15 @@ export default function MobileDashboardClient() {
 
               {/* Quick Actions */}
               <MobileCard className="p-4">
-                <h3 className="font-semibold mb-4">{t('client.dashboard.quick_actions')}</h3>
+                <h3 className="font-semibold mb-4">Быстрые действия</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <Button variant="outline" className="h-16 flex flex-col gap-2">
                     <Plus size={20} />
-                    <span className="text-xs">{t('client.dashboard.create_job')}</span>
+                    <span className="text-xs">Создать заказ</span>
                   </Button>
                   <Button variant="outline" className="h-16 flex flex-col gap-2">
                     <Gavel size={20} />
-                    <span className="text-xs">{t('client.dashboard.create_tender')}</span>
+                    <span className="text-xs">Создать тендер</span>
                   </Button>
                 </div>
               </MobileCard>
@@ -216,7 +216,7 @@ export default function MobileDashboardClient() {
               {/* Recent Jobs */}
               <MobileCard className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold">{t('client.dashboard.recent_jobs')}</h3>
+                  <h3 className="font-semibold">Недавние заказы</h3>
                   <ChevronRight size={20} className="text-muted-foreground" />
                 </div>
                 <div className="space-y-3">
@@ -254,11 +254,11 @@ export default function MobileDashboardClient() {
               <MobileCard className="p-4">
                 <div className="text-center py-8">
                   <Briefcase size={48} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-medium mb-2">{t('client.dashboard.jobs_tab_title')}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{t('client.dashboard.jobs_tab_description')}</p>
+                  <h3 className="font-medium mb-2">Мои заказы</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Управляйте вашими заказами</p>
                   <Button>
                     <Plus size={16} className="mr-2" />
-                    {t('client.dashboard.create_job')}
+                    Создать заказ
                   </Button>
                 </div>
               </MobileCard>
@@ -269,11 +269,11 @@ export default function MobileDashboardClient() {
               <MobileCard className="p-4">
                 <div className="text-center py-8">
                   <Gavel size={48} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-medium mb-2">{t('client.dashboard.tenders_tab_title')}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{t('client.dashboard.tenders_tab_description')}</p>
+                  <h3 className="font-medium mb-2">Мои тендеры</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Создавайте тендеры и получайте предложения</p>
                   <Button>
                     <Plus size={16} className="mr-2" />
-                    {t('client.dashboard.create_tender')}
+                    Создать тендер
                   </Button>
                 </div>
               </MobileCard>
@@ -284,10 +284,10 @@ export default function MobileDashboardClient() {
               <MobileCard className="p-4">
                 <div className="text-center py-8">
                   <Crown size={48} className="mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-medium mb-2">{t('client.dashboard.subscription_tab_title')}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{t('client.dashboard.subscription_tab_description')}</p>
+                  <h3 className="font-medium mb-2">Подписка</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Управляйте вашей подпиской HomeCare</p>
                   <Button variant="outline">
-                    {t('client.dashboard.upgrade_plan')}
+                    Управлять планом
                   </Button>
                 </div>
               </MobileCard>
