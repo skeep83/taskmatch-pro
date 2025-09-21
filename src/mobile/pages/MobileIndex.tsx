@@ -43,28 +43,26 @@ function MobileIndex() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#E5E7EB]">
       <MobileHeader 
         showNotifications 
         showSearch 
-        transparent 
       />
 
-      {/* Hero section */}
+      {/* Hero section с neumorphic дизайном */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="relative pt-20 pb-8"
-        style={{ paddingTop: 56 + safeAreaInsets.top }}
+        className="px-4 pt-20"
+        style={{ paddingTop: 72 + safeAreaInsets.top }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10" />
-        <div className="relative px-4">
+        <MobileCard className="p-6 mb-6">
           <motion.h1
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.6 }}
-            className="text-3xl font-bold mb-2 leading-tight"
+            className="text-2xl font-bold mb-2 leading-tight text-gray-800"
           >
             Найдите идеального
             <span className="text-primary block">специалиста</span>
@@ -74,7 +72,7 @@ function MobileIndex() {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-muted-foreground mb-6 text-lg"
+            className="text-gray-600 mb-6"
           >
             Тысячи проверенных мастеров готовы помочь
           </motion.p>
@@ -84,7 +82,7 @@ function MobileIndex() {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="flex space-x-2 mb-6"
+            className="flex space-x-2 mb-4"
           >
             <div className="flex-1 relative">
               <Input
@@ -92,15 +90,15 @@ function MobileIndex() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-12 h-12 text-base rounded-2xl bg-card border-0 shadow-lg"
+                className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
               />
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
             </div>
             <Button
               onClick={handleSearch}
-              className="h-12 px-6 rounded-2xl shadow-lg"
+              className="h-12 px-6 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]"
             >
-              <Search size={20} />
+              <Search size={18} />
             </Button>
           </motion.div>
 
@@ -109,21 +107,21 @@ function MobileIndex() {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="flex items-center text-muted-foreground mb-8"
+            className="flex items-center text-gray-600"
           >
             <MapPin size={16} className="mr-2" />
             <span>Кишинёв, Молдова</span>
           </motion.div>
-        </div>
+        </MobileCard>
       </motion.div>
 
-      {/* Categories */}
-      <div className="px-4 mb-8">
+      {/* Categories с neumorphic дизайном */}
+      <div className="px-4 mb-6">
         <motion.h2
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-xl font-semibold mb-4"
+          className="text-lg font-semibold mb-4 text-gray-800"
         >
           Популярные категории
         </motion.h2>
@@ -139,27 +137,23 @@ function MobileIndex() {
               <MobileCard
                 pressable
                 onPress={() => handleCategoryPress(category.id)}
-                className={cn(
-                  "p-4 bg-gradient-to-br",
-                  category.color,
-                  "text-white border-0"
-                )}
+                className="p-4 h-20 flex flex-col justify-center items-center text-center"
               >
-                <div className="text-2xl mb-2">{category.icon}</div>
-                <h3 className="font-medium text-sm">{category.name}</h3>
+                <div className="text-2xl mb-1">{category.icon}</div>
+                <h3 className="font-medium text-sm text-gray-700">{category.name}</h3>
               </MobileCard>
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* Features */}
-      <div className="px-4 mb-8">
+      {/* Features с neumorphic дизайном */}
+      <div className="px-4 mb-6">
         <motion.h2
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="text-xl font-semibold mb-4"
+          className="text-lg font-semibold mb-4 text-gray-800"
         >
           Почему выбирают нас
         </motion.h2>
@@ -174,12 +168,12 @@ function MobileIndex() {
             >
               <MobileCard className="p-4">
                 <div className="flex items-start space-x-3">
-                  <div className="p-2 bg-primary/10 rounded-xl">
-                    <feature.icon className="text-primary" size={20} />
+                  <div className="p-2 bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl">
+                    <feature.icon className="text-primary" size={18} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium mb-1">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    <h3 className="font-medium mb-1 text-gray-800">{feature.title}</h3>
+                    <p className="text-sm text-gray-600">{feature.description}</p>
                   </div>
                 </div>
               </MobileCard>
@@ -188,20 +182,22 @@ function MobileIndex() {
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="px-4 mb-8">
+      {/* CTA Section с neumorphic дизайном */}
+      <div className="px-4 mb-6">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.6 }}
         >
-          <MobileCard gradient className="text-center">
-            <TrendingUp className="mx-auto mb-4 text-primary" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Станьте специалистом</h3>
-            <p className="text-muted-foreground mb-4 text-sm">
+          <MobileCard className="p-6 text-center">
+            <div className="p-3 bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl w-fit mx-auto mb-4">
+              <TrendingUp className="text-primary" size={24} />
+            </div>
+            <h3 className="text-lg font-semibold mb-2 text-gray-800">Станьте специалистом</h3>
+            <p className="text-gray-600 mb-4 text-sm">
               Присоединяйтесь к тысячам мастеров и начните зарабатывать уже сегодня
             </p>
-            <Button asChild className="w-full h-12 rounded-2xl">
+            <Button asChild className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
               <Link to="/auth?type=register&role=pro">
                 Начать зарабатывать
               </Link>
