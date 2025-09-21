@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import * as React from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Send, ArrowLeft, Circle, MoreVertical, Trash2 } from 'lucide-react';
@@ -54,7 +55,7 @@ interface Profile {
   avatar_url: string;
 }
 
-export default function MobileMessages() {
+function MobileMessages() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -690,3 +691,5 @@ export default function MobileMessages() {
     </div>
   );
 }
+
+export default React.memo(MobileMessages);
