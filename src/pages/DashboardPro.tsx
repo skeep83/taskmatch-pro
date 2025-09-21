@@ -9,6 +9,7 @@ import { useCurrency } from "@/hooks/useCurrency";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { RoleGuard } from "@/components/RoleGuard";
+import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
 import { 
   Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, 
   CreditCard, Briefcase, Clock, ShieldCheck, TrendingUp, Award,
@@ -38,6 +39,7 @@ const DashboardPro = () => {
   const [completedJobs, setCompletedJobs] = useState<number>(0);
   const [responseTime, setResponseTime] = useState<string>('< 1 час');
   const [tenders, setTenders] = useState<any[]>([]);
+  const [hasPendingProRequest, setHasPendingProRequest] = useState<boolean>(false);
 
   useEffect(() => {
     initializeDashboard();
@@ -71,7 +73,8 @@ const DashboardPro = () => {
         loadWalletBalance(uid),
         loadRatings(uid),
         loadKycStatus(uid),
-        loadTenders(uid)
+        loadTenders(uid),
+        checkProUpgradeStatus(uid)
       ]);
 
       console.log('DashboardPro: Dashboard loaded successfully');
@@ -208,14 +211,36 @@ const DashboardPro = () => {
     }
   };
 
+  const checkProUpgradeStatus = async (uid: string) => {
+    try {
+      const { data: requests } = await supabase
+        .from('pro_upgrade_requests')
+        .select('status')
+        .eq('user_id', uid)
+        .eq('status', 'pending')
+        .limit(1);
+      
+      setHasPendingProRequest(requests && requests.length > 0);
+    } catch (error) {
+      console.error('DashboardPro: Error checking pro upgrade status:', error);
+    }
+  };
+
   if (loading) return (
     <main className="relative min-h-screen flex items-center justify-center">
       <div className="card-surface p-8 text-center animate-pulse-glow">
         <h1 className="text-2xl font-display font-bold text-gradient mb-4">Загружаем кабинет специалиста...</h1>
         <div className="flex items-center justify-center gap-2">
           <NeumorphicIcon icon={Clock} size={32} variant="square" className="animate-spin" />
-        </div>
-      </div>
+            </div>
+          </div>
+
+          {/* Pro Upgrade Status - показываем только если есть pending заявка */}
+          {hasPendingProRequest && (
+            <div className="mb-12">
+              <ProUpgradeStatusCard userId={userId || ''} />
+            </div>
+          )}
     </main>
   );
 

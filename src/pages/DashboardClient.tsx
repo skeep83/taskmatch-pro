@@ -571,10 +571,8 @@ export default function DashboardClient() {
                 </button>
               </div>
 
-              {/* Role Status & Upgrade Section */}
-              {hasPendingProRequest ? (
-                <ProUpgradeStatusCard userId={user?.id || ''} />
-              ) : (
+              {/* Role Upgrade Section */}
+              {!hasPendingProRequest && (
                 <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <RoleUpgrade
                     userId={user?.id || ''}

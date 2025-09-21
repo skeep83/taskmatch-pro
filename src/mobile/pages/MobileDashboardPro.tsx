@@ -14,6 +14,7 @@ import { MobileCard } from '../components/ui/MobileCard';
 import { useMobile } from '../providers/MobileProvider';
 import { useEnhancedI18n } from '@/i18n/enhanced';
 import { RoleGuard } from '@/components/RoleGuard';
+import { ProUpgradeStatusCard } from '@/components/ProUpgradeStatusCard';
 import { Seo } from '@/components/Seo';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -39,6 +40,7 @@ export default function MobileDashboardPro() {
     responseTime: '< 1 час'
   });
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
+  const [hasPendingProRequest, setHasPendingProRequest] = useState<boolean>(false);
 
   // Load user data and stats
   useEffect(() => {
@@ -71,6 +73,9 @@ export default function MobileDashboardPro() {
           setProProfile(proData);
         }
 
+        // Check pro upgrade status
+        await checkProUpgradeStatus(user.id);
+
         // TODO: Load real stats and jobs data
         // For now using mock data
       } catch (error) {
@@ -80,6 +85,21 @@ export default function MobileDashboardPro() {
 
     loadProData();
   }, []);
+
+  const checkProUpgradeStatus = async (uid: string) => {
+    try {
+      const { data: requests } = await supabase
+        .from('pro_upgrade_requests')
+        .select('status')
+        .eq('user_id', uid)
+        .eq('status', 'pending')
+        .limit(1);
+      
+      setHasPendingProRequest(requests && requests.length > 0);
+    } catch (error) {
+      console.error('Error checking pro upgrade status:', error);
+    }
+  };
 
   const getDashboardOptions = () => {
     return [
@@ -154,6 +174,11 @@ export default function MobileDashboardPro() {
                  : user?.email)}
             </p>
           </MobileCard>
+
+          {/* Pro Upgrade Status - показываем только если есть pending заявка */}
+          {hasPendingProRequest && (
+            <ProUpgradeStatusCard userId={user?.id || ''} />
+          )}
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-4">

@@ -9,7 +9,6 @@ import { useMobile } from "@/mobile/providers/MobileProvider";
 import { Seo } from "@/components/Seo";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
-import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -606,9 +605,7 @@ export default function MobileDashboardClient() {
               </div>
 
               {/* Role Upgrade */}
-              {hasPendingProRequest ? (
-                <ProUpgradeStatusCard userId={user?.id || ''} />
-              ) : (
+              {!hasPendingProRequest && (
                 <MobileCard>
                   <RoleUpgrade
                     userId={user?.id || ''}

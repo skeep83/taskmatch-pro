@@ -25,6 +25,28 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
 
   useEffect(() => {
     loadUpgradeStatus();
+    
+    // Настройка реального времени для отслеживания изменений статуса
+    const channel = supabase
+      .channel('pro_upgrade_requests_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'pro_upgrade_requests',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('ProUpgradeStatusCard: Status updated:', payload);
+          loadUpgradeStatus();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userId]);
 
   const loadUpgradeStatus = async () => {
@@ -61,8 +83,9 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
     );
   }
 
-  if (!request) {
-    return null; // No request found
+  // Скрыть карточку если заявка одобрена или если заявки нет
+  if (!request || request.status === 'approved') {
+    return null;
   }
 
   const getStatusConfig = () => {
