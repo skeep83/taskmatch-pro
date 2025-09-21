@@ -47,6 +47,7 @@ function MobileIndex() {
       <MobileHeader 
         showNotifications 
         showSearch 
+        showLogout
       />
 
       {/* Hero section с neumorphic дизайном */}
