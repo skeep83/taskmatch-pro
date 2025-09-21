@@ -35,88 +35,85 @@ export function MobileBottomNav() {
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={cn(
         "fixed bottom-0 left-0 right-0 z-50",
-        "bg-background/95 backdrop-blur-xl border-t border-border/40",
-        "supports-[backdrop-filter]:bg-background/60"
+        "bg-[#E5E7EB]"
       )}
       style={{ 
         height: bottomNavHeight + safeAreaInsets.bottom,
         paddingBottom: safeAreaInsets.bottom 
       }}
     >
-      {/* Top gradient line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-      
-      <nav className="flex items-center justify-around h-20 px-2">
-        {navItems.map((item, index) => {
-          const isActive = location.pathname === item.path;
-          const Icon = item.icon;
-          
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex flex-col items-center justify-center relative",
-                "min-w-[64px] h-16 rounded-2xl transition-all duration-300",
-                "touch-manipulation select-none",
-                isActive 
-                  ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {/* Active indicator */}
-              {isActive && (
-                <motion.div
-                  layoutId="activeTab"
-                  className="absolute inset-0 bg-primary/10 rounded-2xl"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
-              
-              {/* Special styling for create button */}
-              {item.label === 'Создать' ? (
-                <motion.div
-                  whileTap={{ scale: 0.9 }}
-                  className={cn(
-                    "flex flex-col items-center justify-center",
-                    "w-12 h-12 mb-1 rounded-full",
-                    "bg-gradient-to-br from-primary to-primary/80",
-                    "text-primary-foreground shadow-lg shadow-primary/25"
-                  )}
-                >
-                  <Icon size={24} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  whileTap={{ scale: 0.9 }}
-                  className="flex flex-col items-center justify-center relative z-10"
-                >
-                  <Icon 
-                    size={24} 
-                    className={cn(
-                      "mb-1 transition-all duration-300",
-                      isActive && "drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]"
-                    )} 
+      {/* Neumorphic container */}
+      <div className="p-2 h-full bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+        <nav className="flex items-center justify-around h-16">
+          {navItems.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            const Icon = item.icon;
+            
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "relative flex flex-col items-center justify-center gap-1",
+                  "min-w-[60px] h-14 rounded-xl transition-all duration-300",
+                  "touch-manipulation select-none text-gray-700",
+                  "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]",
+                  isActive && "shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-gray-800"
+                )}
+              >
+                {/* Active indicator */}
+                {isActive && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                    style={{ backgroundColor: "#22D3EE" }}
                   />
-                  <span className={cn(
-                    "text-xs font-medium transition-all duration-300",
-                    isActive ? "opacity-100" : "opacity-70"
-                  )}>
-                    {item.label}
-                  </span>
-                </motion.div>
-              )}
+                )}
+                
+                {/* Special styling for create button */}
+                {item.label === 'Создать' ? (
+                  <motion.div
+                    whileTap={{ scale: 0.9 }}
+                    className={cn(
+                      "flex flex-col items-center justify-center",
+                      "w-8 h-8 mb-1 rounded-full",
+                      "bg-gradient-to-br from-primary to-primary/80",
+                      "text-primary-foreground shadow-lg shadow-primary/25"
+                    )}
+                  >
+                    <Icon size={18} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    whileTap={{ scale: 0.9 }}
+                    className="flex flex-col items-center justify-center relative z-10"
+                  >
+                    <Icon 
+                      size={18} 
+                      className="mb-1 transition-all duration-300" 
+                    />
+                  </motion.div>
+                )}
 
-              {/* Notification badge placeholder */}
-              {item.label === 'Сообщения' && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full flex items-center justify-center">
-                  <span className="text-destructive-foreground text-xs font-bold">3</span>
-                </div>
-              )}
-            </NavLink>
-          );
-        })}
-      </nav>
+                <span className={cn(
+                  "text-xs font-medium transition-all duration-300",
+                  isActive ? "opacity-100" : "opacity-70"
+                )}>
+                  {item.label}
+                </span>
+
+                {/* Notification badge placeholder */}
+                {item.label === 'Сообщения' && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center">
+                    <span className="text-destructive-foreground text-xs font-bold">3</span>
+                  </div>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+      </div>
     </motion.div>
   );
 }
