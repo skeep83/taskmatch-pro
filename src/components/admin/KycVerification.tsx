@@ -447,10 +447,26 @@ export const AdminKycVerification = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               {getDocumentStatusBadge(doc.status)}
-                              <Button variant="ghost" size="sm" asChild>
-                                <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
-                                  <Eye className="w-4 h-4" />
-                                </a>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => {
+                                  // Create a signed URL for viewing the document
+                                  supabase.storage
+                                    .from('kyc')
+                                    .createSignedUrl(doc.file_url.split('/kyc/')[1], 300)
+                                    .then(({ data, error }) => {
+                                      if (error) {
+                                        console.error('Error creating signed URL:', error);
+                                        // Fallback to direct URL
+                                        window.open(doc.file_url, '_blank');
+                                      } else {
+                                        window.open(data.signedUrl, '_blank');
+                                      }
+                                    });
+                                }}
+                              >
+                                <Eye className="w-4 h-4" />
                               </Button>
                             </div>
                           </div>
