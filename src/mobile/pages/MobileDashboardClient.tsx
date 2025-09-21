@@ -206,6 +206,10 @@ export default function MobileDashboardClient() {
           pro_id,
           categories!inner (
             label_ru
+          ),
+          job_photos (
+            id,
+            file_url
           )
         `)
         .eq("client_id", user.id)
