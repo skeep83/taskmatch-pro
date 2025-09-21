@@ -614,12 +614,11 @@ const Messages = () => {
         )}>
           {selectedChatId ? (
             <>
-              {/* Debug info */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="p-2 bg-yellow-100 text-xs">
-                  Debug: selectedChatId={selectedChatId}, userId={userId}, selectedChat={selectedChat?.id}, canSend={!!(selectedChatId && userId && selectedChat)}
-                </div>
-              )}
+              {/* Debug info - всегда показываем */}
+              <div className="p-2 bg-yellow-100 text-xs border-b">
+                Debug: selectedChatId={selectedChatId}, userId={userId}, selectedChat={selectedChat?.id}, 
+                chatsCount={chats.length}, canSend={!!(selectedChatId && userId && selectedChat)}
+              </div>
               {/* Chat Header */}
               <div className="p-4 border-b bg-muted/30">
                 <div className="flex items-center gap-3">
@@ -659,7 +658,7 @@ const Messages = () => {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20 lg:pb-4">
                 {messages.length === 0 ? (
                   <div className="text-center text-muted-foreground py-8">
                     {t('messages.no_messages', 'Нет сообщений')}
@@ -728,32 +727,34 @@ const Messages = () => {
                 )}
               </div>
 
-              {/* Message Input */}
-              <div className="p-4 border-t bg-muted/30">
-                <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder={t('messages.type_message', 'Введите сообщение...')}
-                    className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background min-h-[44px]"
-                    disabled={!selectedChatId || !userId}
-                    autoFocus
-                    onFocus={(e) => {
-                      // Прокрутка к input полю на мобильных устройствах
-                      setTimeout(() => {
-                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }, 100);
-                    }}
-                  />
-                  <Button 
-                    type="submit" 
-                    disabled={!text.trim() || !selectedChatId || !userId}
-                    className="min-h-[44px] min-w-[44px]"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </form>
+              {/* Message Input - ВСЕГДА ПОКАЗЫВАЕМ */}
+              <div className="p-4 border-t bg-muted/30 fixed bottom-0 left-0 right-0 lg:relative lg:bottom-auto">
+                <div className="max-w-full mx-auto">
+                  <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      placeholder="Введите сообщение..."
+                      className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background min-h-[44px]"
+                      disabled={false}
+                      autoFocus
+                      onFocus={(e) => {
+                        // Прокрутка к input полю на мобильных устройствах
+                        setTimeout(() => {
+                          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                      }}
+                    />
+                    <Button 
+                      type="submit" 
+                      disabled={!text.trim()}
+                      className="min-h-[44px] min-w-[44px]"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </form>
+                </div>
               </div>
             </>
           ) : (
