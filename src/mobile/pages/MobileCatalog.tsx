@@ -8,6 +8,7 @@ import { MobileCard } from '../components/ui/MobileCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useMobile } from '../providers/MobileProvider';
+import { supabase } from '@/integrations/supabase/client';
 
 const categories = [
   { id: '1', name: 'Сантехника', icon: '🔧' },
@@ -18,52 +19,71 @@ const categories = [
   { id: '6', name: 'Красота', icon: '💄' },
 ];
 
-const mockJobs = [
-  {
-    id: '1',
-    title: 'Ремонт крана в ванной',
-    description: 'Течет кран в ванной комнате, нужна замена картриджа',
-    budget_min: 200,
-    budget_max: 500,
-    location: 'Кишинев, Центр',
-    created_at: new Date().toISOString(),
-    category_name: 'Сантехника',
-    client_name: 'Мария И.',
-    client_rating: 4.8,
-    urgency: 'high' as const,
-    status: 'active'
-  },
-  {
-    id: '2',
-    title: 'Установка розетки',
-    description: 'Нужно установить новую розетку в гостиной',
-    budget_min: 150,
-    budget_max: 300,
-    location: 'Кишинев, Рышкановка',
-    created_at: new Date().toISOString(),
-    category_name: 'Электрика',
-    client_name: 'Андрей П.',
-    client_rating: 4.9,
-    urgency: 'medium' as const,
-    status: 'active'
-  }
-];
-
 export default function MobileCatalog() {
   const [searchParams] = useSearchParams();
   const { bottomNavHeight, safeAreaInsets } = useMobile();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [jobs, setJobs] = useState(mockJobs);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
 
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        ...(selectedCategory && { category_id: selectedCategory }),
+        ...(searchQuery && { search: searchQuery })
+      });
+
+      const { data, error } = await supabase.functions.invoke('jobs-catalog', {
+        method: 'GET',
+        body: null
+      });
+
+      if (error) {
+        console.error('Error fetching jobs:', error);
+        return;
+      }
+
+      if (data?.jobs) {
+        setJobs(data.jobs);
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, [selectedCategory, searchQuery]);
+
+  useEffect(() => {
+    const delayedSearch = setTimeout(() => {
+      if (searchQuery !== searchParams.get('q')) {
+        fetchJobs();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayedSearch);
+  }, [searchQuery]);
+
   const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId === selectedCategory ? '' : categoryId);
+    const newCategory = categoryId === selectedCategory ? '' : categoryId;
+    setSelectedCategory(newCategory);
   };
 
   const handleJobPress = (jobId: string) => {
     // Navigate to job detail
     console.log('Navigate to job:', jobId);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -91,7 +111,7 @@ export default function MobileCatalog() {
             <Input
               placeholder="Что вам нужно?"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
             />
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
@@ -167,7 +187,7 @@ export default function MobileCatalog() {
           className="flex items-center justify-between mb-4"
         >
           <h3 className="text-lg font-semibold text-gray-800">
-            Найдено {jobs.length} заказов
+            {loading ? 'Загрузка...' : `Найдено ${jobs.length} заказов`}
           </h3>
           <Button className="text-sm bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB] rounded-xl px-3 py-2">
             <Filter size={16} className="mr-2" />
@@ -177,32 +197,47 @@ export default function MobileCatalog() {
 
         {/* Jobs List */}
         <div className="space-y-4">
-          {jobs.map((job, index) => (
-            <motion.div
-              key={job.id}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-            >
-              <MobileJobCard
-                job={job}
-                onPress={() => handleJobPress(job.id)}
-              />
-            </motion.div>
-          ))}
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="text-gray-500">Загрузка заказов...</div>
+            </div>
+          ) : jobs.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-gray-500">Заказы не найдены</div>
+            </div>
+          ) : (
+            jobs.map((job, index) => (
+              <motion.div
+                key={job.id}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+              >
+                <MobileJobCard
+                  job={job}
+                  onPress={() => handleJobPress(job.id)}
+                />
+              </motion.div>
+            ))
+          )}
         </div>
 
         {/* Load More */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8 text-center"
-        >
-          <Button className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
-            Загрузить еще
-          </Button>
-        </motion.div>
+        {!loading && jobs.length > 0 && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8 text-center"
+          >
+            <Button 
+              onClick={fetchJobs}
+              className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]"
+            >
+              Обновить
+            </Button>
+          </motion.div>
+        )}
       </div>
     </div>
   );
