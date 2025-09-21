@@ -39,7 +39,7 @@ serve(async (req: Request) => {
         created_at,
         urgency,
         status,
-        categories!inner(name),
+        categories!inner(label_ru, label_ro),
         profiles!jobs_client_id_fkey(
           full_name,
           first_name,
@@ -111,7 +111,7 @@ serve(async (req: Request) => {
         budget_max: job.budget_max_cents ? Math.round(job.budget_max_cents / 100) : null,
         location: job.location_address || '',
         created_at: job.created_at,
-        category_name: category?.name || '',
+        category_name: category?.label_ru || category?.label_ro || '',
         client_name: profile?.full_name || 
                     (profile?.first_name && profile?.last_name 
                       ? `${profile.first_name} ${profile.last_name.charAt(0)}.`
