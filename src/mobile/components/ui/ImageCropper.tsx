@@ -86,31 +86,32 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw image to fill canvas while maintaining aspect ratio
+    // Draw original image
     ctx.drawImage(image, 0, 0, canvasSize.width, canvasSize.height);
 
-    // Save the context state
-    ctx.save();
-
-    // Create circular clipping path for clear area
+    // Calculate crop area
     const centerX = cropArea.x + cropArea.width / 2;
     const centerY = cropArea.y + cropArea.height / 2;
     const radius = cropArea.width / 2;
 
-    // First, draw dark overlay on everything
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    // Create mask: draw everything dark except the circle
+    ctx.save();
+    
+    // Fill entire canvas with dark overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Create circular path and use it to clear the overlay (make it transparent)
+    
+    // Cut out the circle (make it transparent)
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.fill();
-
-    // Restore normal composite operation
+    
+    // Reset to normal drawing mode
     ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
 
-    // Draw circular border (white ring around clear area)
+    // Draw circular border
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3;
     ctx.setLineDash([]);
@@ -118,10 +119,10 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.stroke();
 
-    // Draw resize handles (4 cardinal points)
-    const handleSize = 20;
+    // Draw resize handles
+    const handleSize = 16;
     ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#4F46E5';
+    ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 2;
 
     const handles = [
@@ -138,32 +139,29 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       ctx.stroke();
     });
 
-    // Draw center crosshair (only visible inside the clear circle)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    
-    // Create clipping path for crosshair (only draw inside circle)
+    // Draw subtle crosshair inside the clear area
     ctx.save();
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius - 2, 0, 2 * Math.PI);
+    ctx.arc(centerX, centerY, radius - 3, 0, 2 * Math.PI);
     ctx.clip();
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
     
     // Vertical line
     ctx.beginPath();
-    ctx.moveTo(centerX, centerY - radius + 15);
-    ctx.lineTo(centerX, centerY + radius - 15);
+    ctx.moveTo(centerX, centerY - 30);
+    ctx.lineTo(centerX, centerY + 30);
     ctx.stroke();
     
     // Horizontal line
     ctx.beginPath();
-    ctx.moveTo(centerX - radius + 15, centerY);
-    ctx.lineTo(centerX + radius - 15, centerY);
+    ctx.moveTo(centerX - 30, centerY);
+    ctx.lineTo(centerX + 30, centerY);
     ctx.stroke();
     
-    ctx.restore(); // Restore clipping path
-
-    ctx.restore(); // Restore the main context state
+    ctx.restore();
 
   }, [image, cropArea, canvasSize]);
 
