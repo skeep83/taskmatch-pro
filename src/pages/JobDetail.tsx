@@ -603,49 +603,43 @@ const JobDetail = () => {
             Подробная информация о заказе
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6 mt-8">
-            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-              <Button 
-                variant="ghost" 
-                onClick={() => {
-                  if (userRole === 'pro') {
-                    navigate('/dashboard/pro');
-                  } else if (userRole === 'client') {
-                    navigate('/dashboard/client');
-                  } else {
-                    navigate('/feed');
-                  }
-                }} 
-                className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151] w-full sm:w-auto"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Назад
-              </Button>
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-6 mt-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                if (userRole === 'pro') {
+                  navigate('/dashboard/pro');
+                } else if (userRole === 'client') {
+                  navigate('/dashboard/client');
+                } else {
+                  navigate('/feed');
+                }
+              }} 
+              className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Назад
+            </Button>
             
             {/* Edit and Delete buttons for job owner */}
             {canEdit && (
               <div className="flex items-center gap-4 justify-center">
-                <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-                  <Button 
-                    variant="ghost" 
-                    onClick={handleEditJob} 
-                    className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151]"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Редактировать
-                  </Button>
-                </div>
-                <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-                  <Button 
-                    variant="destructive" 
-                    onClick={handleDeleteJob}
-                    className="bg-red-500 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:bg-red-600 rounded-xl"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Удалить
-                  </Button>
-                </div>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleEditJob} 
+                  className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Редактировать
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDeleteJob}
+                  className="px-6 py-3 bg-red-500 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:bg-red-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-white border-none"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Удалить
+                </Button>
               </div>
             )}
           </div>
