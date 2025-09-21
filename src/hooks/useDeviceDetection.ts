@@ -12,7 +12,7 @@ export interface DeviceInfo {
   hasTouch: boolean;
 }
 
-const MOBILE_BREAKPOINT = 768;
+const MOBILE_BREAKPOINT = 1024; // Увеличили для планшетов
 const TABLET_BREAKPOINT = 1024;
 
 export function useDeviceDetection(): DeviceInfo {

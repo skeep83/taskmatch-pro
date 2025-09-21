@@ -101,7 +101,14 @@ const AppContent = () => {
             <Route path="/job/:id" element={<JobDetail />} />
             <Route path="/job/:id/edit" element={<JobEdit />} />
             <Route path="/job/new" element={
-              isMobile ? <MobileJobNew /> : <JobNew />
+              <>
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="fixed top-2 right-2 z-50 bg-red-500 text-white px-2 py-1 text-xs rounded">
+                    {isMobile ? 'Mobile' : 'Desktop'} ({window.innerWidth}px)
+                  </div>
+                )}
+                {isMobile ? <MobileJobNew /> : <JobNew />}
+              </>
             } />
             <Route path="/dashboard/client" element={
               isMobile ? <MobileDashboardClient /> : <DashboardClient />
