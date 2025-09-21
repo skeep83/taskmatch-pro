@@ -21,6 +21,7 @@ export const ErrorLogsTester = () => {
   const { toast } = useToast();
   const [isCreating, setIsCreating] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [logsCleared, setLogsCleared] = useState(false);
 
   const testLogs: TestLog[] = [
     {
@@ -137,6 +138,7 @@ export const ErrorLogsTester = () => {
         title: "Логи очищены",
         description: "Все логи ошибок успешно удалены",
       });
+      setLogsCleared(true);
     } catch (error) {
       console.error('Failed to clear logs:', error);
       toast({
@@ -198,13 +200,14 @@ export const ErrorLogsTester = () => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Предварительный просмотр тестовых данных</CardTitle>
-          <CardDescription>
-            Эти записи будут созданы в системе логов ошибок
-          </CardDescription>
-        </CardHeader>
+      {!logsCleared && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Предварительный просмотр тестовых данных</CardTitle>
+            <CardDescription>
+              Эти записи будут созданы в системе логов ошибок
+            </CardDescription>
+          </CardHeader>
         <CardContent>
           <ScrollArea className="h-96">
             <div className="space-y-3">
@@ -247,6 +250,7 @@ export const ErrorLogsTester = () => {
           </ScrollArea>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 };
