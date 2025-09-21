@@ -543,12 +543,29 @@ export default function ProfileSettings() {
                       </div>
                     </div>
 
-                    {categories.length > 0 && (
-                      <div className="space-y-3">
-                        <Label>Категории услуг</Label>
-                        <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto p-3 border rounded-md">
+                    <Separator className="my-6" />
+
+                    {/* Categories Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-lg font-medium">Категории услуг</Label>
+                        <span className="text-sm text-muted-foreground">
+                          Выбрано: {selectedCategories.length}
+                        </span>
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        Выберите категории услуг, которые вы предоставляете. Это поможет клиентам найти вас.
+                      </p>
+
+                      {categories.length === 0 ? (
+                        <div className="p-4 border border-dashed border-border rounded-lg text-center">
+                          <p className="text-muted-foreground">Загружаем категории...</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto p-4 border rounded-lg bg-muted/20">
                           {categories.map((category) => (
-                            <div key={category.id} className="flex items-center space-x-2">
+                            <div key={category.id} className="flex items-center space-x-3 p-2 rounded hover:bg-background/50 transition-colors">
                               <Checkbox
                                 id={`category-${category.id}`}
                                 checked={selectedCategories.includes(category.id)}
@@ -556,15 +573,36 @@ export default function ProfileSettings() {
                               />
                               <Label 
                                 htmlFor={`category-${category.id}`}
-                                className="text-sm cursor-pointer flex-1"
+                                className="text-sm cursor-pointer flex-1 font-medium"
                               >
                                 {category.name || category.name_ro}
                               </Label>
                             </div>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+
+                      {selectedCategories.length > 0 && (
+                        <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
+                          <p className="text-sm font-medium text-success mb-2">
+                            Выбранные категории ({selectedCategories.length}):
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedCategories.map((catId) => {
+                              const category = categories.find(c => c.id === catId);
+                              return category ? (
+                                <span 
+                                  key={catId}
+                                  className="px-2 py-1 bg-success/20 text-success text-xs rounded-full"
+                                >
+                                  {category.name || category.name_ro}
+                                </span>
+                              ) : null;
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
