@@ -194,6 +194,41 @@ export const ImageMetadataViewer = ({ imageUrl, onMetadataExtracted }: ImageMeta
     return indicators;
   };
 
+  const getManipulationReasons = (): string[] => {
+    const reasons: string[] = [];
+    
+    if (!metadata?.camera?.make && !metadata?.camera?.model) {
+      reasons.push("Отсутствует информация о камере");
+    } else if (!metadata?.camera?.make) {
+      reasons.push("Не указан производитель камеры");
+    } else if (!metadata?.camera?.model) {
+      reasons.push("Не указана модель камеры");
+    }
+    
+    if (!metadata?.settings?.iso && !metadata?.settings?.aperture && !metadata?.settings?.shutterSpeed) {
+      reasons.push("Отсутствуют настройки съемки");
+    }
+    
+    if (!metadata?.dateTime?.taken) {
+      reasons.push("Нет данных о времени съемки");
+    }
+    
+    if (metadata?.technical?.compression && metadata.technical.compression !== "Uncompressed") {
+      reasons.push("Изображение сжато (возможно пересохранено)");
+    }
+    
+    if (metadata?.camera?.software && (
+      metadata.camera.software.toLowerCase().includes("photoshop") ||
+      metadata.camera.software.toLowerCase().includes("gimp") ||
+      metadata.camera.software.toLowerCase().includes("paint") ||
+      metadata.camera.software.toLowerCase().includes("editor")
+    )) {
+      reasons.push(`Обработано в редакторе: ${metadata.camera.software}`);
+    }
+    
+    return reasons;
+  };
+
   const formatFileSize = (bytes?: number): string => {
     if (!bytes) return 'Неизвестно';
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -323,18 +358,33 @@ export const ImageMetadataViewer = ({ imageUrl, onMetadataExtracted }: ImageMeta
             </div>
             <div>
               <span className="text-muted-foreground">Формат:</span>
-              <p className="font-medium">{metadata.format || 'Неизвестно'}</p>
+              <p className="font-medium">{metadata.format || "Неизвестно"}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Разрешение:</span>
               <p className="font-medium">
                 {metadata.dimensions ? 
                   `${metadata.dimensions.width} × ${metadata.dimensions.height}` : 
-                  'Неизвестно'
+                  "Неизвестно"
                 }
               </p>
             </div>
           </div>
+          
+          {/* Manipulation reasons */}
+          {getManipulationReasons().length > 0 && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <h4 className="font-medium text-yellow-800 mb-2">Признаки возможного редактирования:</h4>
+              <ul className="space-y-1 text-sm text-yellow-700">
+                {getManipulationReasons().map((reason, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-yellow-600 mt-0.5">•</span>
+                    <span>{reason}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </CardContent>
       </Card>
 
