@@ -557,50 +557,49 @@ export default function MobileMessages() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ОТЛАДКА: Message input - ВСЕГДА ВИДИМО */}
+      {/* Message input */}
       <div 
-        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-[9999] bg-red-500"
+        className="fixed bottom-0 left-0 right-0 px-4 py-4 z-[9999]"
         style={{ 
           paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
-          boxShadow: '0 -8px 20px rgba(0,0,0,0.5)',
-          minHeight: '80px'
+          background: 'linear-gradient(145deg, #E8ECF0, #D6DCE5)',
+          boxShadow: '0 -8px 25px rgba(0,0,0,0.15)'
         }}
       >
-        <div className="text-white text-xs mb-2 text-center">
-          ОТЛАДКА: sendMessage функция = {typeof sendMessage}, text = "{text}", длина = {text.length}
-        </div>
         <div className="flex gap-3 items-end">
           <div 
             className="flex-1 bg-white rounded-2xl p-1"
             style={{ 
-              boxShadow: 'inset 6px 6px 12px #D1D5DB, inset -6px -6px 12px #FFFFFF',
-              minHeight: '50px'
+              boxShadow: 'inset 8px 8px 16px #D1D5DB, inset -8px -8px 16px #FFFFFF'
             }}
           >
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyPress={(e) => {
-                console.log('Key pressed:', e.key);
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  console.log('Sending message:', text);
                   sendMessage();
                 }
               }}
-              placeholder="ТЕСТ поле ввода..."
+              placeholder="Написать сообщение..."
               className="w-full border-0 bg-transparent text-base min-h-[48px] px-4 py-3 rounded-[16px] focus:outline-none placeholder:text-gray-500"
-              style={{ fontSize: '16px', backgroundColor: 'yellow' }}
+              style={{ fontSize: '16px' }}
             />
           </div>
           <button
-            onClick={() => {
-              console.log('Button clicked, text:', text);
-              sendMessage();
+            onClick={sendMessage}
+            disabled={!text.trim()}
+            className="w-12 h-12 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200"
+            style={{ 
+              background: text.trim() 
+                ? 'linear-gradient(135deg, #7C3AED, #A855F7)' 
+                : 'linear-gradient(145deg, #E8ECF0, #D6DCE5)',
+              boxShadow: text.trim() 
+                ? '8px 8px 16px #BCBDC1, -8px -8px 16px #FFFFFF' 
+                : 'inset 6px 6px 12px #D1D5DB, inset -6px -6px 12px #FFFFFF',
+              color: text.trim() ? 'white' : '#7C3AED'
             }}
-            disabled={false}
-            className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 bg-blue-500 text-white"
-            style={{ minHeight: '48px', minWidth: '48px' }}
           >
             <Send size={18} />
           </button>
