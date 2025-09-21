@@ -429,13 +429,17 @@ export default function MobileFeed() {
                         {job.job_photos.slice(0, 3).map((photo, index) => (
                           <img
                             key={index}
-                            src={photo.file_url}
+                            src={`https://adstlhdgegtkvtgklkyx.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
                             alt="Фото заказа"
-                            className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                            className="w-16 h-16 object-cover rounded-lg border border-border"
+                            onError={(e) => {
+                              console.log("Failed to load image:", photo.file_url);
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         ))}
-                        {job.job_photos.length > 3 && (
-                          <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                         {job.job_photos.length > 3 && (
+                          <div className="w-16 h-16 bg-muted rounded-lg border border-border flex items-center justify-center">
                             <span className="text-xs text-muted-foreground">
                               +{job.job_photos.length - 3}
                             </span>
