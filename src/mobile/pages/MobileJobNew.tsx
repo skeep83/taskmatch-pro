@@ -452,7 +452,7 @@ const MobileJobNew = () => {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between items-center pt-4 pb-32 safe-bottom">{/* увеличил pb до 32 для большего отступа от нижней навигации */}
+        <div className="flex justify-between items-center pt-4 pb-40 safe-bottom">{/* увеличил pb до 40 для еще большего отступа от нижней навигации */}
           {step > 1 ? (
             <button
               type="button"
