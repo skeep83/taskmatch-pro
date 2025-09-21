@@ -4,11 +4,28 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { RoleGuard } from "@/components/RoleGuard";
+import { Seo } from "@/components/Seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
-import { Building2, User, Calendar, Settings, BarChart3, Users, FileText, Briefcase, UserPlus, Gavel, ArrowLeft } from "lucide-react";
+import { 
+  Building2, 
+  User, 
+  Calendar, 
+  Settings, 
+  BarChart3, 
+  Users, 
+  FileText, 
+  Briefcase, 
+  UserPlus, 
+  Gavel, 
+  ArrowLeft,
+  Plus,
+  Crown,
+  CreditCard,
+  DollarSign
+} from "lucide-react";
 import { BusinessAccountForm } from "@/components/business/BusinessAccountForm";
 import { BusinessMembers } from "@/components/business/BusinessMembers";
 import { BusinessJobs } from "@/components/business/BusinessJobs";
@@ -68,7 +85,8 @@ export default function DashboardBusiness() {
 
   return (
     <RoleGuard requiredRole="business">
-      <main className="min-h-screen bg-background">
+      <Seo title="ServiceHub — Бизнес-панель" description="Управление корпоративным аккаунтом" canonical="/dashboard/business" />
+      <main className="min-h-screen">
         {/* Mobile Header */}
         {isMobile && (
           <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b px-4 py-3">
@@ -101,10 +119,10 @@ export default function DashboardBusiness() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 lg:space-y-8">
-            <div className={`p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] ${isMobile ? 'overflow-x-auto' : ''}`}>
-              <TabsList className={`${isMobile ? 'flex w-max min-w-full' : 'grid w-full grid-cols-6'} bg-transparent gap-1`}>
-                <TabsTrigger value="overview" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800 ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <BarChart3 className="h-4 w-4" />
+            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+              <TabsList className={`${isMobile ? 'flex w-max min-w-full' : 'grid w-full grid-cols-6'} bg-transparent`}>
+                <TabsTrigger value="overview" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
+                  <User className="h-5 w-5 text-black" />
                   <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Обзор</span>
                   {activeTab === "overview" && (
                     <motion.div
@@ -115,8 +133,8 @@ export default function DashboardBusiness() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="company" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800 ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <Building2 className="h-4 w-4" />
+                <TabsTrigger value="company" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
+                  <Building2 className="h-5 w-5 text-black" />
                   <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Компания</span>
                   {activeTab === "company" && (
                     <motion.div
@@ -127,8 +145,8 @@ export default function DashboardBusiness() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="jobs" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800 ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <Briefcase className="h-4 w-4" />
+                <TabsTrigger value="jobs" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
+                  <Briefcase className="h-5 w-5 text-black" />
                   <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Заказы</span>
                   {activeTab === "jobs" && (
                     <motion.div
@@ -139,8 +157,8 @@ export default function DashboardBusiness() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="tenders" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800 ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <Gavel className="h-4 w-4" />
+                <TabsTrigger value="tenders" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
+                  <Gavel className="h-5 w-5 text-black" />
                   <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Тендеры</span>
                   {activeTab === "tenders" && (
                     <motion.div
@@ -151,8 +169,8 @@ export default function DashboardBusiness() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="invoices" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800 ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <FileText className="h-4 w-4" />
+                <TabsTrigger value="invoices" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
+                  <FileText className="h-5 w-5 text-black" />
                   <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Инвойсы</span>
                   {activeTab === "invoices" && (
                     <motion.div
@@ -163,8 +181,8 @@ export default function DashboardBusiness() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 data-[state=active]:text-gray-800 ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
-                  <BarChart3 className="h-4 w-4" />
+                <TabsTrigger value="analytics" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
+                  <BarChart3 className="h-5 w-5 text-black" />
                   <span className={isMobile ? "text-sm" : "hidden sm:inline"}>Аналитика</span>
                   {activeTab === "analytics" && (
                     <motion.div
@@ -181,95 +199,110 @@ export default function DashboardBusiness() {
             <TabsContent value="overview" className="space-y-4 lg:space-y-8">
               {/* Quick Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                <div className="card-surface p-4 lg:p-6">
+                <div className="p-4 lg:p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Общие расходы</p>
-                      <p className="text-xl lg:text-2xl font-bold">$0.00</p>
+                      <p className="text-xl lg:text-2xl font-bold text-black">$0.00</p>
                     </div>
-                    <NeumorphicIcon icon={BarChart3} size={isMobile ? 48 : 64} variant="behance" />
+                    <NeumorphicIcon icon={DollarSign} size={isMobile ? 48 : 64} variant="behance" />
                   </div>
                 </div>
 
-                <div className="card-surface p-4 lg:p-6">
+                <div className="p-4 lg:p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Сотрудников</p>
-                      <p className="text-xl lg:text-2xl font-bold">0</p>
+                      <p className="text-xl lg:text-2xl font-bold text-black">0</p>
                     </div>
                     <NeumorphicIcon icon={Users} size={isMobile ? 48 : 64} variant="behance" />
                   </div>
                 </div>
 
-                <div className="card-surface p-4 lg:p-6">
+                <div className="p-4 lg:p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Заказов</p>
-                      <p className="text-xl lg:text-2xl font-bold">0</p>
+                      <p className="text-xl lg:text-2xl font-bold text-black">0</p>
                     </div>
                     <NeumorphicIcon icon={Briefcase} size={isMobile ? 48 : 64} variant="behance" />
                   </div>
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                <button 
+              {/* Quick Actions - Business Style */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
                   className="p-4 lg:p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => navigate("/job/new")}
                 >
-                  <div className="flex flex-col items-center gap-3 lg:gap-4 text-center">
-                    <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                      <Building2 className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
+                  <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <Plus className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-gray-800 text-sm lg:text-base">Создать заказ</h3>
-                      <p className="text-xs lg:text-sm text-gray-600">Для компании</p>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">Создать заказ</h3>
                     </div>
                   </div>
-                </button>
+                </motion.div>
 
-                <button 
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
                   className="p-4 lg:p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => setActiveTab("invoices")}
                 >
-                  <div className="flex flex-col items-center gap-3 lg:gap-4 text-center">
-                    <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                      <FileText className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
+                  <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <CreditCard className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-gray-800 text-sm lg:text-base">Создать инвойс</h3>
-                      <p className="text-xs lg:text-sm text-gray-600">Финансы</p>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">Инвойсы</h3>
                     </div>
                   </div>
-                </button>
+                </motion.div>
 
-                <button 
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
                   className="p-4 lg:p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
                   onClick={() => setActiveTab("analytics")}
                 >
-                  <div className="flex flex-col items-center gap-3 lg:gap-4 text-center">
-                    <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
-                      <BarChart3 className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
+                  <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <BarChart3 className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-gray-800 text-sm lg:text-base">Посмотреть отчеты</h3>
-                      <p className="text-xs lg:text-sm text-gray-600">Аналитика</p>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">Аналитика</h3>
                     </div>
                   </div>
-                </button>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="p-4 lg:p-6 cursor-pointer transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
+                  onClick={() => setActiveTab("company")}
+                >
+                  <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                      <Building2 className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">Настройки</h3>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
 
               {/* Welcome Message */}
-              <div className="card-surface p-4 lg:p-8">
-                <h2 className="text-lg lg:text-2xl font-semibold mb-3 lg:mb-4">Добро пожаловать в ServiceHub Business!</h2>
+              <div className="p-4 lg:p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+                <h2 className="text-lg lg:text-2xl font-semibold mb-3 lg:mb-4 text-black">Добро пожаловать в ServiceHub Business!</h2>
                 <p className="text-muted-foreground mb-4 lg:mb-6 text-sm lg:text-base">
                   Управляйте заказами компании, контролируйте расходы и координируйте команду в одном месте.
                 </p>
                 <div className="space-y-2 lg:space-y-3">
-                  <p className="text-xs lg:text-sm"><strong>1.</strong> Настройте данные компании во вкладке "Компания"</p>
-                  <p className="text-xs lg:text-sm"><strong>2.</strong> Создавайте заказы и отслеживайте прогресс</p>
-                  <p className="text-xs lg:text-sm"><strong>3.</strong> Контролируйте финансы через инвойсы и аналитику</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>1.</strong> Настройте данные компании во вкладке "Компания"</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>2.</strong> Создавайте заказы и отслеживайте прогресс</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>3.</strong> Контролируйте финансы через инвойсы и аналитику</p>
                 </div>
               </div>
             </TabsContent>
