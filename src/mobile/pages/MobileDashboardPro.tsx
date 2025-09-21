@@ -130,6 +130,7 @@ export default function MobileDashboardPro() {
         <MobileHeader 
           title="Кабинет специалиста"
           showBack={false}
+          showLogout={true}
           showNotifications={true}
           showDashboardSelector={true}
           dashboardOptions={getDashboardOptions()}

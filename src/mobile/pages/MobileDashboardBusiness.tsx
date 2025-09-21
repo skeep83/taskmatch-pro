@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { RoleGuard } from "@/components/RoleGuard";
 import { MobileCard } from "@/mobile/components/ui/MobileCard";
+import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
+import { useMobile } from "@/mobile/providers/MobileProvider";
 import { 
   Building2, 
   Users, 
@@ -37,6 +39,7 @@ const tabItems = [
 export default function MobileDashboardBusiness() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { safeAreaInsets } = useMobile();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -171,13 +174,18 @@ export default function MobileDashboardBusiness() {
 
   return (
     <RoleGuard requiredRole="business">
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-4 pb-20">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gradient mb-2">Бизнес-панель</h1>
-            <p className="text-sm text-gray-600">Управление корпоративным аккаунтом</p>
-          </div>
+      <div className="min-h-screen bg-[#E5E7EB]">
+        <MobileHeader 
+          title="Бизнес-панель"
+          showBack={false}
+          showLogout={true}
+          showNotifications={true}
+        />
+        
+        <div 
+          className="pt-20 pb-24 px-4"
+          style={{ paddingTop: `${80 + safeAreaInsets.top}px` }}
+        >
 
           {/* Horizontal Tab Navigation */}
           <div className="overflow-x-auto mb-6">
