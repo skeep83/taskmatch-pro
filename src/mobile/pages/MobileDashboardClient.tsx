@@ -654,9 +654,13 @@ export default function MobileDashboardClient() {
                         
                         {/* Job Photos */}
                         {(() => {
-                          console.log('Job photos for job:', job.id, job.job_photos);
-                          return job.job_photos && job.job_photos.length > 0;
-                        })() && (
+                          console.log('Rendering job card for:', job.id);
+                          console.log('Job photos:', job.job_photos);
+                          console.log('Has photos:', job.job_photos && job.job_photos.length > 0);
+                          return true;
+                        })()}
+                        
+                        {job.job_photos && job.job_photos.length > 0 && (
                           <div className="mb-3">
                             <div className="flex items-center gap-1 mb-2">
                               <Camera className="h-3 w-3 text-gray-500" />
