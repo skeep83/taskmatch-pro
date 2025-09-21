@@ -89,24 +89,28 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     // Draw image to fill canvas while maintaining aspect ratio
     ctx.drawImage(image, 0, 0, canvasSize.width, canvasSize.height);
 
-    // Draw dark overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Save the context state
+    ctx.save();
 
-    // Create circular crop area (punch hole effect)
+    // Create circular clipping path for clear area
     const centerX = cropArea.x + cropArea.width / 2;
     const centerY = cropArea.y + cropArea.height / 2;
     const radius = cropArea.width / 2;
 
+    // First, draw dark overlay on everything
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Create circular path and use it to clear the overlay (make it transparent)
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Reset composite operation
+    // Restore normal composite operation
     ctx.globalCompositeOperation = 'source-over';
 
-    // Draw circular border
+    // Draw circular border (white ring around clear area)
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3;
     ctx.setLineDash([]);
@@ -134,22 +138,32 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       ctx.stroke();
     });
 
-    // Draw center crosshair
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    // Draw center crosshair (only visible inside the clear circle)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
     
+    // Create clipping path for crosshair (only draw inside circle)
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius - 2, 0, 2 * Math.PI);
+    ctx.clip();
+    
     // Vertical line
     ctx.beginPath();
-    ctx.moveTo(centerX, centerY - radius + 10);
-    ctx.lineTo(centerX, centerY + radius - 10);
+    ctx.moveTo(centerX, centerY - radius + 15);
+    ctx.lineTo(centerX, centerY + radius - 15);
     ctx.stroke();
     
     // Horizontal line
     ctx.beginPath();
-    ctx.moveTo(centerX - radius + 10, centerY);
-    ctx.lineTo(centerX + radius - 10, centerY);
+    ctx.moveTo(centerX - radius + 15, centerY);
+    ctx.lineTo(centerX + radius - 15, centerY);
     ctx.stroke();
+    
+    ctx.restore(); // Restore clipping path
+
+    ctx.restore(); // Restore the main context state
 
   }, [image, cropArea, canvasSize]);
 
