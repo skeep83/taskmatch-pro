@@ -90,6 +90,12 @@ serve(async (req) => {
       
       case "POST":
         const postData = await req.json();
+        
+        // Check if this is a list request via POST
+        if (postData.action === 'list' || (!postData.action && !postData.userId)) {
+          return await handleGetUsers(supabaseService, url, user.id, postData);
+        }
+        
         return await handleUserAction(supabaseService, postData, user.id, req);
       
       case "PUT":
@@ -112,13 +118,13 @@ serve(async (req) => {
   }
 });
 
-async function handleGetUsers(supabase: any, url: URL, adminId: string) {
-  const action = url.searchParams.get('action') || 'list';
-  const userId = url.searchParams.get('userId');
-  const page = parseInt(url.searchParams.get('page') || '1');
-  const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 100);
-  const search = url.searchParams.get('search') || '';
-  const role = url.searchParams.get('role') || '';
+async function handleGetUsers(supabase: any, url: URL, adminId: string, requestData?: any) {
+  const action = requestData?.action || url.searchParams.get('action') || 'list';
+  const userId = requestData?.userId || url.searchParams.get('userId');
+  const page = parseInt(requestData?.page || url.searchParams.get('page') || '1');
+  const limit = Math.min(parseInt(requestData?.limit || url.searchParams.get('limit') || '50'), 100);
+  const search = requestData?.search || url.searchParams.get('search') || '';
+  const role = requestData?.role || url.searchParams.get('role') || '';
 
   // Log admin action
   await supabase.rpc('log_admin_action', {
@@ -130,7 +136,33 @@ async function handleGetUsers(supabase: any, url: URL, adminId: string) {
 
   switch (action) {
     case 'list': {
-      let query = supabase
+      // First get users from auth schema to get emails
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
+        page,
+        perPage: limit
+      });
+
+      if (authError) {
+        console.error('Error fetching auth users:', authError);
+        return new Response(JSON.stringify({ error: 'Failed to fetch users' }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const userIds = authUsers.users.map(u => u.id);
+      
+      if (userIds.length === 0) {
+        return new Response(JSON.stringify({ 
+          users: [], 
+          pagination: { page, limit, total: 0 }
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Get profile data for these users
+      let profileQuery = supabase
         .from('profiles')
         .select(`
           id, full_name, phone, locale, created_at, updated_at,
@@ -139,18 +171,46 @@ async function handleGetUsers(supabase: any, url: URL, adminId: string) {
           pro_profiles(bio, radius_km, hourly_rate_cents),
           pro_rating_stats(avg_score, rating_count)
         `)
-        .range((page - 1) * limit, page * limit - 1)
-        .order('created_at', { ascending: false });
+        .in('id', userIds);
 
       if (search) {
-        query = query.or(`full_name.ilike.%${search}%,phone.ilike.%${search}%`);
+        profileQuery = profileQuery.or(`full_name.ilike.%${search}%,phone.ilike.%${search}%`);
       }
 
-      if (role) {
-        query = query.eq('user_roles.role', role);
+      const { data: profiles, error: profileError } = await profileQuery;
+
+      if (profileError) {
+        console.error('Error fetching profiles:', profileError);
+        return new Response(JSON.stringify({ error: 'Failed to fetch user profiles' }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      const { data: users, error, count } = await query;
+      // Merge auth and profile data
+      const users = authUsers.users.map(authUser => {
+        const profile = profiles?.find(p => p.id === authUser.id);
+        return {
+          id: authUser.id,
+          email: authUser.email,
+          email_confirmed_at: authUser.email_confirmed_at,
+          created_at: authUser.created_at,
+          updated_at: authUser.updated_at,
+          last_sign_in_at: authUser.last_sign_in_at,
+          ...profile
+        };
+      }).filter(user => {
+        if (role && (!user.user_roles || !user.user_roles.some(r => r.role === role))) {
+          return false;
+        }
+        if (search && user.email && !user.email.toLowerCase().includes(search.toLowerCase()) && 
+            (!user.full_name || !user.full_name.toLowerCase().includes(search.toLowerCase()))) {
+          return false;
+        }
+        return true;
+      });
+
+      const total = users.length;
 
       if (error) {
         console.error('Error fetching users:', error);
@@ -162,7 +222,7 @@ async function handleGetUsers(supabase: any, url: URL, adminId: string) {
 
       return new Response(JSON.stringify({ 
         users, 
-        pagination: { page, limit, total: count }
+        pagination: { page, limit, total }
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

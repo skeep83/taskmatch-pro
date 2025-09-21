@@ -22,16 +22,14 @@ class AdminAPI {
     search?: string;
     role?: string;
   } = {}) {
-    const searchParams = new URLSearchParams({
-      action: 'list',
-      page: String(params.page || 1),
-      limit: String(params.limit || 50),
-      ...(params.search && { search: params.search }),
-      ...(params.role && { role: params.role })
-    });
-
     return this.makeRequest('admin-users', {
-      body: { params: Object.fromEntries(searchParams) }
+      body: {
+        action: 'list',
+        page: params.page || 1,
+        limit: params.limit || 50,
+        ...(params.search && { search: params.search }),
+        ...(params.role && { role: params.role })
+      }
     });
   }
 
