@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
