@@ -452,7 +452,7 @@ const MobileJobNew = () => {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between items-center pt-4 pb-8">
+        <div className="flex justify-between items-center pt-4 pb-24 safe-bottom">{/* добавил pb-24 и safe-bottom для отступа от нижней навигации */}
           {step > 1 ? (
             <button
               type="button"
