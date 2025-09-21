@@ -86,7 +86,7 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
       {/* Bottom row */}
       <div className="flex items-center justify-between">
         {/* Budget */}
-        <div className="flex items-center text-primary font-semibold">
+        <div className="flex items-center font-semibold text-primary">
           <DollarSign size={16} className="mr-1" />
           <span>
             {job.budget_min && job.budget_max 
