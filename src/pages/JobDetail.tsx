@@ -575,7 +575,7 @@ const JobDetail = () => {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-background">
       <Seo 
         title={`Заказ: ${job.title}`} 
         description={job.description} 
@@ -583,9 +583,9 @@ const JobDetail = () => {
       />
 
       {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-4 mb-6">
+      <section className="container mx-auto py-8 md:py-16 lg:py-24 px-4 md:px-6">
+        <div className="text-center mb-8 md:mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <Button variant="outline" onClick={() => {
               if (userRole === 'pro') {
                 navigate('/dashboard/pro');
@@ -594,14 +594,14 @@ const JobDetail = () => {
               } else {
                 navigate('/feed');
               }
-            }} className="card-surface">
+            }} className="card-surface w-full sm:w-auto">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Назад
             </Button>
             
             {/* Edit and Delete buttons for job owner */}
             {canEdit && (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <Button variant="outline" onClick={handleEditJob} className="card-surface">
                   <Edit className="w-4 h-4 mr-2" />
                   Редактировать
@@ -614,26 +614,26 @@ const JobDetail = () => {
             )}
           </div>
           
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-display font-bold mb-4 md:mb-6 text-gradient">
             {job.title}
           </h1>
-          <div className="flex items-center justify-center gap-4 text-lg text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm md:text-base lg:text-lg text-muted-foreground">
             <span>{job.categories.label_ru}</span>
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
             <span>{formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ru })}</span>
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
             {getStatusBadge(job.status)}
           </div>
 
           {/* Client Info Card */}
           {clientProfile && (
-            <div className="card-surface p-6 mb-8">
-              <h3 className="text-xl font-semibold mb-4 flex items-center gap-3">
-                <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+            <div className="card-surface p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md">
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3">
+                <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                 Информация о заказчике
               </h3>
               <div className="flex items-center gap-3">
-                <Avatar className="w-12 h-12">
+                <Avatar className="w-10 h-10 md:w-12 md:h-12">
                   <AvatarImage 
                     src={clientProfile.avatar_url || ''} 
                     alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
@@ -646,15 +646,15 @@ const JobDetail = () => {
                         : 'К')}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                    <h4 className="font-semibold text-sm md:text-base truncate">
                       {clientProfile.full_name || 
                        (clientProfile.first_name && clientProfile.last_name 
                          ? `${clientProfile.first_name} ${clientProfile.last_name}` 
                          : 'Клиент')}
                     </h4>
-                    <Badge variant="secondary" className="text-xs">Клиент</Badge>
+                    <Badge variant="secondary" className="text-xs w-fit">Клиент</Badge>
                   </div>
                   <div>
                     {clientRating && clientRating.count > 0 ? (
@@ -676,29 +676,29 @@ const JobDetail = () => {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
             {/* Job Details */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-6 md:space-y-8">
               {/* Description Card */}
-              <div className="card-surface p-8">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                  <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+              <div className="card-surface p-4 md:p-6 lg:p-8">
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
+                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Описание заказа
                 </h2>
-                <p className="text-muted-foreground whitespace-pre-wrap text-lg leading-relaxed">{job.description}</p>
+                <p className="text-muted-foreground whitespace-pre-wrap text-sm md:text-base lg:text-lg leading-relaxed">{job.description}</p>
               </div>
 
               {/* Details Grid */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {(job.budget_min_cents || job.budget_max_cents) && (
-                  <div className="card-surface p-6">
+                  <div className="card-surface p-4 md:p-6">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
-                        <Euro className="w-5 h-5 text-success" />
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-success/10 flex items-center justify-center">
+                        <Euro className="w-4 h-4 md:w-5 md:h-5 text-success" />
                       </div>
-                      <span className="font-semibold text-lg">Бюджет</span>
+                      <span className="font-semibold text-base md:text-lg">Бюджет</span>
                     </div>
-                    <p className="text-2xl font-bold text-success">
+                    <p className="text-lg md:text-xl lg:text-2xl font-bold text-success">
                       {job.budget_min_cents && job.budget_max_cents
                         ? `${formatPrice(job.budget_min_cents)} - ${formatPrice(job.budget_max_cents)}`
                         : job.budget_min_cents
@@ -711,48 +711,48 @@ const JobDetail = () => {
                 )}
 
                 {job.location_address && (
-                  <div className="card-surface p-6">
+                  <div className="card-surface p-4 md:p-6">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <MapPin className="w-5 h-5 text-primary" />
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                       </div>
-                      <span className="font-semibold text-lg">Адрес</span>
+                      <span className="font-semibold text-base md:text-lg">Адрес</span>
                     </div>
-                    <p className="text-muted-foreground">{job.location_address}</p>
+                    <p className="text-muted-foreground text-sm md:text-base">{job.location_address}</p>
                   </div>
                 )}
 
                 {job.scheduled_at && (
-                  <div className="card-surface p-6">
+                  <div className="card-surface p-4 md:p-6 md:col-span-2">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Calendar className="w-5 h-5 text-accent" />
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 md:w-5 md:h-5 text-accent" />
                       </div>
-                      <span className="font-semibold text-lg">Запланировано</span>
+                      <span className="font-semibold text-base md:text-lg">Запланировано</span>
                     </div>
-                    <p className="text-muted-foreground">{new Date(job.scheduled_at).toLocaleString('ru-RU')}</p>
+                    <p className="text-muted-foreground text-sm md:text-base">{new Date(job.scheduled_at).toLocaleString('ru-RU')}</p>
                   </div>
                 )}
               </div>
 
               {/* Assigned Professional Section */}
               {job.pro_id && assignedPro && (
-                <div className="card-surface p-6">
+                <div className="card-surface p-4 md:p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                      <User className="w-5 h-5 text-orange-500" />
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                      <User className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
                     </div>
-                    <span className="font-semibold text-lg">Назначен специалист</span>
+                    <span className="font-semibold text-base md:text-lg">Назначен специалист</span>
                   </div>
                   
-                  <div className="border border-border/50 rounded-lg p-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="w-20 h-20">
+                  <div className="border border-border/50 rounded-lg p-3 md:p-4">
+                    <div className="flex flex-col sm:flex-row items-start gap-3 md:gap-4">
+                      <Avatar className="w-16 h-16 md:w-20 md:h-20 mx-auto sm:mx-0">
                         <AvatarImage 
                           src={assignedPro.profile?.avatar_url || ''} 
                           alt={assignedPro.profile?.full_name || `${assignedPro.profile?.first_name} ${assignedPro.profile?.last_name}` || 'Специалист'} 
                         />
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold text-base md:text-lg">
                           {assignedPro.profile?.full_name 
                             ? assignedPro.profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
                             : (assignedPro.profile?.first_name && assignedPro.profile?.last_name 
@@ -761,20 +761,20 @@ const JobDetail = () => {
                         </AvatarFallback>
                       </Avatar>
                       
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold text-lg">
+                      <div className="flex-1 text-center sm:text-left">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                          <h4 className="font-semibold text-base md:text-lg">
                             {assignedPro.profile?.full_name || 
                              (assignedPro.profile?.first_name && assignedPro.profile?.last_name 
                                ? `${assignedPro.profile.first_name} ${assignedPro.profile.last_name}` 
                                : 'Специалист')}
                           </h4>
-                          <Badge variant="default" className="bg-orange-100 text-orange-800 hover:bg-orange-200">
+                          <Badge variant="default" className="bg-orange-100 text-orange-800 hover:bg-orange-200 w-fit mx-auto sm:mx-0">
                             Специалист
                           </Badge>
                         </div>
 
-                        <div className="flex items-center gap-4 mb-3">
+                        <div className="flex justify-center sm:justify-start items-center gap-4 mb-3">
                           {assignedPro.rating && assignedPro.rating.count > 0 ? (
                             <div className="flex items-center gap-2">
                               <StarRating 
@@ -783,7 +783,7 @@ const JobDetail = () => {
                                 showValue={true}
                                 readonly 
                               />
-                              <span className="text-sm text-muted-foreground">
+                              <span className="text-xs md:text-sm text-muted-foreground">
                                 ({assignedPro.rating.count} отзыв{assignedPro.rating.count === 1 ? '' : assignedPro.rating.count < 5 ? 'а' : 'ов'})
                               </span>
                             </div>
@@ -795,21 +795,21 @@ const JobDetail = () => {
                                 showValue={false}
                                 readonly 
                               />
-                              <span className="text-sm text-muted-foreground">Новый специалист</span>
+                              <span className="text-xs md:text-sm text-muted-foreground">Новый специалист</span>
                             </div>
                           )}
                         </div>
 
                         {assignedPro.proProfile?.bio && (
-                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          <p className="text-xs md:text-sm text-muted-foreground mb-3 line-clamp-2">
                             {assignedPro.proProfile.bio}
                           </p>
                         )}
 
                         {assignedPro.proProfile?.hourly_rate_cents && (
-                          <div className="flex items-center gap-2 mb-3">
-                            <Euro className="w-4 h-4 text-success" />
-                            <span className="text-sm font-medium">
+                          <div className="flex justify-center sm:justify-start items-center gap-2 mb-3">
+                            <Euro className="w-3 h-3 md:w-4 md:h-4 text-success" />
+                            <span className="text-xs md:text-sm font-medium">
                               {formatPrice(assignedPro.proProfile.hourly_rate_cents)}/час
                             </span>
                           </div>
@@ -817,13 +817,13 @@ const JobDetail = () => {
 
                         {assignedPro.portfolio && assignedPro.portfolio.length > 0 && (
                           <div className="mt-3">
-                            <p className="text-sm font-medium text-muted-foreground mb-3">Примеры работ:</p>
-                            <div className="flex gap-3 flex-wrap">
+                            <p className="text-xs md:text-sm font-medium text-muted-foreground mb-3">Примеры работ:</p>
+                            <div className="flex gap-2 md:gap-3 flex-wrap justify-center sm:justify-start">
                               {assignedPro.portfolio.map((item: any) => 
                                 item.portfolio_media?.map((media: any, mediaIndex: number) => {
                                   const imageUrl = media.file_url;
                                   return (
-                                    <div key={`${item.id}-${media.id}`} className="w-20 h-20 rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                                    <div key={`${item.id}-${media.id}`} className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-muted shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                                       <img
                                         src={imageUrl}
                                         alt={`${item.title} - фото ${mediaIndex + 1}`}
@@ -837,11 +837,12 @@ const JobDetail = () => {
                           </div>
                         )}
 
-                        <div className="flex gap-2 mt-4">
+                        <div className="flex flex-col sm:flex-row gap-2 mt-4">
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => navigate(`/pro/${job.pro_id}`)}
+                            className="w-full sm:w-auto"
                           >
                             Профиль
                           </Button>
@@ -849,6 +850,7 @@ const JobDetail = () => {
                             variant="outline" 
                             size="sm"
                             onClick={() => navigate(`/messages?user=${job.pro_id}&job=${job.id}`)}
+                            className="w-full sm:w-auto"
                           >
                             <MessageSquare className="w-4 h-4 mr-1" />
                             Написать
@@ -862,19 +864,19 @@ const JobDetail = () => {
 
               {/* Job Photos */}
               {jobPhotos.length > 0 && (
-                <div className="card-surface pt-8 px-8 pb-0 overflow-hidden">
-                  <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                    <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                <div className="card-surface pt-6 md:pt-8 px-4 md:px-8 pb-0 overflow-hidden">
+                  <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
+                    <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Фотографии заказа
-                    <Badge variant="secondary" className="ml-3 text-lg px-3 py-1">{jobPhotos.length}</Badge>
+                    <Badge variant="secondary" className="ml-3 text-sm md:text-lg px-2 md:px-3 py-1">{jobPhotos.length}</Badge>
                   </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 -mx-8 -mb-0">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 -mx-4 md:-mx-8 -mb-0">
                     {jobPhotos.map((photo, index) => {
                       const imageUrl = supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl;
                       return (
                         <Dialog key={photo.id}>
                           <DialogTrigger asChild>
-                            <div className="relative group cursor-pointer p-2">
+                            <div className="relative group cursor-pointer p-1 md:p-2">
                               <div className="aspect-square rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105">
                                 <img
                                   src={imageUrl}
@@ -882,8 +884,8 @@ const JobDetail = () => {
                                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-3">
-                                    <ZoomIn className="w-5 h-5 text-gray-700" />
+                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 md:p-3">
+                                    <ZoomIn className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
                                   </div>
                                 </div>
                               </div>
@@ -905,18 +907,18 @@ const JobDetail = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1 space-y-8">
+            <div className="lg:col-span-1 space-y-6 md:space-y-8">
               {/* Job Status and Statistics Combined - Only show when professional is assigned */}
               {job.pro_id && (
-                <div className="card-surface p-6 relative z-10">
-                  <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
-                    <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                <div className="card-surface p-4 md:p-6 relative z-10">
+                  <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
+                    <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Статус и статистика заказа
                   </h3>
                   
                   {/* Job Status Progress */}
-                  <div className="mb-8">
-                    <h4 className="text-lg font-medium mb-4 text-muted-foreground">Прогресс выполнения</h4>
+                  <div className="mb-6 md:mb-8">
+                    <h4 className="text-base md:text-lg font-medium mb-3 md:mb-4 text-muted-foreground">Прогресс выполнения</h4>
                   <JobStatusProgress 
                     status={job.status}
                     startConfirmed={jobStatusData.start_confirmed}
@@ -926,18 +928,18 @@ const JobDetail = () => {
 
                 {/* Rating Section - Appears first when job is done and user can rate */}
                 {canRate ? (
-                  <div className="mb-8">
-                    <h4 className="text-lg font-medium mb-6 text-center text-primary animate-pulse">Оцените выполнение услуги специалистом</h4>
+                  <div className="mb-6 md:mb-8">
+                    <h4 className="text-base md:text-lg font-medium mb-4 md:mb-6 text-center text-primary animate-pulse">Оцените выполнение услуги специалистом</h4>
                     
                     {/* Professional Avatar and Info */}
                     {proProfile && (
-                      <div className="flex flex-col items-center mb-6">
-                        <Avatar className="w-40 h-40 mb-4 border-4 border-white/50 shadow-2xl">
+                      <div className="flex flex-col items-center mb-4 md:mb-6">
+                        <Avatar className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 mb-3 md:mb-4 border-4 border-white/50 shadow-2xl">
                           <AvatarImage 
                             src={proProfile.avatar_url || ''} 
                             alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'} 
                           />
-                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-3xl">
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-lg md:text-2xl lg:text-3xl">
                             {proProfile.full_name 
                               ? proProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
                               : (proProfile.first_name && proProfile.last_name 
@@ -945,7 +947,7 @@ const JobDetail = () => {
                                 : 'С')}
                           </AvatarFallback>
                         </Avatar>
-                        <h5 className="font-bold text-xl text-center mb-2">
+                        <h5 className="font-bold text-base md:text-lg lg:text-xl text-center mb-1 md:mb-2">
                           {proProfile.full_name || 
                            (proProfile.first_name && proProfile.last_name 
                              ? `${proProfile.first_name} ${proProfile.last_name}` 
@@ -956,9 +958,9 @@ const JobDetail = () => {
                     )}
 
                     {/* Rating Section */}
-                    <div className="space-y-6">
+                    <div className="space-y-4 md:space-y-6">
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground mb-6 font-medium animate-fade-in">Поставьте оценку от 1 до 5 звезд</p>
+                        <p className="text-xs md:text-sm text-muted-foreground mb-4 md:mb-6 font-medium animate-fade-in">Поставьте оценку от 1 до 5 звезд</p>
                         <div className="relative group">
                           <div className="absolute -inset-3 bg-gradient-to-r from-yellow-400/20 via-orange-400/20 to-red-400/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                           <div className="relative transform hover:scale-110 transition-all duration-300">
@@ -966,7 +968,7 @@ const JobDetail = () => {
                               rating={rating}
                               readonly={false}
                               size="lg"
-                              className="justify-center [&>*]:transition-all [&>*]:duration-300 [&>*]:hover:drop-shadow-lg [&>*]:hover:brightness-125 [&>svg]:w-12 [&>svg]:h-12"
+                              className="justify-center [&>*]:transition-all [&>*]:duration-300 [&>*]:hover:drop-shadow-lg [&>*]:hover:brightness-125 [&>svg]:w-8 [&>svg]:h-8 md:[&>svg]:w-10 md:[&>svg]:h-10 lg:[&>svg]:w-12 lg:[&>svg]:h-12"
                               onRatingChange={setRating}
                             />
                           </div>
@@ -974,23 +976,23 @@ const JobDetail = () => {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium mb-3 block">Комментарий (необязательно)</label>
+                        <label className="text-xs md:text-sm font-medium mb-2 md:mb-3 block">Комментарий (необязательно)</label>
                         <Textarea
                           placeholder="Расскажите о качестве выполненной работы..."
                           value={ratingComment}
                           onChange={(e) => setRatingComment(e.target.value)}
-                          className="min-h-[120px] transition-all duration-300 focus:scale-[1.02]"
+                          className="min-h-[100px] md:min-h-[120px] transition-all duration-300 focus:scale-[1.02] text-sm md:text-base"
                         />
                       </div>
 
                       <Button 
                         onClick={handleSubmitRating}
                         disabled={rating === 0}
-                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:hover:scale-100 disabled:opacity-50 relative overflow-hidden group"
+                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold py-2 md:py-3 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:hover:scale-100 disabled:opacity-50 relative overflow-hidden group"
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-                        <Send className="w-5 h-5 mr-2 relative z-10" />
-                        <span className="relative z-10">Отправить оценку</span>
+                        <Send className="w-4 h-4 md:w-5 md:h-5 mr-2 relative z-10" />
+                        <span className="relative z-10 text-sm md:text-base">Отправить оценку</span>
                       </Button>
                     </div>
                   </div>
@@ -998,21 +1000,21 @@ const JobDetail = () => {
 
                 {/* Statistics - Always shown, but moved below rating when rating is available */}
                 <div>
-                  <h4 className="text-lg font-medium mb-4 text-muted-foreground">Информация о заказе</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b border-border/50">
-                      <span className="text-muted-foreground">Статус:</span>
+                  <h4 className="text-base md:text-lg font-medium mb-3 md:mb-4 text-muted-foreground">Информация о заказе</h4>
+                  <div className="space-y-3 md:space-y-4">
+                    <div className="flex items-center justify-between py-2 md:py-3 border-b border-border/50">
+                      <span className="text-muted-foreground text-sm md:text-base">Статус:</span>
                       {getStatusBadge(job.status)}
                     </div>
                     
-                    <div className="flex items-center justify-between py-3 border-b border-border/50">
-                      <span className="text-muted-foreground">Создан:</span>
-                      <span className="font-medium">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
+                    <div className="flex items-center justify-between py-2 md:py-3 border-b border-border/50">
+                      <span className="text-muted-foreground text-sm md:text-base">Создан:</span>
+                      <span className="font-medium text-sm md:text-base">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
                     </div>
 
-                    <div className="flex items-center justify-between py-3">
-                      <span className="text-muted-foreground">Категория:</span>
-                      <span className="font-medium">{job.categories.label_ru}</span>
+                    <div className="flex items-center justify-between py-2 md:py-3">
+                      <span className="text-muted-foreground text-sm md:text-base">Категория:</span>
+                      <span className="font-medium text-sm md:text-base">{job.categories.label_ru}</span>
                     </div>
                   </div>
                 </div>
@@ -1021,7 +1023,7 @@ const JobDetail = () => {
 
               {/* Applications List for Job Owner - Only show when NO professional is assigned */}
               {isJobOwner && !job.pro_id && (
-                <div className="card-surface p-8 relative z-20">
+                <div className="card-surface p-4 md:p-6 lg:p-8 relative z-20">
                   <JobApplicationsList 
                     jobId={job.id}
                     jobStatus={job.status}
@@ -1033,9 +1035,9 @@ const JobDetail = () => {
 
               {/* Professional Action Buttons */}
               {canApply && (
-                <div className="card-surface p-8 relative z-20">
+                <div className="card-surface p-4 md:p-6 lg:p-8 relative z-20">
                   <div className="space-y-4">
-                    <h3 className="text-xl font-semibold mb-4">
+                    <h3 className="text-lg md:text-xl font-semibold mb-4">
                       Заинтересованы в заказе?
                     </h3>
                     
@@ -1044,7 +1046,7 @@ const JobDetail = () => {
                         <CardHeader className="pb-3">
                           <div className="flex justify-center">
                             <Button 
-                              className="flex-1 max-w-xs"
+                              className="flex-1 max-w-xs w-full"
                               onClick={() => setShowPriceProposal(true)}
                             >
                               <User className="w-4 h-4 mr-2" />
@@ -1058,7 +1060,7 @@ const JobDetail = () => {
                             <div className="p-3 bg-muted rounded-lg">
                               <p className="text-sm font-medium mb-1">Заказчик:</p>
                               <div className="flex items-center gap-3">
-                                <Avatar className="w-12 h-12 flex-shrink-0">
+                                <Avatar className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
                                   <AvatarImage 
                                     src={clientProfile.avatar_url || ''} 
                                     alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'} 
@@ -1074,7 +1076,7 @@ const JobDetail = () => {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-start justify-between gap-3 mb-2">
                                     <div className="min-w-0 flex-1">
-                                      <h4 className="font-semibold flex items-center gap-2 mb-1">
+                                      <h4 className="font-semibold flex items-center gap-2 mb-1 text-sm md:text-base">
                                         <span className="truncate">
                                           {clientProfile.full_name || 
                                            (clientProfile.first_name && clientProfile.last_name 
@@ -1082,8 +1084,8 @@ const JobDetail = () => {
                                              : 'Клиент')}
                                         </span>
                                       </h4>
-                                      <div className="flex items-center gap-2">
-                                        <Badge variant="secondary" className="text-xs">Клиент</Badge>
+                                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                        <Badge variant="secondary" className="text-xs w-fit">Клиент</Badge>
                                         {clientRating && clientRating.count > 0 ? (
                                           <span className="text-xs text-muted-foreground">
                                             Рейтинг: {clientRating.average.toFixed(1)} ({clientRating.count})
@@ -1110,7 +1112,7 @@ const JobDetail = () => {
                       </Card>
                     ) : (
                       <Card className="transition-all">
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 md:p-6">
                           <PriceProposalForm
                             jobId={job.id}
                             jobTitle={job.title}
@@ -1138,23 +1140,23 @@ const JobDetail = () => {
 
               {/* Professional Work Management */}
               {isAssignedPro && (
-                <div className="card-surface p-6 relative z-10">
-                  <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
-                    <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                <div className="card-surface p-4 md:p-6 relative z-10">
+                  <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
+                    <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Управление работой
                   </h3>
                   
                   <div className="space-y-4">
                     {canStartWork && (
-                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <h4 className="font-medium text-blue-900 mb-2">Готовы начать работу?</h4>
-                        <p className="text-sm text-blue-700 mb-4">
+                      <div className="p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 className="font-medium text-blue-900 mb-2 text-sm md:text-base">Готовы начать работу?</h4>
+                        <p className="text-xs md:text-sm text-blue-700 mb-3 md:mb-4">
                           Нажмите кнопку, когда приступите к выполнению заказа. 
                           Статус заказа изменится на "В работе".
                         </p>
                         <Button 
                           onClick={handleStartWork}
-                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-sm md:text-base"
                         >
                           <Clock className="w-4 h-4 mr-2" />
                           Начать выполнение работы
@@ -1163,15 +1165,15 @@ const JobDetail = () => {
                     )}
 
                     {canCompleteWork && (
-                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <h4 className="font-medium text-green-900 mb-2">Работа выполнена?</h4>
-                        <p className="text-sm text-green-700 mb-4">
+                      <div className="p-3 md:p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 className="font-medium text-green-900 mb-2 text-sm md:text-base">Работа выполнена?</h4>
+                        <p className="text-xs md:text-sm text-green-700 mb-3 md:mb-4">
                           Нажмите кнопку, когда закончите выполнение заказа. 
                           Статус заказа изменится на "Выполнен".
                         </p>
                         <Button 
                           onClick={handleCompleteWork}
-                          className="w-full bg-green-600 hover:bg-green-700"
+                          className="w-full bg-green-600 hover:bg-green-700 text-sm md:text-base"
                         >
                           <Star className="w-4 h-4 mr-2" />
                           Завершить работу
@@ -1180,10 +1182,10 @@ const JobDetail = () => {
                     )}
 
                     {job.status === 'done' && (
-                      <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
-                        <Star className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                        <h4 className="font-medium text-emerald-900 mb-1">Работа завершена!</h4>
-                        <p className="text-sm text-emerald-700">
+                      <div className="p-3 md:p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
+                        <Star className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mx-auto mb-2" />
+                        <h4 className="font-medium text-emerald-900 mb-1 text-sm md:text-base">Работа завершена!</h4>
+                        <p className="text-xs md:text-sm text-emerald-700">
                           Заказ успешно выполнен. Ожидайте оценку от заказчика.
                         </p>
                       </div>
@@ -1194,9 +1196,9 @@ const JobDetail = () => {
 
               {/* Professional Status Card */}
               {isProfessional && !canApply && job.status === 'new' && (
-                <div className="card-surface p-6 text-center relative z-10">
-                  <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <p className="text-muted-foreground">
+                <div className="card-surface p-4 md:p-6 text-center relative z-10">
+                  <MessageSquare className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mx-auto mb-3 md:mb-4 opacity-50" />
+                  <p className="text-muted-foreground text-sm md:text-base">
                     {job.pro_id ? 'Заказ уже принят другим специалистом' : 'Вы уже откликнулись на этот заказ'}
                   </p>
                 </div>
