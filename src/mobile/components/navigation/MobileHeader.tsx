@@ -221,16 +221,6 @@ export function MobileHeader({
 
           {/* Right section */}
           <div className="flex items-center space-x-2 min-w-0 flex-1 justify-end">
-            {showLogout && (
-              <motion.button
-                onClick={handleLogout}
-                className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
-                whileTap={{ scale: 0.95 }}
-              >
-                <LogOut size={16} />
-              </motion.button>
-            )}
-
             {showDashboardSelector && (
               <div className="relative">
                 <motion.button
@@ -343,6 +333,16 @@ export function MobileHeader({
                 whileTap={{ scale: 0.95 }}
               >
                 <MoreHorizontal size={16} />
+              </motion.button>
+            )}
+            
+            {showLogout && (
+              <motion.button
+                onClick={handleLogout}
+                className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
+                whileTap={{ scale: 0.95 }}
+              >
+                <LogOut size={16} />
               </motion.button>
             )}
           </div>
