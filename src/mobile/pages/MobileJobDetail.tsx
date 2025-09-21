@@ -86,7 +86,20 @@ export default function MobileJobDetail() {
         return;
       }
 
-      setJob(data);
+      // Fetch job photos separately
+      const { data: photos } = await supabase
+        .from('job_photos')
+        .select('file_url')
+        .eq('job_id', jobId)
+        .order('display_order', { ascending: true });
+
+      // Add photos to job data
+      const jobWithPhotos = {
+        ...data,
+        job_photos: photos || []
+      };
+
+      setJob(jobWithPhotos);
     } catch (error) {
       console.error('Error:', error);
       toast({ 
@@ -261,10 +274,11 @@ export default function MobileJobDetail() {
                 {job.job_photos.map((photo, index) => (
                   <div key={index} className="aspect-square rounded-lg overflow-hidden bg-[#D1D5DB]">
                     <img
-                      src={`${supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl}`}
+                      src={supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl}
                       alt={`Фото ${index + 1}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
+                        console.log("Failed to load image:", photo.file_url);
                         e.currentTarget.src = '/placeholder.svg';
                       }}
                     />
