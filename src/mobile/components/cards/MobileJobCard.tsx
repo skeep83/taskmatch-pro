@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MobileCard } from '../ui/MobileCard';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface MobileJobCardProps {
   job: {
@@ -17,6 +18,7 @@ interface MobileJobCardProps {
     category_name?: string;
     client_name?: string;
     client_rating?: number;
+    client_avatar?: string;
     urgency?: 'low' | 'medium' | 'high';
     status?: string;
   };
@@ -98,7 +100,12 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
       {job.client_name && (
         <div className="flex items-center justify-between">
           <div className="flex items-center text-sm text-muted-foreground">
-            <User size={14} className="mr-1.5" />
+            <Avatar className="h-6 w-6 mr-2">
+              <AvatarImage src={job.client_avatar} />
+              <AvatarFallback className="text-xs">
+                {job.client_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
             <span className="truncate max-w-[120px]">{job.client_name}</span>
           </div>
           {job.client_rating && (
