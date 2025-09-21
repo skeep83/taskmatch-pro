@@ -196,8 +196,8 @@ export default function MobileDashboardClient() {
       
       setUserProfile(profileData);
 
-      // Load user jobs with photos
-      console.log('🔍 LOADING JOBS WITH PHOTOS for user:', user.id);
+      // Load user jobs
+      console.log('🔍 LOADING JOBS for user:', user.id);
       
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")
@@ -213,11 +213,6 @@ export default function MobileDashboardClient() {
           pro_id,
           categories!inner (
             label_ru
-          ),
-          job_photos (
-            id,
-            file_url,
-            display_order
           )
         `)
         .eq("client_id", user.id)
@@ -231,18 +226,34 @@ export default function MobileDashboardClient() {
       
       console.log('✅ JOBS LOADED:', jobsData?.length, 'jobs');
       
-      // Log each job and its photos
-      jobsData?.forEach(job => {
-        console.log(`📋 JOB ${job.id}: "${job.title}"`);
-        console.log(`📸 PHOTOS COUNT: ${job.job_photos?.length || 0}`);
-        if (job.job_photos?.length > 0) {
-          job.job_photos.forEach((photo, index) => {
-            console.log(`  📸 PHOTO ${index + 1}: ${photo.file_url}`);
-          });
+      if (jobsData && jobsData.length > 0) {
+        // Load photos separately
+        const jobIds = jobsData.map(job => job.id);
+        console.log('🖼️ Loading photos for jobs:', jobIds);
+        
+        const { data: photosData, error: photosError } = await supabase
+          .from('job_photos')
+          .select('id, job_id, file_url, display_order')
+          .in('job_id', jobIds)
+          .order('display_order');
+        
+        if (photosError) {
+          console.error('❌ ERROR LOADING PHOTOS:', photosError);
+        } else {
+          console.log('✅ PHOTOS LOADED:', photosData?.length, 'photos');
         }
-      });
-      
-      setJobs(jobsData || []);
+        
+        // Attach photos to jobs
+        const jobsWithPhotos = jobsData.map(job => ({
+          ...job,
+          job_photos: photosData?.filter(photo => photo.job_id === job.id) || []
+        }));
+        
+        console.log('✅ JOBS WITH PHOTOS ATTACHED');
+        setJobs(jobsWithPhotos);
+      } else {
+        setJobs(jobsData || []);
+      }
 
       // Calculate stats
       const totalJobs = jobsData?.length || 0;
