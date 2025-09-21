@@ -625,7 +625,7 @@ const JobDetail = () => {
             
             {/* Edit and Delete buttons for job owner */}
             {canEdit && (
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <div className="flex items-center gap-4 justify-center">
                 <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
                   <Button 
                     variant="ghost" 
