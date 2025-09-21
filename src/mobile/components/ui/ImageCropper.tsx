@@ -93,59 +93,63 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Clear crop area (punch hole effect)
+    // Create circular crop area (punch hole effect)
+    const centerX = cropArea.x + cropArea.width / 2;
+    const centerY = cropArea.y + cropArea.height / 2;
+    const radius = cropArea.width / 2;
+
     ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height);
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.fill();
 
     // Reset composite operation
     ctx.globalCompositeOperation = 'source-over';
 
-    // Draw crop border
+    // Draw circular border
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.setLineDash([]);
-    ctx.strokeRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height);
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.stroke();
 
-    // Draw corner handles
-    const handleSize = 16;
+    // Draw resize handles (4 cardinal points)
+    const handleSize = 20;
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#4F46E5';
     ctx.lineWidth = 2;
 
-    const corners = [
-      { x: cropArea.x - handleSize / 2, y: cropArea.y - handleSize / 2 },
-      { x: cropArea.x + cropArea.width - handleSize / 2, y: cropArea.y - handleSize / 2 },
-      { x: cropArea.x - handleSize / 2, y: cropArea.y + cropArea.height - handleSize / 2 },
-      { x: cropArea.x + cropArea.width - handleSize / 2, y: cropArea.y + cropArea.height - handleSize / 2 }
+    const handles = [
+      { x: centerX, y: centerY - radius }, // top
+      { x: centerX + radius, y: centerY }, // right
+      { x: centerX, y: centerY + radius }, // bottom
+      { x: centerX - radius, y: centerY }, // left
     ];
 
-    corners.forEach(corner => {
-      ctx.fillRect(corner.x, corner.y, handleSize, handleSize);
-      ctx.strokeRect(corner.x, corner.y, handleSize, handleSize);
+    handles.forEach(handle => {
+      ctx.beginPath();
+      ctx.arc(handle.x, handle.y, handleSize / 2, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
     });
 
-    // Draw grid lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    // Draw center crosshair
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
+    ctx.setLineDash([3, 3]);
     
-    // Vertical lines
-    for (let i = 1; i < 3; i++) {
-      const x = cropArea.x + (cropArea.width / 3) * i;
-      ctx.beginPath();
-      ctx.moveTo(x, cropArea.y);
-      ctx.lineTo(x, cropArea.y + cropArea.height);
-      ctx.stroke();
-    }
+    // Vertical line
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY - radius + 10);
+    ctx.lineTo(centerX, centerY + radius - 10);
+    ctx.stroke();
     
-    // Horizontal lines
-    for (let i = 1; i < 3; i++) {
-      const y = cropArea.y + (cropArea.height / 3) * i;
-      ctx.beginPath();
-      ctx.moveTo(cropArea.x, y);
-      ctx.lineTo(cropArea.x + cropArea.width, y);
-      ctx.stroke();
-    }
+    // Horizontal line
+    ctx.beginPath();
+    ctx.moveTo(centerX - radius + 10, centerY);
+    ctx.lineTo(centerX + radius - 10, centerY);
+    ctx.stroke();
 
   }, [image, cropArea, canvasSize]);
 
@@ -154,29 +158,39 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     if (!canvas) return { x: 0, y: 0 };
 
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
     };
   }, []);
 
   const isInCropArea = useCallback((x: number, y: number) => {
-    return x >= cropArea.x && x <= cropArea.x + cropArea.width &&
-           y >= cropArea.y && y <= cropArea.y + cropArea.height;
+    const centerX = cropArea.x + cropArea.width / 2;
+    const centerY = cropArea.y + cropArea.height / 2;
+    const radius = cropArea.width / 2;
+    const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+    return distance <= radius;
   }, [cropArea]);
 
   const isOnHandle = useCallback((x: number, y: number) => {
-    const handleSize = 16;
+    const handleSize = 20;
+    const centerX = cropArea.x + cropArea.width / 2;
+    const centerY = cropArea.y + cropArea.height / 2;
+    const radius = cropArea.width / 2;
+    
     const handles = [
-      { x: cropArea.x - handleSize / 2, y: cropArea.y - handleSize / 2, type: 'nw' },
-      { x: cropArea.x + cropArea.width - handleSize / 2, y: cropArea.y - handleSize / 2, type: 'ne' },
-      { x: cropArea.x - handleSize / 2, y: cropArea.y + cropArea.height - handleSize / 2, type: 'sw' },
-      { x: cropArea.x + cropArea.width - handleSize / 2, y: cropArea.y + cropArea.height - handleSize / 2, type: 'se' }
+      { x: centerX, y: centerY - radius, type: 'n' },
+      { x: centerX + radius, y: centerY, type: 'e' },
+      { x: centerX, y: centerY + radius, type: 's' },
+      { x: centerX - radius, y: centerY, type: 'w' }
     ];
 
     for (const handle of handles) {
-      if (x >= handle.x && x <= handle.x + handleSize &&
-          y >= handle.y && y <= handle.y + handleSize) {
+      const distance = Math.sqrt((x - handle.x) ** 2 + (y - handle.y) ** 2);
+      if (distance <= handleSize / 2) {
         return handle.type;
       }
     }
@@ -184,6 +198,7 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
   }, [cropArea]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     const pos = getMousePos(e);
     const handleType = isOnHandle(pos.x, pos.y);
 
@@ -192,7 +207,9 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       setDragStart({ x: pos.x, y: pos.y });
     } else if (isInCropArea(pos.x, pos.y)) {
       setIsDragging(true);
-      setDragStart({ x: pos.x - cropArea.x, y: pos.y - cropArea.y });
+      const centerX = cropArea.x + cropArea.width / 2;
+      const centerY = cropArea.y + cropArea.height / 2;
+      setDragStart({ x: pos.x - centerX, y: pos.y - centerY });
     }
   }, [getMousePos, isOnHandle, isInCropArea, cropArea]);
 
@@ -200,23 +217,33 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     const pos = getMousePos(e);
 
     if (isDragging) {
-      const newX = Math.max(0, Math.min(pos.x - dragStart.x, canvasSize.width - cropArea.width));
-      const newY = Math.max(0, Math.min(pos.y - dragStart.y, canvasSize.height - cropArea.height));
+      const newCenterX = pos.x - dragStart.x;
+      const newCenterY = pos.y - dragStart.y;
+      const radius = cropArea.width / 2;
+      
+      // Ensure crop area stays within canvas bounds
+      const newX = Math.max(radius, Math.min(newCenterX - radius, canvasSize.width - radius));
+      const newY = Math.max(radius, Math.min(newCenterY - radius, canvasSize.height - radius));
       
       setCropArea(prev => ({ ...prev, x: newX, y: newY }));
     } else if (isResizing) {
-      // Resize while maintaining square aspect ratio
-      const deltaX = pos.x - dragStart.x;
-      const deltaY = pos.y - dragStart.y;
-      const delta = Math.max(deltaX, deltaY);
+      const centerX = cropArea.x + cropArea.width / 2;
+      const centerY = cropArea.y + cropArea.height / 2;
       
-      const newSize = Math.max(50, Math.min(
-        cropArea.width + delta,
-        Math.min(canvasSize.width - cropArea.x, canvasSize.height - cropArea.y)
+      // Calculate distance from center to mouse position
+      const distance = Math.sqrt((pos.x - centerX) ** 2 + (pos.y - centerY) ** 2);
+      const newRadius = Math.max(25, Math.min(distance, 
+        Math.min(
+          Math.min(centerX, canvasSize.width - centerX),
+          Math.min(centerY, canvasSize.height - centerY)
+        )
       ));
       
-      setCropArea(prev => ({ ...prev, width: newSize, height: newSize }));
-      setDragStart({ x: pos.x, y: pos.y });
+      const newSize = newRadius * 2;
+      const newX = centerX - newRadius;
+      const newY = centerY - newRadius;
+      
+      setCropArea(prev => ({ ...prev, x: newX, y: newY, width: newSize, height: newSize }));
     }
 
     // Update cursor
@@ -224,7 +251,7 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     if (!canvas) return;
 
     if (isOnHandle(pos.x, pos.y)) {
-      canvas.style.cursor = 'nw-resize';
+      canvas.style.cursor = 'pointer';
     } else if (isInCropArea(pos.x, pos.y)) {
       canvas.style.cursor = 'move';
     } else {
@@ -238,17 +265,24 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
   }, []);
 
   // Touch event handlers for mobile
+  const getTouchPos = useCallback((touch: React.Touch) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    return {
+      x: (touch.clientX - rect.left) * scaleX,
+      y: (touch.clientY - rect.top) * scaleY
+    };
+  }, []);
+
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     const touch = e.touches[0];
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const pos = {
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top
-    };
+    const pos = getTouchPos(touch);
 
     const handleType = isOnHandle(pos.x, pos.y);
 
@@ -257,41 +291,47 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       setDragStart({ x: pos.x, y: pos.y });
     } else if (isInCropArea(pos.x, pos.y)) {
       setIsDragging(true);
-      setDragStart({ x: pos.x - cropArea.x, y: pos.y - cropArea.y });
+      const centerX = cropArea.x + cropArea.width / 2;
+      const centerY = cropArea.y + cropArea.height / 2;
+      setDragStart({ x: pos.x - centerX, y: pos.y - centerY });
     }
-  }, [isOnHandle, isInCropArea, cropArea]);
+  }, [getTouchPos, isOnHandle, isInCropArea, cropArea]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     const touch = e.touches[0];
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const pos = {
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top
-    };
+    const pos = getTouchPos(touch);
 
     if (isDragging) {
-      const newX = Math.max(0, Math.min(pos.x - dragStart.x, canvasSize.width - cropArea.width));
-      const newY = Math.max(0, Math.min(pos.y - dragStart.y, canvasSize.height - cropArea.height));
+      const newCenterX = pos.x - dragStart.x;
+      const newCenterY = pos.y - dragStart.y;
+      const radius = cropArea.width / 2;
+      
+      // Ensure crop area stays within canvas bounds
+      const newX = Math.max(radius, Math.min(newCenterX - radius, canvasSize.width - radius));
+      const newY = Math.max(radius, Math.min(newCenterY - radius, canvasSize.height - radius));
       
       setCropArea(prev => ({ ...prev, x: newX, y: newY }));
     } else if (isResizing) {
-      const deltaX = pos.x - dragStart.x;
-      const deltaY = pos.y - dragStart.y;
-      const delta = Math.max(deltaX, deltaY);
+      const centerX = cropArea.x + cropArea.width / 2;
+      const centerY = cropArea.y + cropArea.height / 2;
       
-      const newSize = Math.max(50, Math.min(
-        cropArea.width + delta,
-        Math.min(canvasSize.width - cropArea.x, canvasSize.height - cropArea.y)
+      // Calculate distance from center to touch position
+      const distance = Math.sqrt((pos.x - centerX) ** 2 + (pos.y - centerY) ** 2);
+      const newRadius = Math.max(25, Math.min(distance, 
+        Math.min(
+          Math.min(centerX, canvasSize.width - centerX),
+          Math.min(centerY, canvasSize.height - centerY)
+        )
       ));
       
-      setCropArea(prev => ({ ...prev, width: newSize, height: newSize }));
-      setDragStart({ x: pos.x, y: pos.y });
+      const newSize = newRadius * 2;
+      const newX = centerX - newRadius;
+      const newY = centerY - newRadius;
+      
+      setCropArea(prev => ({ ...prev, x: newX, y: newY, width: newSize, height: newSize }));
     }
-  }, [isDragging, isResizing, dragStart, cropArea, canvasSize]);
+  }, [getTouchPos, isDragging, isResizing, dragStart, cropArea, canvasSize]);
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
@@ -321,6 +361,15 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     const sourceWidth = cropArea.width * scaleX;
     const sourceHeight = cropArea.height * scaleY;
 
+    // Create circular clipping path
+    const centerX = outputSize / 2;
+    const centerY = outputSize / 2;
+    const radius = outputSize / 2;
+
+    tempCtx.beginPath();
+    tempCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    tempCtx.clip();
+
     // Draw cropped and scaled image
     tempCtx.drawImage(
       image,
@@ -339,7 +388,7 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       if (blob) {
         onCrop(blob);
       }
-    }, 'image/jpeg', 0.95);
+    }, 'image/png', 1.0);
   }, [image, cropArea, canvasSize, onCrop]);
 
   return (
@@ -370,7 +419,7 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground mb-4">
-              Перетащите рамку или углы для изменения области кадрирования
+              Перетащите круг или измените размер для кадрирования
             </p>
 
             <div className="flex gap-3 justify-center">
