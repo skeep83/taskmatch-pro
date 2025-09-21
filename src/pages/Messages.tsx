@@ -6,10 +6,11 @@ import { useToast } from "@/hooks/use-toast";
 import { FloatingCard } from "@/components/ui/floating-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield, Trash2, MoreVertical, AlertTriangle } from "lucide-react";
+import { Video, Phone, Paperclip, Send, Circle, Clock, CheckCircle2, Shield, Trash2, MoreVertical, AlertTriangle, ArrowLeft, X } from "lucide-react";
 import { createChatNotification, markChatNotificationsAsRead } from "@/utils/chatNotifications";
 import { notificationSounds } from "@/utils/notificationSounds";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
+import { cn } from "@/lib/utils";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -47,6 +48,8 @@ const Messages = () => {
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const roomRef = useRef<any>(null);
   const typingTimerRef = useRef<any>(null);
+
+  const selectedChatId = id;
 
   useEffect(() => {
     (async () => {
@@ -452,361 +455,303 @@ const Messages = () => {
       if (newMessage && selectedChat) {
         const receiverId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
         const senderProfile = profiles[userId] || { full_name: 'Пользователь' };
-        const senderName = senderProfile.full_name || 
-                          (senderProfile.first_name && senderProfile.last_name ? 
-                           `${senderProfile.first_name} ${senderProfile.last_name}` : 
-                           'Пользователь');
+        const senderName = senderProfile.full_name || senderProfile.first_name || 'Пользователь';
+        const messagePreview = text.length > 50 ? text.substring(0, 50) + '...' : text;
         
-        try {
-          await createChatNotification(
-            receiverId,
-            senderName,
-            text,
-            id,
-            newMessage.id,
-            userId
-          );
-          console.log('📬 Notification sent successfully');
-        } catch (notificationError) {
-          console.warn('Failed to send notification:', notificationError);
-        }
+        console.log('📬 Sending notification to:', receiverId);
+        await createChatNotification(receiverId, senderName, messagePreview, id, newMessage.id, userId);
       }
       
-    } catch (e: any) {
-      console.error('❌ Error sending message:', e);
-      toast({ title: "Ошибка", description: e?.message, variant: "destructive" });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({ title: "Ошибка", description: "Не удалось отправить сообщение", variant: "destructive" });
     }
   };
 
-  const selectedChat = useMemo(() => chats.find((c) => String(c.id) === String(id)) || null, [chats, id]);
+  const selectedChat = useMemo(() => {
+    return chats.find(c => String(c.id) === String(selectedChatId));
+  }, [chats, selectedChatId]);
+
+  const otherUser = useMemo(() => {
+    if (!selectedChat || !userId) return null;
+    const otherId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
+    return profiles[otherId] || null;
+  }, [selectedChat, userId, profiles]);
+
+  const renderProfileName = (profile: any) => {
+    if (profile?.full_name) return profile.full_name;
+    if (profile?.first_name && profile?.last_name) return `${profile.first_name} ${profile.last_name}`;
+    if (profile?.first_name) return profile.first_name;
+    return 'Пользователь';
+  };
+
+  const renderProfileInitials = (profile: any) => {
+    const name = renderProfileName(profile);
+    return name
+      .split(' ')
+      .slice(0, 2)
+      .map(word => word[0]?.toUpperCase())
+      .join('');
+  };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#E5E7EB]">
-      <Seo title={`${t('app.name')} — Сообщения`} description="Чаты и сообщения" canonical="/messages" />
+    <div className="min-h-screen bg-background">
+      <Seo title={`${t('app.name')} — ${t('messages.title', 'Сообщения')}`} description="Chat messages" canonical="/messages" />
       
-      {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gray-800">
-            Сообщения
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Общайтесь с клиентами и специалистами в реальном времени
-          </p>
-        </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-4 gap-8 h-[700px]">
-            
-            {/* Chat List */}
-            <div className="lg:col-span-1">
-              <div className="bg-white shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl h-full p-6">
-                <h2 className="text-lg font-semibold mb-6 text-gray-800">Активные чаты</h2>
-                
-                <div className="space-y-3 overflow-y-auto max-h-[580px] pr-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-                  {chats.length === 0 && (
-                    <div className="text-center py-16">
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/30 flex items-center justify-center">
-                        <span className="text-3xl">💬</span>
-                      </div>
-                      <p className="text-sm text-gray-600">Нет активных чатов</p>
-                    </div>
-                  )}
-                  
-                  {chats.map((c, index) => {
-                    const otherUserId = c.client_id === userId ? c.professional_id : c.client_id;
-                    const otherProfile = profiles[otherUserId];
-                    const displayName = otherProfile?.full_name || 
-                                       (otherProfile?.first_name && otherProfile?.last_name ? 
-                                          `${otherProfile.first_name} ${otherProfile.last_name}` : 
-                                          'Пользователь');
-                    
-                    const initials = displayName
-                      .split(' ')
-                      .filter(n => n.length > 0)
-                      .map(n => n[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2);
-                    const jobNumber = String(c.job_id || c.tender_id || c.id).slice(0, 8);
-
-                    return (
-                      <div
-                        key={c.id}
-                        className={`group relative overflow-hidden rounded-xl transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
-                          String(c.id) === String(id) 
-                            ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]' 
-                            : 'bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]'
-                        }`}
-                        style={{ animationDelay: `${index * 100}ms` }}
-                        onClick={() => navigate(`/messages/${c.id}`)}
-                      >
-                        {/* Gradient overlay for active chat */}
-                        {String(c.id) === String(id) && (
-                          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5" />
-                        )}
-                        
-                        <div className="relative p-4 flex items-center gap-3">
-                          <Avatar className="w-12 h-12 flex-shrink-0 ring-2 ring-background shadow-lg">
-                            <AvatarImage 
-                              src={otherProfile?.avatar_url || ''} 
-                              alt={displayName}
-                              className="object-cover"
-                            />
-                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold text-sm">
-                              {initials || 'У'}
-                            </AvatarFallback>
-                          </Avatar>
-                          
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm truncate text-gray-800 group-hover:text-gray-900 transition-colors">
-                              {displayName}
-                            </div>
-                            <div className="text-xs text-gray-600 truncate flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                              Заказ #{jobNumber}
-                            </div>
-                            <div className="text-xs text-gray-600 flex items-center gap-1 mt-1">
-                              <Clock className="w-3 h-3" />
-                              {c.last_message_at ? new Date(c.last_message_at).toLocaleString('ru', { 
-                                hour: '2-digit', 
-                                minute: '2-digit',
-                                day: '2-digit',
-                                month: '2-digit'
-                              }) : new Date(c.created_at).toLocaleString('ru', { 
-                                hour: '2-digit', 
-                                minute: '2-digit',
-                                day: '2-digit',
-                                month: '2-digit'
-                              })}
-                             </div>
-                           </div>
-                           
-                           {/* Delete button */}
-                           <DropdownMenu>
-                             <DropdownMenuTrigger asChild>
-                               <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-                                 onClick={(e) => e.stopPropagation()}
-                               >
-                                 <MoreVertical className="w-4 h-4" />
-                               </Button>
-                             </DropdownMenuTrigger>
-                             <DropdownMenuContent align="end">
-                               <DropdownMenuItem
-                                 onClick={(e) => handleDeleteChat(c.id, e)}
-                                 className="text-destructive hover:bg-destructive/10"
-                               >
-                                 <Trash2 className="w-4 h-4 mr-2" />
-                                 Удалить чат
-                               </DropdownMenuItem>
-                             </DropdownMenuContent>
-                           </DropdownMenu>
-                         </div>
-                       </div>
-                     );
-                   })}
-                 </div>
-               </div>
-             </div>
-
-             {/* Chat Messages - Main Chat Interface */}
-             <div className="lg:col-span-3">
-               <div className="bg-white shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl h-full flex flex-col">
-                 {!id ? (
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center max-w-md">
-                      <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                        <span className="text-4xl">💬</span>
-                      </div>
-                       <h3 className="text-2xl font-display font-semibold mb-3 text-gray-800">Выберите чат</h3>
-                       <p className="text-gray-600 leading-relaxed">Выберите чат из списка слева для начала общения с клиентами и специалистами</p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {/* Chat Header */}
-                    <div className="p-6 border-b border-gray-200 flex items-center justify-between bg-white/50 backdrop-blur-sm">
-                      <div className="flex items-center gap-4">
-                        {selectedChat ? (() => {
-                          const otherUserId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
-                          const otherProfile = profiles[otherUserId];
-                          const displayName = otherProfile?.full_name || 
-                                             (otherProfile?.first_name && otherProfile?.last_name ? 
-                                               `${otherProfile.first_name} ${otherProfile.last_name}` : 
-                                               'Пользователь');
-                          const initials = displayName
-                            .split(' ')
-                            .filter(n => n.length > 0)
-                            .map(n => n[0])
-                            .join('')
-                            .toUpperCase()
-                            .slice(0, 2);
-                          
-                          return (
-                            <>
-                              <Avatar className="w-12 h-12 ring-2 ring-background shadow-lg">
-                                <AvatarImage src={otherProfile?.avatar_url || ''} alt={displayName} />
-                                <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold">
-                                  {initials}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                 <div className="font-semibold text-lg text-gray-800">{displayName}</div>
-                                 <div className="text-sm text-gray-600 flex items-center gap-2">
-                                   <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                                   Заказ #{String(selectedChat.job_id || selectedChat.tender_id || selectedChat.id).slice(0, 8)}
-                                 </div>
-                                 <div className="text-xs text-gray-600 flex items-center gap-2 mt-1">
-                                   <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
-                                   {otherTyping ? (
-                                     <span className="text-primary animate-pulse">Печатает…</span>
-                                   ) : (
-                                     <span>{otherOnline ? 'В сети' : 'Не в сети'}</span>
-                                   )}
-                                 </div>
-                              </div>
-                            </>
-                          );
-                        })() : (
-                          <>
-                            <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-white font-semibold shadow-lg">
-                              {String(id).slice(0, 2).toUpperCase()}
-                            </div>
-                            <div>
-                               <div className="font-semibold text-lg text-gray-800">Чат</div>
-                               <div className="text-sm text-gray-600">Загрузка...</div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" className="hover:bg-accent/10 hover:text-accent">
-                          <Video className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="hover:bg-primary/10 hover:text-primary">
-                          <Phone className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Messages */}
-                    <div className="flex-1 p-6 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-                      {messages.map((m) => {
-                        const senderProfile = profiles[m.sender_id];
-                        const senderName = senderProfile?.full_name || 
-                                          (senderProfile?.first_name && senderProfile?.last_name ? 
-                                           `${senderProfile.first_name} ${senderProfile.last_name}` : 
-                                           'Пользователь');
-                        const senderInitials = senderName
-                          .split(' ')
-                          .filter(n => n.length > 0)
-                          .map(n => n[0])
-                          .join('')
-                          .toUpperCase()
-                          .slice(0, 2);
-                        
-                        return (
-                          <div key={m.id} className={`flex gap-4 ${m.sender_id === userId ? 'justify-end' : 'justify-start'}`}>
-                            {m.sender_id !== userId && (
-                              <Avatar className="w-10 h-10 flex-shrink-0 ring-2 ring-background shadow-md">
-                                <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
-                                <AvatarFallback className="bg-gradient-to-br from-accent to-primary text-white font-semibold text-sm">
-                                  {senderInitials}
-                                </AvatarFallback>
-                              </Avatar>
-                            )}
-                            
-                            <div className={`max-w-[70%] ${m.sender_id === userId ? 'order-2' : ''}`}>
-                              {m.sender_id !== userId && (
-                                <div className="text-xs font-medium text-gray-600 mb-2 px-1">{senderName}</div>
-                              )}
-                              
-                               <div className={`relative rounded-xl p-4 shadow-sm backdrop-blur-sm ${
-                                 m.sender_id === userId 
-                                   ? 'bg-gradient-to-r from-primary to-primary/90 text-white rounded-br-md ml-auto' 
-                                   : 'bg-white border border-gray-200 text-gray-800 rounded-bl-md'
-                               }`}>
-                                <div className="text-sm whitespace-pre-wrap leading-relaxed">{m.content}</div>
-                                 <div className={`text-xs mt-2 flex items-center gap-2 ${
-                                   m.sender_id === userId ? 'text-white/70 justify-end' : 'text-gray-600'
-                                 }`}>
-                                  <span>{new Date(m.created_at).toLocaleTimeString('ru', { 
-                                    hour: '2-digit', 
-                                    minute: '2-digit' 
-                                  })}</span>
-                                  {m.sender_id === userId && m.is_read && (
-                                    <CheckCircle2 className="w-3 h-3" />
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {m.sender_id === userId && (
-                              <Avatar className="w-10 h-10 flex-shrink-0 order-3 ring-2 ring-background shadow-md">
-                                <AvatarImage src={senderProfile?.avatar_url || ''} alt={senderName} />
-                                <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-semibold text-sm">
-                                  {senderInitials}
-                                </AvatarFallback>
-                              </Avatar>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Message Input */}
-                    <div className="p-6 border-t border-gray-200 bg-white/50 backdrop-blur-sm">
-                      <div className="flex gap-3 items-end">
-                        <Button variant="ghost" size="sm" className="mb-2 hover:bg-accent/10 hover:text-accent">
-                          <Paperclip className="w-4 h-4" />
-                        </Button>
-                        
-                        <div className="flex-1 relative">
-                          <input
-                            type="text"
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                send();
-                              }
-                            }}
-                            placeholder="Написать сообщение..."
-                            className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background/60 backdrop-blur-sm transition-all duration-300 focus:ring-2 focus:ring-primary/30 focus:border-primary/50 focus:outline-none text-foreground placeholder:text-muted-foreground"
-                          />
-                        </div>
-                        
-                        <Button 
-                          onClick={send}
-                          disabled={!text.trim()}
-                          className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-6 py-3"
-                        >
-                          <Send className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </>
-                )}
+      <div className="flex h-screen">
+        {/* Chat List Sidebar */}
+        <div className={cn(
+          "border-r bg-muted/30 transition-all duration-300",
+          selectedChatId ? "w-0 lg:w-80 overflow-hidden lg:overflow-visible" : "w-full lg:w-80"
+        )}>
+          <div className="p-4 border-b flex items-center justify-between">
+            <h1 className="text-lg font-semibold">{t('messages.title', 'Сообщения')}</h1>
+            {selectedChatId && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate('/messages')}
+                className="lg:hidden"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          
+          <div className="p-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={t('messages.search_placeholder', 'Поиск чатов...')}
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <ArrowLeft className="h-4 w-4 text-muted-foreground" />
               </div>
             </div>
           </div>
+
+          <div className="overflow-y-auto">
+            {chats.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-muted-foreground">{t('messages.no_chats', 'Нет сообщений')}</p>
+              </div>
+            ) : (
+              <div>
+                {chats.map((chat) => {
+                  const otherId = chat.client_id === userId ? chat.professional_id : chat.client_id;
+                  const otherProfile = profiles[otherId];
+                  
+                  return (
+                    <div
+                      key={chat.id}
+                      className={cn(
+                        "p-4 border-b cursor-pointer hover:bg-muted/50 transition-colors",
+                        String(selectedChatId) === String(chat.id) && "bg-primary/10 border-r-2 border-r-primary"
+                      )}
+                      onClick={() => navigate(`/messages/${chat.id}`)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={otherProfile?.avatar_url} />
+                          <AvatarFallback>{renderProfileInitials(otherProfile)}</AvatarFallback>
+                        </Avatar>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-medium truncate">
+                              {renderProfileName(otherProfile)}
+                            </h3>
+                            <div className="flex items-center gap-2">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <MoreVertical className="h-3 w-3" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem
+                                    onClick={(e) => handleDeleteChat(chat.id, e)}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    {t('messages.delete_chat', 'Удалить чат')}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-1 mt-1">
+                            <span className="text-xs text-muted-foreground">
+                              {chat.last_message_at ? new Date(chat.last_message_at).toLocaleDateString() : ''}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
-      </section>
+
+        {/* Main Chat Area */}
+        <div className={cn(
+          "flex-1 flex flex-col transition-all duration-300",
+          selectedChatId ? "flex" : "hidden lg:flex"
+        )}>
+          {selectedChatId ? (
+            <>
+              {/* Chat Header */}
+              <div className="p-4 border-b bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => navigate('/messages')}
+                    className="lg:hidden"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={otherUser?.avatar_url} />
+                    <AvatarFallback>{renderProfileInitials(otherUser)}</AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1">
+                    <h2 className="font-semibold">{renderProfileName(otherUser)}</h2>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Circle className={cn("h-2 w-2", otherOnline ? "text-green-500 fill-green-500" : "text-muted-foreground")} />
+                      <span>
+                        {otherTyping ? 'печатает...' : otherOnline ? 'в сети' : 'не в сети'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm">
+                      <Phone className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Video className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    {t('messages.no_messages', 'Нет сообщений')}
+                  </div>
+                ) : (
+                  messages.map((message) => {
+                    const isOwn = message.sender_id === userId;
+                    const senderProfile = profiles[message.sender_id];
+                    
+                    return (
+                      <div
+                        key={message.id}
+                        className={cn(
+                          "flex gap-3",
+                          isOwn ? "justify-end" : "justify-start"
+                        )}
+                      >
+                        {!isOwn && (
+                          <Avatar className="h-6 w-6 mt-1">
+                            <AvatarImage src={senderProfile?.avatar_url} />
+                            <AvatarFallback className="text-xs">
+                              {renderProfileInitials(senderProfile)}
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                        
+                        <div
+                          className={cn(
+                            "max-w-[70%] px-3 py-2 rounded-lg",
+                            isOwn
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          )}
+                        >
+                          <p className="text-sm">{message.content}</p>
+                          <div
+                            className={cn(
+                              "flex items-center gap-1 mt-1 text-xs",
+                              isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
+                            )}
+                          >
+                            <Clock className="h-3 w-3" />
+                            <span>
+                              {new Date(message.created_at).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                            {isOwn && (
+                              <CheckCircle2 className="h-3 w-3 ml-1" />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {isOwn && (
+                          <Avatar className="h-6 w-6 mt-1">
+                            <AvatarImage src={profiles[userId]?.avatar_url} />
+                            <AvatarFallback className="text-xs">
+                              {renderProfileInitials(profiles[userId])}
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Message Input */}
+              <div className="p-4 border-t bg-muted/30">
+                <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder={t('messages.type_message', 'Введите сообщение...')}
+                    className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+                    disabled={!selectedChatId}
+                  />
+                  <Button type="submit" disabled={!text.trim() || !selectedChatId}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center bg-muted/20">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Send className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">
+                  {t('messages.select_chat', 'Выберите чат')}
+                </h3>
+                <p className="text-muted-foreground">
+                  {t('messages.select_chat_description', 'Выберите беседу из списка для начала общения')}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-destructive" />
-              Удалить чат?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Удалить чат?</AlertDialogTitle>
             <AlertDialogDescription>
               Это действие нельзя отменить. Чат и все сообщения будут удалены навсегда.
             </AlertDialogDescription>
@@ -815,14 +760,14 @@ const Messages = () => {
             <AlertDialogCancel>Отмена</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-destructive hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Удалить
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </main>
+    </div>
   );
 };
 
