@@ -1,134 +1,69 @@
 import { useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
-import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { KycWizard } from "@/components/kyc/KycWizard";
+import { supabase } from "@/integrations/supabase/client";
 
 const Kyc = () => {
   const { t } = useEnhancedI18n();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
-  const [docs, setDocs] = useState<any[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [docType, setDocType] = useState<string>('id_card');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data: s } = await supabase.auth.getSession();
-      const uid = s.session?.user?.id || null;
-      if (!uid) { navigate('/auth'); return; }
+    const checkAuth = async () => {
+      const { data: session } = await supabase.auth.getSession();
+      const uid = session.session?.user?.id || null;
+      
+      if (!uid) {
+        navigate('/auth');
+        return;
+      }
+      
       setUserId(uid);
-      const { data } = await (supabase as any)
-        .from('kyc_documents')
-        .select('id, doc_type, file_url, status, created_at, reviewed_at')
-        .order('created_at', { ascending: false })
-        .limit(50);
-      setDocs(data || []);
-    })();
+      setLoading(false);
+    };
+
+    checkAuth();
   }, [navigate]);
 
-  const refreshDocs = async () => {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data } = await (supabase as any)
-      .from('kyc_documents')
-      .select('id, doc_type, file_url, status, created_at, reviewed_at')
-      .order('created_at', { ascending: false })
-      .limit(50);
-    setDocs(data || []);
+  const handleKycComplete = () => {
+    navigate('/dashboard/pro');
   };
 
-  const upload = async () => {
-    try {
-      if (!userId || !file) return;
-      setUploading(true);
-      const { supabase } = await import("@/integrations/supabase/client");
-      const ext = file.name.split('.').pop();
-      const path = `${userId}/${crypto.randomUUID()}.${ext}`;
-      const { error: uerr } = await supabase.storage.from('kyc').upload(path, file, { upsert: false, contentType: file.type });
-      if (uerr) throw uerr;
-      const { data: { publicUrl } } = supabase.storage.from('kyc').getPublicUrl(path);
-      const fileUrl = publicUrl || path;
-      const { error: ierr } = await (supabase as any)
-        .from('kyc_documents')
-        .insert({ user_id: userId, doc_type: docType, file_url: fileUrl });
-      if (ierr) throw ierr;
-      toast({ title: 'Документ загружен' });
-      setFile(null);
-      await refreshDocs();
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: 'Ошибка загрузки', description: e?.message, variant: 'destructive' });
-    } finally {
-      setUploading(false);
-    }
-  };
+  if (loading) {
+    return (
+      <main className="container mx-auto py-12">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Загрузка...</p>
+        </div>
+      </main>
+    );
+  }
 
-  const deleteDocument = async (docId: string) => {
-    try {
-      setUploading(true);
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Delete the document from database
-      const { error } = await (supabase as any)
-        .from('kyc_documents')
-        .delete()
-        .eq('id', docId);
-      
-      if (error) throw error;
-      
-      toast({ title: 'Документ удален' });
-      await refreshDocs();
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: 'Ошибка удаления', description: e?.message, variant: 'destructive' });
-    } finally {
-      setUploading(false);
-    }
-  };
+  if (!userId) {
+    return null;
+  }
 
   return (
-    <main className="container mx-auto py-12">
-      <Seo title={`${t('app.name')} — KYC`} description="Загрузка документов KYC" canonical="/kyc" />
-      <section className="max-w-3xl mx-auto card-surface">
-        <h1 className="text-2xl font-semibold mb-4">Верификация KYC</h1>
-        <div className="p-4 border rounded-md mb-6">
-          <div className="flex flex-col md:flex-row gap-3 items-center">
-            <select className="border rounded-md px-3 py-2 bg-background" value={docType} onChange={(e)=>setDocType(e.target.value)}>
-              <option value="id_card">ID / Паспорт</option>
-              <option value="selfie">Селфи</option>
-              <option value="license">Лицензия</option>
-            </select>
-            <input type="file" onChange={(e)=>setFile(e.target.files?.[0]||null)} className="text-sm" />
-            <button className="btn-hero" disabled={uploading || !file} onClick={upload}>{uploading ? 'Загрузка…' : 'Загрузить'}</button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">Файлы будут использоваться для проверки и не публикуются.</p>
-        </div>
-        <h2 className="text-lg font-medium mb-2">Мои документы</h2>
-        <ul className="space-y-3">
-          {docs.length === 0 && <li className="text-sm text-muted-foreground">Пока нет документов</li>}
-          {docs.map((d) => (
-            <li key={d.id} className="p-3 rounded-md border flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm">{d.doc_type}</p>
-                <p className="text-xs text-muted-foreground">Статус: {d.status} • {new Date(d.created_at).toLocaleString()}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <a className="text-xs underline" href={d.file_url} target="_blank" rel="noopener noreferrer">Открыть</a>
-                <button 
-                  onClick={() => deleteDocument(d.id)} 
-                  className="text-xs text-red-600 hover:text-red-800 underline"
-                  disabled={uploading}
-                >
-                  Удалить
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+    <main className="container mx-auto py-12 px-4">
+      <Seo 
+        title={`${t('app.name')} — Верификация KYC`} 
+        description="Пошаговая верификация личности для получения статуса специалиста" 
+        canonical="/kyc" 
+      />
+      
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2">Верификация личности</h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Пройдите простую процедуру верификации, чтобы получить статус специалиста 
+          и начать принимать заказы на платформе
+        </p>
+      </div>
+
+      <KycWizard userId={userId} onComplete={handleKycComplete} />
     </main>
   );
 };
