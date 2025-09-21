@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -44,9 +44,9 @@ function AdminLogs() {
   const [page, setPage] = useState(1);
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
 
-  const adminApi = new AdminAPI();
+  const adminApi = useMemo(() => new AdminAPI(), []);
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
       console.log('Fetching logs with filters:', filters);
@@ -69,18 +69,18 @@ function AdminLogs() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [adminApi, page, filters]);
 
-  const markAsResolved = async (logId: string) => {
+  const markAsResolved = useCallback(async (logId: string) => {
     try {
       await adminApi.markLogAsResolved(logId);
       await fetchLogs();
     } catch (err) {
       console.error('Error marking log as resolved:', err);
     }
-  };
+  }, [adminApi, fetchLogs]);
 
-  const exportLogs = async () => {
+  const exportLogs = useCallback(async () => {
     try {
       const csvData = await adminApi.exportLogs(filters);
       const blob = new Blob([csvData], { type: 'text/csv' });
@@ -93,18 +93,18 @@ function AdminLogs() {
     } catch (err) {
       console.error('Error exporting logs:', err);
     }
-  };
+  }, [adminApi, filters]);
 
   useEffect(() => {
     fetchLogs();
   }, [page, filters]);
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = useCallback((key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     setPage(1);
-  };
+  }, []);
 
-  const getLogIcon = (level: string) => {
+  const getLogIcon = useCallback((level: string) => {
     switch (level) {
       case 'critical':
         return AlertTriangle;
@@ -117,9 +117,9 @@ function AdminLogs() {
       default:
         return Info;
     }
-  };
+  }, []);
 
-  const getLogIconColor = (level: string) => {
+  const getLogIconColor = useCallback((level: string) => {
     switch (level) {
       case 'critical':
         return 'text-red-600';
@@ -132,7 +132,7 @@ function AdminLogs() {
       default:
         return 'text-gray-500';
     }
-  };
+  }, []);
 
   if (loading && logs.length === 0) {
     return (

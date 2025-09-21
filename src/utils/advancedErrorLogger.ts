@@ -238,7 +238,10 @@ class AdvancedErrorLogger {
         });
         observer.observe({ entryTypes: ['longtask'] });
       } catch (e) {
-        console.warn('PerformanceObserver not supported');
+        // Silently ignore if PerformanceObserver not supported
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('PerformanceObserver not supported');
+        }
       }
     }
   }
@@ -450,7 +453,10 @@ class AdvancedErrorLogger {
         });
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
       } catch (e) {
-        console.warn('Performance observation not supported');
+        // Silently ignore if not supported
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Performance observation not supported');
+        }
       }
     }
   }
@@ -575,7 +581,11 @@ class AdvancedErrorLogger {
       this.processErrorQueue();
       
     } catch (e) {
-      console.warn('Failed to log advanced error:', e);
+      // Silently ignore logging errors to prevent infinite loops
+      // Only log to console in development
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to log advanced error:', e);
+      }
     }
   }
 
@@ -607,7 +617,10 @@ class AdvancedErrorLogger {
         });
       }
     } catch (e) {
-      console.warn('Failed to process error queue:', e);
+      // Silently ignore errors to prevent console spam
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to process error queue:', e);
+      }
     } finally {
       this.isProcessingQueue = false;
       

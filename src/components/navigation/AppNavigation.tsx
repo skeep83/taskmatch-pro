@@ -207,6 +207,9 @@ export const AppNavigation = () => {
                   src={platformLogo} 
                   alt="ServiceHub Logo" 
                   className="h-8 w-8 object-contain transition-all duration-300 group-hover:scale-110" 
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                 />
               </div>
             ) : (
@@ -237,9 +240,9 @@ export const AppNavigation = () => {
                       <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
-                          <Link
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                            to="/job/new"
+                          <div
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md cursor-pointer"
+                            onClick={() => navigate('/job/new')}
                           >
                             <Plus className="h-6 w-6 mb-2" />
                             <div className="mb-2 mt-4 text-lg font-medium">
@@ -248,7 +251,7 @@ export const AppNavigation = () => {
                             <p className="text-sm leading-tight text-muted-foreground">
                               {t("nav.new_order_description")}
                             </p>
-                          </Link>
+                          </div>
                         </NavigationMenuLink>
                       </li>
                       <ListItem href="/catalog" title={t("nav.catalog_specialists")}>
@@ -268,11 +271,11 @@ export const AppNavigation = () => {
                 {/* Quick Links */}
                 {mainNavItems.map((item) => (
                   <NavigationMenuItem key={item.href}>
-                    <Link to={item.href}>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                      <Link to={item.href}>
                         {item.title}
-                      </NavigationMenuLink>
-                    </Link>
+                      </Link>
+                    </NavigationMenuLink>
                   </NavigationMenuItem>
                 ))}
               </NavigationMenuList>

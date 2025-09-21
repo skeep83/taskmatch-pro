@@ -1,18 +1,69 @@
 import { supabase } from "@/integrations/supabase/client";
 
 class AdminAPI {
-  public async makeRequest(functionName: string, options: any = {}) {
-    const { data, error } = await supabase.functions.invoke(functionName, {
-      body: options.body || {},
-      headers: options.headers || {}
-    });
+  private requestCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+  private readonly CACHE_TTL = 30000; // 30 seconds cache
+  private readonly REQUEST_TIMEOUT = 10000; // 10 seconds timeout
 
-    if (error) {
-      console.error(`AdminAPI Error (${functionName}):`, error);
-      throw new Error(error.message || `Failed to call ${functionName}`);
+  public async makeRequest(functionName: string, options: any = {}) {
+    // Create cache key
+    const cacheKey = `${functionName}_${JSON.stringify(options.body || {})}`;
+    
+    // Check cache first (only for GET-like operations)
+    if (!options.body?.action || ['list', 'detail', 'stats'].includes(options.body?.action)) {
+      const cached = this.requestCache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < cached.ttl) {
+        console.log(`Cache hit for ${functionName}`);
+        return cached.data;
+      }
     }
 
-    return data;
+    // Create timeout promise
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`Request timeout: ${functionName}`)), this.REQUEST_TIMEOUT);
+    });
+
+    try {
+      const requestPromise = supabase.functions.invoke(functionName, {
+        body: options.body || {},
+        headers: options.headers || {}
+      });
+
+      const { data, error } = await Promise.race([requestPromise, timeoutPromise]) as any;
+
+      if (error) {
+        console.error(`AdminAPI Error (${functionName}):`, error);
+        throw new Error(error.message || `Failed to call ${functionName}`);
+      }
+
+      // Cache successful responses
+      if (!options.body?.action || ['list', 'detail', 'stats'].includes(options.body?.action)) {
+        this.requestCache.set(cacheKey, {
+          data,
+          timestamp: Date.now(),
+          ttl: this.CACHE_TTL
+        });
+        
+        // Clean old cache entries
+        this.cleanCache();
+      }
+
+      return data;
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('timeout')) {
+        console.error(`Request timeout for ${functionName}`);
+      }
+      throw err;
+    }
+  }
+
+  private cleanCache() {
+    const now = Date.now();
+    for (const [key, value] of this.requestCache.entries()) {
+      if (now - value.timestamp > value.ttl) {
+        this.requestCache.delete(key);
+      }
+    }
   }
 
   // Users management
