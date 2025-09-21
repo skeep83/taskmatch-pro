@@ -25,6 +25,7 @@ import {
   Download,
   MessageSquare
 } from "lucide-react";
+import { DocumentViewer } from "./DocumentViewer";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -67,6 +68,17 @@ export const AdminKycVerification = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [documentViewer, setDocumentViewer] = useState<{
+    isOpen: boolean;
+    imageUrl: string;
+    documentType: string;
+    fileName?: string;
+  }>({
+    isOpen: false,
+    imageUrl: "",
+    documentType: "",
+    fileName: ""
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -451,19 +463,12 @@ export const AdminKycVerification = () => {
                                 variant="ghost" 
                                 size="sm" 
                                 onClick={() => {
-                                  // Create a signed URL for viewing the document
-                                  supabase.storage
-                                    .from('kyc')
-                                    .createSignedUrl(doc.file_url.split('/kyc/')[1], 300)
-                                    .then(({ data, error }) => {
-                                      if (error) {
-                                        console.error('Error creating signed URL:', error);
-                                        // Fallback to direct URL
-                                        window.open(doc.file_url, '_blank');
-                                      } else {
-                                        window.open(data.signedUrl, '_blank');
-                                      }
-                                    });
+                                  setDocumentViewer({
+                                    isOpen: true,
+                                    imageUrl: doc.file_url,
+                                    documentType: doc.doc_type,
+                                    fileName: doc.file_url.split('/').pop()
+                                  });
                                 }}
                               >
                                 <Eye className="w-4 h-4" />
@@ -544,6 +549,15 @@ export const AdminKycVerification = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Document Viewer Modal */}
+      <DocumentViewer
+        isOpen={documentViewer.isOpen}
+        onClose={() => setDocumentViewer(prev => ({ ...prev, isOpen: false }))}
+        imageUrl={documentViewer.imageUrl}
+        documentType={documentViewer.documentType}
+        fileName={documentViewer.fileName}
+      />
     </div>
   );
 };
