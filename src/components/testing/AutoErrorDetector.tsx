@@ -72,6 +72,8 @@ export const AutoErrorDetector = () => {
     setFoundErrors(0);
 
     try {
+      console.log('Starting auto-error-crawler scan...');
+      
       const { data, error } = await supabase.functions.invoke('auto-error-crawler', {
         body: {
           startUrl,
@@ -79,58 +81,33 @@ export const AutoErrorDetector = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error invoking crawler:', error);
+        throw error;
+      }
 
-      // Simulate real-time progress updates
-      const totalPages = data.estimatedPages || scanConfig.maxPages;
-      let currentPage = 0;
+      console.log('Crawler completed successfully:', data);
 
-      const progressInterval = setInterval(() => {
-        if (currentPage < totalPages && isScanning) {
-          currentPage++;
-          setScannedPages(currentPage);
-          setProgress((currentPage / totalPages) * 100);
-          
-          // Simulate finding results
-          if (Math.random() > 0.7) {
-            const mockResult: ScanResult = {
-              url: `${startUrl}/page-${currentPage}`,
-              status: Math.random() > 0.8 ? 'error' : Math.random() > 0.5 ? 'warning' : 'success',
-              responseTime: Math.floor(Math.random() * 2000) + 100,
-              errors: Math.random() > 0.6 ? [{
-                type: ['JavaScript Error', 'HTTP Error', 'Performance Issue'][Math.floor(Math.random() * 3)],
-                message: [
-                  'Uncaught TypeError: Cannot read property of undefined',
-                  'Failed to load resource: 404 Not Found',
-                  'Page load time exceeds 3 seconds'
-                ][Math.floor(Math.random() * 3)],
-                severity: ['critical', 'error', 'warning'][Math.floor(Math.random() * 3)] as any
-              }] : [],
-              timestamp: new Date().toISOString()
-            };
-            
-            setResults(prev => [...prev, mockResult]);
-            if (mockResult.errors.length > 0) {
-              setFoundErrors(prev => prev + mockResult.errors.length);
-            }
-          }
-        } else {
-          clearInterval(progressInterval);
-          setIsScanning(false);
-          setProgress(100);
-        }
-      }, scanConfig.delayBetweenRequests);
+      // Display real results from crawler
+      if (data && data.results) {
+        setResults(data.results);
+        setScannedPages(data.summary?.totalPages || data.results.length);
+        setFoundErrors(data.summary?.totalErrors || 0);
+        setProgress(100);
+        
+        toast({
+          title: "Сканирование завершено",
+          description: `Проверено ${data.summary?.totalPages || data.results.length} страниц, найдено ${data.summary?.totalErrors || 0} ошибок`,
+        });
+      }
 
-      // Auto-publish critical errors to logs
-      setTimeout(() => {
-        publishErrorsToLogs();
-      }, scanConfig.delayBetweenRequests * scanConfig.maxPages + 2000);
+      setIsScanning(false);
 
     } catch (error) {
       console.error('Scan error:', error);
       toast({
         title: "Ошибка сканирования",
-        description: "Не удалось запустить автоматическое сканирование",
+        description: error.message || "Не удалось запустить автоматическое сканирование",
         variant: "destructive"
       });
       setIsScanning(false);
