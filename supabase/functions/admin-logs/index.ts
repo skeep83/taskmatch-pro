@@ -63,16 +63,19 @@ serve(async (req) => {
     }
 
     // Check if user has admin access
-    const { data: userRoles } = await supabaseAdmin
+    const { data: userRoles, error: rolesError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id);
+
+    console.log('User roles check:', { userRoles, rolesError, userId: user.id });
 
     const hasAdminAccess = userRoles?.some(r => 
       ['admin', 'superadmin', 'ops'].includes(r.role)
     );
 
     if (!hasAdminAccess) {
+      console.log('Access denied for user:', user.id, 'roles:', userRoles);
       return new Response(
         JSON.stringify({ error: 'Access denied' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
