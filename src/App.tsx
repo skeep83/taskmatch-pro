@@ -36,6 +36,7 @@ const DashboardPro = lazy(() => import("./pages/DashboardPro"));
 const MobileDashboardPro = lazy(() => import("./mobile/pages/MobileDashboardPro"));
 const DashboardBusiness = lazy(() => import("./pages/DashboardBusiness"));
 const Messages = lazy(() => import("./pages/Messages"));
+const MobileMessages = lazy(() => import("./mobile/pages/MobileMessages"));
 const Kyc = lazy(() => import("./pages/Kyc"));
 const ProSchedule = lazy(() => import("./pages/ProSchedule"));
 const ProPortfolio = lazy(() => import("./pages/ProPortfolio"));
@@ -107,8 +108,12 @@ const AppContent = () => {
             } />
             <Route path="/dashboard/business" element={<DashboardBusiness />} />
             <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/messages/:id" element={<Messages />} />
+            <Route path="/messages" element={
+              isMobile ? <MobileMessages /> : <Messages />
+            } />
+            <Route path="/messages/:id" element={
+              isMobile ? <MobileMessages /> : <Messages />
+            } />
             <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="/kyc" element={<Kyc />} />
             <Route path="/pro-upgrade-status" element={<ProUpgradeStatus />} />
