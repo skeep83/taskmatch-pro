@@ -10,7 +10,7 @@ import { getUserRole } from "@/lib/userRoles";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { MobileCard } from "@/mobile/components/ui/MobileCard";
 import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
@@ -310,19 +310,18 @@ export default function MobileFeed() {
               
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Все категории" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Все категории</SelectItem>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.label_ru || cat.key}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="flex-1 bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50"
+                >
+                  <option value="">Все категории</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.label_ru || cat.key}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </MobileCard>
