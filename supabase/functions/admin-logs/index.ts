@@ -303,6 +303,46 @@ serve(async (req) => {
           JSON.stringify({ success: true }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
+
+      } else if (action === 'bulk_create') {
+        // Create multiple log entries at once (for crawler results)
+        const logs = body.logs;
+        
+        if (!logs || !Array.isArray(logs)) {
+          return new Response(
+            JSON.stringify({ error: 'Logs array is required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const logEntries = logs.map(log => ({
+          level: log.level,
+          source: log.source || 'auto-crawler',
+          message: log.message,
+          user_id: log.user_id,
+          metadata: log.metadata,
+          stack_trace: log.stack_trace,
+          resolved: false,
+          timestamp: new Date().toISOString()
+        }));
+
+        const { data, error } = await supabaseAdmin
+          .from('error_logs')
+          .insert(logEntries)
+          .select();
+
+        if (error) {
+          console.error('Error creating bulk logs:', error);
+          return new Response(
+            JSON.stringify({ error: 'Failed to create bulk logs' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        return new Response(
+          JSON.stringify({ success: true, logs: data, count: data.length }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
     }
 

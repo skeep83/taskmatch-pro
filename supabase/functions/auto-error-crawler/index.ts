@@ -353,6 +353,45 @@ serve(async (req) => {
 
     console.log(`Crawl completed. Found ${results.length} pages with ${results.reduce((sum, r) => sum + r.errors.length, 0)} total errors`);
 
+    // Auto-publish critical errors to logs
+    const criticalErrors = results.filter(r => 
+      r.errors.some(e => e.severity === 'critical' || e.severity === 'error')
+    );
+
+    if (criticalErrors.length > 0) {
+      const logsToPublish = [];
+      for (const result of criticalErrors) {
+        for (const error of result.errors) {
+          logsToPublish.push({
+            level: error.severity,
+            source: 'auto-crawler',
+            message: `${error.type}: ${error.message}`,
+            user_id: user.id,
+            metadata: {
+              url: result.url,
+              responseTime: result.responseTime,
+              scanTimestamp: result.timestamp,
+              userAgent: config.userAgent,
+              crawlerConfig: config
+            },
+            stack_trace: error.stack
+          });
+        }
+      }
+
+      try {
+        await supabaseAdmin.functions.invoke('admin-logs', {
+          body: {
+            action: 'bulk_create',
+            logs: logsToPublish
+          }
+        });
+        console.log(`Auto-published ${logsToPublish.length} critical errors to logs`);
+      } catch (error) {
+        console.error('Failed to auto-publish errors:', error);
+      }
+    }
+
     // Log admin action
     await supabaseAdmin.rpc('log_admin_action', {
       admin_user_id: user.id,

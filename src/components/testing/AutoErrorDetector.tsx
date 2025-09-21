@@ -150,34 +150,54 @@ export const AutoErrorDetector = () => {
       r.errors.some(e => e.severity === 'critical' || e.severity === 'error')
     );
 
+    if (criticalErrors.length === 0) {
+      toast({
+        title: "Нет критических ошибок",
+        description: "Не найдено ошибок для публикации"
+      });
+      return;
+    }
+
+    const logsToPublish = [];
     for (const result of criticalErrors) {
       for (const error of result.errors) {
-        try {
-          await supabase.functions.invoke('admin-logs', {
-            body: {
-              action: 'create',
-              level: error.severity,
-              source: 'auto-crawler',
-              message: `${error.type}: ${error.message}`,
-              metadata: {
-                url: result.url,
-                responseTime: result.responseTime,
-                scanTimestamp: result.timestamp,
-                userAgent: scanConfig.userAgent
-              },
-              stack_trace: error.stack
-            }
-          });
-        } catch (err) {
-          console.error('Failed to publish error:', err);
-        }
+        logsToPublish.push({
+          level: error.severity,
+          source: 'auto-crawler',
+          message: `${error.type}: ${error.message}`,
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          metadata: {
+            url: result.url,
+            responseTime: result.responseTime,
+            scanTimestamp: result.timestamp,
+            userAgent: scanConfig.userAgent,
+            crawlerConfig: scanConfig
+          },
+          stack_trace: error.stack
+        });
       }
     }
 
-    if (criticalErrors.length > 0) {
+    try {
+      const { error } = await supabase.functions.invoke('admin-logs', {
+        body: {
+          action: 'bulk_create',
+          logs: logsToPublish
+        }
+      });
+
+      if (error) throw error;
+
       toast({
         title: "Ошибки опубликованы",
-        description: `${criticalErrors.length} критических ошибок добавлено в логи`
+        description: `${logsToPublish.length} ошибок добавлено в систему логов`
+      });
+    } catch (err) {
+      console.error('Failed to publish errors:', err);
+      toast({
+        title: "Ошибка публикации",
+        description: "Не удалось опубликовать ошибки в логи",
+        variant: "destructive"
       });
     }
   };
