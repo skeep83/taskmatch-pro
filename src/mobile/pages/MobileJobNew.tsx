@@ -15,7 +15,6 @@ const MobileJobNew = () => {
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [step, setStep] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -181,14 +180,6 @@ const MobileJobNew = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const nextStep = () => {
-    if (step < 2) setStep(step + 1);
-  };
-
-  const prevStep = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
   return (
     <div className="min-h-screen bg-[#E5E7EB] pb-safe">
       <Seo title={`${t('app.name')} — Создать заказ`} description="Создать заказ" canonical="/job/new" />
@@ -207,287 +198,246 @@ const MobileJobNew = () => {
         </div>
       </div>
 
-      {/* Progress Steps */}
-      <div className="px-4 py-6">
-        <div className="flex items-center justify-center space-x-2">
-          {[1, 2].map((stepNum) => (
-            <div key={stepNum} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] ${
-                stepNum <= step ? 'bg-primary text-white' : 'bg-[#E5E7EB] text-[#6B7280]'
-              }`}>
-                {stepNum <= step ? <CheckCircle className="w-4 h-4" /> : stepNum}
-              </div>
-              {stepNum < 2 && <div className={`w-8 h-1 mx-1 rounded-full transition-all ${
-                stepNum < step ? 'bg-primary' : 'bg-[#D1D5DB]'
-              }`} />}
+      <form onSubmit={onSubmit} className="px-4 py-6 space-y-6">
+        {/* Service Details */}
+        <MobileCard>
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
+              <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+              Детали услуги
+            </h2>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2 text-[#374151]">Категория услуги</label>
+              <select 
+                name="category_id" 
+                defaultValue={presetCategory}
+                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50" 
+                required
+              >
+                <option value="" disabled>Выберите категорию</option>
+                {categoryOptions}
+              </select>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <form onSubmit={onSubmit} className="px-4 space-y-6">
-        {/* Step 1: Service Details */}
-        {step === 1 && (
+            <div>
+              <label className="block text-sm font-medium mb-2 text-[#374151]">Приоритет</label>
+              <select name="urgency" className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50">
+                <option value="normal">Обычный</option>
+                <option value="urgent">Срочно (+30%)</option>
+                <option value="same_day">В тот же день (+50%)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2 text-[#374151]">Описание задачи</label>
+              <textarea 
+                name="description"
+                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50 resize-none" 
+                rows={4}
+                placeholder="Детально опишите задачу..."
+                required
+              />
+              <p className="text-xs text-[#6B7280] mt-2">
+                Чем подробнее описание, тем точнее будут предложения
+              </p>
+            </div>
+          </div>
+        </MobileCard>
+
+        {/* Budget Section */}
+        <MobileCard>
           <div className="space-y-4">
-            <MobileCard>
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
-                  <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
-                  Детали услуги
-                </h2>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-[#374151]">Категория услуги</label>
-                  <select 
-                    name="category_id" 
-                    defaultValue={presetCategory}
-                    className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50" 
-                    required
-                  >
-                    <option value="" disabled>Выберите категорию</option>
-                    {categoryOptions}
-                  </select>
+            <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
+              <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+              Бюджет и расписание
+            </h2>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-[#374151]">
+                  <Euro className="w-4 h-4 text-green-500" />
+                  Бюджет от
+                </label>
+                <input 
+                  name="budget_min" 
+                  type="number" 
+                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                  placeholder="1000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-[#374151]">до</label>
+                <input 
+                  name="budget_max" 
+                  type="number" 
+                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                  placeholder="5000"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-[#374151]">
+                  <Clock className="w-4 h-4 text-blue-500" />
+                  Дата
+                </label>
+                <input 
+                  name="date" 
+                  type="date" 
+                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-[#374151]">Время</label>
+                <input 
+                  name="time" 
+                  type="time" 
+                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+            </div>
+          </div>
+        </MobileCard>
+
+        {/* Photos Section */}
+        <MobileCard>
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
+              <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              Фотографии задачи
+            </h2>
+            
+            {/* Quick Camera Actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.capture = 'environment';
+                  input.onchange = (e) => {
+                    const files = Array.from((e.target as HTMLInputElement).files || []);
+                    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+                  };
+                  input.click();
+                }}
+                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all"
+              >
+                <Camera className="w-4 h-4 text-primary mb-1" />
+                <span className="text-xs text-[#374151] font-medium">Камера</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'video/*';
+                  input.capture = 'environment';
+                  input.onchange = (e) => {
+                    const files = Array.from((e.target as HTMLInputElement).files || []);
+                    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+                  };
+                  input.click();
+                }}
+                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all"
+              >
+                <div className="w-4 h-4 text-primary mb-1 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                  </svg>
                 </div>
+                <span className="text-xs text-[#374151] font-medium">Видео</span>
+              </button>
+            </div>
+            
+            {/* File Upload Area */}
+            <div
+              className={`border-2 border-dashed rounded-lg p-3 text-center transition-all ${
+                dragActive ? 'border-primary bg-primary/5' : 'border-[#D1D5DB]'
+              }`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            >
+              <Upload className="w-5 h-5 text-primary mx-auto mb-1" />
+              <p className="text-xs text-[#6B7280] mb-2">
+                Или выберите файлы
+              </p>
+              <input
+                type="file"
+                multiple
+                accept="image/*,video/*"
+                onChange={handleFileInput}
+                className="hidden"
+                id="mobile-photo-upload"
+                name="photos"
+              />
+              <label htmlFor="mobile-photo-upload" className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] inline-flex items-center gap-1 cursor-pointer active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]">
+                <Upload className="w-3 h-3" />
+                Выбрать
+              </label>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-[#374151]">Приоритет</label>
-                  <select name="urgency" className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50">
-                    <option value="normal">Обычный</option>
-                    <option value="urgent">Срочно (+30%)</option>
-                    <option value="same_day">В тот же день (+50%)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-[#374151]">Описание задачи</label>
-                  <textarea 
-                    name="description"
-                    className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50 resize-none" 
-                    rows={4}
-                    placeholder="Детально опишите задачу..."
-                    required
-                  />
-                  <p className="text-xs text-[#6B7280] mt-2">
-                    Чем подробнее описание, тем точнее будут предложения
-                  </p>
-                </div>
-
-                {/* Photo/Video Upload Section */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-[#374151]">Фото и видео задачи</label>
-                  
-                  {/* Quick Camera Actions */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'image/*';
-                        input.capture = 'environment';
-                        input.onchange = (e) => {
-                          const files = Array.from((e.target as HTMLInputElement).files || []);
-                          setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
-                        };
-                        input.click();
-                      }}
-                      className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all"
-                    >
-                      <Camera className="w-4 h-4 text-primary mb-1" />
-                      <span className="text-xs text-[#374151] font-medium">Камера</span>
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'video/*';
-                        input.capture = 'environment';
-                        input.onchange = (e) => {
-                          const files = Array.from((e.target as HTMLInputElement).files || []);
-                          setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
-                        };
-                        input.click();
-                      }}
-                      className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all"
-                    >
-                      <div className="w-4 h-4 text-primary mb-1 flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-                          <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                        </svg>
-                      </div>
-                      <span className="text-xs text-[#374151] font-medium">Видео</span>
-                    </button>
-                  </div>
-                  
-                  {/* File Upload Area */}
-                  <div
-                    className={`border-2 border-dashed rounded-lg p-3 text-center transition-all ${
-                      dragActive ? 'border-primary bg-primary/5' : 'border-[#D1D5DB]'
-                    }`}
-                    onDragEnter={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                  >
-                    <Upload className="w-5 h-5 text-primary mx-auto mb-1" />
-                    <p className="text-xs text-[#6B7280] mb-2">
-                      Или выберите файлы
-                    </p>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*,video/*"
-                      onChange={handleFileInput}
-                      className="hidden"
-                      id="mobile-photo-upload"
-                      name="photos"
-                    />
-                    <label htmlFor="mobile-photo-upload" className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] inline-flex items-center gap-1 cursor-pointer active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]">
-                      <Upload className="w-3 h-3" />
-                      Выбрать
-                    </label>
-                  </div>
-
-                  {/* Uploaded Files Preview */}
-                  {uploadedFiles.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-xs text-[#6B7280]">Загружено: {uploadedFiles.length}/8</p>
-                      <div className="grid grid-cols-4 gap-2">
-                        {uploadedFiles.map((file, index) => (
-                          <div key={index} className="relative group bg-[#E5E7EB] rounded-lg p-1 shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB]">
-                            {file.type.startsWith('video/') ? (
-                              <div className="w-full h-12 bg-[#D1D5DB] rounded flex items-center justify-center relative">
-                                <svg className="w-4 h-4 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                                </svg>
-                                <span className="absolute bottom-0 right-0 bg-black/70 text-white text-xs px-1 rounded">
-                                  {(file.size / 1024 / 1024).toFixed(1)}MB
-                                </span>
-                              </div>
-                            ) : (
-                              <img
-                                src={URL.createObjectURL(file)}
-                                alt={`Upload ${index + 1}`}
-                                className="w-full h-12 object-cover rounded"
-                              />
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => removeFile(index)}
-                              className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-[1px_1px_2px_rgba(0,0,0,0.2)]"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
+            {/* Uploaded Files Preview */}
+            {uploadedFiles.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-[#6B7280]">Загружено: {uploadedFiles.length}/8</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {uploadedFiles.map((file, index) => (
+                    <div key={index} className="relative group bg-[#E5E7EB] rounded-lg p-1 shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB]">
+                      {file.type.startsWith('video/') ? (
+                        <div className="w-full h-12 bg-[#D1D5DB] rounded flex items-center justify-center relative">
+                          <svg className="w-4 h-4 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                          </svg>
+                          <span className="absolute bottom-0 right-0 bg-black/70 text-white text-xs px-1 rounded">
+                            {(file.size / 1024 / 1024).toFixed(1)}MB
+                          </span>
+                        </div>
+                      ) : (
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Upload ${index + 1}`}
+                          className="w-full h-12 object-cover rounded"
+                        />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeFile(index)}
+                        className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-[1px_1px_2px_rgba(0,0,0,0.2)]"
+                      >
+                        ×
+                      </button>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
-            </MobileCard>
+            )}
           </div>
-        )}
+        </MobileCard>
 
-        {/* Step 2: Budget & Schedule */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <MobileCard>
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
-                  <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
-                  Бюджет и расписание
-                </h2>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-[#374151] flex items-center gap-1">
-                      <Euro className="w-3 h-3 text-green-500" />
-                      От
-                    </label>
-                    <input 
-                      name="budget_min" 
-                      type="number" 
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-3 py-2 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
-                      placeholder="1000"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-[#374151]">До</label>
-                    <input 
-                      name="budget_max" 
-                      type="number" 
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-3 py-2 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
-                      placeholder="5000"
-                    />
-                  </div>
-                </div>
+        {/* Submit Button */}
+        <div className="flex justify-between items-center pt-4 pb-20">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-6 py-3 bg-[#E5E7EB] text-[#374151] rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
+          >
+            Отмена
+          </button>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-[#374151] flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-blue-500" />
-                      Дата
-                    </label>
-                    <input 
-                      name="date" 
-                      type="date" 
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-3 py-2 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-[#374151]">Время</label>
-                    <input 
-                      name="time" 
-                      type="time" 
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-3 py-2 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-                </div>
-              </div>
-            </MobileCard>
-          </div>
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between items-center pt-4 pb-40 safe-bottom">{/* увеличил pb до 40 для еще большего отступа от нижней навигации */}
-          {step > 1 ? (
-            <button
-              type="button"
-              onClick={prevStep}
-              className="px-6 py-3 bg-[#E5E7EB] text-[#374151] rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
-            >
-              Назад
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="px-6 py-3 bg-[#E5E7EB] text-[#374151] rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
-            >
-              Отмена
-            </button>
-          )}
-
-          {step < 2 ? (
-            <button
-              type="button"
-              onClick={nextStep}
-              className="px-6 py-3 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
-            >
-              Далее
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-3 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] disabled:opacity-50"
-            >
-              {loading ? 'Создаем...' : 'Создать'}
-            </button>
-          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-3 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] disabled:opacity-50"
+          >
+            {loading ? 'Создаем...' : 'Создать заказ'}
+          </button>
         </div>
       </form>
     </div>

@@ -233,28 +233,10 @@ const JobNew = () => {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center space-x-4">
-              {[1, 2, 3].map((stepNum) => (
-                <div key={stepNum} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] ${
-                    stepNum <= step ? 'bg-primary text-white' : 'bg-[#E5E7EB] text-[#6B7280]'
-                  }`}>
-                    {stepNum <= step ? <CheckCircle className="w-5 h-5" /> : stepNum}
-                  </div>
-                  {stepNum < 3 && <div className={`w-16 h-1 mx-2 transition-all rounded-full ${
-                    stepNum < step ? 'bg-primary' : 'bg-[#D1D5DB]'
-                  }`} />}
-                </div>
-              ))}
-            </div>
-          </div>
-
           <div className="bg-[#E5E7EB] rounded-3xl p-8 shadow-[12px_12px_24px_#D1D5DB,-12px_-12px_24px_#F9FAFB]">
             <form className="space-y-8" onSubmit={onSubmit}>
               
-              {/* Step 1: Service Details */}
+              {/* Service Details */}
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
                   <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">1</span>
@@ -300,7 +282,7 @@ const JobNew = () => {
                 </div>
               </div>
 
-              {/* Step 2: Budget & Schedule */}
+              {/* Budget & Schedule */}
               <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
                   <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">2</span>
@@ -360,7 +342,7 @@ const JobNew = () => {
                 </div>
               </div>
 
-              {/* Step 3: Photos */}
+              {/* Photos */}
               <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
                   <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">3</span>
