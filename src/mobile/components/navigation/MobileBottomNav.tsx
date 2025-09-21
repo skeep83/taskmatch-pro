@@ -35,16 +35,23 @@ export function MobileBottomNav() {
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={cn(
         "fixed bottom-0 left-0 right-0 z-50",
-        "bg-[#E5E7EB]"
+        "bg-[#E5E7EB]",
+        "safe-bottom" // Using CSS safe area utility
       )}
       style={{ 
-        height: bottomNavHeight + safeAreaInsets.bottom,
-        paddingBottom: safeAreaInsets.bottom 
+        height: `${bottomNavHeight}px`,
+        paddingBottom: `max(${safeAreaInsets.bottom}px, env(safe-area-inset-bottom))`
       }}
     >
-      {/* Neumorphic container - уменьшенная высота */}
-      <div className="p-1.5 h-full bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-        <nav className="flex items-center justify-around h-12">
+      {/* Neumorphic container with adaptive height */}
+      <div 
+        className="px-2 pt-1.5 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]"
+        style={{ 
+          height: `${bottomNavHeight}px`,
+          paddingBottom: `max(8px, env(safe-area-inset-bottom))`
+        }}
+      >
+        <nav className="flex items-center justify-around" style={{ height: `${bottomNavHeight - 12}px` }}>
           {navItems.map((item, index) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
