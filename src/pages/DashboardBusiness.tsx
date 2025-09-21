@@ -119,7 +119,7 @@ export default function DashboardBusiness() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 lg:space-y-8">
-            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+            <div className={`p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] ${isMobile ? 'overflow-x-auto' : ''}`}>
               <TabsList className={`${isMobile ? 'flex w-max min-w-full' : 'grid w-full grid-cols-6'} bg-transparent`}>
                 <TabsTrigger value="overview" className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black ${isMobile ? 'flex-shrink-0 px-3 py-2' : ''}`}>
                   <User className="h-5 w-5 text-black" />
