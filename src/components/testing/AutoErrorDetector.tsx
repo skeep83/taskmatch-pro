@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -409,9 +409,9 @@ export const AutoErrorDetector = () => {
                           <div className="space-y-1 flex-1">
                             <div className="flex items-center gap-2">
                               {result.status === 'success' ? (
-                                <CheckCircle className="h-4 w-4 text-green-600" />
+                                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                               ) : result.status === 'warning' ? (
-                                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                                <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                               ) : (
                                 <AlertTriangle className="h-4 w-4 text-destructive" />
                               )}
