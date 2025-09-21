@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
 import { AvatarUpload } from '@/components/AvatarUpload';
+import { MobileAvatarUpload } from '../components/ui/MobileAvatarUpload';
 import { NeumorphicIcon } from '@/components/ui/neumorphic-icon';
 
 interface Profile {
@@ -355,7 +356,7 @@ export default function MobileProfileSettings() {
                 <Camera className="h-5 w-5" />
                 Фото профиля
               </h3>
-              <AvatarUpload
+              <MobileAvatarUpload
                 userId={user.id}
                 currentAvatarUrl={profile.avatar_url}
                 userName={`${profile.first_name} ${profile.last_name}`.trim()}
