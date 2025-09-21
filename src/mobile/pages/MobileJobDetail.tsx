@@ -20,6 +20,7 @@ interface JobDetail {
   created_at: string;
   urgency: string;
   status: string;
+  client_id?: string;
   categories?: { label_ru: string; label_ro: string };
   profiles?: {
     full_name?: string;
@@ -63,6 +64,7 @@ export default function MobileJobDetail() {
           created_at,
           urgency,
           status,
+          client_id,
           categories(label_ru, label_ro),
           profiles!jobs_client_id_fkey(
             full_name,
@@ -315,11 +317,19 @@ export default function MobileJobDetail() {
                 </div>
                 
                 <div className="flex space-x-2">
-                  <button className="p-2 rounded-lg bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
+                  <button 
+                    onClick={() => navigate(`/messages?job_id=${job.id}&client_id=${job.client_id || ''}`)}
+                    className="p-2 rounded-lg bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] hover:shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] transition-all duration-200"
+                    title="Написать сообщение"
+                  >
                     <MessageCircle size={18} className="text-[#374151]" />
                   </button>
-                  {job.profiles.phone && (
-                    <button className="p-2 rounded-lg bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
+                  {job.profiles?.phone && (
+                    <button 
+                      onClick={() => window.open(`tel:${job.profiles.phone}`, '_self')}
+                      className="p-2 rounded-lg bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] hover:shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] transition-all duration-200"
+                      title="Позвонить"
+                    >
                       <Phone size={18} className="text-[#374151]" />
                     </button>
                   )}
