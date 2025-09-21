@@ -867,32 +867,61 @@ export default function AdminUsers() {
                                   )}
 
                                   {/* KYC Actions */}
-                                  {selectedUser.kyc_status === "pending" && (
+                                  {selectedUser.kyc_status !== "none" && (
                                     <>
+                                      {selectedUser.kyc_status === "pending" && (
+                                        <>
+                                          <Button
+                                            onClick={() => moderateKyc(selectedUser.id, "approved", actionNote)}
+                                          >
+                                            <CheckCircle className="w-4 h-4 mr-1" />
+                                            Одобрить KYC
+                                          </Button>
+                                          <Button
+                                            variant="destructive"
+                                            onClick={() => moderateKyc(selectedUser.id, "rejected", actionNote)}
+                                          >
+                                            <XCircle className="w-4 h-4 mr-1" />
+                                            Отклонить KYC
+                                          </Button>
+                                        </>
+                                      )}
+
+                                      {selectedUser.kyc_status === "approved" && (
+                                        <>
+                                          <Button
+                                            onClick={() => moderateKyc(selectedUser.id, "approved", actionNote)}
+                                          >
+                                            <CheckCircle className="w-4 h-4 mr-1" />
+                                            Переодобрить KYC
+                                          </Button>
+                                          <Button
+                                            variant="destructive"
+                                            onClick={() => moderateKyc(selectedUser.id, "rejected", actionNote)}
+                                          >
+                                            <XCircle className="w-4 h-4 mr-1" />
+                                            Отклонить KYC
+                                          </Button>
+                                        </>
+                                      )}
+
+                                      {selectedUser.kyc_status === "rejected" && (
+                                        <Button
+                                          onClick={() => moderateKyc(selectedUser.id, "approved", actionNote)}
+                                        >
+                                          <CheckCircle className="w-4 h-4 mr-1" />
+                                          Одобрить KYC
+                                        </Button>
+                                      )}
+
                                       <Button
-                                        onClick={() => moderateKyc(selectedUser.id, "approved", actionNote)}
+                                        variant="outline"
+                                        onClick={() => resetKyc(selectedUser.id, actionNote)}
                                       >
-                                        <CheckCircle className="w-4 h-4 mr-1" />
-                                        Одобрить KYC
-                                      </Button>
-                                      <Button
-                                        variant="destructive"
-                                        onClick={() => moderateKyc(selectedUser.id, "rejected", actionNote)}
-                                      >
-                                        <XCircle className="w-4 h-4 mr-1" />
-                                        Отклонить KYC
+                                        <AlertTriangle className="w-4 h-4 mr-1" />
+                                        Сбросить KYC
                                       </Button>
                                     </>
-                                  )}
-
-                                  {(selectedUser.kyc_status === "approved" || selectedUser.kyc_status === "rejected") && (
-                                    <Button
-                                      variant="outline"
-                                      onClick={() => resetKyc(selectedUser.id, actionNote)}
-                                    >
-                                      <AlertTriangle className="w-4 h-4 mr-1" />
-                                      Сбросить KYC
-                                    </Button>
                                   )}
                                 </div>
                               </div>
