@@ -235,7 +235,7 @@ const Catalog = () => {
                 </div>
 
                 {/* Content Section with glass morphism effect */}
-                <div className="pt-16 px-6 pb-6 h-full flex flex-col" 
+                <div className="pt-20 px-6 pb-8 h-full flex flex-col" 
                      style={{ 
                        background: 'linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))',
                        backdropFilter: 'blur(10px)',
