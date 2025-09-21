@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { 
   User, Camera, MapPin, Phone, Mail, Globe, 
   Briefcase, Clock, DollarSign, Save, CheckCircle2,
-  ArrowLeft, Wrench, Plus, X
+  ArrowLeft, Wrench, Plus, X, Settings, Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { MobileHeader } from '../components/navigation/MobileHeader';
 import { MobileCard } from '../components/ui/MobileCard';
 import { useMobile } from '../providers/MobileProvider';
@@ -73,6 +74,13 @@ export default function MobileProfileSettings() {
 
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  
+  const [notifications, setNotifications] = useState({
+    newJobs: true,
+    sms: false,
+    email: true,
+    push: true
+  });
 
   useEffect(() => {
     loadUserData();
@@ -303,7 +311,8 @@ export default function MobileProfileSettings() {
     { id: 'contact', label: 'Контакты', icon: Phone },
     ...(userRole === 'pro' ? [
       { id: 'professional', label: 'Специалист', icon: Briefcase },
-      { id: 'categories', label: 'Категории', icon: Wrench }
+      { id: 'categories', label: 'Категории', icon: Wrench },
+      { id: 'notifications', label: 'Уведомления', icon: Settings }
     ] : [])
   ];
 
@@ -590,6 +599,75 @@ export default function MobileProfileSettings() {
                   </div>
                 </div>
               )}
+            </MobileCard>
+          </div>
+        )}
+
+        {/* Notifications Tab */}
+        {activeTab === 'notifications' && userRole === 'pro' && (
+          <div className="space-y-4">
+            <MobileCard>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Настройки уведомлений
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Управляйте способами получения уведомлений
+              </p>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium">Новые заказы</label>
+                    <p className="text-xs text-muted-foreground">Получать уведомления о новых заказах</p>
+                  </div>
+                  <Switch
+                    checked={notifications.newJobs}
+                    onCheckedChange={(checked) => 
+                      setNotifications(prev => ({ ...prev, newJobs: checked }))
+                    }
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium">SMS уведомления</label>
+                    <p className="text-xs text-muted-foreground">Получать SMS уведомления</p>
+                  </div>
+                  <Switch
+                    checked={notifications.sms}
+                    onCheckedChange={(checked) => 
+                      setNotifications(prev => ({ ...prev, sms: checked }))
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium">Email уведомления</label>
+                    <p className="text-xs text-muted-foreground">Получать уведомления на почту</p>
+                  </div>
+                  <Switch
+                    checked={notifications.email}
+                    onCheckedChange={(checked) => 
+                      setNotifications(prev => ({ ...prev, email: checked }))
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-medium">Push уведомления</label>
+                    <p className="text-xs text-muted-foreground">Получать push уведомления в приложении</p>
+                  </div>
+                  <Switch
+                    checked={notifications.push}
+                    onCheckedChange={(checked) => 
+                      setNotifications(prev => ({ ...prev, push: checked }))
+                    }
+                  />
+                </div>
+              </div>
             </MobileCard>
           </div>
         )}

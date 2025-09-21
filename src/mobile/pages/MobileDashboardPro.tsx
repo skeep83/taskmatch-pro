@@ -138,8 +138,7 @@ export default function MobileDashboardPro() {
     { id: "jobs", label: "Заказы", icon: Briefcase },
     { id: "portfolio", label: "Портфолио", icon: Star },
     { id: "schedule", label: "График", icon: Calendar },
-    { id: "earnings", label: "Доходы", icon: DollarSign },
-    { id: "settings", label: "Настройки", icon: Settings }
+    { id: "earnings", label: "Доходы", icon: DollarSign }
   ];
 
   return (
@@ -408,47 +407,6 @@ export default function MobileDashboardPro() {
             </div>
           )}
 
-          {activeTab === "settings" && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Настройки</h2>
-              
-              <MobileCard>
-                <h4 className="font-semibold mb-4">Профиль специалиста</h4>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Специализация</label>
-                    <p className="text-muted-foreground">Сантехник, электрик</p>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Радиус работы</label>
-                    <p className="text-muted-foreground">10 км</p>
-                  </div>
-                </div>
-              </MobileCard>
-
-              <MobileCard>
-                <h4 className="font-semibold mb-4">Уведомления</h4>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="text-sm font-medium">Новые заказы</label>
-                      <p className="text-xs text-muted-foreground">Получать уведомления о новых заказах</p>
-                    </div>
-                    <div className="w-10 h-6 bg-primary rounded-full"></div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <label className="text-sm font-medium">SMS уведомления</label>
-                      <p className="text-xs text-muted-foreground">Получать SMS уведомления</p>
-                    </div>
-                    <div className="w-10 h-6 bg-gray-300 rounded-full"></div>
-                  </div>
-                </div>
-              </MobileCard>
-            </div>
-          )}
         </div>
       </div>
     </RoleGuard>
