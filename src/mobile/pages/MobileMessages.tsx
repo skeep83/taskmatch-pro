@@ -69,8 +69,10 @@ export default function MobileMessages() {
   const [presence, setPresence] = useState<Record<string, any>>({});
   const [otherOnline, setOtherOnline] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const roomRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -92,6 +94,10 @@ export default function MobileMessages() {
     return () => {
       if (roomRef.current) {
         roomRef.current.unsubscribe();
+      }
+      // Очищаем typing timeout при размонтировании
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
       }
     };
   }, [id, userId]);
@@ -214,8 +220,55 @@ export default function MobileMessages() {
     }
   };
 
+  // Функция для отправки typing статуса
+  const updateTypingStatus = async (typing: boolean) => {
+    if (roomRef.current && userId) {
+      try {
+        await roomRef.current.track({ 
+          user_id: userId, 
+          chat_id: id, 
+          online_at: new Date().toISOString(), 
+          typing 
+        });
+      } catch (error) {
+        console.error('Error updating typing status:', error);
+      }
+    }
+  };
+
+  // Обработка изменения текста с typing indicator
+  const handleTextChange = async (newText: string) => {
+    setText(newText);
+    
+    // Отправляем typing status только если текст не пустой и мы не печатаем уже
+    if (newText.trim() && !isTyping) {
+      setIsTyping(true);
+      await updateTypingStatus(true);
+    }
+    
+    // Очищаем предыдущий таймер
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Устанавливаем новый таймер для отключения typing
+    typingTimeoutRef.current = setTimeout(async () => {
+      setIsTyping(false);
+      await updateTypingStatus(false);
+    }, 2000); // Останавливаем typing через 2 секунды
+  };
+
   const sendMessage = async () => {
     if (!text.trim() || !userId || !id) return;
+    
+    // Останавливаем typing статус перед отправкой
+    if (isTyping) {
+      setIsTyping(false);
+      await updateTypingStatus(false);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    }
     
     try {
       const { supabase } = await import('@/integrations/supabase/client');
@@ -455,11 +508,17 @@ export default function MobileMessages() {
               <div>
                 <div className="font-semibold text-gray-800">{displayName}</div>
                 <div className="text-xs text-gray-600 flex items-center gap-1">
-                  <Circle className={`w-2 h-2 fill-current ${otherOnline ? 'text-green-500' : 'text-gray-400'}`} />
+                  <Circle className={`w-2 h-2 fill-current transition-colors duration-200 ${
+                    otherOnline ? 'text-green-500' : 'text-gray-400'
+                  }`} />
                   {otherTyping ? (
-                    <span className="text-primary animate-pulse">Печатает…</span>
+                    <span className="text-primary animate-pulse font-medium">Печатает…</span>
                   ) : (
-                    <span>{otherOnline ? 'В сети' : 'Не в сети'}</span>
+                    <span className={`transition-colors duration-200 ${
+                      otherOnline ? 'text-green-600 font-medium' : 'text-gray-500'
+                    }`}>
+                      {otherOnline ? 'В сети' : 'Не в сети'}
+                    </span>
                   )}
                 </div>
               </div>
@@ -575,7 +634,7 @@ export default function MobileMessages() {
           >
             <input
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => handleTextChange(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
