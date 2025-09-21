@@ -197,7 +197,7 @@ export default function MobileDashboardClient() {
       setUserProfile(profileData);
 
       // Load user jobs with photos
-      console.log('🔍 Loading jobs for user:', user.id);
+      console.log('🔍 LOADING JOBS WITH PHOTOS for user:', user.id);
       
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")
@@ -214,7 +214,7 @@ export default function MobileDashboardClient() {
           categories!inner (
             label_ru
           ),
-          job_photos(
+          job_photos!inner (
             id,
             file_url,
             display_order
@@ -225,19 +225,19 @@ export default function MobileDashboardClient() {
         .limit(10);
 
       if (jobsError) {
-        console.error('❌ Error loading jobs:', jobsError);
+        console.error('❌ ERROR LOADING JOBS:', jobsError);
         throw jobsError;
       }
       
-      console.log('✅ Jobs loaded:', jobsData?.length, 'jobs');
+      console.log('✅ JOBS LOADED:', jobsData?.length, 'jobs with photos');
       
       // Log each job and its photos
       jobsData?.forEach(job => {
-        console.log(`📋 Job ${job.id}: "${job.title}"`);
-        console.log(`📸 Photos count: ${job.job_photos?.length || 0}`);
+        console.log(`📋 JOB ${job.id}: "${job.title}"`);
+        console.log(`📸 PHOTOS COUNT: ${job.job_photos?.length || 0}`);
         if (job.job_photos?.length > 0) {
           job.job_photos.forEach((photo, index) => {
-            console.log(`  📸 Photo ${index + 1}: ${photo.file_url}`);
+            console.log(`  📸 PHOTO ${index + 1}: ${photo.file_url}`);
           });
         }
       });
