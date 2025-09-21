@@ -10,30 +10,31 @@ export const SignatureGradient: React.FC = () => {
     let x = 50, y = 30;
     let cachedRect: DOMRect | null = null;
     let rectUpdateQueued = false;
+    let isInitialized = false;
 
     const updateRect = () => {
-      if (el) {
-        cachedRect = el.getBoundingClientRect();
-        rectUpdateQueued = false;
-      }
-    };
-
-    const queueRectUpdate = () => {
-      if (!rectUpdateQueued) {
+      if (el && !rectUpdateQueued) {
         rectUpdateQueued = true;
-        requestAnimationFrame(updateRect);
+        requestAnimationFrame(() => {
+          cachedRect = el.getBoundingClientRect();
+          rectUpdateQueued = false;
+        });
       }
     };
 
     const onMove = (e: MouseEvent) => {
-      if (!cachedRect) {
-        cachedRect = el.getBoundingClientRect();
+      // Use cached rect to avoid forced reflow, only update if needed
+      if (!cachedRect && isInitialized) {
+        updateRect();
+        return;
       }
       
-      const nx = ((e.clientX - cachedRect.left) / cachedRect.width) * 100;
-      const ny = ((e.clientY - cachedRect.top) / cachedRect.height) * 100;
-      x = nx; y = ny;
-      if (!raf) raf = requestAnimationFrame(update);
+      if (cachedRect) {
+        const nx = ((e.clientX - cachedRect.left) / cachedRect.width) * 100;
+        const ny = ((e.clientY - cachedRect.top) / cachedRect.height) * 100;
+        x = nx; y = ny;
+        if (!raf) raf = requestAnimationFrame(update);
+      }
     };
 
     const update = () => {
@@ -43,15 +44,24 @@ export const SignatureGradient: React.FC = () => {
     };
 
     const onResize = () => {
-      queueRectUpdate();
+      // Debounce resize to prevent excessive rect calculations
+      if (!rectUpdateQueued) {
+        updateRect();
+      }
     };
 
-    // Initial rect calculation
-    updateRect();
+    // Initial setup with deferred rect calculation
+    const initialize = () => {
+      requestAnimationFrame(() => {
+        cachedRect = el.getBoundingClientRect();
+        isInitialized = true;
+      });
+    };
 
     const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (!mql.matches) {
-      el.addEventListener("mousemove", onMove);
+      initialize();
+      el.addEventListener("mousemove", onMove, { passive: true });
       window.addEventListener("resize", onResize, { passive: true });
     }
     
