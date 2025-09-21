@@ -336,18 +336,63 @@ const MobileJobNew = () => {
           </div>
         )}
 
-        {/* Step 3: Photos */}
+        {/* Step 3: Photos & Videos */}
         {step === 3 && (
           <div className="space-y-4">
             <MobileCard>
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
                   <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
-                  Фотографии
+                  Фото и видео
                 </h2>
                 
+                {/* Quick Camera Action */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.capture = 'environment';
+                      input.onchange = (e) => {
+                        const files = Array.from((e.target as HTMLInputElement).files || []);
+                        setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+                      };
+                      input.click();
+                    }}
+                    className="flex flex-col items-center justify-center p-3 bg-[#E5E7EB] rounded-xl shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all"
+                  >
+                    <Camera className="w-5 h-5 text-primary mb-1" />
+                    <span className="text-xs text-[#374151] font-medium">Камера</span>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'video/*';
+                      input.capture = 'environment';
+                      input.onchange = (e) => {
+                        const files = Array.from((e.target as HTMLInputElement).files || []);
+                        setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+                      };
+                      input.click();
+                    }}
+                    className="flex flex-col items-center justify-center p-3 bg-[#E5E7EB] rounded-xl shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all"
+                  >
+                    <div className="w-5 h-5 text-primary mb-1 flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                      </svg>
+                    </div>
+                    <span className="text-xs text-[#374151] font-medium">Видео</span>
+                  </button>
+                </div>
+                
                 <div
-                  className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${
+                  className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${
                     dragActive ? 'border-primary bg-primary/5' : 'border-[#D1D5DB]'
                   }`}
                   onDragEnter={handleDrag}
@@ -355,44 +400,58 @@ const MobileJobNew = () => {
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
                 >
-                  <Camera className="w-8 h-8 text-primary mx-auto mb-3" />
-                  <h3 className="text-sm font-medium mb-2 text-[#374151]">Добавьте фото</h3>
+                  <Upload className="w-6 h-6 text-primary mx-auto mb-2" />
+                  <h3 className="text-sm font-medium mb-1 text-[#374151]">Загрузить файлы</h3>
                   <p className="text-xs text-[#6B7280] mb-3">
-                    Перетащите или выберите файлы
+                    Фото, видео или перетащите сюда
                   </p>
                   <input
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="image/*,video/*"
                     onChange={handleFileInput}
                     className="hidden"
                     id="mobile-photo-upload"
                     name="photos"
                   />
-                  <label htmlFor="mobile-photo-upload" className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] inline-flex items-center gap-2 cursor-pointer active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]">
+                  <label htmlFor="mobile-photo-upload" className="bg-primary text-white px-3 py-2 rounded-xl text-xs font-semibold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] inline-flex items-center gap-1 cursor-pointer active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]">
                     <Upload className="w-3 h-3" />
                     Выбрать
                   </label>
                 </div>
 
                 {uploadedFiles.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2">
-                    {uploadedFiles.map((file, index) => (
-                      <div key={index} className="relative group bg-[#E5E7EB] rounded-lg p-1 shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Upload ${index + 1}`}
-                          className="w-full h-16 object-cover rounded"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeFile(index)}
-                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                  <div className="space-y-2">
+                    <p className="text-xs text-[#6B7280]">Загружено: {uploadedFiles.length}/8</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {uploadedFiles.map((file, index) => (
+                        <div key={index} className="relative group bg-[#E5E7EB] rounded-lg p-1 shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
+                          {file.type.startsWith('video/') ? (
+                            <div className="w-full h-16 bg-[#D1D5DB] rounded flex items-center justify-center relative">
+                              <svg className="w-6 h-6 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                              </svg>
+                              <span className="absolute bottom-0 right-0 bg-black/70 text-white text-xs px-1 rounded">
+                                {(file.size / 1024 / 1024).toFixed(1)}MB
+                              </span>
+                            </div>
+                          ) : (
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-16 object-cover rounded"
+                            />
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeFile(index)}
+                            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-[2px_2px_4px_rgba(0,0,0,0.2)]"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
