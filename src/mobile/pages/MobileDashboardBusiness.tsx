@@ -37,7 +37,6 @@ const tabItems = [
 ];
 
 export default function MobileDashboardBusiness() {
-  console.log('🏢 Business Dashboard component rendered');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { safeAreaInsets } = useMobile();

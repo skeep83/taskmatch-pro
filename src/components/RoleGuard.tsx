@@ -37,7 +37,6 @@ export const RoleGuard = ({ requiredRole, children, redirectTo }: RoleGuardProps
         .in("role", ['client', 'pro', 'business']);
       
       const userRoles = (roles || []).map((r: any) => r.role as UserRole);
-      console.log(`🔐 RoleGuard: User roles:`, userRoles, `Required:`, requiredRole);
       
       if (userRoles.length > 0) {
         if (userRoles.includes(requiredRole)) {
