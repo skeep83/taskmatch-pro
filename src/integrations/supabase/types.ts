@@ -2419,7 +2419,7 @@ export type Database = {
       }
       clear_all_error_logs: {
         Args: Record<PropertyKey, never>
-        Returns: undefined
+        Returns: Json
       }
       clear_expired_otp: {
         Args: Record<PropertyKey, never>
