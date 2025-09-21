@@ -317,7 +317,7 @@ const ProPublic = () => {
               </div>
             </div>
             <div className="shrink-0">
-              <Link to={`/job/new?${new URLSearchParams({ category_id: categories[0]?.id || '', pro_id: String(id) })}`} className="btn-hero">Забронировать</Link>
+              <Link to={`/job/new?${new URLSearchParams({ category_id: categories[0]?.id || '', pro_id: String(id) })}`} className="btn-hero text-white">Забронировать</Link>
             </div>
           </div>
 
