@@ -92,14 +92,16 @@ export default function DashboardBusiness() {
 
         {/* Header Section */}
         <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Бизнес-панель
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Управление корпоративным аккаунтом, {user?.email}
-          </p>
-        </div>
+        {!isMobile && (
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+              Бизнес-панель
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Управление корпоративным аккаунтом
+            </p>
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 lg:space-y-8">
