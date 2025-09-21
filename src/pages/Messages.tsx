@@ -426,6 +426,14 @@ const Messages = () => {
 
   const send = async () => {
     if (!text.trim() || !userId || !id) return;
+    
+    const currentSelectedChat = chats.find(c => String(c.id) === String(id));
+    if (!currentSelectedChat) {
+      console.error('❌ Selected chat not found');
+      toast({ title: "Ошибка", description: "Чат не найден", variant: "destructive" });
+      return;
+    }
+    
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
@@ -452,8 +460,8 @@ const Messages = () => {
       setText("");
       
       // Send notification to other participant
-      if (newMessage && selectedChat) {
-        const receiverId = selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id;
+      if (newMessage && currentSelectedChat) {
+        const receiverId = currentSelectedChat.client_id === userId ? currentSelectedChat.professional_id : currentSelectedChat.client_id;
         const senderProfile = profiles[userId] || { full_name: 'Пользователь' };
         const senderName = senderProfile.full_name || senderProfile.first_name || 'Пользователь';
         const messagePreview = text.length > 50 ? text.substring(0, 50) + '...' : text;
