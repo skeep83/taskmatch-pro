@@ -52,31 +52,45 @@
     <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQZNLo_U2r.woff2" as="font" type="font/woff2" crossorigin>
     
-    <!-- Advanced critical resource loading strategy -->
+    <!-- Optimized critical resource loading strategy -->
     <script>
-      // Immediately start parallel loading of critical resources
-      const resources = [
-        { href: '/assets/index.js', as: 'script', priority: 'high' },
-        { href: '/assets/index.css', as: 'style', priority: 'high' },
+      // Immediately start parallel loading of only critical resources
+      const criticalResources = [
         { href: '/src/main.tsx', as: 'script', priority: 'high' }
       ];
       
-      resources.forEach(({ href, as, priority }) => {
+      const deferredResources = [
+        { href: '/assets/index.css', as: 'style', priority: 'low' }
+      ];
+      
+      // Load critical resources immediately
+      criticalResources.forEach(({ href, as, priority }) => {
         const link = document.createElement('link');
-        link.rel = as === 'script' ? 'modulepreload' : 'preload';
+        link.rel = 'modulepreload';
         link.href = href;
-        if (as !== 'script') link.as = as;
         link.fetchPriority = priority;
         link.crossOrigin = 'anonymous';
         document.head.appendChild(link);
       });
       
-      // Early connection establishment for faster resource loading
-      if ('connection' in navigator && navigator.connection && navigator.connection.downlink > 1) {
-        const linkElem = document.createElement('link');
-        linkElem.rel = 'prefetch';
-        linkElem.href = '/assets/index.js';
-        document.head.appendChild(linkElem);
+      // Defer non-critical resources until after critical path
+      const loadDeferredResources = () => {
+        deferredResources.forEach(({ href, as, priority }) => {
+          const link = document.createElement('link');
+          link.rel = as === 'script' ? 'modulepreload' : 'preload';
+          link.href = href;
+          if (as !== 'script') link.as = as;
+          link.fetchPriority = priority;
+          link.crossOrigin = 'anonymous';
+          document.head.appendChild(link);
+        });
+      };
+      
+      // Load deferred resources during idle time
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadDeferredResources, { timeout: 1000 });
+      } else {
+        setTimeout(loadDeferredResources, 100);
       }
     </script>
     
@@ -323,9 +337,32 @@
     <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
     
     
-    <!-- Aggressive prefetch for next-likely resources -->
-    <link rel="prefetch" href="/assets/index.js">
-    <link rel="prefetch" href="/src/main.tsx" as="script" crossorigin>
+    <!-- Optimized resource prefetching - defer non-critical JS -->
+    <script>
+      // Intelligent resource prefetching based on user behavior
+      const prefetchNonCritical = () => {
+        const resources = [
+          { href: '/assets/index.js', as: 'script' },
+          { href: '/assets/index.css', as: 'style' }
+        ];
+        
+        resources.forEach(({ href, as }) => {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.href = href;
+          if (as !== 'script') link.as = as;
+          link.crossOrigin = 'anonymous';
+          document.head.appendChild(link);
+        });
+      };
+      
+      // Only prefetch after initial critical rendering is complete
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(prefetchNonCritical, { timeout: 2000 });
+      } else {
+        setTimeout(prefetchNonCritical, 1000);
+      }
+    </script>
     <link rel="prefetch" href="/assets/index.css" as="style">
     <link rel="canonical" href="https://taskmatch-pro.lovable.app/" />
     
@@ -389,6 +426,6 @@
         }, 100);
       });
     </script>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/main.tsx" defer></script>
   </body>
 </html>
