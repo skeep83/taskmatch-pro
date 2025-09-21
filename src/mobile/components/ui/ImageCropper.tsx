@@ -351,6 +351,9 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     tempCanvas.width = outputSize;
     tempCanvas.height = outputSize;
 
+    // Make background transparent
+    tempCtx.clearRect(0, 0, outputSize, outputSize);
+
     // Calculate scale factors from canvas to original image
     const scaleX = image.width / canvasSize.width;
     const scaleY = image.height / canvasSize.height;
@@ -361,16 +364,18 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
     const sourceWidth = cropArea.width * scaleX;
     const sourceHeight = cropArea.height * scaleY;
 
-    // Create circular clipping path
+    // Create circular clipping path FIRST
     const centerX = outputSize / 2;
     const centerY = outputSize / 2;
     const radius = outputSize / 2;
 
+    tempCtx.save();
     tempCtx.beginPath();
     tempCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    tempCtx.closePath();
     tempCtx.clip();
 
-    // Draw cropped and scaled image
+    // Draw cropped and scaled image within the circular clip
     tempCtx.drawImage(
       image,
       sourceX,
@@ -383,7 +388,9 @@ export function ImageCropper({ isOpen, onClose, onCrop, imageFile }: ImageCroppe
       outputSize
     );
 
-    // Convert to blob with high quality
+    tempCtx.restore();
+
+    // Convert to blob with PNG format to preserve transparency
     tempCanvas.toBlob((blob) => {
       if (blob) {
         onCrop(blob);
