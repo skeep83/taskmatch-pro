@@ -53,6 +53,98 @@ export function MobileHeader({
   const { unreadCount } = useNotifications();
   const [selectorOpen, setSelectorOpen] = React.useState(false);
   const [notificationOpen, setNotificationOpen] = React.useState(false);
+  const [unreadMessagesCount, setUnreadMessagesCount] = React.useState(0);
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  // Загружаем количество непрочитанных сообщений
+  React.useEffect(() => {
+    const loadUnreadMessagesCount = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: session } = await supabase.auth.getSession();
+        const uid = session.session?.user?.id;
+        
+        if (!uid) {
+          setUnreadMessagesCount(0);
+          return;
+        }
+        
+        setUserId(uid);
+        
+        // Получаем количество непрочитанных сообщений
+        const { data: unreadMessages } = await supabase
+          .from('chat_messages')
+          .select('id, chat_id')
+          .eq('is_read', false)
+          .neq('sender_id', uid);
+        
+        setUnreadMessagesCount(unreadMessages?.length || 0);
+        
+        // Подписываемся на новые сообщения
+        const channel = supabase
+          .channel('header-unread-messages-counter')
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'chat_messages'
+            },
+            (payload: any) => {
+              // Увеличиваем счетчик если сообщение не от нас
+              if (payload.new.sender_id !== uid) {
+                setUnreadMessagesCount(prev => prev + 1);
+              }
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'chat_messages'
+            },
+            (payload: any) => {
+              // Уменьшаем счетчик если сообщение прочитано
+              if (payload.new.is_read && !payload.old.is_read && payload.new.sender_id !== uid) {
+                setUnreadMessagesCount(prev => Math.max(0, prev - 1));
+              }
+            }
+          )
+          .subscribe();
+        
+        return () => supabase.removeChannel(channel);
+      } catch (error) {
+        console.error('Error loading unread messages count:', error);
+      }
+    };
+    
+    loadUnreadMessagesCount();
+  }, []);
+
+  // Обнуляем счетчик сообщений когда заходим в чаты
+  React.useEffect(() => {
+    if (location.pathname.startsWith('/messages') && userId) {
+      const markMessagesAsRead = async () => {
+        try {
+          const { supabase } = await import('@/integrations/supabase/client');
+          
+          // Помечаем все сообщения как прочитанные
+          await supabase
+            .from('chat_messages')
+            .update({ is_read: true })
+            .eq('is_read', false)
+            .neq('sender_id', userId);
+          
+          setUnreadMessagesCount(0);
+        } catch (error) {
+          console.error('Error marking messages as read:', error);
+        }
+      };
+      
+      markMessagesAsRead();
+    }
+  }, [location.pathname, userId]);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -180,12 +272,25 @@ export function MobileHeader({
                   whileTap={{ scale: 0.95 }}
                 >
                   <Bell size={16} className={unreadCount > 0 ? "text-red-500" : ""} />
+                  {/* Общий счетчик уведомлений */}
                   {unreadCount > 0 && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full flex items-center justify-center">
                       <span className="text-destructive-foreground text-xs font-bold">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     </div>
+                  )}
+                  {/* Дополнительный индикатор для сообщений */}
+                  {unreadMessagesCount > 0 && unreadCount === 0 && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">
+                        {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                      </span>
+                    </div>
+                  )}
+                  {/* Показываем синий индикатор сообщений рядом с основным счетчиком */}
+                  {unreadMessagesCount > 0 && unreadCount > 0 && (
+                    <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                   )}
                 </motion.button>
                 
