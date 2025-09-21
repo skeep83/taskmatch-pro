@@ -46,7 +46,7 @@ serve(async (req: Request) => {
           last_name,
           avatar_url
         ),
-        job_photos(file_url)
+        
       `)
       .eq("status", "new")
       .order("created_at", { ascending: false })
@@ -70,6 +70,26 @@ serve(async (req: Request) => {
     if (error) {
       console.error("Error fetching jobs:", error);
       throw error;
+    }
+
+    // Fetch job photos separately
+    let jobPhotos: Record<string, any[]> = {};
+    if (jobs && jobs.length > 0) {
+      const jobIds = jobs.map(job => job.id);
+      const { data: photos } = await supabase
+        .from("job_photos")
+        .select("job_id, file_url")
+        .in("job_id", jobIds);
+      
+      if (photos) {
+        jobPhotos = photos.reduce((acc, photo) => {
+          if (!acc[photo.job_id]) {
+            acc[photo.job_id] = [];
+          }
+          acc[photo.job_id].push({ file_url: photo.file_url });
+          return acc;
+        }, {} as Record<string, any[]>);
+      }
     }
 
     // Get user ratings for clients
@@ -121,7 +141,7 @@ serve(async (req: Request) => {
         client_rating: avgRating ? Number(avgRating.toFixed(1)) : null,
         urgency: job.urgency || 'medium',
         status: job.status || 'active',
-        job_photos: job.job_photos || []
+        job_photos: jobPhotos[job.id] || []
       };
     }) || [];
 
