@@ -36,6 +36,7 @@ import { BusinessAnalytics } from "@/components/business/BusinessAnalytics";
 import { BusinessTenders } from "@/components/business/BusinessTenders";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
 
 export default function DashboardBusiness() {
   const navigate = useNavigate();
@@ -85,10 +86,56 @@ export default function DashboardBusiness() {
     );
   }
 
+  const dashboardOptions = [
+    {
+      value: 'client',
+      label: 'Клиент',
+      icon: User,
+      description: 'Личный кабинет клиента',
+      available: true,
+    },
+    {
+      value: 'pro',
+      label: 'Специалист',
+      icon: Briefcase,
+      description: 'Кабинет специалиста',
+      available: false,
+    },
+    {
+      value: 'business',
+      label: 'Бизнес',
+      icon: Building2,
+      description: 'Корпоративный аккаунт',
+      available: true,
+    },
+  ];
+
+  const handleDashboardChange = (dashboard: string) => {
+    if (dashboard === 'client') {
+      navigate('/dashboard/client');
+    } else if (dashboard === 'pro') {
+      navigate('/dashboard/pro');
+    } else if (dashboard === 'business') {
+      navigate('/dashboard/business');
+    }
+  };
+
   return (
     <RoleGuard requiredRole="business">
       <Seo title="ServiceHub — Бизнес-панель" description="Управление корпоративным аккаунтом" canonical="/dashboard/business" />
-      <main className="min-h-screen">
+      
+      {isMobile && (
+        <MobileHeader
+          title="Бизнес-панель"
+          showNotifications={true}
+          showDashboardSelector={true}
+          dashboardOptions={dashboardOptions}
+          currentDashboard="business"
+          onDashboardChange={handleDashboardChange}
+        />
+      )}
+      
+      <main className="min-h-screen" style={{ paddingTop: isMobile ? 'calc(env(safe-area-inset-top) + 80px)' : '0' }}>
 
         {/* Header Section */}
         <section className="container mx-auto py-24 px-6">
