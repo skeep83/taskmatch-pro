@@ -1,10 +1,10 @@
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Suspense, lazy } from "react";
 import { MobileProvider } from "./mobile/providers/MobileProvider";
 import { useDeviceDetection } from "./hooks/useDeviceDetection";
 import { MobileBottomNav } from "./mobile/components/navigation/MobileBottomNav";
@@ -71,7 +71,7 @@ const AdminCategories = lazy(() => import("./pages/admin/Categories"));
 const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests"));
 import PageTransition from "./components/PageTransition";
 
-const queryClient = new QueryClient();
+
 
 const AppContent = () => {
   const location = useLocation();
@@ -169,7 +169,10 @@ const AppContent = () => {
   );
 };
 
-const App = () => (
+const App = () => {
+  console.log("App component initializing...", { React, QueryClient, QueryClientProvider });
+  const queryClient = React.useMemo(() => new QueryClient(), []);
+  return (
   <QueryClientProvider client={queryClient}>
     <EnhancedI18nProvider>
       <DatabaseI18nProvider>
@@ -201,6 +204,7 @@ const App = () => (
       </DatabaseI18nProvider>
     </EnhancedI18nProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

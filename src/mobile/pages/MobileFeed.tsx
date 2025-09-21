@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -68,6 +68,7 @@ interface Category {
 }
 
 export default function MobileFeed() {
+  console.log("MobileFeed component loading...", { React });
   const navigate = useNavigate();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
