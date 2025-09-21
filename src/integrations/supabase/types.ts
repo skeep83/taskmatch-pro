@@ -712,7 +712,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          level: string
+          level?: string
           message: string
           metadata?: Json | null
           resolved?: boolean
