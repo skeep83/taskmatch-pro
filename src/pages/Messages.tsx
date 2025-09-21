@@ -477,7 +477,9 @@ const Messages = () => {
   };
 
   const selectedChat = useMemo(() => {
-    return chats.find(c => String(c.id) === String(selectedChatId));
+    const chat = chats.find(c => String(c.id) === String(selectedChatId));
+    console.log('🔍 Selected chat:', { selectedChatId, chat, chatsLength: chats.length });
+    return chat;
   }, [chats, selectedChatId]);
 
   const otherUser = useMemo(() => {
@@ -612,6 +614,12 @@ const Messages = () => {
         )}>
           {selectedChatId ? (
             <>
+              {/* Debug info */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="p-2 bg-yellow-100 text-xs">
+                  Debug: selectedChatId={selectedChatId}, userId={userId}, selectedChat={selectedChat?.id}, canSend={!!(selectedChatId && userId && selectedChat)}
+                </div>
+              )}
               {/* Chat Header */}
               <div className="p-4 border-b bg-muted/30">
                 <div className="flex items-center gap-3">
@@ -728,10 +736,21 @@ const Messages = () => {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder={t('messages.type_message', 'Введите сообщение...')}
-                    className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-                    disabled={!selectedChatId}
+                    className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background min-h-[44px]"
+                    disabled={!selectedChatId || !userId}
+                    autoFocus
+                    onFocus={(e) => {
+                      // Прокрутка к input полю на мобильных устройствах
+                      setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 100);
+                    }}
                   />
-                  <Button type="submit" disabled={!text.trim() || !selectedChatId}>
+                  <Button 
+                    type="submit" 
+                    disabled={!text.trim() || !selectedChatId || !userId}
+                    className="min-h-[44px] min-w-[44px]"
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </form>
