@@ -29,20 +29,6 @@ interface LogStats {
   last_24h: number;
 }
 
-const levelColors = {
-  critical: 'destructive',
-  error: 'destructive',
-  warning: 'secondary',
-  info: 'default',
-} as const;
-
-const levelIcons = {
-  critical: AlertTriangle,
-  error: XCircle,
-  warning: AlertTriangle,
-  info: Info,
-};
-
 function AdminLogs() {
   const [logs, setLogs] = useState<ErrorLog[]>([]);
   const [stats, setStats] = useState<LogStats | null>(null);
@@ -116,6 +102,36 @@ function AdminLogs() {
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     setPage(1);
+  };
+
+  const getLogIcon = (level: string) => {
+    switch (level) {
+      case 'critical':
+        return AlertTriangle;
+      case 'error':
+        return XCircle;
+      case 'warning':
+        return AlertTriangle;
+      case 'info':
+        return Info;
+      default:
+        return Info;
+    }
+  };
+
+  const getLogIconColor = (level: string) => {
+    switch (level) {
+      case 'critical':
+        return 'text-red-600';
+      case 'error':
+        return 'text-red-500';
+      case 'warning':
+        return 'text-yellow-500';
+      case 'info':
+        return 'text-blue-500';
+      default:
+        return 'text-gray-500';
+    }
   };
 
   if (loading && logs.length === 0) {
@@ -276,19 +292,15 @@ function AdminLogs() {
         ) : (
           logs.map((log) => {
             const isExpanded = expandedLog === log.id;
+            const LogIcon = getLogIcon(log.level);
+            const iconColor = getLogIconColor(log.level);
             
             return (
               <Card key={log.id} className={`transition-all ${log.level === 'critical' ? 'border-red-200 bg-red-50/50' : ''}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1">
-                      {/* Temporarily use static icon to isolate the issue */}
-                      <AlertTriangle className={`w-5 h-5 mt-0.5 ${
-                        log.level === 'critical' ? 'text-red-600' :
-                        log.level === 'error' ? 'text-red-500' :
-                        log.level === 'warning' ? 'text-yellow-500' :
-                        'text-blue-500'
-                      }`} />
+                      <LogIcon className={`w-5 h-5 mt-0.5 ${iconColor}`} />
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge variant="default">
