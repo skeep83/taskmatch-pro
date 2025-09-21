@@ -235,12 +235,6 @@ const DashboardPro = () => {
             </div>
           </div>
 
-          {/* Pro Upgrade Status - показываем только если есть pending заявка */}
-          {hasPendingProRequest && (
-            <div className="mb-12">
-              <ProUpgradeStatusCard userId={userId || ''} />
-            </div>
-          )}
     </main>
   );
 
@@ -274,6 +268,13 @@ const DashboardPro = () => {
         </div>
 
         <div className="max-w-7xl mx-auto">
+          {/* Pro Upgrade Status - показываем только если есть pending заявка */}
+          {userId && (
+            <div className="mb-12">
+              <ProUpgradeStatusCard userId={userId} />
+            </div>
+          )}
+
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
             <div className="card-surface p-6">

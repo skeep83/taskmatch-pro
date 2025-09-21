@@ -8,7 +8,7 @@ import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Seo } from "@/components/Seo";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
-import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
+
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
