@@ -13,32 +13,63 @@
     <meta name="msapplication-tap-highlight" content="no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Critical DNS and connection optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://taskmatch-pro.lovable.app" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://taskmatch-pro.lovable.app">
     
-    <!-- Preload critical resources with high priority -->
+    <!-- High-priority critical resource preloading -->
     <link rel="preload" href="/assets/hero-dashboard.jpg" as="image" fetchpriority="high">
-    <link rel="modulepreload" href="/src/main.tsx" fetchpriority="high">
-    <link rel="modulepreload" href="/src/App.tsx" fetchpriority="high">
-    <link rel="modulepreload" href="/src/integrations/supabase/client.ts">
-    <link rel="modulepreload" href="/src/components/layout/Header.tsx">
-    <link rel="modulepreload" href="/src/components/layout/Footer.tsx">
-    <link rel="modulepreload" href="/src/pages/Index.tsx">
+    <link rel="modulepreload" href="/src/main.tsx" fetchpriority="high" crossorigin>
+    <link rel="modulepreload" href="/src/App.tsx" fetchpriority="high" crossorigin>
+    <link rel="modulepreload" href="/src/integrations/supabase/client.ts" crossorigin>
+    <link rel="modulepreload" href="/src/components/layout/Header.tsx" crossorigin>
+    <link rel="modulepreload" href="/src/components/layout/Footer.tsx" crossorigin>
+    <link rel="modulepreload" href="/src/pages/Index.tsx" crossorigin>
+    
+    <!-- Preload critical CSS and JS bundles -->
+    <script>
+      // Early critical resource discovery and preloading
+      const preloadResource = (href, as, fetchpriority = 'high') => {
+        const link = document.createElement('link');
+        link.rel = as === 'script' ? 'modulepreload' : 'preload';
+        link.href = href;
+        if (as !== 'script') link.as = as;
+        if (fetchpriority) link.fetchPriority = fetchpriority;
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      };
+      
+      // Preload main bundle immediately
+      preloadResource('/assets/index.js', 'script');
+      preloadResource('/assets/index.css', 'style');
+    </script>
     
     <!-- Preload font files directly for instant loading -->
     <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvUDQZNLo_U2r.woff2" as="font" type="font/woff2" crossorigin>
     
-    <!-- Early critical resource loading -->
+    <!-- Advanced critical resource loading strategy -->
     <script>
-      // Immediately start loading the main bundle
-      const script = document.createElement('link');
-      script.rel = 'modulepreload';
-      script.href = '/src/main.tsx';
-      script.fetchPriority = 'high';
-      document.head.appendChild(script);
+      // Immediately start parallel loading of critical resources
+      const resources = [
+        { href: '/assets/index.js', as: 'script', priority: 'high' },
+        { href: '/assets/index.css', as: 'style', priority: 'high' },
+        { href: '/src/main.tsx', as: 'script', priority: 'high' }
+      ];
+      
+      resources.forEach(({ href, as, priority }) => {
+        const link = document.createElement('link');
+        link.rel = as === 'script' ? 'modulepreload' : 'preload';
+        link.href = href;
+        if (as !== 'script') link.as = as;
+        link.fetchPriority = priority;
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      });
       
       // Early connection establishment for faster resource loading
       if ('connection' in navigator && navigator.connection && navigator.connection.downlink > 1) {
@@ -263,9 +294,10 @@
     <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
     
     
-    <!-- Additional performance optimizations -->
+    <!-- Aggressive prefetch for next-likely resources -->
     <link rel="prefetch" href="/assets/index.js">
-    <link rel="preload" href="/src/main.tsx" as="script" crossorigin>
+    <link rel="prefetch" href="/src/main.tsx" as="script" crossorigin>
+    <link rel="prefetch" href="/assets/index.css" as="style">
     <link rel="canonical" href="https://taskmatch-pro.lovable.app/" />
 
     <meta property="og:title" content="ServiceHub — маркетплейс услуг" />
