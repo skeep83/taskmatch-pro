@@ -100,8 +100,9 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
     const limit = Math.min(parseInt(data.limit || '50'), 100);
     const search = data.search || '';
     const role = data.role || '';
+    const includeStats = data.include_stats;
 
-    console.log(`Fetching users - page: ${page}, limit: ${limit}, search: ${search}, role: ${role}`);
+    console.log(`Fetching users - page: ${page}, limit: ${limit}, search: ${search}, role: ${role}, includeStats: ${includeStats}`);
 
     // Get all users from auth schema with emails
     const { data: authUsersResponse, error: authError } = await supabase.auth.admin.listUsers();
@@ -120,7 +121,15 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
     if (allAuthUsers.length === 0) {
       return new Response(JSON.stringify({ 
         users: [], 
-        pagination: { page, limit, total: 0 }
+        pagination: { page, limit, total: 0 },
+        stats: includeStats ? {
+          total_users: 0,
+          active_users: 0,
+          pro_users: 0,
+          pending_kyc: 0,
+          blocked_users: 0,
+          new_signups_today: 0
+        } : undefined
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -129,7 +138,7 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
     // Get all profiles in one query
     const { data: allProfiles, error: profileError } = await supabase
       .from('profiles')
-      .select('id, full_name, phone, locale, created_at, updated_at');
+      .select('id, full_name, phone, locale, city, created_at, updated_at');
 
     if (profileError) {
       console.error('Error fetching profiles:', profileError);
@@ -144,10 +153,16 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
       console.error('Error fetching user roles:', rolesError);
     }
 
+    // Get KYC documents if needed
+    const { data: kycDocuments } = await supabase
+      .from('kyc_documents')
+      .select('user_id, status');
+
     // Merge data for all users
     const enrichedUsers = allAuthUsers.map(authUser => {
       const profile = allProfiles?.find(p => p.id === authUser.id);
       const userRoles = allUserRoles?.filter(r => r.user_id === authUser.id) || [];
+      const userKyc = kycDocuments?.filter(k => k.user_id === authUser.id) || [];
 
       return {
         id: authUser.id,
@@ -158,9 +173,10 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
         last_sign_in_at: authUser.last_sign_in_at,
         full_name: profile?.full_name || null,
         phone: profile?.phone || null,
+        city: profile?.city || null,
         locale: profile?.locale || 'ru',
         user_roles: userRoles,
-        kyc_documents: [],
+        kyc_documents: userKyc,
         pro_profiles: [],
         pro_rating_stats: []
       };
@@ -185,6 +201,63 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
       });
     }
 
+    // Calculate stats if requested
+    let stats = undefined;
+    if (includeStats) {
+      try {
+        // Calculate real statistics from the data
+        const totalUsers = allAuthUsers.length;
+        
+        // Active users (signed in within last 30 days)
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const activeUsers = allAuthUsers.filter(user => 
+          user.last_sign_in_at && new Date(user.last_sign_in_at) > thirtyDaysAgo
+        ).length;
+
+        // Pro users
+        const proUsers = enrichedUsers.filter(user => 
+          user.user_roles.some(r => r.role === 'pro')
+        ).length;
+
+        // Pending KYC
+        const pendingKyc = enrichedUsers.filter(user => 
+          user.kyc_documents.some(k => k.status === 'pending')
+        ).length;
+
+        // Blocked users
+        const blockedUsers = enrichedUsers.filter(user => 
+          user.user_roles.some(r => r.role === 'blocked')
+        ).length;
+
+        // New signups today
+        const today = new Date().toDateString();
+        const newSignupsToday = allAuthUsers.filter(user => 
+          user.created_at && new Date(user.created_at).toDateString() === today
+        ).length;
+
+        stats = {
+          total_users: totalUsers,
+          active_users: activeUsers,
+          pro_users: proUsers,
+          pending_kyc: pendingKyc,
+          blocked_users: blockedUsers,
+          new_signups_today: newSignupsToday
+        };
+
+        console.log('Calculated real stats:', stats);
+      } catch (statsError) {
+        console.error('Error calculating stats:', statsError);
+        stats = {
+          total_users: 0,
+          active_users: 0,
+          pro_users: 0,
+          pending_kyc: 0,
+          blocked_users: 0,
+          new_signups_today: 0
+        };
+      }
+    }
+
     // Apply pagination
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
@@ -194,7 +267,9 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
 
     return new Response(JSON.stringify({ 
       users: paginatedUsers, 
-      pagination: { page, limit, total: filteredUsers.length }
+      pagination: { page, limit, total: filteredUsers.length },
+      total_pages: Math.ceil(filteredUsers.length / limit),
+      stats
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

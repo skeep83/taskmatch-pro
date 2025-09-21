@@ -88,43 +88,21 @@ export default function AdminUsers() {
       setLoading(true);
       const { supabase } = await import("@/integrations/supabase/client");
       
-      // Call admin-users edge function
+      // Call admin-users edge function to get users and stats together
       const { data, error } = await supabase.functions.invoke('admin-users', {
         body: {
           action: 'list',
           page: currentPage,
           limit: 20,
           search: searchTerm || undefined,
-          role: roleFilter !== "all" ? roleFilter : undefined
+          role: roleFilter !== "all" ? roleFilter : undefined,
+          include_stats: true
         }
       });
 
       if (error) throw error;
 
-      // Get additional stats
-      const { data: profilesCount } = await supabase
-        .from('profiles')
-        .select('id', { count: 'exact', head: true });
-      
-      const { data: activeUsersCount } = await supabase
-        .from('profiles')
-        .select('id', { count: 'exact', head: true })
-        .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-      
-      const { data: proUsersCount } = await supabase
-        .from('user_roles')
-        .select('user_id', { count: 'exact', head: true })
-        .eq('role', 'pro');
-      
-      const { data: pendingKycCount } = await supabase
-        .from('kyc_documents')
-        .select('user_id', { count: 'exact', head: true })
-        .eq('status', 'pending');
-
-      const { data: todaySignupsCount } = await supabase
-        .from('profiles')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', new Date().toISOString().split('T')[0]);
+      console.log('Admin users response:', data);
 
       // Transform API response to UI format
       const users: User[] = data?.users?.map((user: any) => {
@@ -150,9 +128,9 @@ export default function AdminUsers() {
           first_name: user.full_name?.split(' ')[0] || '',
           last_name: user.full_name?.split(' ').slice(1).join(' ') || '',
           phone: user.phone || '',
-          city: '', // Not available in current schema
+          city: user.city || '',
           created_at: user.created_at,
-          last_sign_in_at: user.updated_at,
+          last_sign_in_at: user.last_sign_in_at || user.updated_at,
           roles,
           kyc_status: kyc_status as any,
           is_blocked: roles.includes('blocked'),
@@ -174,17 +152,34 @@ export default function AdminUsers() {
 
       setUsers(users);
       
-      // Update stats
-      setStats({
-        total_users: profilesCount?.count || 0,
-        active_users: activeUsersCount?.count || 0,
-        pro_users: proUsersCount?.count || 0,
-        pending_kyc: pendingKycCount?.count || 0,
-        blocked_users: users.filter(u => u.is_blocked).length,
-        new_signups_today: todaySignupsCount?.count || 0
-      });
+      // Use stats from the API response if available, otherwise calculate locally
+      if (data?.stats) {
+        console.log('Using API stats:', data.stats);
+        setStats({
+          total_users: data.stats.total_users || 0,
+          active_users: data.stats.active_users || 0,
+          pro_users: data.stats.pro_users || 0,
+          pending_kyc: data.stats.pending_kyc || 0,
+          blocked_users: data.stats.blocked_users || 0,
+          new_signups_today: data.stats.new_signups_today || 0
+        });
+      } else {
+        console.log('Calculating local stats from users:', users.length);
+        // Fallback to local calculation
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const calculatedStats = {
+          total_users: users.length,
+          active_users: users.filter(u => u.last_sign_in_at && new Date(u.last_sign_in_at) > thirtyDaysAgo).length,
+          pro_users: users.filter(u => u.roles.includes('pro')).length,
+          pending_kyc: users.filter(u => u.kyc_status === 'pending').length,
+          blocked_users: users.filter(u => u.is_blocked).length,
+          new_signups_today: users.filter(u => u.created_at && new Date(u.created_at).toDateString() === new Date().toDateString()).length
+        };
+        console.log('Calculated local stats:', calculatedStats);
+        setStats(calculatedStats);
+      }
 
-      setTotalPages(Math.ceil((profilesCount?.count || 0) / 20));
+      setTotalPages(data?.total_pages || Math.ceil(users.length / 20));
       
     } catch (error) {
       console.error("Failed to fetch users:", error);
