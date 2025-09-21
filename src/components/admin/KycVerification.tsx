@@ -231,7 +231,7 @@ export const AdminKycVerification = () => {
       case 'pending':
         return <Badge variant="outline" className="text-yellow-600">На проверке</Badge>;
       case 'approved':
-        return <Badge variant="default" className="text-green-600">Одобрено</Badge>;
+        return <Badge variant="default" className="text-green-600">Проверено</Badge>;
       case 'rejected':
         return <Badge variant="destructive">Отклонено</Badge>;
       default:
