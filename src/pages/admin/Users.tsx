@@ -27,6 +27,7 @@ interface User {
   is_blocked: boolean;
   profile_completion: number;
   pro_data?: ProData;
+  pro_upgrade_request?: ProUpgradeRequest;
 }
 
 interface ProData {
@@ -53,6 +54,15 @@ interface KycDocument {
   reviewer_notes?: string;
 }
 
+interface ProUpgradeRequest {
+  id: string;
+  user_id: string;
+  status: "pending" | "approved" | "rejected";
+  submitted_at: string;
+  reviewed_at?: string;
+  rejection_reason?: string;
+}
+
 interface UserStats {
   total_users: number;
   active_users: number;
@@ -66,6 +76,7 @@ export default function AdminUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [kycDocuments, setKycDocuments] = useState<KycDocument[]>([]);
+  const [proUpgradeRequests, setProUpgradeRequests] = useState<ProUpgradeRequest[]>([]);
   const [stats, setStats] = useState<UserStats>({
     total_users: 0,
     active_users: 0,
@@ -282,6 +293,90 @@ export default function AdminUsers() {
       toast({
         title: "Ошибка",
         description: "Не удалось загрузить KYC документы",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const fetchUserProUpgradeRequests = async (userId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { data: requests, error } = await supabase
+        .from('pro_upgrade_requests')
+        .select('*')
+        .eq('user_id', userId)
+        .order('submitted_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      setProUpgradeRequests(requests || []);
+    } catch (error) {
+      console.error("Failed to fetch pro upgrade requests:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить заявки на статус профи",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const approveProUpgradeRequest = async (requestId: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error } = await supabase.rpc('approve_pro_upgrade_request', {
+        _request_id: requestId
+      });
+      
+      if (error) throw error;
+      
+      // Refresh user data and pro upgrade requests
+      if (selectedUser) {
+        fetchUserProUpgradeRequests(selectedUser.id);
+        fetchUsers();
+      }
+      
+      toast({
+        title: "Успешно",
+        description: "Заявка на статус специалиста одобрена"
+      });
+    } catch (error) {
+      console.error("Failed to approve pro upgrade request:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось одобрить заявку",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const rejectProUpgradeRequest = async (requestId: string, reason?: string) => {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error } = await supabase.rpc('reject_pro_upgrade_request', {
+        _request_id: requestId,
+        _reason: reason || actionNote
+      });
+      
+      if (error) throw error;
+      
+      // Refresh user data and pro upgrade requests
+      if (selectedUser) {
+        fetchUserProUpgradeRequests(selectedUser.id);
+        fetchUsers();
+      }
+      
+      toast({
+        title: "Успешно",
+        description: "Заявка на статус специалиста отклонена"
+      });
+    } catch (error) {
+      console.error("Failed to reject pro upgrade request:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отклонить заявку",
         variant: "destructive"
       });
     }
@@ -699,12 +794,13 @@ export default function AdminUsers() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              if (user.kyc_status !== "none") {
-                                fetchUserKyc(user.id);
-                              }
-                            }}
+                           onClick={() => {
+                             setSelectedUser(user);
+                             if (user.kyc_status !== "none") {
+                               fetchUserKyc(user.id);
+                             }
+                             fetchUserProUpgradeRequests(user.id);
+                           }}
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -806,6 +902,79 @@ export default function AdminUsers() {
                                           >
                                             <ExternalLink className="w-4 h-4" />
                                           </Button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Pro Upgrade Requests */}
+                              {proUpgradeRequests.length > 0 && (
+                                <div>
+                                  <h4 className="font-medium mb-2">Заявки на статус специалиста</h4>
+                                  <div className="space-y-2">
+                                    {proUpgradeRequests.map((request) => (
+                                      <div key={request.id} className="flex items-center justify-between p-3 border rounded">
+                                        <div>
+                                          <div className="font-medium">Заявка на статус специалиста</div>
+                                          <div className="text-sm text-muted-foreground">
+                                            Подана: {new Date(request.submitted_at).toLocaleString()}
+                                          </div>
+                                          {request.reviewed_at && (
+                                            <div className="text-sm text-muted-foreground">
+                                              Рассмотрена: {new Date(request.reviewed_at).toLocaleString()}
+                                            </div>
+                                          )}
+                                          {request.rejection_reason && (
+                                            <div className="text-sm text-red-600">
+                                              Причина отклонения: {request.rejection_reason}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Badge className={
+                                            request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                            request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            'bg-red-100 text-red-800'
+                                          }>
+                                            {request.status === 'pending' ? 'Ожидает' :
+                                             request.status === 'approved' ? 'Одобрена' : 'Отклонена'}
+                                          </Badge>
+                                          {request.status === 'pending' && (
+                                            <div className="flex gap-1">
+                                              <Button
+                                                size="sm"
+                                                onClick={() => approveProUpgradeRequest(request.id)}
+                                              >
+                                                <CheckCircle className="w-4 h-4" />
+                                              </Button>
+                                              <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                onClick={() => rejectProUpgradeRequest(request.id)}
+                                              >
+                                                <XCircle className="w-4 h-4" />
+                                              </Button>
+                                            </div>
+                                          )}
+                                          {request.status === 'approved' && (
+                                            <Button
+                                              size="sm"
+                                              variant="destructive"
+                                              onClick={() => rejectProUpgradeRequest(request.id, "Пересмотр решения")}
+                                            >
+                                              <XCircle className="w-4 h-4" />
+                                            </Button>
+                                          )}
+                                          {request.status === 'rejected' && (
+                                            <Button
+                                              size="sm"
+                                              onClick={() => approveProUpgradeRequest(request.id)}
+                                            >
+                                              <CheckCircle className="w-4 h-4" />
+                                            </Button>
+                                          )}
                                         </div>
                                       </div>
                                     ))}
