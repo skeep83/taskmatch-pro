@@ -380,13 +380,18 @@ serve(async (req) => {
       }
 
       try {
-        await supabaseAdmin.functions.invoke('admin-logs', {
+        const { error: logsError } = await supabaseAdmin.functions.invoke('admin-logs', {
           body: {
             action: 'bulk_create',
             logs: logsToPublish
           }
         });
-        console.log(`Auto-published ${logsToPublish.length} critical errors to logs`);
+
+        if (logsError) {
+          console.error('Failed to auto-publish errors to logs:', logsError);
+        } else {
+          console.log(`Auto-published ${logsToPublish.length} critical errors to logs`);
+        }
       } catch (error) {
         console.error('Failed to auto-publish errors:', error);
       }

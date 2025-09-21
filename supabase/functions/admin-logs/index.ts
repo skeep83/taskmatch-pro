@@ -315,6 +315,8 @@ serve(async (req) => {
           );
         }
 
+        console.log(`Bulk creating ${logs.length} log entries`);
+
         const logEntries = logs.map(log => ({
           level: log.level,
           source: log.source || 'auto-crawler',
@@ -334,10 +336,12 @@ serve(async (req) => {
         if (error) {
           console.error('Error creating bulk logs:', error);
           return new Response(
-            JSON.stringify({ error: 'Failed to create bulk logs' }),
+            JSON.stringify({ error: 'Failed to create bulk logs', details: error.message }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
+
+        console.log(`Successfully created ${data.length} log entries`);
 
         return new Response(
           JSON.stringify({ success: true, logs: data, count: data.length }),
