@@ -171,7 +171,7 @@ const AppContent = () => {
 
 const App = () => {
   console.log("App component initializing...", { React, QueryClient, QueryClientProvider });
-  const queryClient = React.useMemo(() => new QueryClient(), []);
+  const queryClient = new QueryClient();
   return (
   <QueryClientProvider client={queryClient}>
     <EnhancedI18nProvider>
