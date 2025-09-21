@@ -254,14 +254,12 @@ const DashboardPro = () => {
           </p>
           
           <div className="flex justify-center mt-8">
-            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              {kycStatus === 'approved' ? (
-                <CheckCircle className="h-6 w-6 text-green-500" />
-              ) : (
-                <AlertCircle className="h-6 w-6 text-orange-500" />
-              )}
-              <span className="text-sm font-medium">
-                KYC: {kycStatus === 'approved' ? 'Верифицирован' : 'Требует проверки'}
+            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] transition-all duration-300">
+              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+              </div>
+              <span className="text-sm font-medium text-foreground">
+                Статус: Проверенный специалист
               </span>
             </div>
           </div>
