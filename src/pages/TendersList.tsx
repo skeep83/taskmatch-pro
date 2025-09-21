@@ -86,7 +86,9 @@ const TendersList = () => {
               transition={{ delay: 0.1 }}
               className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
             >
-              <NeumorphicIcon icon={Gavel} size={32} variant="square" />
+              <div className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                <Gavel className="w-5 h-5 text-primary" />
+              </div>
               <span className="font-medium">Аукцион Vickrey</span>
             </motion.div>
             <motion.div 
@@ -95,7 +97,9 @@ const TendersList = () => {
               transition={{ delay: 0.2 }}
               className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
             >
-              <NeumorphicIcon icon={Trophy} size={32} variant="square" />
+              <div className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-primary" />
+              </div>
               <span className="font-medium">BAFO система</span>
             </motion.div>
           </div>
