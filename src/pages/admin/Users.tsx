@@ -146,7 +146,7 @@ export default function AdminUsers() {
 
         return {
           id: user.id,
-          email: `user-${user.id.slice(0, 8)}@servicehub.md`, // Placeholder until we get real emails
+          email: user.email || `user-${user.id.slice(0, 8)}@servicehub.md`,
           first_name: user.full_name?.split(' ')[0] || '',
           last_name: user.full_name?.split(' ').slice(1).join(' ') || '',
           phone: user.phone || '',
