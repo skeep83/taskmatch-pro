@@ -124,6 +124,7 @@ export default function MobileProfileSettings() {
         .single();
 
       const currentRole = roleData?.role || 'client';
+      console.log('MobileProfileSettings - Current role:', currentRole, 'Role data:', roleData);
       setUserRole(currentRole);
 
       // Load categories
@@ -315,6 +316,8 @@ export default function MobileProfileSettings() {
       { id: 'notifications', label: 'Уведомления', icon: Settings }
     ] : [])
   ];
+
+  console.log('MobileProfileSettings - User role:', userRole, 'Tab items:', tabItems.length);
 
   if (loading) {
     return (
