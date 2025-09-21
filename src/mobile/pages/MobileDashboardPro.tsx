@@ -259,13 +259,13 @@ export default function MobileDashboardPro() {
 
                 <MobileCard 
                   pressable 
-                  onPress={() => setActiveTab("earnings")}
+                  onPress={() => navigate("/mobile/profile-settings")}
                   className="flex flex-col items-center justify-center text-center h-24"
                 >
                   <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
-                    <DollarSign className="h-5 w-5 text-primary" />
+                    <Settings className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">Доходы</h3>
+                  <h3 className="font-semibold text-sm">Настройки</h3>
                 </MobileCard>
               </div>
 

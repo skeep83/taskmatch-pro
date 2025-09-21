@@ -43,6 +43,7 @@ const MobileMessages = lazy(() => import("./mobile/pages/MobileMessages"));
 const MobileJobNew = lazy(() => import("./mobile/pages/MobileJobNew"));
 const MobileJobDetail = lazy(() => import("./mobile/pages/MobileJobDetail"));
 const MobileJobRespond = lazy(() => import("./mobile/pages/MobileJobRespond"));
+const MobileProfileSettings = lazy(() => import("./mobile/pages/MobileProfileSettings"));
 const Kyc = lazy(() => import("./pages/Kyc"));
 const ProSchedule = lazy(() => import("./pages/ProSchedule"));
 const ProPortfolio = lazy(() => import("./pages/ProPortfolio"));
@@ -134,6 +135,7 @@ const AppContent = () => {
               isMobile ? <MobileMessages /> : <Messages />
             } />
             <Route path="/profile/settings" element={<ProfileSettings />} />
+            <Route path="/mobile/profile-settings" element={<MobileProfileSettings />} />
             <Route path="/kyc" element={<Kyc />} />
             <Route path="/pro-upgrade-status" element={<ProUpgradeStatus />} />
             <Route path="/pro/profile" element={<Navigate to="/profile/settings" replace />} />
