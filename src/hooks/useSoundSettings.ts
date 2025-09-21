@@ -50,11 +50,14 @@ export const useSoundSettings = () => {
       case 'job_update':
       case 'price_proposal':
       case 'job_application':
+      case 'job_accepted':
         return settings.jobSound;
       case 'payment':
         return settings.paymentSound;
       case 'system':
       case 'rating':
+      case 'pro_upgrade_approved':
+      case 'pro_upgrade_rejected':
         return settings.systemSound;
       default:
         return true;

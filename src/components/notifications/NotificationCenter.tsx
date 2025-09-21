@@ -55,6 +55,12 @@ export const NotificationCenter = () => {
     } else if (notification.type === 'rating' && notification.data?.job_id) {
       // For rating notifications, navigate to job or dashboard
       navigate(`/job/${notification.data.job_id}`);
+    } else if (notification.type === 'pro_upgrade_approved') {
+      // Navigate to pro dashboard after approval
+      navigate('/pro/dashboard');
+    } else if (notification.type === 'pro_upgrade_rejected') {
+      // Navigate to kyc page to resubmit
+      navigate('/kyc');
     }
     
     // Close the popover after navigation
@@ -79,6 +85,10 @@ export const NotificationCenter = () => {
         return '💬';
       case 'rating':
         return '⭐';
+      case 'pro_upgrade_approved':
+        return '🎉';
+      case 'pro_upgrade_rejected':
+        return '❌';
       case 'system':
         return '🔔';
       default:
