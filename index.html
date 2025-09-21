@@ -285,54 +285,62 @@
       h1, h2, h3, h4, h5, h6 { font-synthesis: none; }
     </style>
     
-    <!-- Non-blocking font loading strategy -->
+    <!-- Non-blocking font loading strategy - optimized -->
     <script>
-      // Load fonts asynchronously after critical path
+      // Advanced non-blocking font loading
       function loadFonts() {
         if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap';
           link.media = 'print';
-          link.onload = function() { this.media = 'all'; };
+          link.onload = function() { 
+            this.media = 'all';
+            this.onload = null; // Prevent memory leaks
+          };
+          link.onerror = function() {
+            // Fallback to system fonts if Google Fonts fail
+            this.remove();
+          };
           document.head.appendChild(link);
         }
       }
       
-      // Load fonts during idle time or after a short delay
+      // Load fonts after critical path - much faster
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadFonts, { timeout: 500 });
+        requestIdleCallback(loadFonts, { timeout: 200 });
       } else {
-        setTimeout(loadFonts, 100);
+        setTimeout(loadFonts, 50);
       }
     </script>
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
     
-    <!-- Non-blocking CSS loading strategy -->
+    <!-- Completely non-blocking CSS loading strategy -->
     <script>
-      // Enhanced CSS loading with conditional media queries
+      // Enhanced CSS loading with immediate rendering
       function loadMainCSS() {
         if (!document.querySelector('link[href*="index"][href*=".css"]')) {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = '/assets/index.css';
           
-          // Use media query to conditionally load based on viewport
-          link.media = window.innerWidth > 768 ? 'screen' : 'print';
+          // Use print media and switch to all on load - non-blocking
+          link.media = 'print';
           link.onload = function() { 
             this.media = 'all';
+            this.onload = null; // Prevent memory leaks
             if (window.onCSSLoaded) window.onCSSLoaded();
+          };
+          link.onerror = function() {
+            // Remove failed stylesheet to prevent blocking
+            this.remove();
           };
           document.head.appendChild(link);
         }
       }
       
-      // Start loading CSS immediately but non-blocking
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadMainCSS, { timeout: 100 });
-      } else {
-        setTimeout(loadMainCSS, 0);
-      }
+      // Load CSS immediately but non-blocking
+      loadMainCSS();
     </script>
     <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
     
