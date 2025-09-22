@@ -558,7 +558,13 @@ class AdvancedErrorLogger {
 
   private getElementSelector(element: HTMLElement): string {
     if (element.id) return `#${element.id}`;
-    if (element.className) return `.${element.className.split(' ')[0]}`;
+    if (element.className && typeof element.className === 'string') {
+      return `.${element.className.split(' ')[0]}`;
+    }
+    if (element.className && element.className.toString) {
+      const classStr = element.className.toString();
+      if (classStr) return `.${classStr.split(' ')[0]}`;
+    }
     return element.tagName.toLowerCase();
   }
 
