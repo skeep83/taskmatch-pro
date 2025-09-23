@@ -138,27 +138,34 @@ serve(async (req) => {
       console.warn('Escrow creation failed:', escrowError);
     }
 
-    // Send notification to selected professional
+    // Send notification to selected professional using notifications-send function
     const proName = `${application.profiles?.first_name || ''} ${application.profiles?.last_name || ''}`.trim() || 'Специалист';
     
-    const { error: notificationError } = await supabase.from('notifications').insert({
-      user_id: application.pro_id,
-      type: 'job_accepted',
-      title: 'Ваше предложение принято!',
-      title_ro: 'Oferta dvs. a fost acceptată!',
-      message: `Клиент выбрал ваше предложение на "${job.title}" за ${Math.round(application.price_cents / 100)} Lei`,
-      message_ro: `Clientul a ales oferta dvs. pentru "${job.title}" pentru ${Math.round(application.price_cents / 100)} Lei`,
-      data: {
-        job_id: jobId,
-        application_id: applicationId,
-        price_cents: application.price_cents
-      }
-    });
+    try {
+      const { error: notifyError } = await supabase.functions.invoke('notifications-send', {
+        body: {
+          user_id: application.pro_id,
+          type: 'job_accepted',
+          title: 'Ваше предложение принято!',
+          title_ro: 'Oferta dvs. a fost acceptată!',
+          message: `Клиент выбрал ваше предложение на "${job.title}" за ${Math.round(application.price_cents / 100)} Lei`,
+          message_ro: `Clientul a ales oferta dvs. pentru "${job.title}" pentru ${Math.round(application.price_cents / 100)} Lei`,
+          data: {
+            job_id: jobId,
+            application_id: applicationId,
+            price_cents: application.price_cents
+          },
+          channels: ['push']
+        }
+      });
 
-    if (notificationError) {
-      console.error('Failed to create notification:', notificationError);
-    } else {
-      console.log(`Notification sent to professional ${application.pro_id}`);
+      if (notifyError) {
+        console.error('Failed to send notification:', notifyError);
+      } else {
+        console.log(`Notification sent to professional ${application.pro_id}`);
+      }
+    } catch (notifyErr) {
+      console.error('Error invoking notification function:', notifyErr);
     }
 
     // Send notifications to other professionals that they were not selected
@@ -185,19 +192,27 @@ serve(async (req) => {
       .filter(proId => proId !== application.pro_id);
 
     if (uniqueProIds.length > 0) {
-      const notifications = uniqueProIds.map(proId => ({
-        user_id: proId,
-        type: 'job_application_declined',
-        title: 'Заказ отдан другому специалисту',
-        title_ro: 'Comanda a fost dată unui alt specialist',
-        message: `К сожалению, заказ "${job.title}" отдан другому специалисту`,
-        message_ro: `Din păcate, comanda "${job.title}" a fost dată unui alt specialist`,
-        data: {
-          job_id: jobId
+      // Send notifications to other professionals using notifications-send function
+      for (const proId of uniqueProIds) {
+        try {
+          await supabase.functions.invoke('notifications-send', {
+            body: {
+              user_id: proId,
+              type: 'job_application_declined',
+              title: 'Заказ отдан другому специалисту',
+              title_ro: 'Comanda a fost dată unui alt specialist',
+              message: `К сожалению, заказ "${job.title}" отдан другому специалисту`,
+              message_ro: `Din păcate, comanda "${job.title}" a fost dată unui alt specialist`,
+              data: {
+                job_id: jobId
+              },
+              channels: ['push']
+            }
+          });
+        } catch (notifyErr) {
+          console.error(`Error sending decline notification to pro ${proId}:`, notifyErr);
         }
-      }));
-
-      await supabase.from('notifications').insert(notifications);
+      }
     }
 
     console.log(`Job ${jobId} assigned to professional ${application.pro_id} via application ${applicationId}`);
