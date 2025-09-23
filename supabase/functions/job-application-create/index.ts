@@ -105,7 +105,18 @@ serve(async (req) => {
       throw new Error('Job not found or no longer available');
     }
 
-    // Check if professional offers this service category
+    // Check if professional has any services configured first
+    const { data: allProServices } = await supabase
+      .from('pro_services')
+      .select('id, category_id, is_active')
+      .eq('pro_id', user.id)
+      .eq('is_active', true);
+
+    if (!allProServices || allProServices.length === 0) {
+      throw new Error('You need to configure your services first. Go to your profile settings to add the services you offer.');
+    }
+
+    // Check if professional offers this specific service category
     const { data: proService } = await supabase
       .from('pro_services')
       .select('id, category_id, is_active')
@@ -115,7 +126,9 @@ serve(async (req) => {
       .maybeSingle();
 
     if (!proService) {
-      throw new Error('You do not offer services in this category');
+      // Get category name for better error message
+      const categoryName = job.categories?.label_ru || 'this category';
+      throw new Error(`You do not offer services in "${categoryName}". You can add this service in your profile settings.`);
     }
 
     // Check if already applied
