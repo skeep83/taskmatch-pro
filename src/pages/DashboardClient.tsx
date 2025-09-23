@@ -382,7 +382,7 @@ export default function DashboardClient() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+            <div className="p-2 rounded-2xl bg-muted shadow-neumorphic-inset">
               <TabsList className="grid w-full grid-cols-8 bg-transparent gap-1">
                 <TabsTrigger 
                   value="overview" 
