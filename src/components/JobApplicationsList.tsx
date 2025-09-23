@@ -340,7 +340,7 @@ export function JobApplicationsList({
     );
   }
 
-  // Если специалист назначен, показываем статус выполнения
+  // Если специалист назначен, показываем статус выполнения и назначенного специалиста
   if (selectedProId) {
     return (
       <div className="space-y-6">
@@ -349,6 +349,78 @@ export function JobApplicationsList({
           <h3 className="text-xl font-semibold text-foreground">
             Специалист назначен
           </h3>
+        </div>
+        
+        {/* Assigned Professional Card */}
+        <div className="card-surface p-6">
+          <h4 className="text-lg font-semibold mb-4">Ваш специалист</h4>
+          {applications.length > 0 && (
+            (() => {
+              const assignedApp = applications.find(app => app.pro_id === selectedProId);
+              if (!assignedApp) return <div>Загрузка данных специалиста...</div>;
+
+              const profileName = assignedApp.profiles?.full_name || 
+                (assignedApp.profiles?.first_name && assignedApp.profiles?.last_name 
+                  ? `${assignedApp.profiles.first_name} ${assignedApp.profiles.last_name}` 
+                  : 'Специалист');
+
+              return (
+                <div className="flex items-center justify-between p-4 bg-white/50 rounded-lg border border-white/60">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage 
+                          src={assignedApp.profiles?.avatar_url || ''} 
+                          alt={profileName}
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold">
+                          {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-lg">{profileName}</h5>
+                      <div className="flex items-center gap-2">
+                        {assignedApp.rating && (
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm font-medium">
+                              {assignedApp.rating.avg_score.toFixed(1)}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              ({assignedApp.rating.rating_count})
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Цена: {formatPrice(assignedApp.price_cents)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Link 
+                      to={`/messages?job_id=${jobId}&pro_id=${selectedProId}`}
+                      className="btn-primary px-4 py-2 text-sm"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-1" />
+                      Чат
+                    </Link>
+                    <Link 
+                      to={`/pro/${selectedProId}`}
+                      className="btn-outline px-4 py-2 text-sm"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Профиль
+                    </Link>
+                  </div>
+                </div>
+              );
+            })()
+          )}
         </div>
         
         {/* Job Status Progress */}

@@ -468,7 +468,7 @@ export default function MobileJobDetail() {
           </MobileCard>
         )}
 
-        {/* Response Button */}
+        {/* Response Button - Only show for professionals on NEW jobs */}
         {job.status === 'new' && (
           <div className="pt-4 pb-20">
             <Button

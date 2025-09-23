@@ -1047,8 +1047,8 @@ const JobDetail = () => {
                 </div>
               )}
 
-              {/* Applications List for Job Owner - Only show when NO professional is assigned */}
-              {isJobOwner && !job.pro_id && (
+              {/* Applications List for Job Owner - Show applications and job progress */}
+              {isJobOwner && (
                 <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                   <JobApplicationsList 
                     jobId={job.id}

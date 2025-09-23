@@ -8,6 +8,7 @@ import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Seo } from "@/components/Seo";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
+import { HallOfFame } from "@/components/HallOfFame";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -382,7 +383,7 @@ export default function DashboardClient() {
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-              <TabsList className="grid w-full grid-cols-7 bg-transparent gap-1">
+              <TabsList className="grid w-full grid-cols-8 bg-transparent gap-1">
                 <TabsTrigger 
                   value="overview" 
                   className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
@@ -460,6 +461,20 @@ export default function DashboardClient() {
                   <Gift className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">{t('client.dashboard.tabs.referrals')}</span>
                   {activeTab === "referrals" && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
+                    />
+                  )}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="reviews" 
+                  className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                >
+                  <Star className="h-5 w-5" />
+                  <span className="hidden sm:inline font-medium">Зал славы</span>
+                  {activeTab === "reviews" && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -900,6 +915,15 @@ export default function DashboardClient() {
                   </div>
                 </div>
               </div>
+            </TabsContent>
+
+            {/* Reviews Tab - Hall of Fame */}
+            <TabsContent value="reviews">
+              <HallOfFame 
+                userId={user?.id || ''}
+                userRole="client"
+                className="max-w-4xl mx-auto"
+              />
             </TabsContent>
 
             {/* Settings Tab */}
