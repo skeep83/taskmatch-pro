@@ -77,25 +77,35 @@ const DashboardPro = () => {
         (payload) => {
           console.log('DashboardPro: Job updated:', payload);
           const updatedJob = payload.new as any;
+          const oldJob = payload.old as any;
           
-          // Если работа была назначена текущему пользователю
-          if (userId && updatedJob.pro_id === userId && updatedJob.status === 'accepted') {
-            console.log('DashboardPro: Job assigned to current user, reloading active jobs');
-            loadActiveJobs(userId);
+          // Если работа была назначена текущему пользователю (статус изменился на accepted и назначен pro_id)
+          if (userId && updatedJob.pro_id === userId && updatedJob.status === 'accepted' && 
+              (oldJob.status !== 'accepted' || oldJob.pro_id !== userId)) {
+            console.log('DashboardPro: Job assigned to current user, forcing data reload');
+            
+            // Принудительно перезагружаем данные
+            setTimeout(() => {
+              loadActiveJobs(userId);
+              loadNearbyJobs(userId);
+            }, 500);
+            
+            // Показываем уведомление
             toast({
-              title: "Новая работа!",
-              description: `Вам назначена работа: ${updatedJob.title}`,
-              duration: 5000
+              title: "Новая работа назначена!",
+              description: `Заказ "${updatedJob.title}" назначен вам на выполнение`,
+              duration: 8000
             });
           }
           
-          // Перезагружаем соответствующие списки
-          if (userId) {
-            if (updatedJob.status === 'new') {
-              loadNearbyJobs(userId);
-            } else if (updatedJob.pro_id === userId) {
-              loadActiveJobs(userId);
-            }
+          // Обновляем активные заказы если это наша работа
+          if (userId && updatedJob.pro_id === userId) {
+            setTimeout(() => loadActiveJobs(userId), 300);
+          }
+          
+          // Обновляем доступные заказы если статус изменился на 'new'
+          if (updatedJob.status === 'new') {
+            setTimeout(() => loadNearbyJobs(userId), 300);
           }
         }
       )
@@ -141,6 +151,12 @@ const DashboardPro = () => {
 
       console.log('DashboardPro: Dashboard loaded successfully');
       setLoading(false);
+      
+      // Дополнительная проверка через 2 секунды на случай пропущенных обновлений
+      setTimeout(() => {
+        console.log('DashboardPro: Performing delayed check for missed updates');
+        loadActiveJobs(uid);
+      }, 2000);
     } catch (error: any) {
       console.error('DashboardPro: Error during initialization:', error);
       toast({ 
@@ -213,7 +229,8 @@ const DashboardPro = () => {
           budget_max_cents,
           location_address,
           created_at,
-          updated_at
+          updated_at,
+          pro_id
         `)
         .eq('pro_id', uid)
         .in('status', ['accepted', 'in_progress', 'done'])
@@ -227,19 +244,26 @@ const DashboardPro = () => {
       
       const jobs = data || [];
       const targetJob = jobs.find(job => job.id === 'd984322c-a83b-477b-acfa-0ac6e80d03e6');
-      console.log('DashboardPro: Loaded active jobs:', {
+       console.log('DashboardPro: Loaded active jobs:', {
         totalJobs: jobs.length,
         jobs: jobs,
         targetJobFound: !!targetJob,
         targetJob: targetJob,
-        userId: uid
+        userId: uid,
+        timestamp: new Date().toISOString()
       });
       
+      // Обновляем состояние
       setMyActiveJobs(jobs);
       
       // Calculate completed jobs count
       const completed = jobs.filter(job => job.status === 'done').length;
       setCompletedJobs(completed);
+      
+      // Если целевой заказ найден, показываем дополнительное уведомление
+      if (targetJob && targetJob.status === 'accepted') {
+        console.log('DashboardPro: Target job found and accepted!');
+      }
     } catch (error) {
       console.error('DashboardPro: Error loading active jobs:', error);
     }
