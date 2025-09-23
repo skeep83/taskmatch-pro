@@ -8,7 +8,7 @@ import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Seo } from "@/components/Seo";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
-import { HallOfFame } from "@/components/HallOfFame";
+import { HallOfFame } from "@/pages/HallOfFame";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -919,11 +919,9 @@ export default function DashboardClient() {
 
             {/* Reviews Tab - Hall of Fame */}
             <TabsContent value="reviews">
-              <HallOfFame 
-                userId={user?.id || ''}
-                userRole="client"
-                className="max-w-4xl mx-auto"
-              />
+              <div className="max-w-4xl mx-auto">
+                <HallOfFame />
+              </div>
             </TabsContent>
 
             {/* Settings Tab */}
