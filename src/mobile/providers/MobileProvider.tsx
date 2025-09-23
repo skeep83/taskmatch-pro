@@ -1,4 +1,4 @@
-import { default as React, createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useDeviceDetection, DeviceInfo } from '@/hooks/useDeviceDetection';
 
 interface MobileContextType extends DeviceInfo {
@@ -24,7 +24,7 @@ export function useMobile() {
 }
 
 interface MobileProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function MobileProvider({ children }: MobileProviderProps) {
