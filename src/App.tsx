@@ -180,18 +180,49 @@ const AppContent = () => {
 const App = () => {
   console.log("ServiceHub App initializing...", { React });
   
-  // Create QueryClient instance with optimized settings
+  // Debug React instance
+  console.log("React instance check:", {
+    useEffect: React.useEffect,
+    useState: React.useState,
+    useContext: React.useContext,
+    version: React.version
+  });
+  
+  // Create a minimal QueryClient instance
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 5 * 60 * 1000, // 5 minutes
         refetchOnWindowFocus: false,
+        retry: false, // Disable retries to avoid additional errors
       },
     },
   });
 
+  // Test component to verify React hooks work
+  const ReactTest = () => {
+    const [count, setCount] = React.useState(0);
+    
+    React.useEffect(() => {
+      console.log("React hooks test - useEffect working!");
+    }, []);
+    
+    return (
+      <div className="fixed top-4 right-4 z-50 bg-green-500 text-white p-2 rounded text-xs">
+        React Test: {count}
+        <button 
+          onClick={() => setCount(c => c + 1)} 
+          className="ml-2 px-1 bg-green-700 rounded"
+        >
+          +
+        </button>
+      </div>
+    );
+  };
+
   return (
     <ErrorBoundary>
+      <ReactTest />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <EnhancedI18nProvider>
