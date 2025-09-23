@@ -203,6 +203,7 @@
   "messages.no_active_chats": "Nu sunt chat-uri active",
   "messages.order_id": "Comanda #{id}",
   "messages.select_chat": "Selectează chat",
+  "messages.select_chat_description": "Selectează o conversație din listă pentru a începe comunicarea",
   "messages.select_from_list": "Selectează un chat din lista din stânga pentru a începe comunicarea",
   "messages.chat": "Chat",
   "messages.typing": "Scrie…",
