@@ -342,7 +342,7 @@ export function JobApplicationsList({
                   </div>
                   
                   {/* Bottom white section */}
-                  <div className="relative bg-white px-6 pt-20 pb-8">
+                  <div className="relative bg-white pt-20 pb-8 mx-0 my-0 py-[70px] px-[41px]">
                     {/* Name and title */}
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
