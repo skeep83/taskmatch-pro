@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { MobileHeader } from '../components/navigation/MobileHeader';
 import { MobileCard } from '../components/ui/MobileCard';
+import { MobileCategorySelector } from '../components/ui/MobileCategorySelector';
 import { useMobile } from '../providers/MobileProvider';
 import { useEnhancedI18n } from '@/i18n/enhanced';
 import { supabase } from '@/integrations/supabase/client';
@@ -600,64 +601,28 @@ export default function MobileProfileSettings() {
                 <Wrench className="h-5 w-5" />
                 Категории услуг
               </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Выберите категории услуг, которые вы предоставляете
-              </p>
-
-              {/* Debug info */}
-              <div className="mb-4 p-2 bg-yellow-100 rounded text-xs">
-                Загружено категорий: {categories.length}, Выбрано: {selectedCategories.length}
-              </div>
-              
-              <div className="space-y-3">
-                {categories.map((category) => (
-                  <div
-                    key={category.id}
-                    onClick={() => toggleCategory(category.id)}
-                    className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                      selectedCategories.includes(category.id)
-                        ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 bg-white'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">
-                        {profile.locale === 'ro' ? category.label_ro : category.label_ru}
-                      </span>
-                      {selectedCategories.includes(category.id) && (
-                        <CheckCircle2 className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
+              <div className="space-y-4">
+                <p className="text-gray-600 text-sm">
+                  Выберите категории, в которых вы предоставляете услуги:
+                </p>
+                
+                <MobileCategorySelector
+                  categories={categories}
+                  selectedCategories={selectedCategories}
+                  onSelectionChange={setSelectedCategories}
+                  placeholder="Выберите категории услуг"
+                  maxSelection={5}
+                  disabled={categories.length === 0}
+                />
+                
+                {categories.length === 0 && (
+                  <div className="p-6 text-center text-gray-500 bg-[#E5E7EB] rounded-2xl shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
+                    <Wrench className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Нет доступных категорий</p>
+                    <p className="text-xs mt-1">Попробуйте обновить страницу</p>
                   </div>
-                ))}
+                )}
               </div>
-
-              {selectedCategories.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="font-medium mb-2">Выбранные категории:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCategories.map((catId) => {
-                      const category = categories.find(c => c.id === catId);
-                      return category ? (
-                        <Badge
-                          key={catId}
-                          variant="secondary"
-                          className="flex items-center gap-1"
-                        >
-                          {profile.locale === 'ro' ? category.label_ro : category.label_ru}
-                          <X
-                            className="h-3 w-3 cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleCategory(catId);
-                            }}
-                          />
-                        </Badge>
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              )}
             </MobileCard>
           </div>
         )}
