@@ -382,8 +382,8 @@ export default function DashboardClient() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
-              <TabsList className="grid w-full grid-cols-8 bg-transparent gap-1">
+            <div className="flex justify-center p-3 rounded-2xl bg-muted shadow-neumorphic-inset">
+              <TabsList className="grid grid-cols-8 bg-transparent gap-1 w-full max-w-6xl">
                 <TabsTrigger 
                   value="overview" 
                   className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
