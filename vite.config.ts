@@ -11,17 +11,6 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     sourcemap: true,
-    rollupOptions: {
-      external: [],
-    },
-  },
-  optimizeDeps: {
-    include: [
-      "react",
-      "react-dom",
-      "@tanstack/react-query",
-      "framer-motion"
-    ],
   },
   plugins: [
     react(),
@@ -29,7 +18,6 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
   ].filter(Boolean),
   resolve: {
-    dedupe: ["react", "react-dom"],
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },

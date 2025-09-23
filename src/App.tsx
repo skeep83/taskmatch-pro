@@ -1,36 +1,221 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { Suspense, lazy } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { MobileProvider } from "./mobile/providers/MobileProvider";
+import { useDeviceDetection } from "./hooks/useDeviceDetection";
+import { MobileBottomNav } from "./mobile/components/navigation/MobileBottomNav";
 
-// Simple test component to isolate the issue
-const TestApp = () => {
-  return <div>Test App Working</div>;
+// Core pages loaded immediately
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import HowItWorks from "./pages/HowItWorks";
+
+// UI components loaded immediately
+import { AppNavigation } from "./components/navigation/AppNavigation";
+import { FloatingActionButton } from "./components/navigation/FloatingActionButton";
+import Footer from "./components/layout/Footer";
+import { EnhancedI18nProvider } from "./i18n/enhanced";
+import { DatabaseI18nProvider } from "./i18n/DatabaseI18n";
+import Diagnostics from "./components/Diagnostics";
+import { usePresenceTracking } from "./hooks/usePresenceTracking";
+
+// Lazy-loaded pages for code splitting
+const Auth = lazy(() => import("./pages/Auth"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const MobileFeed = lazy(() => import("./mobile/pages/MobileFeed"));
+const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
+const JobNew = lazy(() => import("./pages/JobNew"));
+const JobDetail = lazy(() => import("./pages/JobDetail"));
+const JobEdit = lazy(() => import("./pages/JobEdit"));
+const DashboardClient = lazy(() => import("./pages/DashboardClient"));
+const MobileDashboardClient = lazy(() => import("./mobile/pages/MobileDashboardClient"));
+const DashboardPro = lazy(() => import("./pages/DashboardPro"));
+const MobileDashboardPro = lazy(() => import("./mobile/pages/MobileDashboardPro"));
+const DashboardBusiness = lazy(() => import("./pages/DashboardBusiness"));
+const Messages = lazy(() => import("./pages/Messages"));
+const MobileMessages = lazy(() => import("./mobile/pages/MobileMessages"));
+const MobileJobNew = lazy(() => import("./mobile/pages/MobileJobNew"));
+const MobileJobDetail = lazy(() => import("./mobile/pages/MobileJobDetail"));
+const MobileJobRespond = lazy(() => import("./mobile/pages/MobileJobRespond"));
+const MobileProfileSettings = lazy(() => import("./mobile/pages/MobileProfileSettings"));
+const Kyc = lazy(() => import("./pages/Kyc"));
+const ProSchedule = lazy(() => import("./pages/ProSchedule"));
+const ProPortfolio = lazy(() => import("./pages/ProPortfolio"));
+const TendersList = lazy(() => import("./pages/TendersList"));
+const TenderDetail = lazy(() => import("./pages/TenderDetail"));
+const TenderNew = lazy(() => import("./pages/TenderNew"));
+const Catalog = lazy(() => import("./pages/Catalog"));
+const MobileCatalog = lazy(() => import("./mobile/pages/MobileCatalog"));
+const ProPublic = lazy(() => import("./pages/ProPublic"));
+const Feed = lazy(() => import("./pages/Feed"));
+const ProUpgradeStatus = lazy(() => import("./pages/ProUpgradeStatus"));
+const ProfileSettings = lazy(() => import("./pages/ProfileSettings"));
+const ServiceHubDashboard = lazy(() => import("./pages/ServiceHubDashboard"));
+const HallOfFame = lazy(() => import("./pages/HallOfFame"));
+
+// Admin pages lazy-loaded
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminJobs = lazy(() => import("./pages/admin/Jobs"));
+const AdminTenders = lazy(() => import("./pages/admin/Tenders"));
+const AdminDisputes = lazy(() => import("./pages/admin/Disputes"));
+const AdminFinance = lazy(() => import("./pages/admin/Finance"));
+const AdminRisk = lazy(() => import("./pages/admin/Risk"));
+const AdminContent = lazy(() => import("./pages/admin/Content"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminTesting = lazy(() => import("./pages/admin/Testing"));
+const AdminCurrencies = lazy(() => import("./pages/admin/Currencies"));
+const AdminCategories = lazy(() => import("./pages/admin/Categories"));
+const AdminLogs = lazy(() => import("./pages/admin/Logs"));
+const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests"));
+const AdminKycVerification = lazy(() => import("./pages/admin/KycVerification"));
+import PageTransition from "./components/PageTransition";
+
+
+
+const AppContent = () => {
+  const location = useLocation();
+  const { isMobile } = useDeviceDetection();
+  
+  // Отслеживаем присутствие пользователя на платформе
+  usePresenceTracking();
+  
+  return (
+    <>
+      {!isMobile && <AppNavigation />}
+      <PageTransition>
+        <Suspense fallback={
+          <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
+            <div className="text-center p-8">
+              <div className="relative">
+                <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin mx-auto mb-4"></div>
+              </div>
+              <p className="text-sm text-muted-foreground animate-pulse">Загрузка...</p>
+            </div>
+          </div>
+        }>
+          <Routes location={location}>
+            <Route path="/" element={<Index />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/catalog" element={
+              isMobile ? <MobileCatalog /> : <Catalog />
+            } />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/job/:id" element={
+              isMobile ? <MobileJobDetail /> : <JobDetail />
+            } />
+            <Route path="/job/:id/respond" element={<MobileJobRespond />} />
+            <Route path="/job/:id/edit" element={<JobEdit />} />
+            <Route path="/job/new" element={
+              <>
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="fixed top-2 right-2 z-50 bg-red-500 text-white px-2 py-1 text-xs rounded">
+                    {isMobile ? 'Mobile' : 'Desktop'} ({window.innerWidth}px)
+                  </div>
+                )}
+                {isMobile ? <MobileJobNew /> : <JobNew />}
+              </>
+            } />
+            <Route path="/jobs/search" element={<ServiceHubDashboard />} />
+            <Route path="/hall-of-fame" element={<HallOfFame />} />
+            <Route path="/dashboard/client" element={
+              isMobile ? <MobileDashboardClient /> : <DashboardClient />
+            } />
+            <Route path="/dashboard/pro" element={
+              isMobile ? <MobileDashboardPro /> : <DashboardPro />
+            } />
+            <Route path="/dashboard/business" element={<DashboardBusiness />} />
+            <Route path="/dashboard" element={<Navigate to="/jobs/search" replace />} />
+            <Route path="/messages" element={
+              isMobile ? <MobileMessages /> : <Messages />
+            } />
+            <Route path="/messages/:id" element={
+              isMobile ? <MobileMessages /> : <Messages />
+            } />
+            <Route path="/profile/settings" element={<ProfileSettings />} />
+            <Route path="/mobile/profile-settings" element={<MobileProfileSettings />} />
+            <Route path="/kyc" element={<Kyc />} />
+            <Route path="/pro-upgrade-status" element={<ProUpgradeStatus />} />
+            <Route path="/pro/profile" element={<Navigate to="/profile/settings" replace />} />
+            <Route path="/pro/schedule" element={<ProSchedule />} />
+            <Route path="/portfolio" element={<ProPortfolio />} />
+            <Route path="/tenders" element={<TendersList />} />
+            <Route path="/tenders/new" element={<TenderNew />} />
+            <Route path="/tenders/:id" element={<TenderDetail />} />
+            <Route path="/pro/:id" element={<ProPublic />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-canceled" element={<PaymentCanceled />} />
+            <Route path="/feed" element={isMobile ? <MobileFeed /> : <Feed />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="jobs" element={<AdminJobs />} />
+              <Route path="tenders" element={<AdminTenders />} />
+              <Route path="disputes" element={<AdminDisputes />} />
+              <Route path="pro-requests" element={<ProUpgradeRequests />} />
+              <Route path="kyc" element={<AdminKycVerification />} />
+              <Route path="finance" element={<AdminFinance />} />
+              <Route path="risk" element={<AdminRisk />} />
+              <Route path="content" element={<AdminContent />} />
+                    <Route path="currencies" element={<AdminCurrencies />} />
+                    <Route path="categories" element={<AdminCategories />} />
+                    <Route path="logs" element={<AdminLogs />} />
+                    <Route path="settings" element={<AdminSettings />} />
+                    <Route path="testing" element={<AdminTesting />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </PageTransition>
+      {!isMobile && <FloatingActionButton />}
+      {!isMobile && <Footer />}
+      {isMobile && <MobileBottomNav />}
+    </>
+  );
 };
 
-// Create QueryClient outside component
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
 const App = () => {
-  console.log("App rendering, React:", React);
-  console.log("QueryClient:", queryClient);
-  console.log("QueryClientProvider:", QueryClientProvider);
-  
-  try {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TestApp />
-      </QueryClientProvider>
-    );
-  } catch (error) {
-    console.error("Error in App:", error);
-    return <div>Error: {error.message}</div>;
-  }
+  console.log("App component initializing...", { React, QueryClient, QueryClientProvider });
+  const queryClient = new QueryClient();
+  return (
+  <QueryClientProvider client={queryClient}>
+    <EnhancedI18nProvider>
+      <DatabaseI18nProvider>
+        <MobileProvider>
+          <TooltipProvider>
+          <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
+              <div className="text-center p-8">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-6"></div>
+                  <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-primary/40 animate-spin mx-auto" style={{animationDuration: '1.5s'}}></div>
+                </div>
+                <h2 className="text-xl font-semibold text-foreground mb-2">ServiceHub</h2>
+                <p className="text-muted-foreground animate-pulse">Загрузка переводов...</p>
+              </div>
+            </div>
+          }>
+            <BrowserRouter>
+              <div style={{ background: 'var(--background-neomorphic)' }}>
+                <Toaster />
+                <Sonner />
+                <Diagnostics />
+                <AppContent />
+              </div>
+            </BrowserRouter>
+          </Suspense>
+          </TooltipProvider>
+        </MobileProvider>
+      </DatabaseI18nProvider>
+    </EnhancedI18nProvider>
+  </QueryClientProvider>
+  );
 };
 
 export default App;

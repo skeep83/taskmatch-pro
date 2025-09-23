@@ -203,7 +203,6 @@
   "messages.no_active_chats": "Нет активных чатов",
   "messages.order_id": "Заказ #{id}",
   "messages.select_chat": "Выберите чат",
-  "messages.select_chat_description": "Выберите беседу из списка для начала общения",
   "messages.select_from_list": "Выберите чат из списка слева для начала общения",
   "messages.chat": "Чат",
   "messages.typing": "Печатает…",
