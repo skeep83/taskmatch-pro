@@ -223,21 +223,22 @@ export default function MobileDashboardPro() {
           </div>
 
           {/* Horizontal Tab Navigation */}
-          <div className="overflow-x-auto">
-            <div className="flex space-x-2 p-2 min-w-max">
+          <div className="overflow-x-auto mb-6">
+            <div className="flex space-x-2 p-3 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] rounded-2xl min-w-max">
               {tabItems.map((tab) => (
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-300 ${
+                  className={`flex items-center gap-2 px-4 py-3 rounded-xl whitespace-nowrap transition-all duration-300 font-medium ${
                     activeTab === tab.id
-                      ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black'
-                      : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600'
+                      ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary'
+                      : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]'
                   }`}
                   whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.02 }}
                 >
                   <tab.icon className="h-4 w-4" />
-                  <span className="text-sm font-medium">{tab.label}</span>
+                  <span className="text-sm">{tab.label}</span>
                 </motion.button>
               ))}
             </div>
