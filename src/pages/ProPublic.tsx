@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 
 const ProPublic = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
