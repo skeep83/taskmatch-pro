@@ -364,7 +364,8 @@ export default function ProPortfolio() {
         </div>
       </div>
 
-      <div className="container mx-auto py-4 lg:py-8 px-4">
+      <div className="container mx-auto py-4 lg:py-8 px-4 bg-background-neomorphic">
+        <div className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 lg:p-8 shadow-neomorphic border border-border/50">
         {/* Hero Section */}
         <section className="relative overflow-hidden rounded-3xl mb-6 lg:mb-12 bg-gradient-to-br from-primary/10 via-background to-primary/5">
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
@@ -565,6 +566,7 @@ export default function ProPortfolio() {
             </div>
           )}
         </motion.section>
+        </div>
       </div>
     </div>
   );
