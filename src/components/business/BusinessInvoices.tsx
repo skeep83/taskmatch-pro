@@ -136,99 +136,98 @@ export function BusinessInvoices() {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center py-8">
-            Загрузка инвойсов...
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <span className="ml-3 text-black">Загрузка инвойсов...</span>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          Инвойсы
-        </CardTitle>
-        <Button onClick={createInvoice}>
-          <Plus className="h-4 w-4 mr-2" />
-          Создать инвойс
-        </Button>
-      </CardHeader>
-      <CardContent>
-        {invoices.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>У вас пока нет инвойсов</p>
-            <p className="text-sm mb-4">Создайте первый инвойс для автоматизации оплат</p>
-            <Button onClick={createInvoice}>
-              <Plus className="h-4 w-4 mr-2" />
-              Создать инвойс
-            </Button>
+    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <FileText className="h-6 w-6 text-primary" />
           </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Номер</TableHead>
-                <TableHead>Статус</TableHead>
-                <TableHead>Сумма</TableHead>
-                <TableHead>Срок оплаты</TableHead>
-                <TableHead>Создан</TableHead>
-                <TableHead>Действия</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell>
-                    <div className="font-mono text-sm">
-                      #{invoice.id.slice(-8).toUpperCase()}
+          <h2 className="text-2xl font-bold text-black">Инвойсы</h2>
+        </div>
+        <button
+          onClick={createInvoice}
+          className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+        >
+          <Plus className="h-4 w-4" />
+          Создать инвойс
+        </button>
+      </div>
+      
+      {invoices.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <FileText className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-semibold text-black mb-2">У вас пока нет инвойсов</h3>
+          <p className="text-gray-600 mb-6">Создайте первый инвойс для автоматизации оплат</p>
+          <button
+            onClick={createInvoice}
+            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+          >
+            <Plus className="h-4 w-4" />
+            Создать инвойс
+          </button>
+        </div>
+      ) : (
+        <div className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl p-6">
+          <div className="space-y-4">
+            {invoices.map((invoice) => (
+              <div key={invoice.id} className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl p-6 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-4 mb-3">
+                      <span className="font-mono text-lg font-semibold text-black">
+                        #{invoice.id.slice(-8).toUpperCase()}
+                      </span>
+                      {getStatusBadge(invoice.status)}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(invoice.status)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    
+                    <div className="flex items-center gap-6 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        Срок: {invoice.due_date ? 
+                          new Date(invoice.due_date).toLocaleDateString() :
+                          "Не указан"
+                        }
+                      </div>
+                      <div>
+                        Создан: {new Date(invoice.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <div className="flex items-center gap-1 text-xl font-bold text-black mb-3">
+                      <DollarSign className="h-5 w-5" />
                       {formatPrice(invoice.amount_cents, invoice.currency)}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      {invoice.due_date ? 
-                        new Date(invoice.due_date).toLocaleDateString() :
-                        "Не указан"
-                      }
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(invoice.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {invoice.pdf_url ? (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={invoice.pdf_url} target="_blank" rel="noopener noreferrer">
-                          <Download className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    ) : (
-                      <Button variant="outline" size="sm" disabled>
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+                    <button
+                      className={`p-2 rounded-lg transition-all duration-300 ${
+                        invoice.pdf_url 
+                          ? 'bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]'
+                          : 'bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] opacity-50'
+                      }`}
+                      disabled={!invoice.pdf_url}
+                    >
+                      <Download className="h-4 w-4 text-primary" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

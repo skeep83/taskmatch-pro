@@ -129,105 +129,99 @@ export function BusinessJobs() {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center py-8">
-            Загрузка заказов...
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <span className="ml-3 text-black">Загрузка заказов...</span>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <Briefcase className="h-5 w-5" />
-          Заказы компании
-        </CardTitle>
-        <Button onClick={() => navigate('/job/new')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Создать заказ
-        </Button>
-      </CardHeader>
-      <CardContent>
-        {jobs.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>У вас пока нет заказов</p>
-            <p className="text-sm mb-4">Создайте первый заказ для компании</p>
-            <Button onClick={() => navigate('/job/new')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Создать заказ
-            </Button>
+    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Briefcase className="h-6 w-6 text-primary" />
           </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Заказ</TableHead>
-                <TableHead>Категория</TableHead>
-                <TableHead>Статус</TableHead>
-                <TableHead>Бюджет</TableHead>
-                <TableHead>Дата</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {jobs.map((businessJob) => {
-                const job = businessJob.jobs;
-                return (
-                  <TableRow key={businessJob.id} className="cursor-pointer">
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{job.title}</div>
-                        <div className="text-sm text-muted-foreground line-clamp-2">
-                          {job.description}
+          <h2 className="text-2xl font-bold text-black">Заказы компании</h2>
+        </div>
+        <button
+          onClick={() => navigate('/job/new')}
+          className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+        >
+          <Plus className="h-4 w-4" />
+          Создать заказ
+        </button>
+      </div>
+      
+      {jobs.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Briefcase className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-semibold text-black mb-2">У вас пока нет заказов</h3>
+          <p className="text-gray-600 mb-6">Создайте первый заказ для компании</p>
+          <button
+            onClick={() => navigate('/job/new')}
+            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+          >
+            <Plus className="h-4 w-4" />
+            Создать заказ
+          </button>
+        </div>
+      ) : (
+        <div className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl p-6">
+          <div className="space-y-4">
+            {jobs.map((businessJob) => {
+              const job = businessJob.jobs;
+              return (
+                <div key={businessJob.id} className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl p-6 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300 cursor-pointer">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-black text-lg mb-2">{job.title}</h3>
+                      <p className="text-gray-600 text-sm line-clamp-2 mb-3">{job.description}</p>
+                      
+                      {job.location_address && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                          <MapPin className="h-4 w-4" />
+                          {job.location_address}
                         </div>
-                        {job.location_address && (
-                          <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                            <MapPin className="h-3 w-3" />
-                            {job.location_address}
-                          </div>
-                        )}
+                      )}
+                      
+                      <div className="flex items-center gap-4">
+                        <div className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-lg px-3 py-1 text-sm text-black">
+                          {job.categories?.label_ru || "Не указано"}
+                        </div>
+                        {getStatusBadge(job.status)}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {job.categories?.label_ru || "Не указано"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(job.status)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    
+                    <div className="text-right">
+                      <div className="flex items-center gap-1 text-black font-semibold mb-2">
+                        <DollarSign className="h-4 w-4" />
                         {job.budget_min_cents && job.budget_max_cents ? (
-                          <span>
-                            {formatPrice(job.budget_min_cents)} - {formatPrice(job.budget_max_cents)}
-                          </span>
+                          <span>{formatPrice(job.budget_min_cents)} - {formatPrice(job.budget_max_cents)}</span>
                         ) : (
-                          <span className="text-muted-foreground">По договоренности</span>
+                          <span className="text-gray-500">По договоренности</span>
                         )}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Calendar className="h-3 w-3" />
                         {job.scheduled_at ? 
                           new Date(job.scheduled_at).toLocaleDateString() :
                           new Date(job.created_at).toLocaleDateString()
                         }
                       </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

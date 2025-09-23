@@ -129,117 +129,95 @@ export const BusinessTenders = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-48">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Загрузка тендеров...</p>
+      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <span className="ml-3 text-black">Загрузка тендеров...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Тендеры</h2>
-          <p className="text-muted-foreground">Управление тендерами компании</p>
+    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Calendar className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-black">Тендеры</h2>
+            <p className="text-gray-600">Управление тендерами компании</p>
+          </div>
         </div>
-        <Button onClick={() => navigate('/tenders/new')} className="gap-2">
+        <button
+          onClick={() => navigate('/tenders/new')}
+          className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+        >
           <Plus className="h-4 w-4" />
           Создать тендер
-        </Button>
+        </button>
       </div>
 
       {tenders.length === 0 ? (
-        <Card className="card-surface">
-          <CardContent className="p-12 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="mb-6">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Calendar className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Нет тендеров</h3>
-                <p className="text-muted-foreground mb-6">
-                  У вас пока нет созданных тендеров. Создайте первый тендер для получения предложений от специалистов.
-                </p>
-              </div>
-              <Button onClick={() => navigate('/tenders/new')} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Создать первый тендер
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="text-center py-12">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Calendar className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="text-xl font-semibold text-black mb-2">Нет тендеров</h3>
+          <p className="text-gray-600 mb-6">
+            У вас пока нет созданных тендеров. Создайте первый тендер для получения предложений от специалистов.
+          </p>
+          <button
+            onClick={() => navigate('/tenders/new')}
+            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+          >
+            <Plus className="h-4 w-4" />
+            Создать первый тендер
+          </button>
+        </div>
       ) : (
-        <Card className="card-surface">
-          <CardHeader>
-            <CardTitle>Список тендеров</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Название</TableHead>
-                  <TableHead>Статус</TableHead>
-                  <TableHead>Бюджет</TableHead>
-                  <TableHead>Заявки</TableHead>
-                  <TableHead>Срок подачи</TableHead>
-                  <TableHead>Создан</TableHead>
-                  <TableHead className="text-right">Действия</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tenders.map((tender) => (
-                  <TableRow key={tender.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{tender.title}</div>
-                        <div className="text-sm text-muted-foreground truncate max-w-xs">
-                          {tender.description}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
+        <div className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-black mb-6">Список тендеров</h3>
+          <div className="space-y-4">
+            {tenders.map((tender) => (
+              <div key={tender.id} className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl p-6 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-black text-lg mb-2">{tender.title}</h4>
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-3">{tender.description}</p>
+                    
+                    <div className="flex items-center gap-4 mb-3">
                       {getStatusBadge(tender.status)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        {formatPrice(tender.budget_max_cents)}
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Users className="h-4 w-4" />
+                        {tender.bid_count} заявок
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        {tender.bid_count}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {formatDate(tender.deadline)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {formatDate(tender.created_at)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate(`/tenders/${tender.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>Срок подачи: {formatDate(tender.deadline)}</span>
+                      <span>Создан: {formatDate(tender.created_at)}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right ml-6">
+                    <div className="flex items-center gap-1 text-black font-semibold mb-3">
+                      <DollarSign className="h-4 w-4" />
+                      {formatPrice(tender.budget_max_cents)}
+                    </div>
+                    <button
+                      onClick={() => navigate(`/tenders/${tender.id}`)}
+                      className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] rounded-lg p-2 transition-all duration-300"
+                    >
+                      <Eye className="h-4 w-4 text-primary" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

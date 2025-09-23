@@ -113,58 +113,62 @@ export function BusinessAccountForm() {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin" />
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5" />
-          Данные компании
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="company_name">Название компании *</Label>
-            <Input
-              id="company_name"
-              value={account.company_name}
-              onChange={(e) => setAccount({ ...account, company_name: e.target.value })}
-              placeholder="ООО «Пример»"
-            />
+    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <Building2 className="h-6 w-6 text-primary" />
+        </div>
+        <h2 className="text-2xl font-bold text-black">Данные компании</h2>
+      </div>
+      
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="company_name" className="text-black font-medium">Название компании *</Label>
+            <div className="relative">
+              <Input
+                id="company_name"
+                value={account.company_name}
+                onChange={(e) => setAccount({ ...account, company_name: e.target.value })}
+                placeholder="ООО «Пример»"
+                className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="idno">IDNO *</Label>
+          <div className="space-y-2">
+            <Label htmlFor="idno" className="text-black font-medium">IDNO *</Label>
             <Input
               id="idno"
               value={account.idno}
               onChange={(e) => setAccount({ ...account, idno: e.target.value })}
               placeholder="1234567890123"
+              className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="vat_number">НДС номер</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="vat_number" className="text-black font-medium">НДС номер</Label>
             <Input
               id="vat_number"
               value={account.vat_number}
               onChange={(e) => setAccount({ ...account, vat_number: e.target.value })}
               placeholder="MD123456789"
+              className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
             />
           </div>
-          <div>
-            <Label htmlFor="rate_multiplier">Множитель тарифа</Label>
+          <div className="space-y-2">
+            <Label htmlFor="rate_multiplier" className="text-black font-medium">Множитель тарифа</Label>
             <Input
               id="rate_multiplier"
               type="number"
@@ -173,49 +177,56 @@ export function BusinessAccountForm() {
               max="10"
               value={account.rate_multiplier}
               onChange={(e) => setAccount({ ...account, rate_multiplier: parseFloat(e.target.value) || 1.0 })}
+              className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
             />
           </div>
         </div>
 
-        <div>
-          <Label htmlFor="legal_address">Юридический адрес *</Label>
+        <div className="space-y-2">
+          <Label htmlFor="legal_address" className="text-black font-medium">Юридический адрес *</Label>
           <Textarea
             id="legal_address"
             value={account.legal_address}
             onChange={(e) => setAccount({ ...account, legal_address: e.target.value })}
             placeholder="г. Кишинев, ул. Примера, 123"
             rows={3}
+            className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB] resize-none"
           />
         </div>
 
-        <div>
-          <Label htmlFor="contract_url">Ссылка на договор</Label>
+        <div className="space-y-2">
+          <Label htmlFor="contract_url" className="text-black font-medium">Ссылка на договор</Label>
           <Input
             id="contract_url"
             value={account.contract_url || ""}
             onChange={(e) => setAccount({ ...account, contract_url: e.target.value })}
             placeholder="https://example.com/contract.pdf"
+            className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
           />
         </div>
 
-        <Button 
-          onClick={saveBusinessAccount} 
-          disabled={saving || !account.company_name || !account.idno || !account.legal_address}
-          className="w-full"
-        >
-          {saving ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Сохранение...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              Сохранить данные
-            </>
-          )}
-        </Button>
-      </CardContent>
-    </Card>
+        <div className="pt-4">
+          <button
+            onClick={saveBusinessAccount}
+            disabled={saving || !account.company_name || !account.idno || !account.legal_address}
+            className="w-full h-14 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] disabled:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] disabled:text-gray-400 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 text-black font-semibold text-lg"
+          >
+            {saving ? (
+              <>
+                <div className="w-5 h-5 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] animate-spin"></div>
+                Сохранение...
+              </>
+            ) : (
+              <>
+                <div className="w-5 h-5 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                  <Save className="h-3 w-3 text-primary" />
+                </div>
+                Сохранить данные
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
