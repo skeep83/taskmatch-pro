@@ -172,7 +172,13 @@ function MobileMessages() {
           table: 'chat_messages', 
           filter: `chat_id=eq.${id}` 
         }, (payload: any) => {
-          setMessages(prev => [...prev, payload.new]);
+          // Проверяем, есть ли уже это сообщение в списке (предотвращение дублирования)
+          setMessages(prev => {
+            const exists = prev.some(msg => msg.id === payload.new.id);
+            if (exists) return prev;
+            return [...prev, payload.new];
+          });
+          
           // Воспроизводим звук получения сообщения если это не наше сообщение
           if (payload.new.sender_id !== userId && shouldPlaySound('message')) {
             notificationSounds.playNotification('message');
@@ -299,7 +305,7 @@ function MobileMessages() {
         .eq('id', id);
       
       setText('');
-      setMessages(prev => [...prev, newMessage]);
+      // НЕ добавляем сообщение локально - оно придет через реал-тайм подписку
       
       // Воспроизводим звук отправки сообщения
       if (shouldPlaySound('message')) {
