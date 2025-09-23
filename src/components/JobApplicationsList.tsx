@@ -365,57 +365,96 @@ export function JobApplicationsList({
                   : 'Специалист');
 
               return (
-                <div className="flex items-center justify-between p-6 bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-2xl border border-border/30 shadow-neomorphic hover:shadow-neomorphic-hover transition-all duration-300 hover:scale-[1.02]">
-                  <div className="flex items-center space-x-4">
-                    <div className="relative">
-                      <Avatar className="w-16 h-16">
+                <div className="card-3d group relative w-full bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
+                  {/* Top gradient section */}
+                  <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600">
+                    {/* Decorative gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
+                  </div>
+                  
+                  {/* Avatar positioned to overlap sections - with higher z-index */}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-16 z-10">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                      className="relative"
+                    >
+                      <Avatar className="w-32 h-32 ring-4 ring-white shadow-xl">
                         <AvatarImage 
                           src={assignedApp.profiles?.avatar_url || ''} 
                           alt={profileName}
+                          className="object-cover"
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold">
+                        <AvatarFallback className="bg-gradient-to-br from-gray-400 to-gray-600 text-white font-bold text-2xl">
                           {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-4 h-4 text-white" />
-                      </div>
-                    </div>
-                    <div>
-                      <h5 className="font-semibold text-lg">{profileName}</h5>
-                      <div className="flex items-center gap-2">
-                        {assignedApp.rating && (
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm font-medium">
-                              {assignedApp.rating.avg_score.toFixed(1)}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              ({assignedApp.rating.rating_count})
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Цена: {formatPrice(assignedApp.price_cents)}
+                      
+                      {/* Status indicator */}
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white z-20"
+                      >
+                        <CheckCircle className="w-6 h-6 text-white" />
+                      </motion.div>
+                    </motion.div>
+                  </div>
+                  
+                  {/* Bottom white section */}
+                  <div className="relative bg-white px-6 pt-20 pb-8">
+                    {/* Name and title */}
+                    <div className="text-center mb-6">
+                      <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
+                      <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
+                        СПЕЦИАЛИСТ
                       </p>
                     </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Link 
-                      to={`/messages?job_id=${jobId}&pro_id=${selectedProId}`}
-                      className="btn-primary px-4 py-2 text-sm"
-                    >
-                      <MessageSquare className="w-4 h-4 mr-1" />
-                      Чат
-                    </Link>
-                    <Link 
-                      to={`/pro/${selectedProId}`}
-                      className="btn-outline px-4 py-2 text-sm"
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      Профиль
-                    </Link>
+                    
+                    {/* Rating */}
+                    {assignedApp.rating && (
+                      <div className="flex justify-center items-center gap-2 mb-6">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                              key={star} 
+                              className={`w-5 h-5 ${star <= assignedApp.rating!.avg_score ? 'text-purple-500 fill-purple-500' : 'text-gray-300'}`} 
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          ({assignedApp.rating.rating_count})
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Price section */}
+                    <div className="text-center mb-6">
+                      <div className="text-3xl font-bold text-gray-900">
+                        {formatPrice(assignedApp.price_cents)}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Цена работы
+                      </div>
+                    </div>
+                    
+                    {/* Action buttons */}
+                    <div className="space-y-3">
+                      <Link 
+                        to={`/messages?job_id=${jobId}&pro_id=${selectedProId}`}
+                        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+                      >
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Чат
+                      </Link>
+                      <Link 
+                        to={`/pro/${selectedProId}`}
+                        className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200 flex items-center justify-center"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Профиль
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
