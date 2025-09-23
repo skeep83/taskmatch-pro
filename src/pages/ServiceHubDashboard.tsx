@@ -61,7 +61,7 @@ interface DashboardStats {
   averageRating: number;
 }
 
-export const ServiceHubDashboard: React.FC = () => {
+const ServiceHubDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isMobile } = useDeviceDetection();
