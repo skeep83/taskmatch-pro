@@ -139,11 +139,20 @@ export const JobResponseForm = ({
           description: 'Чтобы откликаться на заказы, вам нужно стать специалистом. Перейдите в настройки профиля.',
           variant: 'destructive'
         });
-      } else if (error.message?.includes('You do not offer services in this category')) {
+      } else if (error.message?.includes('You do not offer services in this category') || error.message?.includes('You need to configure your services first')) {
         toast({
-          title: 'Услуга недоступна',
-          description: 'Вы не предоставляете услуги в этой категории. Добавьте её в своём профиле специалиста.',
-          variant: 'destructive'
+          title: 'Настройте услуги',
+          description: 'Добавьте категории услуг в настройках профиля, чтобы откликаться на заказы.',
+          variant: 'destructive',
+          action: (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.location.href = '/profile/settings'}
+            >
+              Настройки
+            </Button>
+          )
         });
       } else if (error.message?.includes('You have already applied to this job')) {
         toast({

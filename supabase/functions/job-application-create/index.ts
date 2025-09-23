@@ -106,26 +106,24 @@ serve(async (req) => {
     }
 
     // Check if professional has any services configured first
-    const { data: allProServices } = await supabase
-      .from('pro_services')
-      .select('id, category_id, is_active')
-      .eq('pro_id', user.id)
-      .eq('is_active', true);
+    const { data: allProCategories } = await supabase
+      .from('pro_categories')
+      .select('id, category_id')
+      .eq('user_id', user.id);
 
-    if (!allProServices || allProServices.length === 0) {
+    if (!allProCategories || allProCategories.length === 0) {
       throw new Error('You need to configure your services first. Go to your profile settings to add the services you offer.');
     }
 
     // Check if professional offers this specific service category
-    const { data: proService } = await supabase
-      .from('pro_services')
-      .select('id, category_id, is_active')
-      .eq('pro_id', user.id)
+    const { data: proCategory } = await supabase
+      .from('pro_categories')
+      .select('id, category_id')
+      .eq('user_id', user.id)
       .eq('category_id', job.category_id)
-      .eq('is_active', true)
       .maybeSingle();
 
-    if (!proService) {
+    if (!proCategory) {
       // Get category name for better error message
       const categoryName = job.categories?.label_ru || 'this category';
       throw new Error(`You do not offer services in "${categoryName}". You can add this service in your profile settings.`);
