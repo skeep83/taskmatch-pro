@@ -55,6 +55,8 @@ const ProPublic = lazy(() => import("./pages/ProPublic"));
 const Feed = lazy(() => import("./pages/Feed"));
 const ProUpgradeStatus = lazy(() => import("./pages/ProUpgradeStatus"));
 const ProfileSettings = lazy(() => import("./pages/ProfileSettings"));
+const ServiceHubDashboard = lazy(() => import("./pages/ServiceHubDashboard"));
+const HallOfFame = lazy(() => import("./pages/HallOfFame"));
 
 // Admin pages lazy-loaded
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
@@ -120,6 +122,8 @@ const AppContent = () => {
                 {isMobile ? <MobileJobNew /> : <JobNew />}
               </>
             } />
+            <Route path="/jobs/search" element={<ServiceHubDashboard />} />
+            <Route path="/hall-of-fame" element={<HallOfFame />} />
             <Route path="/dashboard/client" element={
               isMobile ? <MobileDashboardClient /> : <DashboardClient />
             } />
@@ -127,7 +131,7 @@ const AppContent = () => {
               isMobile ? <MobileDashboardPro /> : <DashboardPro />
             } />
             <Route path="/dashboard/business" element={<DashboardBusiness />} />
-            <Route path="/dashboard" element={<Navigate to="/dashboard/client" replace />} />
+            <Route path="/dashboard" element={<Navigate to="/jobs/search" replace />} />
             <Route path="/messages" element={
               isMobile ? <MobileMessages /> : <Messages />
             } />

@@ -619,6 +619,62 @@ export type Database = {
         }
         Relationships: []
       }
+      disputes: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          evidence_urls: string[] | null
+          id: string
+          initiator_id: string
+          job_id: string
+          reason: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          respondent_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          evidence_urls?: string[] | null
+          id?: string
+          initiator_id: string
+          job_id: string
+          reason: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          respondent_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          evidence_urls?: string[] | null
+          id?: string
+          initiator_id?: string
+          job_id?: string
+          reason?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          respondent_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_queue: {
         Row: {
           created_at: string
@@ -992,66 +1048,193 @@ export type Database = {
           },
         ]
       }
+      job_responses: {
+        Row: {
+          attachments: string[] | null
+          comment: string | null
+          created_at: string | null
+          estimated_hours: number | null
+          eta_date: string | null
+          id: string
+          job_id: string
+          price_cents: number
+          provider_id: string
+          response_type: Database["public"]["Enums"]["response_type"]
+          status: string | null
+          template_used: string | null
+          updated_at: string | null
+          warranty_days: number | null
+        }
+        Insert: {
+          attachments?: string[] | null
+          comment?: string | null
+          created_at?: string | null
+          estimated_hours?: number | null
+          eta_date?: string | null
+          id?: string
+          job_id: string
+          price_cents: number
+          provider_id: string
+          response_type?: Database["public"]["Enums"]["response_type"]
+          status?: string | null
+          template_used?: string | null
+          updated_at?: string | null
+          warranty_days?: number | null
+        }
+        Update: {
+          attachments?: string[] | null
+          comment?: string | null
+          created_at?: string | null
+          estimated_hours?: number | null
+          eta_date?: string | null
+          id?: string
+          job_id?: string
+          price_cents?: number
+          provider_id?: string
+          response_type?: Database["public"]["Enums"]["response_type"]
+          status?: string | null
+          template_used?: string | null
+          updated_at?: string | null
+          warranty_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_responses_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_status_transitions: {
+        Row: {
+          created_at: string | null
+          from_status: string | null
+          id: string
+          job_id: string
+          metadata: Json | null
+          reason: string | null
+          to_status: string
+          triggered_by: string
+        }
+        Insert: {
+          created_at?: string | null
+          from_status?: string | null
+          id?: string
+          job_id: string
+          metadata?: Json | null
+          reason?: string | null
+          to_status: string
+          triggered_by: string
+        }
+        Update: {
+          created_at?: string | null
+          from_status?: string | null
+          id?: string
+          job_id?: string
+          metadata?: Json | null
+          reason?: string | null
+          to_status?: string
+          triggered_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_status_transitions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
+          acceptance_deadline: string | null
+          auto_accepted: boolean | null
           budget_max_cents: number | null
           budget_min_cents: number | null
           category_id: string
+          change_requests: Json | null
           client_id: string
           created_at: string
+          deadline: string | null
           description: string | null
+          dispute_reason: string | null
           end_confirmed: boolean
           id: string
           location_address: string | null
           location_lat: number | null
           location_lng: number | null
+          media_urls: string[] | null
+          milestones: Json | null
           otp_code: string | null
           pro_id: string | null
           scheduled_at: string | null
           start_confirmed: boolean
           status: Database["public"]["Enums"]["job_status"]
+          status_new: Database["public"]["Enums"]["job_status_new"] | null
+          tags: string[] | null
           title: string | null
           updated_at: string
           urgency: string
         }
         Insert: {
+          acceptance_deadline?: string | null
+          auto_accepted?: boolean | null
           budget_max_cents?: number | null
           budget_min_cents?: number | null
           category_id: string
+          change_requests?: Json | null
           client_id: string
           created_at?: string
+          deadline?: string | null
           description?: string | null
+          dispute_reason?: string | null
           end_confirmed?: boolean
           id?: string
           location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          media_urls?: string[] | null
+          milestones?: Json | null
           otp_code?: string | null
           pro_id?: string | null
           scheduled_at?: string | null
           start_confirmed?: boolean
           status?: Database["public"]["Enums"]["job_status"]
+          status_new?: Database["public"]["Enums"]["job_status_new"] | null
+          tags?: string[] | null
           title?: string | null
           updated_at?: string
           urgency?: string
         }
         Update: {
+          acceptance_deadline?: string | null
+          auto_accepted?: boolean | null
           budget_max_cents?: number | null
           budget_min_cents?: number | null
           category_id?: string
+          change_requests?: Json | null
           client_id?: string
           created_at?: string
+          deadline?: string | null
           description?: string | null
+          dispute_reason?: string | null
           end_confirmed?: boolean
           id?: string
           location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          media_urls?: string[] | null
+          milestones?: Json | null
           otp_code?: string | null
           pro_id?: string | null
           scheduled_at?: string | null
           start_confirmed?: boolean
           status?: Database["public"]["Enums"]["job_status"]
+          status_new?: Database["public"]["Enums"]["job_status_new"] | null
+          tags?: string[] | null
           title?: string | null
           updated_at?: string
           urgency?: string
@@ -1946,6 +2129,45 @@ export type Database = {
         }
         Relationships: []
       }
+      response_templates: {
+        Row: {
+          category_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          price_cents: number | null
+          provider_id: string
+          title: string
+          updated_at: string | null
+          warranty_days: number | null
+        }
+        Insert: {
+          category_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          price_cents?: number | null
+          provider_id: string
+          title: string
+          updated_at?: string | null
+          warranty_days?: number | null
+        }
+        Update: {
+          category_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          price_cents?: number | null
+          provider_id?: string
+          title?: string
+          updated_at?: string | null
+          warranty_days?: number | null
+        }
+        Relationships: []
+      }
       scores: {
         Row: {
           entity_id: string
@@ -2520,6 +2742,14 @@ export type Database = {
         Args: { _reason?: string; _request_id: string }
         Returns: boolean
       }
+      transition_job_status: {
+        Args: {
+          _job_id: string
+          _new_status: Database["public"]["Enums"]["job_status_new"]
+          _reason?: string
+        }
+        Returns: boolean
+      }
       upgrade_user_role: {
         Args: {
           _new_role: Database["public"]["Enums"]["app_role"]
@@ -2565,9 +2795,19 @@ export type Database = {
         | "done"
         | "disputed"
         | "canceled"
+      job_status_new:
+        | "Draft"
+        | "Published"
+        | "Assigned"
+        | "InProgress"
+        | "Submitted"
+        | "Completed"
+        | "Dispute"
+        | "Cancelled"
       kyc_status: "pending" | "approved" | "rejected"
       payout_status: "pending" | "approved" | "rejected" | "paid"
       referral_status: "pending" | "granted" | "revoked"
+      response_type: "regular" | "proposal" | "bid"
       tender_status: "open" | "closed" | "awarded" | "canceled"
       txn_direction: "credit" | "debit"
     }
@@ -2724,9 +2964,20 @@ export const Constants = {
         "disputed",
         "canceled",
       ],
+      job_status_new: [
+        "Draft",
+        "Published",
+        "Assigned",
+        "InProgress",
+        "Submitted",
+        "Completed",
+        "Dispute",
+        "Cancelled",
+      ],
       kyc_status: ["pending", "approved", "rejected"],
       payout_status: ["pending", "approved", "rejected", "paid"],
       referral_status: ["pending", "granted", "revoked"],
+      response_type: ["regular", "proposal", "bid"],
       tender_status: ["open", "closed", "awarded", "canceled"],
       txn_direction: ["credit", "debit"],
     },
