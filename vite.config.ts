@@ -12,6 +12,14 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: true,
   },
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "@tanstack/react-query",
+      "framer-motion"
+    ],
+  },
   plugins: [
     react(),
     mode === 'development' &&
