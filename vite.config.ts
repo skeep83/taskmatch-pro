@@ -14,12 +14,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       external: [],
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'react-router': ['react-router-dom'],
-          'react-query': ['@tanstack/react-query'],
-          'i18n': ['react-i18next', 'i18next'],
-        },
+        manualChunks: undefined, // Disable manual chunks to prevent React duplication
       },
     },
   },
@@ -31,10 +26,20 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Force all React imports to use the same instance
       "react": path.resolve(__dirname, "./node_modules/react"),
       "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+      "react/jsx-runtime": path.resolve(__dirname, "./node_modules/react/jsx-runtime"),
+      "react/jsx-dev-runtime": path.resolve(__dirname, "./node_modules/react/jsx-dev-runtime"),
     },
-    dedupe: ["react", "react-dom", "react-is"],
+    // Critical: dedupe all React-related packages
+    dedupe: [
+      "react", 
+      "react-dom", 
+      "react-is",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime"
+    ],
   },
   optimizeDeps: {
     include: [
@@ -48,9 +53,18 @@ export default defineConfig(({ mode }) => ({
       "i18next"
     ],
     exclude: [],
+    // Force re-optimization to ensure single React instance
     force: true,
+    esbuildOptions: {
+      // Ensure JSX is handled consistently
+      jsx: 'automatic',
+    }
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
+  },
+  // Ensure external dependencies use our React instance
+  ssr: {
+    noExternal: ['react', 'react-dom']
   }
 }));
