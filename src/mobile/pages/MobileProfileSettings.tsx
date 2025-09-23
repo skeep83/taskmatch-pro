@@ -142,10 +142,10 @@ export default function MobileProfileSettings() {
 
       // Load categories
       const { data: catsData } = await supabase
-        .from('service_categories')
-        .select('id, name, name_ro')
+        .from('categories')
+        .select('id, name_ru, name_ro')
         .eq('is_active', true)
-        .order('name');
+        .order('name_ru');
 
       setCategories(catsData || []);
 
@@ -616,7 +616,7 @@ export default function MobileProfileSettings() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-medium">
-                        {profile.locale === 'ro' ? category.name_ro : category.name}
+                        {profile.locale === 'ro' ? category.name_ro : category.name_ru}
                       </span>
                       {selectedCategories.includes(category.id) && (
                         <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -638,7 +638,7 @@ export default function MobileProfileSettings() {
                           variant="secondary"
                           className="flex items-center gap-1"
                         >
-                          {profile.locale === 'ro' ? category.name_ro : category.name}
+                          {profile.locale === 'ro' ? category.name_ro : category.name_ru}
                           <X
                             className="h-3 w-3 cursor-pointer"
                             onClick={(e) => {
