@@ -198,6 +198,8 @@ const DashboardPro = () => {
   const loadActiveJobs = async (uid: string) => {
     try {
       console.log('DashboardPro: Loading active jobs for pro_id:', uid);
+      console.log('DashboardPro: Looking for specific job: d984322c-a83b-477b-acfa-0ac6e80d03e6');
+      
       const { data, error } = await supabase
         .from('jobs')
         .select(`
@@ -224,7 +226,15 @@ const DashboardPro = () => {
       }
       
       const jobs = data || [];
-      console.log('DashboardPro: Loaded active jobs:', jobs.length, jobs);
+      const targetJob = jobs.find(job => job.id === 'd984322c-a83b-477b-acfa-0ac6e80d03e6');
+      console.log('DashboardPro: Loaded active jobs:', {
+        totalJobs: jobs.length,
+        jobs: jobs,
+        targetJobFound: !!targetJob,
+        targetJob: targetJob,
+        userId: uid
+      });
+      
       setMyActiveJobs(jobs);
       
       // Calculate completed jobs count
