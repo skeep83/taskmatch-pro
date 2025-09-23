@@ -9,6 +9,7 @@ import { Seo } from "@/components/Seo";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
 import { HallOfFame } from "@/pages/HallOfFame";
+import { JobCarousel3D } from "@/components/client/JobCarousel3D";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -635,166 +636,22 @@ export default function DashboardClient() {
 
               {/* Recent Jobs */}
               <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
-                <h2 className="text-2xl font-semibold mb-6">Последние заказы</h2>
-                {jobs.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>У вас пока нет заказов</p>
-                    <p className="text-sm mb-4">Создайте первый заказ для поиска специалистов</p>
-                    <button 
-                      onClick={() => navigate("/job/new")}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Создать заказ
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {jobs.slice(0, 5).map((job) => (
-                      <div key={job.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-medium">{job.title || "Без названия"}</h4>
-                            {getStatusBadge(job.status)}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {job.categories?.label_ru || "Другое"} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => navigate(`/job/${job.id}`)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          {canEditJob(job) && (
-                            <>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => navigate(`/job/${job.id}/edit`)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="destructive" 
-                                size="sm"
-                                onClick={() => handleDeleteJob(job.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </>
-                          )}
-                          {job.pro_id && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => navigate("/messages")}
-                            >
-                              <MessageSquare className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <JobCarousel3D 
+                  jobs={jobs.slice(0, 5)}
+                  onEdit={(jobId) => navigate(`/job/${jobId}/edit`)}
+                  onDelete={handleDeleteJob}
+                />
               </div>
             </TabsContent>
 
             {/* Jobs Tab */}
             <TabsContent value="jobs">
               <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
-                <div className="flex flex-row items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold">Мои заказы</h2>
-                  <Button onClick={() => navigate("/job/new")}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Создать заказ
-                  </Button>
-                </div>
-                {jobs.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>У вас пока нет заказов</p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Заказ</TableHead>
-                        <TableHead>Статус</TableHead>
-                        <TableHead>Бюджет</TableHead>
-                        <TableHead>Дата</TableHead>
-                        <TableHead>Действия</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {jobs.map((job) => (
-                        <TableRow key={job.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{job.title}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {job.categories?.label_ru || "Другое"}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              {getStatusBadge(job.status)}
-                              {job.urgency !== 'normal' && getUrgencyBadge(job.urgency)}
-                            </div>
-                          </TableCell>
-                          <TableCell>{formatPrice(job.budget_min_cents, job.budget_max_cents)}</TableCell>
-                          <TableCell>
-                            {new Date(job.created_at).toLocaleDateString('ru-RU')}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => navigate(`/job/${job.id}`)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              {canEditJob(job) && (
-                                <>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => navigate(`/job/${job.id}/edit`)}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="destructive" 
-                                    size="sm"
-                                    onClick={() => handleDeleteJob(job.id)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </>
-                              )}
-                              {job.pro_id && (
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => navigate("/messages")}
-                                >
-                                  <MessageSquare className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+                <JobCarousel3D 
+                  jobs={jobs}
+                  onEdit={(jobId) => navigate(`/job/${jobId}/edit`)}
+                  onDelete={handleDeleteJob}
+                />
               </div>
             </TabsContent>
 
