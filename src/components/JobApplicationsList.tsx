@@ -365,7 +365,7 @@ export function JobApplicationsList({
                   : 'Специалист');
 
               return (
-                <div className="flex items-center justify-between p-4 bg-white/50 rounded-lg border border-white/60">
+                <div className="flex items-center justify-between p-6 bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-2xl border border-border/30 shadow-neomorphic hover:shadow-neomorphic-hover transition-all duration-300 hover:scale-[1.02]">
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <Avatar className="w-16 h-16">
