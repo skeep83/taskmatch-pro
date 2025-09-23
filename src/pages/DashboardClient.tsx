@@ -9,6 +9,7 @@ import { Seo } from "@/components/Seo";
 import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
 import { HallOfFame } from "@/pages/HallOfFame";
+import { JobsCarousel3D } from "@/components/client/JobsCarousel3D";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -705,97 +706,9 @@ export default function DashboardClient() {
               </div>
             </TabsContent>
 
-            {/* Jobs Tab */}
+            {/* Jobs 3D Carousel */}
             <TabsContent value="jobs">
-              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
-                <div className="flex flex-row items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold">Мои заказы</h2>
-                  <Button onClick={() => navigate("/job/new")}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Создать заказ
-                  </Button>
-                </div>
-                {jobs.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>У вас пока нет заказов</p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Заказ</TableHead>
-                        <TableHead>Статус</TableHead>
-                        <TableHead>Бюджет</TableHead>
-                        <TableHead>Дата</TableHead>
-                        <TableHead>Действия</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {jobs.map((job) => (
-                        <TableRow key={job.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{job.title}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {job.categories?.label_ru || "Другое"}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              {getStatusBadge(job.status)}
-                              {job.urgency !== 'normal' && getUrgencyBadge(job.urgency)}
-                            </div>
-                          </TableCell>
-                          <TableCell>{formatPrice(job.budget_min_cents, job.budget_max_cents)}</TableCell>
-                          <TableCell>
-                            {new Date(job.created_at).toLocaleDateString('ru-RU')}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => navigate(`/job/${job.id}`)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              {canEditJob(job) && (
-                                <>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => navigate(`/job/${job.id}/edit`)}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button 
-                                    variant="destructive" 
-                                    size="sm"
-                                    onClick={() => handleDeleteJob(job.id)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </>
-                              )}
-                              {job.pro_id && (
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => navigate("/messages")}
-                                >
-                                  <MessageSquare className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </div>
+              <JobsCarousel3D userId={user?.id} />
             </TabsContent>
 
             {/* Tenders Tab */}
