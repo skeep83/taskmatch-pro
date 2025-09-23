@@ -18,8 +18,7 @@ import {
   Shield, 
   CheckCircle,
   Eye,
-  Heart,
-  User
+  Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -297,57 +296,55 @@ export const HallOfFame: React.FC = () => {
           {filteredAndSortedProviders.map(provider => (
             <div 
               key={provider.id}
-              className="bg-card rounded-xl p-6 border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
+              className="card-surface group cursor-pointer transition-all duration-300 hover:scale-105"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/40 rounded-xl flex items-center justify-center">
-                      <User size={24} className="text-primary" />
-                    </div>
+                    <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-xl"></div>
                     {provider.isOnline && (
-                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-background shadow-sm"></div>
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
                     )}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-lg text-foreground">
+                      <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
                         {provider.name}
                       </h3>
                       {getVerificationIcon(provider.verificationLevel)}
                     </div>
-                    <div className="flex items-center gap-1 text-muted-foreground">
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                       <MapPin size={14} />
                       <span className="text-sm">{provider.location}</span>
                     </div>
                   </div>
                 </div>
 
-                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">
+                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
                   <Heart size={16} />
                 </Button>
               </div>
 
               {/* Rating & Stats */}
-              <div className="flex items-center justify-between mb-4 p-3 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
-                    <Star size={16} className="text-amber-500 fill-amber-500" />
-                    <span className="font-bold text-foreground">
+                    <Star size={16} className="text-amber-500 fill-current" />
+                    <span className="font-bold text-gray-900 dark:text-gray-100">
                       {provider.rating}
                     </span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     ({provider.reviewCount} отзывов)
                   </span>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-sm font-medium text-foreground">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {provider.completedJobs} заказов
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     Отвечает за {formatResponseTime(provider.responseTime)}
                   </div>
                 </div>
@@ -357,7 +354,7 @@ export const HallOfFame: React.FC = () => {
               {provider.badges.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {provider.badges.slice(0, 3).map(badge => (
-                    <Badge key={badge} variant="secondary" className="text-xs">
+                    <Badge key={badge} variant="secondary" className="text-xs bg-primary/10 text-primary">
                       {badge}
                     </Badge>
                   ))}
@@ -367,13 +364,14 @@ export const HallOfFame: React.FC = () => {
               {/* Portfolio Samples */}
               {provider.portfolioSamples.length > 0 && (
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium text-foreground mb-2">Примеры работ</h4>
                   <div className="grid grid-cols-2 gap-2">
                     {provider.portfolioSamples.slice(0, 4).map(sample => (
-                      <div key={sample.id} className="relative group/sample overflow-hidden rounded-lg">
-                        <div className="w-full h-20 bg-muted rounded-lg border border-border flex items-center justify-center">
-                          <span className="text-xs text-muted-foreground">{sample.title}</span>
-                        </div>
+                      <div key={sample.id} className="relative group/sample">
+                        <img
+                          src={sample.beforeImage}
+                          alt={sample.title}
+                          className="w-full h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+                        />
                         {sample.afterImage && (
                           <div className="absolute inset-0 bg-black/80 opacity-0 group-hover/sample:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                             <span className="text-white text-xs font-medium">До/После</span>
@@ -386,20 +384,20 @@ export const HallOfFame: React.FC = () => {
               )}
 
               {/* Price & Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-border/30">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-lg font-bold text-foreground">
+                  <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
                     {provider.priceRange.min}-{provider.priceRange.max} {provider.priceRange.currency}
                   </div>
                   {provider.guaranteeOffered && (
-                    <div className="flex items-center gap-1 text-xs text-green-600">
+                    <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
                       <Shield size={12} />
                       <span>Гарантия</span>
                     </div>
                   )}
                 </div>
 
-                <Button size="sm" className="gap-2">
+                <Button size="sm" className="gap-1">
                   <Eye size={14} />
                   Профиль
                 </Button>
