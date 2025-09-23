@@ -11,6 +11,13 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+        },
+      },
+    },
   },
   plugins: [
     react(),
@@ -21,10 +28,17 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    dedupe: ["react", "react-dom"],
+    dedupe: ["react", "react-dom", "react-is"],
   },
   optimizeDeps: {
-    include: ["react", "react-dom"],
-    exclude: ["react-is"],
+    include: [
+      "react", 
+      "react-dom", 
+      "react/jsx-runtime",
+      "@radix-ui/react-tooltip",
+      "@tanstack/react-query",
+      "react-i18next"
+    ],
+    force: true,
   },
 }));
