@@ -611,7 +611,7 @@ export default function MobileProfileSettings() {
                   selectedCategories={selectedCategories}
                   onSelectionChange={setSelectedCategories}
                   placeholder="Выберите категории услуг"
-                  maxSelection={5}
+                  maxSelection={20}
                   disabled={categories.length === 0}
                 />
                 

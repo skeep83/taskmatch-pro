@@ -26,7 +26,7 @@ export function MobileCategorySelector({
   selectedCategories,
   onSelectionChange,
   placeholder = "Выберите категории",
-  maxSelection = 5,
+  maxSelection = 20,
   disabled = false
 }: MobileCategorySelectorProps) {
   const { t } = useEnhancedI18n();
@@ -264,7 +264,7 @@ export function MobileCategorySelector({
             {/* Footer */}
             <div className="p-3 border-t border-gray-300/50 bg-[#E5E7EB]">
               <div className="flex items-center justify-between text-xs text-gray-600">
-                <span>Выберите до {maxSelection} категорий</span>
+                <span>Выберите категории (без ограничений)</span>
                 <Button
                   variant="ghost"
                   size="sm"
