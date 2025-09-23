@@ -67,6 +67,7 @@ export default function ProfileSettings() {
   });
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categorySearch, setCategorySearch] = useState<string>('');
   const [userRole, setUserRole] = useState<UserRole>('client');
   const [showProSettings, setShowProSettings] = useState(false);
 
@@ -163,15 +164,29 @@ export default function ProfileSettings() {
   const loadCategories = async () => {
     try {
       const { data, error } = await supabase
-        .from('service_categories')
-        .select('id, name, name_ro')
-        .eq('is_active', true)
-        .order('name');
+        .from('categories')
+        .select('id, key, label_ru, label_ro')
+        .order('label_ru');
 
       if (error) throw error;
-      setCategories(data || []);
+      
+      // Transform data to match expected format
+      const transformedData = (data || []).map(cat => ({
+        id: cat.id,
+        key: cat.key,
+        name: cat.label_ru,
+        name_ro: cat.label_ro
+      }));
+      
+      setCategories(transformedData);
+      console.log('Loaded categories:', transformedData.length);
     } catch (error: any) {
       console.error('Error loading categories:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось загрузить категории услуг",
+        variant: "destructive"
+      });
     }
   };
 
@@ -560,45 +575,115 @@ export default function ProfileSettings() {
                       <p className="text-sm text-muted-foreground">
                         Выберите категории услуг, которые вы предоставляете. Это поможет клиентам найти вас.
                       </p>
+                      
+                      {/* Search for categories */}
+                      <div className="space-y-3">
+                        <Input
+                          placeholder="Поиск категорий..."
+                          value={categorySearch}
+                          onChange={(e) => setCategorySearch(e.target.value)}
+                          className="w-full"
+                        />
+                        
+                        {/* Quick filters */}
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-xs text-muted-foreground">Популярные:</span>
+                          {['Сантехника', 'Электрика', 'Уборка', 'Переезды/грузчики', 'Ремонт'].map((popular) => (
+                            <button
+                              key={popular}
+                              onClick={() => setCategorySearch(popular)}
+                              className="px-2 py-1 text-xs bg-primary/10 hover:bg-primary/20 text-primary rounded-full transition-colors"
+                            >
+                              {popular}
+                            </button>
+                          ))}
+                          {categorySearch && (
+                            <button
+                              onClick={() => setCategorySearch('')}
+                              className="px-2 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground rounded-full transition-colors"
+                            >
+                              Очистить
+                            </button>
+                          )}
+                        </div>
+                      </div>
 
                       {categories.length === 0 ? (
                         <div className="p-4 border border-dashed border-border rounded-lg text-center">
                           <p className="text-muted-foreground">Загружаем категории...</p>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto p-4 border rounded-lg bg-muted/20">
-                          {categories.map((category) => (
-                            <div key={category.id} className="flex items-center space-x-3 p-2 rounded hover:bg-background/50 transition-colors">
-                              <Checkbox
-                                id={`category-${category.id}`}
-                                checked={selectedCategories.includes(category.id)}
-                                onCheckedChange={() => toggleCategory(category.id)}
-                              />
-                              <Label 
-                                htmlFor={`category-${category.id}`}
-                                className="text-sm cursor-pointer flex-1 font-medium"
-                              >
-                                {category.name || category.name_ro}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
+                        <>
+                          {(() => {
+                            const filteredCategories = categories.filter(category => 
+                              categorySearch === '' || 
+                              category.name?.toLowerCase().includes(categorySearch.toLowerCase()) ||
+                              category.name_ro?.toLowerCase().includes(categorySearch.toLowerCase())
+                            );
+                            
+                            if (filteredCategories.length === 0) {
+                              return (
+                                <div className="p-6 border border-dashed border-border rounded-lg text-center">
+                                  <p className="text-muted-foreground">
+                                    Категории не найдены для запроса "{categorySearch}"
+                                  </p>
+                                  <button
+                                    onClick={() => setCategorySearch('')}
+                                    className="mt-2 text-sm text-primary hover:underline"
+                                  >
+                                    Показать все категории
+                                  </button>
+                                </div>
+                              );
+                            }
+                            
+                            return (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto p-4 border rounded-lg bg-muted/20">
+                                {filteredCategories.map((category) => (
+                                  <div key={category.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-background/70 transition-colors border border-border/30">
+                                    <Checkbox
+                                      id={`category-${category.id}`}
+                                      checked={selectedCategories.includes(category.id)}
+                                      onCheckedChange={() => toggleCategory(category.id)}
+                                      className="data-[state=checked]:bg-primary"
+                                    />
+                                    <Label 
+                                      htmlFor={`category-${category.id}`}
+                                      className="text-sm cursor-pointer flex-1 font-medium leading-snug"
+                                      title={`${category.name_ro} (${category.key})`} // Show Romanian translation and key on hover
+                                    >
+                                      {category.name}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })()}
+                        </>
                       )}
 
                       {selectedCategories.length > 0 && (
-                        <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
-                          <p className="text-sm font-medium text-success mb-2">
-                            Выбранные категории ({selectedCategories.length}):
+                        <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
+                          <p className="text-sm font-medium text-success mb-3">
+                            ✓ Выбранные категории ({selectedCategories.length}):
                           </p>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-2">
                             {selectedCategories.map((catId) => {
                               const category = categories.find(c => c.id === catId);
                               return category ? (
                                 <span 
                                   key={catId}
-                                  className="px-2 py-1 bg-success/20 text-success text-xs rounded-full"
+                                  className="inline-flex items-center px-3 py-1 bg-success/20 text-success text-sm rounded-full border border-success/30 font-medium"
+                                  title={category.name_ro}
                                 >
-                                  {category.name || category.name_ro}
+                                  {category.name}
+                                  <button
+                                    onClick={() => toggleCategory(catId)}
+                                    className="ml-2 w-4 h-4 rounded-full bg-success/30 hover:bg-success/50 flex items-center justify-center text-xs transition-colors"
+                                    title="Убрать категорию"
+                                  >
+                                    ×
+                                  </button>
                                 </span>
                               ) : null;
                             })}
