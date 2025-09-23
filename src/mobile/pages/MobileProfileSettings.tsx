@@ -141,12 +141,14 @@ export default function MobileProfileSettings() {
       setUserRole(currentRole);
 
       // Load categories
-      const { data: catsData } = await supabase
+      console.log('Loading categories from categories table...');
+      const { data: catsData, error: catsError } = await supabase
         .from('categories')
         .select('id, name_ru, name_ro')
         .eq('is_active', true)
         .order('name_ru');
 
+      console.log('Categories loaded:', catsData?.length || 0, 'Error:', catsError);
       setCategories(catsData || []);
 
       // If user is pro, load pro profile and categories
@@ -602,6 +604,11 @@ export default function MobileProfileSettings() {
               <p className="text-sm text-muted-foreground mb-4">
                 Выберите категории услуг, которые вы предоставляете
               </p>
+
+              {/* Debug info */}
+              <div className="mb-4 p-2 bg-yellow-100 rounded text-xs">
+                Загружено категорий: {categories.length}, Выбрано: {selectedCategories.length}
+              </div>
               
               <div className="space-y-3">
                 {categories.map((category) => (
