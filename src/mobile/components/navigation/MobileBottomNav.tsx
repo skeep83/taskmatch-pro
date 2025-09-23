@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { default as React, useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Search, MessageCircle, User, Briefcase, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';

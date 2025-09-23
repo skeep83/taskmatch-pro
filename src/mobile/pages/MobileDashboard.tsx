@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { default as React, useState } from 'react';
 import { Plus, Bell, Star, TrendingUp, Calendar, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';

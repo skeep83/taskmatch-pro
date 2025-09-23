@@ -1,4 +1,4 @@
-import React from 'react';
+import { default as React } from 'react';
 import { Star, MapPin, Clock, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';

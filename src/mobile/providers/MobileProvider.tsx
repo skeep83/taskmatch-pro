@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { default as React, createContext, useContext, useEffect, useState } from 'react';
 import { useDeviceDetection, DeviceInfo } from '@/hooks/useDeviceDetection';
 
 interface MobileContextType extends DeviceInfo {

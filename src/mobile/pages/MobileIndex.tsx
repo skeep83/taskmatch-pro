@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { default as React, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, Zap, Shield, Star, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
