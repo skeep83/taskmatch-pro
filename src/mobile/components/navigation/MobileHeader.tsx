@@ -1,4 +1,4 @@
-import React from 'react';
+import { default as React } from 'react';
 import { ArrowLeft, Bell, Search, MoreHorizontal, ChevronDown, User, Briefcase, Building2, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
