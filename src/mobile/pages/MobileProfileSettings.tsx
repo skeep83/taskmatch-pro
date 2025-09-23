@@ -174,7 +174,9 @@ export default function MobileProfileSettings() {
           .select('category_id')
           .eq('user_id', user.id);
 
-        setSelectedCategories((catData || []).map(c => c.category_id));
+        const selectedCategoryIds = (catData || []).map(c => String(c.category_id));
+        console.log('Loaded selected categories:', selectedCategoryIds);
+        setSelectedCategories(selectedCategoryIds);
 
         // Load availability schedule
         const { data: availData } = await supabase
@@ -270,6 +272,7 @@ export default function MobileProfileSettings() {
     if (proError) throw proError;
 
     // Sync categories
+    console.log('Saving categories - selected:', selectedCategories);
     const { data: existing } = await supabase
       .from('pro_categories')
       .select('category_id')
@@ -281,12 +284,19 @@ export default function MobileProfileSettings() {
       .map(id => ({ user_id: user.id, category_id: id }));
     const toRemove = [...existingIds].filter((id: string) => !selectedCategories.includes(id));
 
+    console.log('Categories to add:', toAdd.length, 'to remove:', toRemove.length);
+
     if (toAdd.length > 0) {
       const { error } = await supabase
         .from('pro_categories')
         .insert(toAdd);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding categories:', error);
+        throw error;
+      } else {
+        console.log('Successfully added categories');
+      }
     }
 
     if (toRemove.length > 0) {
@@ -296,7 +306,12 @@ export default function MobileProfileSettings() {
         .eq('user_id', user.id)
         .in('category_id', toRemove);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error removing categories:', error);
+        throw error;
+      } else {
+        console.log('Successfully removed categories');
+      }
     }
   };
 
