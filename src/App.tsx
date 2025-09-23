@@ -180,15 +180,24 @@ const AppContent = () => {
   );
 };
 
+// Create QueryClient instance outside component to avoid recreation
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 const App = () => {
-  console.log("App component initializing...", { React, QueryClient, QueryClientProvider });
-  const queryClient = new QueryClient();
   return (
-  <QueryClientProvider client={queryClient}>
-    <EnhancedI18nProvider>
-      <DatabaseI18nProvider>
-        <MobileProvider>
-          <TooltipProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <EnhancedI18nProvider>
+          <DatabaseI18nProvider>
+            <MobileProvider>
+              <TooltipProvider>
           <Suspense fallback={
             <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
               <div className="text-center p-8">
@@ -210,11 +219,12 @@ const App = () => {
               </div>
             </BrowserRouter>
           </Suspense>
-          </TooltipProvider>
-        </MobileProvider>
-      </DatabaseI18nProvider>
-    </EnhancedI18nProvider>
-  </QueryClientProvider>
+              </TooltipProvider>
+            </MobileProvider>
+          </DatabaseI18nProvider>
+        </EnhancedI18nProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
