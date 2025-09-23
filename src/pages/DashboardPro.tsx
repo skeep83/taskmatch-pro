@@ -64,8 +64,46 @@ const DashboardPro = () => {
       )
       .subscribe();
 
+    // Настройка реального времени для отслеживания изменений в работах
+    const jobsChannel = supabase
+      .channel('jobs_pro_dashboard')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'jobs'
+        },
+        (payload) => {
+          console.log('DashboardPro: Job updated:', payload);
+          const updatedJob = payload.new as any;
+          
+          // Если работа была назначена текущему пользователю
+          if (userId && updatedJob.pro_id === userId && updatedJob.status === 'accepted') {
+            console.log('DashboardPro: Job assigned to current user, reloading active jobs');
+            loadActiveJobs(userId);
+            toast({
+              title: "Новая работа!",
+              description: `Вам назначена работа: ${updatedJob.title}`,
+              duration: 5000
+            });
+          }
+          
+          // Перезагружаем соответствующие списки
+          if (userId) {
+            if (updatedJob.status === 'new') {
+              loadNearbyJobs(userId);
+            } else if (updatedJob.pro_id === userId) {
+              loadActiveJobs(userId);
+            }
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(kycChannel);
+      supabase.removeChannel(jobsChannel);
     };
   }, [userId]);
 
@@ -159,15 +197,34 @@ const DashboardPro = () => {
 
   const loadActiveJobs = async (uid: string) => {
     try {
-      const { data } = await supabase
+      console.log('DashboardPro: Loading active jobs for pro_id:', uid);
+      const { data, error } = await supabase
         .from('jobs')
-        .select('id, client_id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
+        .select(`
+          id, 
+          client_id, 
+          title,
+          description, 
+          status, 
+          scheduled_at, 
+          budget_min_cents, 
+          budget_max_cents,
+          location_address,
+          created_at,
+          updated_at
+        `)
         .eq('pro_id', uid)
         .in('status', ['accepted', 'in_progress', 'done'])
-        .order('created_at', { ascending: false })
+        .order('updated_at', { ascending: false })
         .limit(20);
       
+      if (error) {
+        console.error('DashboardPro: Error loading active jobs:', error);
+        return;
+      }
+      
       const jobs = data || [];
+      console.log('DashboardPro: Loaded active jobs:', jobs.length, jobs);
       setMyActiveJobs(jobs);
       
       // Calculate completed jobs count
