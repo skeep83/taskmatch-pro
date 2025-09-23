@@ -198,14 +198,14 @@ const App = () => {
               </div>
             </div>
           }>
-            <div style={{ background: 'var(--background-neomorphic)' }}>
-              <Toaster />
-              <Sonner />
-              <Diagnostics />
-              <BrowserRouter>
+            <BrowserRouter>
+              <div style={{ background: 'var(--background-neomorphic)' }}>
+                <Toaster />
+                <Sonner />
+                <Diagnostics />
                 <AppContent />
-              </BrowserRouter>
-            </div>
+              </div>
+            </BrowserRouter>
           </Suspense>
           </TooltipProvider>
         </MobileProvider>
