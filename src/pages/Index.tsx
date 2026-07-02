@@ -11,6 +11,7 @@ import {
   ClipboardList, Users, CheckCircle2, ArrowRight, type LucideIcon,
 } from "lucide-react";
 import { HeroShowcase } from "@/components/HeroShowcase";
+import { Reveal } from "@/components/Reveal";
 
 const categories: { key: string; labelKey: string; icon: LucideIcon }[] = [
   { key: "plumbing", labelKey: "landing.cat_plumbing", icon: Wrench },
@@ -74,7 +75,7 @@ const DesktopIndex = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12 animate-fade-in" style={{ animationDelay: "200ms" }}>
-                <Link to="/catalog" className="neo-btn-primary px-8 py-4 text-lg">
+                <Link to="/catalog" className="neo-btn-primary btn-sheen px-8 py-4 text-lg">
                   {t("landing.cta_find")}
                   <ArrowRight size={20} />
                 </Link>
@@ -107,19 +108,19 @@ const DesktopIndex = () => {
 
       {/* Categories */}
       <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
+        <Reveal className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             {t("section.categories")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {t("landing.categories_desc")}
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {categories.map((c, index) => (
+            <Reveal key={c.key} delay={index * 70}>
             <Link
-              key={c.key}
               to={`/catalog?category=${c.key}`}
               className="neo-card neo-card-interactive p-6 text-center group"
               style={{ animationDelay: `${index * 100}ms` }}
@@ -137,24 +138,26 @@ const DesktopIndex = () => {
                 {t(c.labelKey)}
               </div>
             </Link>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* How it works */}
       <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
+        <Reveal className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             {t("landing.how_title")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {t("landing.how_desc")}
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
-            <div key={step.titleKey} className="neo-card neo-aura p-8 text-left">
+            <Reveal key={step.titleKey} delay={index * 120}>
+            <div className="neo-card neo-aura p-8 text-left h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="neo-icon-well w-14 h-14">
                   <step.icon size={26} className="text-primary" />
@@ -164,6 +167,7 @@ const DesktopIndex = () => {
               <h3 className="text-2xl font-semibold mb-4">{t(step.titleKey)}</h3>
               <p className="text-muted-foreground leading-relaxed">{t(step.textKey)}</p>
             </div>
+            </Reveal>
           ))}
         </div>
 
@@ -177,18 +181,19 @@ const DesktopIndex = () => {
 
       {/* Audiences */}
       <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
+        <Reveal className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             {t("landing.aud_title")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {t("landing.aud_desc")}
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {audiences.map((a) => (
-            <div key={a.titleKey} className="neo-card neo-aura p-8 flex flex-col">
+          {audiences.map((a, index) => (
+            <Reveal key={a.titleKey} delay={index * 120} className="h-full">
+            <div className="neo-card neo-aura p-8 flex flex-col h-full">
               <div className="neo-icon-well w-16 h-16 mb-6">
                 <a.icon size={28} className="text-primary" />
               </div>
@@ -199,12 +204,14 @@ const DesktopIndex = () => {
                 <ArrowRight size={18} />
               </Link>
             </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* Final CTA */}
       <section className="container mx-auto py-24 px-6">
+        <Reveal>
         <div className="neo-card neo-aura p-10 lg:p-14 text-center max-w-5xl mx-auto">
           <div className="neo-chip inline-flex items-center gap-2 px-4 py-2 mb-6">
             <Sparkles size={18} className="text-primary" />
@@ -217,7 +224,7 @@ const DesktopIndex = () => {
             {t("landing.final_desc")}
           </p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Link to="/catalog" className="neo-btn-primary px-8 py-4 text-lg">
+            <Link to="/catalog" className="neo-btn-primary btn-sheen px-8 py-4 text-lg">
               {t("landing.cta_find")}
               <ArrowRight size={20} />
             </Link>
@@ -229,6 +236,7 @@ const DesktopIndex = () => {
             </Link>
           </div>
         </div>
+        </Reveal>
       </section>
     </main>
   );

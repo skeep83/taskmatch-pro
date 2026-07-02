@@ -56,7 +56,7 @@ export const HeroShowcase = () => {
             <div className="font-bold text-sm shrink-0">450 MDL</div>
             <button type="button" tabIndex={-1} className="neo-btn px-3 py-1.5 text-xs shrink-0">{t("hero.mock.select")}</button>
           </div>
-          <div className="neo-2 bg-neo rounded-xl p-3.5 flex items-center gap-3 opacity-80">
+          <div className="neo-2 bg-neo rounded-xl p-3.5 flex items-center gap-3 fx-appear" style={{ animationDelay: "1.4s" }}>
             <div className="neo-icon-well w-10 h-10 text-sm font-bold text-accent shrink-0">ИМ</div>
             <div className="flex-1 min-w-0">
               <div className="font-medium text-sm">{t("hero.mock.pro2")}</div>
@@ -70,7 +70,7 @@ export const HeroShowcase = () => {
       </div>
 
       {/* Floating chat bubble */}
-      <div className="neo-card absolute -bottom-8 -left-4 lg:-left-10 max-w-[260px] p-4 animate-float-slow" style={{ animationDelay: "600ms" }}>
+      <div className="neo-card fx-appear absolute -bottom-8 -left-4 lg:-left-10 max-w-[260px] p-4" style={{ animationDelay: "2.1s" }}>
         <div className="flex items-center gap-2 mb-2">
           <MessageSquare size={15} className="text-primary" />
           <span className="text-xs font-semibold text-primary">{t("hero.mock.pro1")}</span>
@@ -79,7 +79,7 @@ export const HeroShowcase = () => {
       </div>
 
       {/* Floating verified badge */}
-      <div className="neo-card absolute -top-6 -right-2 lg:-right-8 p-3.5 flex items-center gap-2 animate-float-slow" style={{ animationDelay: "300ms" }}>
+      <div className="neo-card fx-appear absolute -top-6 -right-2 lg:-right-8 p-3.5 flex items-center gap-2" style={{ animationDelay: "0.8s" }}>
         <CheckCircle2 size={18} className="text-success" />
         <span className="text-xs font-semibold">KYC ✓</span>
       </div>
