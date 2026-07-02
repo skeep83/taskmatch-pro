@@ -76,6 +76,7 @@ const AdminLogs = lazy(() => import("./pages/admin/Logs"));
 const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests"));
 const AdminKycVerification = lazy(() => import("./pages/admin/KycVerification"));
 import PageTransition from "./components/PageTransition";
+import { GlobalHaze } from "./components/GlobalHaze";
 
 const AppContent = () => {
   const location = useLocation();
@@ -87,8 +88,11 @@ const AppContent = () => {
   // Отслеживаем присутствие пользователя на платформе
   usePresenceTracking(!isAuthRoute);
 
+  const isLandingRoute = location.pathname === "/";
+
   return (
     <>
+      {!isLandingRoute && <GlobalHaze />}
       {!hidePublicShell && !isMobile && <AppNavigation />}
       <PageTransition>
         <Suspense fallback={
