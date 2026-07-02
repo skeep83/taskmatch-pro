@@ -135,6 +135,8 @@ const JobDetail = () => {
   const [rating, setRating] = useState(0);
   const [ratingComment, setRatingComment] = useState('');
   const [hasSubmittedRating, setHasSubmittedRating] = useState(false);
+  const [clientRatingScore, setClientRatingScore] = useState(0);
+  const [clientRatingComment, setClientRatingComment] = useState('');
   const [hasClientRatedAssignedPro, setHasClientRatedAssignedPro] = useState(false);
   const [proProfile, setProProfile] = useState<BasicProfile | null>(null);
   const [clientRating, setClientRating] = useState<{average: number, count: number} | null>(null);
@@ -747,6 +749,54 @@ const JobDetail = () => {
     }
   };
 
+  const handleSubmitClientRating = async () => {
+    if (!job || !currentUser || clientRatingScore === 0) {
+      toast({
+        title: t("notifications.error"),
+        description: t("ui.pozhaluista_vyberite_ocenku"),
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('ratings')
+        .insert({
+          job_id: job.id,
+          from_user_id: currentUser.id,
+          to_user_id: job.client_id,
+          score: clientRatingScore,
+          comment: clientRatingComment || null
+        });
+
+      if (error) throw error;
+
+      setHasSubmittedRating(true);
+      toast({ title: t("rate.client_sent") });
+
+      void supabase.functions.invoke('notifications-send', {
+        body: {
+          user_id: job.client_id,
+          type: 'rating',
+          title: t("rate.new_client_review"),
+          title_ro: 'O recenzie nouă despre dvs.',
+          message: `Специалист оценил сотрудничество: ${clientRatingScore}/5`,
+          message_ro: `Specialistul a evaluat colaborarea: ${clientRatingScore}/5`,
+          data: { job_id: job.id, rating: clientRatingScore },
+          channels: ['push']
+        }
+      });
+    } catch (error) {
+      console.error('Error submitting client rating:', error);
+      toast({
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_otpravit_ocenku"),
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleSubmitRating = async () => {
     if (!job || !currentUser || !job.pro_id || rating === 0) {
       toast({
@@ -1293,6 +1343,42 @@ const JobDetail = () => {
                       </div>
                     )}
 
+                    {job.status === 'done' && !hasSubmittedRating && (
+                      <div className="p-3 md:p-4 rounded-lg bg-neo neo-inset-2">
+                        <h4 className="font-medium mb-1 text-sm md:text-base">{t("rate.client_title")}</h4>
+                        <p className="text-xs md:text-sm text-muted-foreground mb-3">{t("rate.client_hint")}</p>
+                        <StarRating
+                          rating={clientRatingScore}
+                          readonly={false}
+                          size="lg"
+                          className="justify-center mb-3"
+                          onRatingChange={setClientRatingScore}
+                        />
+                        <Textarea
+                          placeholder={t("rate.client_placeholder")}
+                          value={clientRatingComment}
+                          onChange={(e) => setClientRatingComment(e.target.value)}
+                          className="mb-3 text-sm"
+                          rows={3}
+                        />
+                        <Button
+                          onClick={handleSubmitClientRating}
+                          disabled={clientRatingScore === 0}
+                          className="w-full rounded-xl"
+                        >
+                          <Star className="w-4 h-4 mr-2" />
+                          {t("ui.otpravit_ocenku")}
+                        </Button>
+                      </div>
+                    )}
+
+                    {job.status === 'done' && hasSubmittedRating && (
+                      <div className="p-3 md:p-4 rounded-lg bg-neo neo-inset-2 text-center">
+                        <Star className="w-5 h-5 text-amber-500 mx-auto mb-1" />
+                        <p className="text-xs md:text-sm text-muted-foreground">{t("rate.client_thanks")}</p>
+                      </div>
+                    )}
+
                     {job.status === 'done' && (
                       <div className={`p-3 md:p-4 rounded-lg text-center ${isDoneConfirmed ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
                         <Star className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mx-auto mb-2" />
@@ -1353,12 +1439,17 @@ const JobDetail = () => {
                   </div>
                   <div>
                     {clientRating && clientRating.count > 0 ? (
-                      <StarRating
-                        rating={clientRating.average}
-                        size="sm"
-                        showValue={false}
-                        readonly
-                      />
+                      <div className="flex items-center gap-2">
+                        <StarRating
+                          rating={clientRating.average}
+                          size="sm"
+                          showValue={false}
+                          readonly
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {clientRating.average.toFixed(1)} · {clientRating.count}
+                        </span>
+                      </div>
                     ) : (
                       <p className="text-xs text-[#6B7280]">{t("ui.novyi_klient")}</p>
                     )}

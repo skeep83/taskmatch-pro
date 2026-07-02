@@ -1724,5 +1724,13 @@
   "ui.otdelnyi_kontur_dlia_korporativnyh": "Отдельный контур для корпоративных заказов и крупных закупок",
   "ui.biznes_zakazy": "Бизнес-заказы",
   "job.detail.status_will_change_progress": "Статус заказа изменится на «В работе».",
-  "job.detail.status_will_change_done": "Статус заказа изменится на «Выполнен»."
+  "job.detail.status_will_change_done": "Статус заказа изменится на «Выполнен».",
+  "rate.client_title": "Оцените заказчика",
+  "rate.client_hint": "Взаимные отзывы помогают платформе: ваш отзыв покажет другим специалистам, насколько комфортно работать с этим клиентом.",
+  "rate.client_placeholder": "Как прошло сотрудничество? Оплата, коммуникация, чёткость задачи...",
+  "rate.client_sent": "Отзыв о заказчике сохранён",
+  "rate.client_thanks": "Вы уже оценили этого заказчика по данному заказу. Спасибо!",
+  "rate.reviews_title": "Отзывы",
+  "rate.no_reviews": "Отзывов пока нет",
+  "rate.new_client_review": "Новый отзыв о вас"
 }

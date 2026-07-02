@@ -1724,5 +1724,13 @@
   "ui.otdelnyi_kontur_dlia_korporativnyh": "Un circuit separat pentru comenzi corporative și achiziții mari",
   "ui.biznes_zakazy": "Comenzi business",
   "job.detail.status_will_change_progress": "Statusul comenzii se va schimba în „În lucru”.",
-  "job.detail.status_will_change_done": "Statusul comenzii se va schimba în „Finalizat”."
+  "job.detail.status_will_change_done": "Statusul comenzii se va schimba în „Finalizat”.",
+  "rate.client_title": "Evaluați clientul",
+  "rate.client_hint": "Recenziile reciproce ajută platforma: recenzia dvs. le va arăta altor specialiști cât de confortabil este să lucrezi cu acest client.",
+  "rate.client_placeholder": "Cum a decurs colaborarea? Plata, comunicarea, claritatea sarcinii...",
+  "rate.client_sent": "Recenzia despre client a fost salvată",
+  "rate.client_thanks": "Ați evaluat deja acest client pentru această comandă. Mulțumim!",
+  "rate.reviews_title": "Recenzii",
+  "rate.no_reviews": "Nu există recenzii încă",
+  "rate.new_client_review": "O recenzie nouă despre dvs."
 }

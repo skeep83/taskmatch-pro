@@ -1,4 +1,5 @@
 import { Seo } from "@/components/Seo";
+import { UserReviews } from "@/components/UserReviews";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
@@ -355,6 +356,8 @@ const ProPublic = () => {
               </div>
             </div>
           )}
+
+          {id && <UserReviews userId={String(id)} />}
         </div>
       </section>
     </main>

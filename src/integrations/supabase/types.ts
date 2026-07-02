@@ -2690,7 +2690,14 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_rating_stats: {
+        Row: {
+          user_id: string
+          avg_rating: number
+          rating_count: number
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_admin_role: { Args: { _user_id: string }; Returns: undefined }
