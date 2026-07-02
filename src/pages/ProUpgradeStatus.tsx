@@ -72,7 +72,7 @@ export default function ProUpgradeStatus() {
         throw error;
       }
 
-      setRequest(data);
+      setRequest(data as unknown as ProUpgradeRequest | null);
     } catch (error: any) {
       console.error('Error loading upgrade request:', error);
       toast({

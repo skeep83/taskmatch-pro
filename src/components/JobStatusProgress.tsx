@@ -3,7 +3,7 @@ import { CheckCircle, Clock, PlayCircle, AlertCircle, XCircle } from "lucide-rea
 import { Badge } from "@/components/ui/badge";
 
 interface JobStatusProgressProps {
-  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'cancelled';
+  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled' | 'disputed';
   startConfirmed?: boolean;
   endConfirmed?: boolean;
   className?: string;
@@ -22,7 +22,8 @@ const getStatusInfo = (status: string) => {
     'accepted': { label: 'Принят', variant: 'default' as const, color: 'text-blue-500' },
     'in_progress': { label: 'В работе', variant: 'default' as const, color: 'text-yellow-500' },
     'done': { label: 'Выполнен', variant: 'default' as const, color: 'text-green-500' },
-    'cancelled': { label: 'Отменен', variant: 'destructive' as const, color: 'text-red-500' }
+    'canceled': { label: 'Отменен', variant: 'destructive' as const, color: 'text-red-500' },
+    'disputed': { label: 'Спор', variant: 'destructive' as const, color: 'text-orange-500' }
   };
 
   return statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const, color: 'text-gray-500' };
@@ -34,7 +35,7 @@ const getProgressValue = (status: string) => {
     case 'accepted': return 50;
     case 'in_progress': return 75;
     case 'done': return 100;
-    case 'cancelled': return 0;
+    case 'canceled': return 0;
     default: return 0;
   }
 };
@@ -50,7 +51,7 @@ export function JobStatusProgress({
   const progressValue = getProgressValue(status);
   const currentStepIndex = statusSteps.findIndex(step => step.key === status);
 
-  if (status === 'cancelled') {
+  if (status === 'canceled' || status === 'disputed') {
     return (
       <div className={`space-y-4 ${className}`}>
         <div className="flex items-center gap-2">

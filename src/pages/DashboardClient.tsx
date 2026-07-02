@@ -10,7 +10,7 @@ import { RoleGuard } from "@/components/RoleGuard";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
 import { HallOfFame } from "@/pages/HallOfFame";
 import { canClientCancelJob, canClientDeleteJob, canClientEditJob } from "@/utils/jobLifecycle";
-import { deleteClientJob, getErrorMessage } from "@/utils/deleteClientJob";
+import { deleteClientJob } from "@/utils/deleteClientJob";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -54,7 +54,7 @@ interface Job {
   id: string;
   public_id: string;
   title: string;
-  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled';
+  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled' | 'disputed';
   budget_min_cents?: number;
   budget_max_cents?: number;
   created_at: string;

@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Plus, Calendar, DollarSign } from "lucide-react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface BusinessInvoice {
   id: string;
@@ -23,6 +26,10 @@ export function BusinessInvoices() {
   const [loading, setLoading] = useState(true);
   const [invoices, setInvoices] = useState<BusinessInvoice[]>([]);
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newAmount, setNewAmount] = useState("");
+  const [newCurrency, setNewCurrency] = useState("usd");
+  const [creating, setCreating] = useState(false);
 
   const loadBusinessInvoices = useCallback(async () => {
     setLoading(true);
@@ -117,51 +124,45 @@ export function BusinessInvoices() {
   const createInvoice = async () => {
     if (!businessId) return;
 
-    try {
-      // Create a proper business invoice with all required fields
-      const invoiceData = {
-        business_id: businessId,
-        amount_cents: Math.floor(Math.random() * 500000) + 50000, // $500-$5000
-        currency: 'usd',
-        status: 'draft',
-        due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        invoice_number: `INV-${Date.now()}`,
-        description: 'Автоматически созданный инвойс для демонстрации',
-        line_items: [
-          {
-            description: 'Услуги консультации',
-            quantity: 1,
-            unit_price: Math.floor(Math.random() * 300000) + 30000,
-            total: Math.floor(Math.random() * 300000) + 30000
-          },
-          {
-            description: 'Сервисные работы',
-            quantity: 2,
-            unit_price: Math.floor(Math.random() * 100000) + 10000,
-            total: Math.floor(Math.random() * 200000) + 20000
-          }
-        ],
-        tax_rate: 0.2, // 20% НДС
-        payment_terms: 'Net 30'
-      };
+    const amount = Math.round(parseFloat(newAmount.replace(',', '.')) * 100);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast({
+        title: "Укажите сумму",
+        description: "Сумма инвойса должна быть больше нуля",
+        variant: "destructive"
+      });
+      return;
+    }
 
+    setCreating(true);
+    try {
       const { error } = await supabase
         .from("biz_invoices")
-        .insert(invoiceData);
+        .insert({
+          business_id: businessId,
+          amount_cents: amount,
+          currency: newCurrency,
+          status: 'draft',
+          due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        });
 
       if (error) throw error;
 
+      setCreateOpen(false);
+      setNewAmount("");
       loadBusinessInvoices();
       toast({
         title: "Инвойс создан",
-        description: "E-invoice готов к отправке клиенту"
+        description: "Черновик инвойса создан. Срок оплаты — 30 дней."
       });
     } catch (error: any) {
       toast({
         title: "Ошибка",
-        description: "Не удалось создать инвойс",
+        description: error.message || "Не удалось создать инвойс",
         variant: "destructive"
       });
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -186,7 +187,7 @@ export function BusinessInvoices() {
           <h2 className="text-2xl font-bold text-black">Инвойсы</h2>
         </div>
         <button
-          onClick={createInvoice}
+          onClick={() => setCreateOpen(true)}
           className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
         >
           <Plus className="h-4 w-4" />
@@ -202,7 +203,7 @@ export function BusinessInvoices() {
           <h3 className="text-xl font-semibold text-black mb-2">У вас пока нет инвойсов</h3>
           <p className="text-gray-600 mb-6">Создайте первый инвойс для автоматизации оплат</p>
           <button
-            onClick={createInvoice}
+            onClick={() => setCreateOpen(true)}
             className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
           >
             <Plus className="h-4 w-4" />
@@ -259,6 +260,47 @@ export function BusinessInvoices() {
           </div>
         </div>
       )}
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Новый инвойс</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="invoice_amount">Сумма</Label>
+              <Input
+                id="invoice_amount"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Например 1500.00"
+                value={newAmount}
+                onChange={(e) => setNewAmount(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="invoice_currency">Валюта</Label>
+              <select
+                id="invoice_currency"
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                value={newCurrency}
+                onChange={(e) => setNewCurrency(e.target.value)}
+              >
+                <option value="usd">USD</option>
+                <option value="eur">EUR</option>
+                <option value="mdl">MDL</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>Отмена</Button>
+            <Button onClick={createInvoice} disabled={creating}>
+              {creating ? "Создание..." : "Создать"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

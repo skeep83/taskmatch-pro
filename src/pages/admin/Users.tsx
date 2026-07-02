@@ -319,7 +319,7 @@ export default function AdminUsers() {
 
       if (error) throw error;
 
-      setProUpgradeRequests(requests || []);
+      setProUpgradeRequests((requests || []) as unknown as ProUpgradeRequest[]);
     } catch (error) {
       console.error("Failed to fetch pro upgrade requests:", error);
       toast({

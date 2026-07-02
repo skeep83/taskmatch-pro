@@ -50,7 +50,7 @@ interface Job {
   public_id: string;
   title: string;
   description: string;
-  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled';
+  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled' | 'disputed';
   budget_min_cents?: number;
   budget_max_cents?: number;
   location_address?: string;

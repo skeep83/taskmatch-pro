@@ -20,7 +20,7 @@ export const Seo: React.FC<SeoProps> = ({ title, description, canonical = "/", j
     }
     link.setAttribute("href", canonical);
 
-    let ld = document.getElementById("jsonld");
+    const ld = document.getElementById("jsonld");
     if (ld) ld.remove();
     if (jsonLd) {
       const s = document.createElement("script");

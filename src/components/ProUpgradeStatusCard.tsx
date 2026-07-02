@@ -87,7 +87,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
         .maybeSingle();
 
       if (requestError) throw requestError;
-      setRequest(requestData);
+      setRequest(requestData as ProUpgradeStatus | null);
 
       // Проверяем статус KYC документов
       const { data: kycData, error: kycError } = await supabase

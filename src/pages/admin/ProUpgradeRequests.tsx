@@ -110,7 +110,7 @@ export default function ProUpgradeRequests() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setRequests(data || []);
+      setRequests((data || []) as unknown as ProUpgradeRequest[]);
     } catch (error: any) {
       console.error('Error loading requests:', error);
       toast({

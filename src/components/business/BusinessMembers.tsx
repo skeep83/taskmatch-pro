@@ -14,7 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 interface BusinessMember {
   id: string;
   user_id: string;
-  role: 'admin' | 'manager' | 'member';
+  role: 'owner' | 'manager' | 'member';
   limits: any;
   created_at: string;
   profiles?: {
@@ -29,7 +29,7 @@ export function BusinessMembers() {
   const [members, setMembers] = useState<BusinessMember[]>([]);
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [newMemberEmail, setNewMemberEmail] = useState("");
-  const [newMemberRole, setNewMemberRole] = useState<'admin' | 'manager' | 'member'>('member');
+  const [newMemberRole, setNewMemberRole] = useState<'manager' | 'member'>('member');
   const [addingMember, setAddingMember] = useState(false);
 
   useEffect(() => {
@@ -84,42 +84,26 @@ export function BusinessMembers() {
     
     setAddingMember(true);
     try {
-      // Create invitation - in production this would send an email invitation
-      const inviteData = {
-        business_id: businessId,
-        email: newMemberEmail,
-        role: newMemberRole,
-        status: 'pending',
-        invited_by: (await supabase.auth.getSession()).data.session?.user?.id
-      };
-
-      // For demo purposes, create a dummy member entry
-      const dummyUserId = `invited_${Date.now()}`;
-      const { error } = await supabase
-        .from("business_members")
-        .insert({
+      // Приглашение отправляется через серверную функцию уведомлений.
+      // Прямое создание записи невозможно: user_id появляется только после
+      // регистрации пользователя (FK на profiles).
+      const { error } = await supabase.functions.invoke('notifications-send', {
+        body: {
+          type: 'business_member_invite',
+          email: newMemberEmail,
           business_id: businessId,
-          user_id: dummyUserId,
           role: newMemberRole,
-          limits: {
-            max_order_amount: newMemberRole === 'admin' ? 100000 : newMemberRole === 'manager' ? 50000 : 10000,
-            can_approve_orders: newMemberRole !== 'member',
-            can_invite_members: newMemberRole === 'admin'
-          }
-        });
+        },
+      });
 
-      if (error) throw error;
-
-      // In a real system, send invitation email/SMS
-      console.log('Invitation would be sent to:', newMemberEmail, 'with role:', newMemberRole);
+      if (error) throw new Error(error.message || 'Сервис приглашений недоступен');
 
       setNewMemberEmail("");
       setNewMemberRole('member');
-      loadBusinessMembers();
-      
+
       toast({
         title: "Приглашение отправлено",
-        description: `Приглашение отправлено на ${newMemberEmail}. Пользователь получит уведомление для подтверждения.`
+        description: `Приглашение отправлено на ${newMemberEmail}. После регистрации пользователь появится в списке сотрудников.`
       });
     } catch (error: any) {
       toast({
@@ -157,7 +141,7 @@ export function BusinessMembers() {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'admin': return <Crown className="h-4 w-4" />;
+      case 'owner': return <Crown className="h-4 w-4" />;
       case 'manager': return <Settings className="h-4 w-4" />;
       default: return <User className="h-4 w-4" />;
     }
@@ -165,7 +149,7 @@ export function BusinessMembers() {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Администратор';
+      case 'owner': return 'Владелец';
       case 'manager': return 'Менеджер';
       default: return 'Сотрудник';
     }
@@ -213,7 +197,6 @@ export function BusinessMembers() {
               <SelectContent>
                 <SelectItem value="member">Сотрудник</SelectItem>
                 <SelectItem value="manager">Менеджер</SelectItem>
-                <SelectItem value="admin">Администратор</SelectItem>
               </SelectContent>
             </Select>
           </div>

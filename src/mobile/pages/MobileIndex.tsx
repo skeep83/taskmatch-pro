@@ -18,7 +18,7 @@ type HomeCategory = {
   color: string;
 };
 
-const ACTIVE_JOB_STATUSES = ['new', 'accepted', 'in_progress', 'done'];
+const ACTIVE_JOB_STATUSES = ['new', 'accepted', 'in_progress', 'done'] as const;
 
 const features = [
   { icon: Zap, title: 'Предложения', description: 'Получайте предложения по задаче без долгого поиска' },

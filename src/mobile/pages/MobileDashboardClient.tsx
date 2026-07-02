@@ -19,7 +19,7 @@ import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { MobileCard } from "@/mobile/components/ui/MobileCard";
 import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
 import { canClientCancelJob, canClientDeleteJob, canClientEditJob } from "@/utils/jobLifecycle";
-import { deleteClientJob, getErrorMessage } from "@/utils/deleteClientJob";
+import { deleteClientJob } from "@/utils/deleteClientJob";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import {
@@ -60,7 +60,7 @@ interface Job {
   id: string;
   public_id: string;
   title: string;
-  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled';
+  status: 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled' | 'disputed';
   budget_min_cents?: number;
   budget_max_cents?: number;
   created_at: string;
@@ -257,7 +257,11 @@ export default function MobileDashboardClient() {
         .eq('user_id', session.session.user.id);
 
       if (rolesData) {
-        setUserRoles(rolesData.map(r => r.role));
+        setUserRoles(
+          rolesData
+            .map(r => r.role)
+            .filter((r): r is UserRole => r === 'client' || r === 'pro' || r === 'business')
+        );
       }
 
       // Check for pending pro upgrade request

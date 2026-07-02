@@ -42,11 +42,15 @@ export async function migrateTranslationsToDatabase(): Promise<void> {
       ...Object.entries(ruFlat).map(([key, value]) => ({
         key,
         value,
+        translation_key: key,
+        translation_value: value,
         language_code: 'ru',
       })),
       ...Object.entries(roFlat).map(([key, value]) => ({
         key,
         value,
+        translation_key: key,
+        translation_value: value,
         language_code: 'ro',
       })),
     ];
@@ -115,9 +119,11 @@ export async function addTranslation(
     .upsert({
       key,
       value,
+      translation_key: key,
+      translation_value: value,
       language_code: languageCode,
     }, {
-      onConflict: 'key,language_code'
+      onConflict: 'language_code,translation_key,namespace'
     });
   
   if (error) {

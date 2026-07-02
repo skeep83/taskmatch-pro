@@ -82,9 +82,6 @@ const ServiceHubDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
 
-  useEffect(() => {
-    void loadDashboardData();
-  }, [loadDashboardData]);
 
   const loadDashboardData = useCallback(async () => {
     try {
@@ -126,6 +123,10 @@ const ServiceHubDashboard: React.FC = () => {
       if (jobsData) {
         const formattedJobs: Job[] = jobsData.map(job => ({
           ...job,
+          category: job.category_id || '',
+          urgency: job.urgency || 'normal',
+          tags: job.tags || [],
+          media_urls: job.media_urls || [],
           client: {
             name: `${job.profiles?.first_name || ''} ${job.profiles?.last_name || ''}`.trim() || 'Аноним',
             avatar: job.profiles?.avatar_url,
@@ -163,6 +164,10 @@ const ServiceHubDashboard: React.FC = () => {
       setLoading(false);
     }
   }, [navigate, toast]);
+
+  useEffect(() => {
+    void loadDashboardData();
+  }, [loadDashboardData]);
 
   const filterJobs = (status?: string) => {
     if (!status || status === 'all') return jobs;

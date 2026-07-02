@@ -141,8 +141,8 @@ export default function MobileProfileSettings() {
           postal_code: profileData.postal_code || '',
           address_notes: profileData.address_notes || '',
           location_public_label: profileData.location_public_label || '',
-          location_precision: profileData.location_precision || '',
-          location_source: profileData.location_source || ''
+          location_precision: (profileData.location_precision || '') as LocationPrecision | '',
+          location_source: (profileData.location_source || '') as LocationSource | ''
         });
       }
 

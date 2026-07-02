@@ -101,5 +101,8 @@ export default defineConfig(({ mode }) => ({
   // Additional configuration to prevent React duplication
   esbuild: {
     jsx: 'automatic',
+    pure: mode === 'production'
+      ? ['console.log', 'console.debug', 'console.info']
+      : [],
   }
 }));

@@ -71,10 +71,10 @@ interface PortfolioImage {
   isMain: boolean;
 }
 
-type JobProgressStatus = 'new' | 'accepted' | 'in_progress' | 'done' | 'cancelled';
+type JobProgressStatus = 'new' | 'accepted' | 'in_progress' | 'done' | 'canceled' | 'disputed';
 
 const normalizeJobProgressStatus = (status: string): JobProgressStatus => {
-  if (status === 'accepted' || status === 'in_progress' || status === 'done' || status === 'cancelled') {
+  if (status === 'accepted' || status === 'in_progress' || status === 'done' || status === 'canceled' || status === 'disputed') {
     return status;
   }
 

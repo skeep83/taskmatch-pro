@@ -61,8 +61,8 @@ export const BusinessTenders = () => {
           id,
           title,
           description,
-          budget_max_cents,
-          deadline,
+          budget_max_cents:budget_hint_cents,
+          deadline:window_to,
           status,
           created_at,
           category_id

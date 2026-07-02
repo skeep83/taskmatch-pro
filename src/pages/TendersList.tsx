@@ -24,11 +24,6 @@ const TendersList = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { formatPrice } = useCurrency();
 
-  // Mobile version
-  if (isMobile) {
-    return <MobileTenders />;
-  }
-
   useEffect(() => {
     (async () => {
       try {
@@ -36,7 +31,7 @@ const TendersList = () => {
         const { data, error } = await (supabase as any)
           .from('tenders')
           .select(`
-            id, title, description, status, created_at, deadline, budget_max_cents,
+            id, title, description, status, created_at, deadline:window_to, budget_max_cents:budget_hint_cents,
             bids(id, price_cents, created_at),
             categories(label_ru, key)
           `)
@@ -72,6 +67,11 @@ const TendersList = () => {
 
     return `${hours}ч ${minutes}м`;
   };
+
+  // Mobile version (after all hooks — hooks must run unconditionally)
+  if (isMobile) {
+    return <MobileTenders />;
+  }
 
   return (
     <main className="min-h-screen">

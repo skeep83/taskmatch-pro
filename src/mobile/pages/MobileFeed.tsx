@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -88,72 +88,6 @@ export default function MobileFeed() {
   const [userRole, setUserRole] = useState<string>("client");
   const [user, setUser] = useState<{ id: string } | null>(null);
 
-
-  useEffect(() => {
-    void checkAuth();
-  }, [checkAuth]);
-
-  useEffect(() => {
-    if (user) {
-      void loadJobs();
-    }
-  }, [loadJobs, user]);
-
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const refresh = () => {
-      if (document.visibilityState === 'visible') {
-        void loadJobs();
-      }
-    };
-
-    window.addEventListener('focus', refresh);
-    document.addEventListener('visibilitychange', refresh);
-
-    const jobsChannel = supabase
-      .channel(`mobile-feed-jobs-${user.id}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'jobs',
-      }, () => {
-        void loadJobs();
-      })
-      .subscribe();
-
-    const applicationsChannel = supabase
-      .channel(`mobile-feed-applications-${user.id}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'job_applications',
-        filter: `pro_id=eq.${user.id}`,
-      }, () => {
-        void loadJobs();
-      })
-      .subscribe();
-
-    const proposalsChannel = supabase
-      .channel(`mobile-feed-proposals-${user.id}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'job_price_proposals',
-        filter: `pro_id=eq.${user.id}`,
-      }, () => {
-        void loadJobs();
-      })
-      .subscribe();
-
-    return () => {
-      window.removeEventListener('focus', refresh);
-      document.removeEventListener('visibilitychange', refresh);
-      void supabase.removeChannel(jobsChannel);
-      void supabase.removeChannel(applicationsChannel);
-      void supabase.removeChannel(proposalsChannel);
-    };
-  }, [loadJobs, user?.id]);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -245,6 +179,73 @@ export default function MobileFeed() {
       setRefreshing(false);
     }
   }, [searchQuery, selectedCategory, toast, user?.id, userRole]);
+
+  useEffect(() => {
+    void checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (user) {
+      void loadJobs();
+    }
+  }, [loadJobs, user]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        void loadJobs();
+      }
+    };
+
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+
+    const jobsChannel = supabase
+      .channel(`mobile-feed-jobs-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'jobs',
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    const applicationsChannel = supabase
+      .channel(`mobile-feed-applications-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'job_applications',
+        filter: `pro_id=eq.${user.id}`,
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    const proposalsChannel = supabase
+      .channel(`mobile-feed-proposals-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'job_price_proposals',
+        filter: `pro_id=eq.${user.id}`,
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      void supabase.removeChannel(jobsChannel);
+      void supabase.removeChannel(applicationsChannel);
+      void supabase.removeChannel(proposalsChannel);
+    };
+  }, [loadJobs, user?.id]);
+
 
   const handleJobPress = (jobId: string) => {
     navigate(`/job/${jobId}`);
@@ -465,7 +466,7 @@ export default function MobileFeed() {
                         {job.job_photos.slice(0, 3).map((photo, index) => (
                           <img
                             key={index}
-                            src={`https://tedkllggdmwhxtxwqrzk.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
+                            src={`${SUPABASE_URL}/storage/v1/object/public/evidence/${photo.file_url}`}
                             alt="Фото заказа"
                             className="w-16 h-16 object-cover rounded-lg border border-border"
                             onError={(e) => {

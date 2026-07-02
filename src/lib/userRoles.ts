@@ -1,6 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 
+import type { Database } from "@/integrations/supabase/types";
+
+/** Primary account roles used across dashboards */
 export type UserRole = 'client' | 'pro' | 'business';
+/** Full set of roles as stored in the user_roles table */
+export type AppRole = Database["public"]["Enums"]["app_role"];
 
 export interface UserRoleResult {
   success: boolean;

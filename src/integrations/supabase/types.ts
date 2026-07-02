@@ -312,7 +312,22 @@ export type Database = {
           id?: string
           job_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "business_jobs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_jobs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       business_members: {
         Row: {
@@ -339,7 +354,22 @@ export type Database = {
           role?: Database["public"]["Enums"]["biz_role"]
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "business_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_members_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       categories: {
         Row: {
@@ -2671,6 +2701,33 @@ export type Database = {
       cleanup_rate_limits: { Args: never; Returns: undefined }
       clear_all_error_logs: { Args: never; Returns: Json }
       clear_expired_otp: { Args: never; Returns: undefined }
+      delete_client_job: { Args: { _job_id: string }; Returns: undefined }
+      find_nearby_jobs_for_pro: {
+        Args: {
+          _pro_id: string
+          _limit_results?: number
+          _max_distance_km?: number
+        }
+        Returns: {
+          id: string
+          title: string
+          description: string
+          status: string
+          scheduled_at: string
+          budget_min_cents: number
+          budget_max_cents: number
+          client_id: string
+          pro_id: string
+          category_id: string
+          location_lat: number
+          location_lng: number
+          location_address: string
+          created_at: string
+          distance_km: number
+          within_coverage: boolean
+          match_category_id: string
+        }[]
+      }
       find_nearby_pros: {
         Args: {
           job_category_id: string

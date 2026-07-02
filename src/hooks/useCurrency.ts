@@ -55,7 +55,7 @@ export function useCurrency() {
 
       if (settingsData) {
         const settingsMap = settingsData.reduce((acc, setting) => {
-          acc[setting.key] = JSON.parse(setting.value);
+          acc[setting.key] = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
           return acc;
         }, {} as Record<string, any>);
 

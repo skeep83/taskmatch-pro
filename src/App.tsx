@@ -159,11 +159,11 @@ const AppContent = () => {
               <Route path="finance" element={<AdminFinance />} />
               <Route path="risk" element={<AdminRisk />} />
               <Route path="content" element={<AdminContent />} />
-                    <Route path="currencies" element={<AdminCurrencies />} />
-                    <Route path="categories" element={<AdminCategories />} />
-                    <Route path="logs" element={<AdminLogs />} />
-                    <Route path="settings" element={<AdminSettings />} />
-                    <Route path="testing" element={<AdminTesting />} />
+              <Route path="currencies" element={<AdminCurrencies />} />
+              <Route path="categories" element={<AdminCategories />} />
+              <Route path="logs" element={<AdminLogs />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="testing" element={<AdminTesting />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -176,22 +176,22 @@ const AppContent = () => {
   );
 };
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
 const App = () => {
   const routerBasename = (() => {
     const base = (import.meta.env.BASE_URL || '/').trim();
     if (!base || base === '/') return '/';
     return base.endsWith('/') ? base.slice(0, -1) : base;
   })();
-
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchOnWindowFocus: false,
-        retry: 1,
-      },
-    },
-  });
 
   return (
     <ErrorBoundary>

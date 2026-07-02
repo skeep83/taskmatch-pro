@@ -73,10 +73,11 @@ serve(async (req) => {
       case "GET":
         return await handleGetFinance(supabaseService, url);
       
-      case "POST":
+      case "POST": {
         const postData = await req.json();
         return await handleFinanceAction(supabaseService, postData, req);
-      
+      }
+
       default:
         return new Response(JSON.stringify({ error: "Method not allowed" }), {
           status: 405,

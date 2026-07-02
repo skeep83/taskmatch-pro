@@ -398,7 +398,11 @@ const DashboardPro = () => {
         .eq('status', 'open')
         .order('created_at', { ascending: false })
         .limit(5);
-      setTenders(data || []);
+      setTenders((data || []).map((t) => ({
+        id: t.id,
+        title: t.title || 'Тендер',
+        deadline: t.window_to || t.created_at,
+      })));
     } catch (error) {
       console.error('DashboardPro: Error loading tenders:', error);
     }

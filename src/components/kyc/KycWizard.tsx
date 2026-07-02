@@ -258,8 +258,8 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
         .from('pro_upgrade_requests')
         .upsert({
           user_id: userId,
-          profile_data: personalInfo,
-          kyc_documents: documents,
+          profile_data: JSON.parse(JSON.stringify(personalInfo)),
+          kyc_documents: JSON.parse(JSON.stringify(documents)),
           status: 'pending'
         });
 

@@ -18,7 +18,7 @@ type Category = {
   popularity: number;
 };
 
-const ACTIVE_JOB_STATUSES = ['new'];
+const ACTIVE_JOB_STATUSES = ['new'] as const;
 
 export default function MobileCatalog() {
   const [searchParams, setSearchParams] = useSearchParams();

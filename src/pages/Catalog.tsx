@@ -53,7 +53,7 @@ type ProProfile = {
   } | null;
 };
 
-const ACTIVE_JOB_STATUSES = ["new", "accepted", "in_progress", "done"];
+const ACTIVE_JOB_STATUSES = ["new", "accepted", "in_progress", "done"] as const;
 const ROTATION_WINDOW = 6;
 
 const Catalog = () => {

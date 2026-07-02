@@ -270,8 +270,8 @@ export const RoleUpgradeWizard = ({
           .from('pro_upgrade_requests')
           .insert({
             user_id: userId,
-            profile_data: profileData,
-            kyc_documents: kycDocs || []
+            profile_data: JSON.parse(JSON.stringify(profileData)),
+            kyc_documents: JSON.parse(JSON.stringify(kycDocs || []))
           });
 
         if (error) throw error;

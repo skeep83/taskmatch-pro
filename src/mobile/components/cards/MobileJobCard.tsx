@@ -2,6 +2,7 @@ import { default as React } from 'react';
 import { MapPin, Clock, DollarSign, User, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SUPABASE_URL } from '@/integrations/supabase/client';
 import { MobileCard } from '../ui/MobileCard';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -77,7 +78,7 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
             {job.job_photos.slice(0, 3).map((photo, index) => (
               <div key={index} className="w-8 h-8 rounded border-2 border-white overflow-hidden shadow-sm">
                 <img
-                  src={`https://tedkllggdmwhxtxwqrzk.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
+                  src={`${SUPABASE_URL}/storage/v1/object/public/evidence/${photo.file_url}`}
                   alt={`Фото ${index + 1}`}
                   className="w-full h-full object-cover"
                   onError={(e) => {

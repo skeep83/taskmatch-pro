@@ -40,10 +40,9 @@ export function useStrictTranslation(ns?: string | string[]) {
 /**
  * Утилита для проверки всех переводов в компоненте
  */
-export function validateTranslations(keys: string[], namespace?: string) {
-  if (!import.meta.env.DEV) return;
-  
+export function useValidateTranslations(keys: string[], namespace?: string) {
   const { t } = useTranslation(namespace);
+  if (!import.meta.env.DEV) return;
   
   const missing: string[] = [];
   const empty: string[] = [];
@@ -74,8 +73,8 @@ export function validateTranslations(keys: string[], namespace?: string) {
  * Хук для автоматической проверки переводов при монтировании компонента
  */
 export function useTranslationValidation(keys: string[], namespace?: string) {
-  if (import.meta.env.DEV) {
-    const result = validateTranslations(keys, namespace);
+  const result = useValidateTranslations(keys, namespace);
+  if (import.meta.env.DEV && result) {
     
     if (result.missing.length > 0 || result.empty.length > 0) {
       console.group(`[i18n] Translation issues in component`);

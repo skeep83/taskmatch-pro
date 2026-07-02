@@ -37,7 +37,7 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      setNotifications(data || []);
+      setNotifications((data || []) as Notification[]);
       const newUnreadCount = data?.filter(n => !n.is_read).length || 0;
       console.log('📧 Fetched notifications:', {
         total: data?.length || 0,

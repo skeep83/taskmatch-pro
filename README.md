@@ -1,73 +1,67 @@
-# Welcome to your Lovable project
+# ServiceHub (taskmatch-pro)
 
-## Project info
+Маркетплейс услуг: заказчики публикуют заказы и тендеры, специалисты откликаются, бизнес-аккаунты управляют командой и инвойсами. Веб-приложение + мобильная оболочка (Capacitor, iOS/Android).
 
-**URL**: https://lovable.dev/projects/6e55eb01-313b-440f-a7fe-90daae1051fc
+## Стек
 
-## How can I edit this code?
+- **Frontend:** Vite, React 18, TypeScript, Tailwind CSS, shadcn/ui, framer-motion
+- **Backend:** Supabase (PostgreSQL, Auth, Storage, Realtime, Edge Functions)
+- **Мобильные приложения:** Capacitor 7 (папки `mobile/`, конфиг `capacitor.config.ts`)
+- **i18n:** ru / ro (i18next + переводы в БД)
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/6e55eb01-313b-440f-a7fe-90daae1051fc) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Быстрый старт
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev        # dev-сервер на http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+## Сборка production
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+npm run build      # результат в dist/
+npm run preview    # локальный просмотр production-сборки
+```
 
-**Use GitHub Codespaces**
+## Конфигурация
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Параметры Supabase задаются в `.env`:
 
-## What technologies are used for this project?
+```
+VITE_SUPABASE_PROJECT_ID="..."
+VITE_SUPABASE_PUBLISHABLE_KEY="..."
+VITE_SUPABASE_URL="https://<project>.supabase.co"
+```
 
-This project is built with:
+## База данных
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Миграции лежат в `supabase/migrations/`. Применение на проект:
 
-## How can I deploy this project?
+```sh
+supabase link --project-ref <project-id>
+supabase db push
+```
 
-Simply open [Lovable](https://lovable.dev/projects/6e55eb01-313b-440f-a7fe-90daae1051fc) and click on Share -> Publish.
+> **Важно:** миграция `20260702120000_add_missing_business_fks.sql` добавляет
+> внешние ключи для `business_jobs` и `business_members` — без неё разделы
+> бизнес-кабинета (заказы, сотрудники, аналитика) не работают.
 
-## Can I connect a custom domain to my Lovable project?
+Edge-функции (`supabase/functions/`) деплоятся командой:
 
-Yes, you can!
+```sh
+supabase functions deploy
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Проверки
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```sh
+npx tsc -p tsconfig.app.json --noEmit   # типы
+npm run lint                             # ESLint
+```
+
+## Структура
+
+- `src/pages` — страницы (desktop), `src/mobile` — мобильные версии
+- `src/components` — UI-компоненты (admin, business, kyc, servicehub и др.)
+- `src/integrations/supabase` — клиент и сгенерированные типы БД
+- `supabase/` — миграции, edge-функции, конфиг

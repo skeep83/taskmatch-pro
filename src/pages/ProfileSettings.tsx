@@ -332,7 +332,7 @@ export default function ProfileSettings() {
     }
   };
 
-  const updateProfile = (field: keyof Profile, value: string) => {
+  const updateProfile = (field: keyof Profile, value: string | number | null) => {
     setProfile(prev => ({
       ...prev,
       [field]: value
