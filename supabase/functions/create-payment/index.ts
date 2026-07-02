@@ -31,9 +31,9 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || new URL(req.url).origin;
     const body = await req.json().catch(() => ({}));
-    const amountCents = Number.parseInt(String(body.amountCents ?? 0));
+    const amountCents = Number.parseInt(String(body.amountCents ?? body.amount_cents ?? 0));
     const currency = (body.currency || "usd").toLowerCase();
-    const name = body.name || "ServiceHub Payment";
+    const name = body.name || body.description || "ServiceHub Payment";
 
     if (!Number.isFinite(amountCents) || amountCents <= 0) {
       return new Response(JSON.stringify({ error: "Invalid amount" }), { status: 400, headers: { ...corsHeaders, "content-type": "application/json" } });

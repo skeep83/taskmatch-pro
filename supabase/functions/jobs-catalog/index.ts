@@ -13,11 +13,22 @@ serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get('page') || '1');
-    const limit = parseInt(url.searchParams.get('limit') || '20');
-    const city = url.searchParams.get('city');
-    const category_id = url.searchParams.get('category_id');
-    const search = url.searchParams.get('search');
+    let page = parseInt(url.searchParams.get('page') || '1');
+    let limit = parseInt(url.searchParams.get('limit') || '20');
+    let city = url.searchParams.get('city');
+    let category_id = url.searchParams.get('category_id');
+    let search = url.searchParams.get('search');
+
+    // Also accept POST body { params: {...} } (client wrapper sends POST)
+    if (req.method === 'POST') {
+      const body = await req.json().catch(() => ({}));
+      const p = body?.params || body || {};
+      if (p.page) page = parseInt(String(p.page));
+      if (p.limit) limit = parseInt(String(p.limit));
+      if (p.city) city = String(p.city);
+      if (p.category_id) category_id = String(p.category_id);
+      if (p.search) search = String(p.search);
+    }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -39,8 +50,10 @@ serve(async (req: Request) => {
         created_at,
         urgency,
         status,
+        client_id,
         categories!inner(label_ru, label_ro),
         profiles!jobs_client_id_fkey(
+          id,
           full_name,
           first_name,
           last_name,
@@ -96,7 +109,7 @@ serve(async (req: Request) => {
     }
 
     // Get user ratings for clients
-    const clientIds = jobs?.map(job => job.profiles?.id).filter(Boolean) || [];
+    const clientIds = jobs?.map(job => job.client_id).filter(Boolean) || [];
     let clientRatings: Record<string, number> = {};
     
     if (clientIds.length > 0) {
@@ -122,7 +135,7 @@ serve(async (req: Request) => {
     const transformedJobs = jobs?.map(job => {
       const profile = job.profiles;
       const category = job.categories;
-      const clientId = profile?.id;
+      const clientId = job.client_id;
       const avgRating = clientRatings[clientId] 
         ? clientRatings[clientId].total / clientRatings[clientId].count 
         : null;
