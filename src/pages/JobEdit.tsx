@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { AnimatedIcon } from '@/components/ui/animated-icon';
 import { ArrowLeft, Save, Camera, Upload, Video, X } from 'lucide-react';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import {
   appendJobChangeRequest,
   buildMaterialUpdateEntry,
@@ -39,6 +40,7 @@ interface JobPhoto {
 }
 
 const JobEdit = () => {
+  const { t } = useEnhancedI18n();
   const { id: jobId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -100,8 +102,8 @@ const JobEdit = () => {
 
       if (!canClientEditJob({ job: data, isOwner: true, hasPayment: hasEscrow })) {
         toast({
-          title: 'Редактирование невозможно',
-          description: 'После выбора исполнителя или создания депозита заказ больше нельзя редактировать',
+          title: t("ui.redaktirovanie_nevozmozhno"),
+          description: t("ui.posle_vybora_ispolnitelia_ili"),
           variant: 'destructive'
         });
         navigate(`/job/${jobId}`);
@@ -112,8 +114,8 @@ const JobEdit = () => {
     } catch (error: any) {
       console.error('Error fetching job:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось загрузить заказ',
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_zagruzit_zakaz"),
         variant: 'destructive'
       });
       navigate('/dashboard/client');
@@ -180,7 +182,7 @@ const JobEdit = () => {
       }
 
       if (!job) {
-        throw new Error('Заказ не загружен');
+        throw new Error(t("ui.zakaz_ne_zagruzhen"));
       }
 
       const materialChanges = getMaterialJobChanges(job, updateData);
@@ -294,7 +296,7 @@ const JobEdit = () => {
             body: {
               user_id: proId,
               type: 'job_materially_updated',
-              title: 'Условия заказа изменились',
+              title: t("ui.usloviia_zakaza_izmenilis"),
               title_ro: 'Condițiile comenzii s-au schimbat',
               message: `Клиент обновил важные детали заказа "${updateData.title || job.title}". Проверьте описание, бюджет, адрес и вложения.`,
               message_ro: `Clientul a actualizat detalii importante pentru comanda "${updateData.title || job.title}". Verificați descrierea, bugetul, adresa și fișierele.`,
@@ -318,14 +320,14 @@ const JobEdit = () => {
       setDeletedPhotoIds([]);
 
       toast({
-        title: 'Заказ обновлен',
-        description: 'Изменения успешно сохранены'
+        title: t("ui.zakaz_obnovlen"),
+        description: t("ui.izmeneniia_uspeshno_sohraneny")
       });
       navigate(`/job/${jobId}`);
     } catch (error: any) {
       console.error('Error updating job:', error);
       toast({
-        title: 'Ошибка',
+        title: t("notifications.error"),
         description: `Не удалось обновить заказ: ${error.message}`,
         variant: 'destructive'
       });
@@ -376,11 +378,11 @@ const JobEdit = () => {
   };
 
   if (loading) {
-    return <div className="container mx-auto py-8">Загрузка...</div>;
+    return <div className="container mx-auto py-8">{t("common.loading")}</div>;
   }
 
   if (!job) {
-    return <div className="container mx-auto py-8">Заказ не найден</div>;
+    return <div className="container mx-auto py-8">{t("ui.zakaz_ne_naiden")}</div>;
   }
 
   const scheduledDateTime = job.scheduled_at ? new Date(job.scheduled_at) : null;
@@ -393,13 +395,13 @@ const JobEdit = () => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Назад
         </Button>
-        <h1 className="text-2xl font-bold">Редактировать заказ</h1>
+        <h1 className="text-2xl font-bold">{t("ui.redaktirovat_zakaz")}</h1>
       </div>
 
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle>Детали заказа</CardTitle>
+            <CardTitle>{t("job.new.service_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -411,38 +413,38 @@ const JobEdit = () => {
                 )}
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Заголовок</label>
+                  <label className="block text-sm font-medium mb-2">{t("ui.zagolovok")}</label>
                   <input
                     name="title"
                     type="text"
                     defaultValue={job.title}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
-                    placeholder="Например: Установить розетку"
+                    placeholder={t("ui.naprimer_ustanovit_rozetku")}
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Описание</label>
+                  <label className="block text-sm font-medium mb-2">{t("ui.opisanie")}</label>
                   <textarea
                     name="description"
                     defaultValue={job.description}
                     required
                     rows={4}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
-                    placeholder="Опишите детали работы..."
+                    placeholder={t("ui.opishite_detali_raboty")}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Категория</label>
+                  <label className="block text-sm font-medium mb-2">{t("job.new.category")}</label>
                   <select
                     name="category_id"
                     defaultValue={job.category_id}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
                   >
-                    <option value="">Выберите категорию</option>
+                    <option value="">{t("job.new.select_category")}</option>
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.label_ru}
@@ -452,31 +454,31 @@ const JobEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Срочность</label>
+                  <label className="block text-sm font-medium mb-2">{t("ui.srochnost")}</label>
                   <select
                     name="urgency"
                     defaultValue={job.urgency}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
                   >
-                    <option value="normal">Обычная</option>
-                    <option value="urgent">Срочная</option>
-                    <option value="same_day">В тот же день</option>
+                    <option value="normal">{t("ui.obychnaia")}</option>
+                    <option value="urgent">{t("ui.srochnaia")}</option>
+                    <option value="same_day">{t("dash.client.urg_same_day")}</option>
                   </select>
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Адрес</label>
+                  <label className="block text-sm font-medium mb-2">{t("ui.adres")}</label>
                   <input
                     name="location_address"
                     type="text"
                     defaultValue={job.location_address || ''}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
-                    placeholder="Укажите адрес выполнения работ"
+                    placeholder={t("ui.ukazhite_adres_vypolneniia_rabot")}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Бюджет от</label>
+                  <label className="block text-sm font-medium mb-2">{t("job.new.budget_from")}</label>
                   <input
                     name="budget_min"
                     type="number"
@@ -487,7 +489,7 @@ const JobEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Бюджет до</label>
+                  <label className="block text-sm font-medium mb-2">{t("ui.biudzhet_do")}</label>
                   <input
                     name="budget_max"
                     type="number"
@@ -498,7 +500,7 @@ const JobEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Дата</label>
+                  <label className="block text-sm font-medium mb-2">{t("dash.client.col_date")}</label>
                   <input
                     name="date"
                     type="date"
@@ -508,7 +510,7 @@ const JobEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Время</label>
+                  <label className="block text-sm font-medium mb-2">{t("job.new.time")}</label>
                   <input
                     name="time"
                     type="time"
@@ -520,12 +522,12 @@ const JobEdit = () => {
 
               {/* Media Section */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-3">Фото и видео</label>
+                <label className="block text-sm font-medium mb-3">{t("job.new.photos")}</label>
 
                 {/* Existing Media */}
                 {existingPhotos.length > 0 && (
                   <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Текущие вложения:</h4>
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">{t("ui.tekuschie_vlozheniia")}</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {existingPhotos.map((photo) => (
                         <div key={photo.id} className="relative group">
@@ -626,7 +628,7 @@ const JobEdit = () => {
                 {/* New Media Preview */}
                 {uploadedFiles.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Новые вложения:</h4>
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">{t("ui.novye_vlozheniia")}</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map((file, index) => (
                         <div key={index} className="relative group">
@@ -662,7 +664,7 @@ const JobEdit = () => {
               <div className="flex gap-4 pt-6">
                 <Button type="submit" disabled={saving} className="flex-1">
                   <Save className="w-4 h-4 mr-2" />
-                  {saving ? 'Сохранение...' : 'Сохранить изменения'}
+                  {saving ? t("common.saving") : t("dash.client.save_changes")}
                 </Button>
                 <Button
                   type="button"

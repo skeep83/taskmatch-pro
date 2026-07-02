@@ -10,6 +10,7 @@ import { useMobile } from '../providers/MobileProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import heroImage from '@/assets/services-hero.jpg';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 type HomeCategory = {
   id: string;
@@ -20,13 +21,15 @@ type HomeCategory = {
 
 const ACTIVE_JOB_STATUSES = ['new', 'accepted', 'in_progress', 'done'] as const;
 
-const features = [
-  { icon: Zap, title: 'Предложения', description: 'Получайте предложения по задаче без долгого поиска' },
-  { icon: Shield, title: 'Безопасно', description: 'Профили исполнителей и понятные условия заказа' },
-  { icon: Star, title: 'Прозрачно', description: 'Сравнивайте рейтинг, отзывы и профиль исполнителя' },
-];
+
 
 function MobileIndex() {
+  const { t } = useEnhancedI18n();
+  const features = [
+    { icon: Zap, title: t("ui.predlozheniia"), description: t("ui.poluchaite_predlozheniia_po_zadache") },
+    { icon: Shield, title: t("ui.bezopasno"), description: t("ui.profili_ispolnitelei_i_poniatnye") },
+    { icon: Star, title: t("ui.prozrachno"), description: t("ui.sravnivaite_reiting_otzyvy_i") },
+  ];
   const navigate = useNavigate();
   const { safeAreaInsets, bottomNavHeight } = useMobile();
   const [searchQuery, setSearchQuery] = useState('');
@@ -107,8 +110,8 @@ function MobileIndex() {
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-2xl font-bold mb-2 leading-tight text-gray-800"
           >
-            Найдите
-            <span className="text-primary block">исполнителя</span>
+            {t("ui.naidite")}
+            <span className="text-primary block">{t("ui.ispolnitelia")}</span>
           </motion.h1>
 
           <motion.p
@@ -117,7 +120,7 @@ function MobileIndex() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-gray-600 mb-6"
           >
-            Создайте заказ и получите предложения от исполнителей
+            {t("ui.sozdaite_zakaz_i_poluchite")}
           </motion.p>
 
           {/* Search bar */}
@@ -129,7 +132,7 @@ function MobileIndex() {
           >
             <div className="flex-1 relative">
               <Input
-                placeholder="Что вам нужно сделать?"
+                placeholder={t("ui.chto_vam_nuzhno_sdelat")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -153,7 +156,7 @@ function MobileIndex() {
             className="flex items-center text-gray-600"
           >
             <MapPin size={16} className="mr-2" />
-            <span>Кишинёв, Молдова</span>
+            <span>{t("ui.kishinev_moldova")}</span>
           </motion.div>
         </MobileCard>
       </motion.div>
@@ -166,7 +169,7 @@ function MobileIndex() {
           transition={{ delay: 0.8, duration: 0.6 }}
           className="text-lg font-semibold mb-4 text-gray-800"
         >
-          Почему выбирают нас
+          {t("ui.pochemu_vybiraiut_nas")}
         </motion.h2>
 
         <div className="space-y-3">
@@ -201,7 +204,7 @@ function MobileIndex() {
           transition={{ delay: 0.5, duration: 0.6 }}
           className="text-lg font-semibold mb-4 text-gray-800"
         >
-          Популярные категории
+          {t("section.categories")}
         </motion.h2>
 
         <div className="grid grid-cols-2 gap-3">
@@ -233,19 +236,19 @@ function MobileIndex() {
           transition={{ delay: 1.2, duration: 0.6 }}
         >
           <MobileCard className="p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2 text-gray-800">Присоединяйтесь к платформе</h3>
+            <h3 className="text-lg font-semibold mb-2 text-gray-800">{t("ui.prisoediniaites_k_platforme")}</h3>
             <p className="text-gray-600 mb-4 text-sm">
-              Выберите свою роль и начните зарабатывать или находить исполнителей
+              {t("ui.vyberite_svoiu_rol_i")}
             </p>
             <div className="space-y-3">
               <Button asChild className="w-full h-12 rounded-xl bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo">
                 <Link to="/auth?type=register&role=pro">
-                  Стать исполнителем
+                  {t("landing.aud2_cta")}
                 </Link>
               </Button>
               <Button asChild className="w-full h-12 rounded-xl bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo">
                 <Link to="/tenders">
-                  Для бизнеса
+                  {t("ui.dlia_biznesa")}
                 </Link>
               </Button>
             </div>

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { buildQuickResponseNote, submitJobResponse } from '@/lib/jobResponseSubmission';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import {
   Clock,
   Shield,
@@ -39,6 +40,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
   onCancel,
   className
 }) => {
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -54,21 +56,21 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const etaOptions = [
-    { value: 'today', label: 'Сегодня' },
-    { value: 'tomorrow', label: 'Завтра' },
-    { value: '2-3-days', label: '2-3 дня' },
-    { value: 'this-week', label: 'На этой неделе' },
-    { value: 'next-week', label: 'На следующей неделе' },
-    { value: 'custom', label: 'Выбрать дату' }
+    { value: 'today', label: t("hero.mock.urgency") },
+    { value: 'tomorrow', label: t("ui.zavtra") },
+    { value: '2-3-days', label: t("ui.2_3_dnia") },
+    { value: 'this-week', label: t("ui.na_etoi_nedele") },
+    { value: 'next-week', label: t("ui.na_sleduiuschei_nedele") },
+    { value: 'custom', label: t("ui.vybrat_datu") }
   ];
 
   const warrantyOptions = [
-    { value: '0', label: 'Без гарантии' },
-    { value: '7', label: '7 дней' },
-    { value: '30', label: '30 дней' },
-    { value: '90', label: '3 месяца' },
-    { value: '180', label: '6 месяцев' },
-    { value: '365', label: '1 год' }
+    { value: '0', label: t("ui.bez_garantii") },
+    { value: '7', label: t("ui.7_dnei") },
+    { value: '30', label: t("ui.30_dnei") },
+    { value: '90', label: t("ui.3_mesiaca") },
+    { value: '180', label: t("ui.6_mesiacev") },
+    { value: '365', label: t("ui.1_god") }
   ];
 
   React.useEffect(() => {
@@ -112,8 +114,8 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
 
     if (!formData.price || !formData.comment) {
       toast({
-        title: 'Ошибка',
-        description: 'Заполните цену и комментарий',
+        title: t("notifications.error"),
+        description: t("ui.zapolnite_cenu_i_kommentarii"),
         variant: 'destructive'
       });
       return;
@@ -143,8 +145,8 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
       if (error) throw error;
 
       toast({
-        title: 'Предложение отправлено!',
-        description: 'Ваше предложение успешно отправлено клиенту'
+        title: t("ui.predlozhenie_otpravleno"),
+        description: t("ui.vashe_predlozhenie_uspeshno_otpravleno_2")
       });
 
       onSuccess?.();
@@ -158,12 +160,12 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
       const unauthorized = /not authorized|row-level security|violates row-level security|JWT|auth/i.test(message);
 
       toast({
-        title: duplicateResponse ? 'Предложение уже отправлено' : 'Ошибка',
+        title: duplicateResponse ? t("ui.predlozhenie_uzhe_otpravleno") : t("notifications.error"),
         description: duplicateResponse
-          ? 'Вы уже отправили предложение по этому заказу.'
+          ? t("ui.vy_uzhe_otpravili_predlozhenie_2")
           : unauthorized
-            ? 'Сначала войдите в аккаунт специалиста и повторите попытку.'
-            : (message || 'Не удалось отправить предложение'),
+            ? t("ui.snachala_voidite_v_akkaunt_2")
+            : (message || t("ui.ne_udalos_otpravit_predlozhenie")),
         variant: 'destructive'
       });
     } finally {
@@ -177,7 +179,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
         <div className="p-2 bg-primary/10 rounded-lg">
           <Send size={20} className="text-primary" />
         </div>
-        <h3 className="text-xl font-semibold">Быстрое предложение</h3>
+        <h3 className="text-xl font-semibold">{t("ui.bystroe_predlozhenie")}</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -189,7 +191,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
             </label>
             <Select onValueChange={handleTemplateSelect}>
               <SelectTrigger>
-                <SelectValue placeholder="Выберите шаблон ответа" />
+                <SelectValue placeholder={t("ui.vyberite_shablon_otveta")} />
               </SelectTrigger>
               <SelectContent>
                 {templates.map(template => (
@@ -259,7 +261,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
             onValueChange={(value) => setFormData({ ...formData, etaDate: value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Выберите время" />
+              <SelectValue placeholder={t("ui.vyberite_vremia")} />
             </SelectTrigger>
             <SelectContent>
               {etaOptions.map(option => (
@@ -296,7 +298,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
             Комментарий *
           </label>
           <Textarea
-            placeholder="Опишите, как вы выполните эту работу, какие материалы потребуются, особенности..."
+            placeholder={t("ui.opishite_kak_vy_vypolnite")}
             value={formData.comment}
             onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
             rows={4}
@@ -314,12 +316,12 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
             className="gap-2"
           >
             <Lightbulb size={16} />
-            {showAdvanced ? 'Скрыть' : 'Дополнительно'}
+            {showAdvanced ? t("ui.skryt") : t("ui.dopolnitelno")}
           </Button>
 
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>Готов выехать завтра</span>
+            <span>{t("ui.gotov_vyehat_zavtra")}</span>
           </div>
         </div>
 
@@ -351,12 +353,12 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
           <div className="flex items-start gap-3">
             <Lightbulb size={16} className="text-blue-600 dark:text-blue-400 mt-0.5" />
             <div className="text-sm text-blue-700 dark:text-blue-300">
-              <p className="font-medium mb-1">Совет для успешного предложения:</p>
+              <p className="font-medium mb-1">{t("ui.sovet_dlia_uspeshnogo_predlozheniia")}</p>
               <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
-                <li>Укажите реалистичную цену</li>
-                <li>Детально опишите план работ</li>
-                <li>Предложите гарантию на результат</li>
-                <li>Будьте готовы к быстрому выезду</li>
+                <li>{t("ui.ukazhite_realistichnuiu_cenu")}</li>
+                <li>{t("ui.detalno_opishite_plan_rabot")}</li>
+                <li>{t("ui.predlozhite_garantiiu_na_rezultat")}</li>
+                <li>{t("ui.budte_gotovy_k_bystromu")}</li>
               </ul>
             </div>
           </div>

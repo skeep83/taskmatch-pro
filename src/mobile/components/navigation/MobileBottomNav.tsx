@@ -3,12 +3,14 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Search, MessageCircle, User, Plus, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobile } from '@/mobile/providers/MobileProvider';
+import { useEnhancedI18n } from '@/i18n/enhanced';
 import { motion } from 'framer-motion';
 import { supabase } from "@/integrations/supabase/client";
 
 interface NavItem {
   icon: LucideIcon;
-  label: string;
+  key: string;
+  labelKey: string;
   path: string;
   color?: string;
   matchPrefix?: boolean;
@@ -16,13 +18,14 @@ interface NavItem {
 
 // Базовые пункты меню без профиля (профиль будет динамическим)
 const baseNavItems: Omit<NavItem, 'path'>[] = [
-  { icon: Home, label: 'Главная', matchPrefix: false },
-  { icon: Search, label: 'Поиск', matchPrefix: false },
-  { icon: Plus, label: 'Создать', color: 'text-primary', matchPrefix: true },
-  { icon: MessageCircle, label: 'Сообщения', matchPrefix: true },
+  { icon: Home, key: 'home', labelKey: 'nav.home_tab', matchPrefix: false },
+  { icon: Search, key: 'search', labelKey: 'nav.search_tab', matchPrefix: false },
+  { icon: Plus, key: 'create', labelKey: 'nav.create_tab', color: 'text-primary', matchPrefix: true },
+  { icon: MessageCircle, key: 'messages', labelKey: 'nav.messages_tab', matchPrefix: true },
 ];
 
 export function MobileBottomNav() {
+  const { t } = useEnhancedI18n();
   const location = useLocation();
   const { isKeyboardOpen } = useMobile();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -67,12 +70,12 @@ export function MobileBottomNav() {
   const navItems: NavItem[] = [
     ...baseNavItems.map(item => ({
       ...item,
-      path: item.label === 'Главная' ? '/' :
-            item.label === 'Поиск' ? '/catalog' :
-            item.label === 'Создать' ? '/job/new' :
-            item.label === 'Сообщения' ? '/messages' : '/'
+      path: item.key === 'home' ? '/' :
+            item.key === 'search' ? '/catalog' :
+            item.key === 'create' ? '/job/new' :
+            item.key === 'messages' ? '/messages' : '/'
     })),
-    { icon: User, label: 'Профиль', path: profilePath, matchPrefix: true }
+    { icon: User, key: 'profile', labelKey: 'nav.profile_tab', path: profilePath, matchPrefix: true }
   ];
 
   // Загружаем количество непрочитанных сообщений
@@ -184,9 +187,9 @@ export function MobileBottomNav() {
           {navItems.map((item, index) => {
             // Определяем активность: для точных совпадений или по префиксу
             let isActive = false;
-            if (item.label === 'Главная') {
+            if (item.key === 'home') {
               isActive = location.pathname === '/';
-            } else if (item.label === 'Поиск') {
+            } else if (item.key === 'search') {
               isActive = location.pathname === '/catalog';
             } else if (item.matchPrefix) {
               isActive = location.pathname.startsWith(item.path);
@@ -194,7 +197,7 @@ export function MobileBottomNav() {
               isActive = location.pathname === item.path;
             }
             // Для профиля используем startsWith, так как могут быть вложенные
-            if (item.label === 'Профиль') {
+            if (item.key === 'profile') {
               isActive = location.pathname.startsWith('/dashboard');
             }
             const Icon = item.icon;
@@ -220,7 +223,7 @@ export function MobileBottomNav() {
                   />
                 )}
 
-                {item.label === 'Создать' ? (
+                {item.key === 'create' ? (
                   <motion.div
                     whileTap={{ scale: 0.9 }}
                     className={cn(
@@ -248,10 +251,10 @@ export function MobileBottomNav() {
                   "text-xs font-medium transition-all duration-300",
                   isActive ? "opacity-100" : "opacity-70"
                 )}>
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
 
-                {item.label === 'Сообщения' && unreadCount > 0 && (
+                {item.key === 'messages' && unreadCount > 0 && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}

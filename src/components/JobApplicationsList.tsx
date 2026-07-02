@@ -15,6 +15,7 @@ import { OptimizedImage } from '@/components/media/OptimizedImage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Link, useNavigate } from 'react-router-dom';
 import { JobStatusProgress } from '@/components/JobStatusProgress';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface JobApplication {
   id: string;
@@ -169,6 +170,7 @@ export function JobApplicationsList({
   selectedProId,
   onApplicationSelect
 }: JobApplicationsListProps) {
+  const { t } = useEnhancedI18n();
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState<string | null>(null);
@@ -196,8 +198,8 @@ export function JobApplicationsList({
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast({
-        title: 'Не удалось загрузить предложения',
-        description: error instanceof Error ? error.message : 'Попробуйте обновить страницу',
+        title: t("ui.ne_udalos_zagruzit_predlozheniia"),
+        description: error instanceof Error ? error.message : t("ui.poprobuite_obnovit_stranicu"),
         variant: 'destructive',
       });
       setApplications([]);
@@ -264,8 +266,8 @@ export function JobApplicationsList({
       onApplicationSelect();
 
       toast({
-        title: 'Исполнитель выбран',
-        description: 'Предложение успешно принято, заказ передан исполнителю'
+        title: t("dash.client.st_accepted"),
+        description: t("ui.predlozhenie_uspeshno_priniato_zakaz")
       });
 
       if (data?.chatId) {
@@ -275,9 +277,9 @@ export function JobApplicationsList({
       navigate(`/messages?user=${application.pro_id}&job=${jobId}`);
     } catch (error: unknown) {
       console.error('Error selecting professional:', error);
-      const message = error instanceof Error ? error.message : 'Не удалось выбрать исполнителя';
+      const message = error instanceof Error ? error.message : t("ui.ne_udalos_vybrat_ispolnitelia");
       toast({
-        title: 'Ошибка',
+        title: t("notifications.error"),
         description: message,
         variant: 'destructive'
       });
@@ -297,8 +299,8 @@ export function JobApplicationsList({
         images.push({
           id: `main-${item.id}`,
           url: item.image_url,
-          title: item.title || 'Основное фото',
-          description: `Работа: ${item.title || 'Без названия'}`,
+          title: item.title || t("ui.osnovnoe_foto"),
+          description: `Работа: ${item.title || t("dash.client.untitled")}`,
           isMain: true
         });
       }
@@ -312,8 +314,8 @@ export function JobApplicationsList({
             images.push({
               id: media.id,
               url: media.file_url,
-              title: media.file_name || 'Дополнительное фото',
-              description: `Работа: ${item.title || 'Без названия'}`,
+              title: media.file_name || t("ui.dopolnitelnoe_foto"),
+              description: `Работа: ${item.title || t("dash.client.untitled")}`,
               isMain: false
             });
           });
@@ -328,7 +330,7 @@ export function JobApplicationsList({
   };
 
   if (loading) {
-    return <div className="text-center py-8">Загрузка откликов...</div>;
+    return <div className="text-center py-8">{t("ui.zagruzka_otklikov")}</div>;
   }
 
   if (applications.length === 0) {
@@ -336,9 +338,9 @@ export function JobApplicationsList({
       <Card>
         <CardContent className="text-center py-8">
           <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Пока нет предложений</h3>
+          <h3 className="text-lg font-semibold mb-2">{t("ui.poka_net_predlozhenii")}</h3>
           <p className="text-muted-foreground">
-            Специалисты увидят ваш заказ и начнут отправлять предложения
+            {t("ui.specialisty_uvidiat_vash_zakaz")}
           </p>
         </CardContent>
       </Card>
@@ -352,22 +354,22 @@ export function JobApplicationsList({
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-semibold text-foreground">
-            Исполнитель выбран
+            {t("dash.client.st_accepted")}
           </h3>
         </div>
 
         {/* Assigned Professional Card */}
         <div className="card-surface p-6">
-          <h4 className="text-lg font-semibold mb-4">Ваш исполнитель</h4>
+          <h4 className="text-lg font-semibold mb-4">{t("ui.vash_ispolnitel")}</h4>
           {applications.length > 0 && (
             (() => {
               const assignedApp = applications.find(app => app.pro_id === selectedProId);
-              if (!assignedApp) return <div>Загрузка данных исполнителя...</div>;
+              if (!assignedApp) return <div>{t("ui.zagruzka_dannyh_ispolnitelia")}</div>;
 
               const profileName = assignedApp.profiles?.full_name ||
                 (assignedApp.profiles?.first_name && assignedApp.profiles?.last_name
                   ? `${assignedApp.profiles.first_name} ${assignedApp.profiles.last_name}`
-                  : 'Специалист');
+                  : t("menu.role_pro"));
 
               return (
                 <div className="card-3d group relative w-full bg-neo rounded-3xl neo-12 overflow-hidden transform-gpu">
@@ -412,7 +414,7 @@ export function JobApplicationsList({
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
                       <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
-                        СПЕЦИАЛИСТ
+                        {t("ui.specialist")}
                       </p>
                     </div>
 
@@ -439,7 +441,7 @@ export function JobApplicationsList({
                         {formatPrice(assignedApp.price_cents)}
                       </div>
                       <div className="text-sm text-gray-500">
-                        Предложенная цена
+                        {t("ui.predlozhennaia_cena")}
                       </div>
                     </div>
 
@@ -450,14 +452,14 @@ export function JobApplicationsList({
                         className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
                       >
                         <MessageSquare className="w-4 h-4 mr-2" />
-                        Чат
+                        {t("nav.chat_tab")}
                       </Link>
                       <Link
                         to={`/pro/${selectedProId}`}
                         className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200 flex items-center justify-center"
                       >
                         <Eye className="w-4 h-4 mr-2" />
-                        Профиль
+                        {t("nav.profile_tab")}
                       </Link>
                     </div>
                   </div>
@@ -478,30 +480,30 @@ export function JobApplicationsList({
 
         {/* Tips for working with professional */}
         <div className="card-surface p-6">
-          <h4 className="text-lg font-semibold mb-4">Советы по работе с исполнителем</h4>
+          <h4 className="text-lg font-semibold mb-4">{t("ui.sovety_po_rabote_s")}</h4>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
               <p className="text-sm text-muted-foreground">
-                Обсудите все детали работы в чате перед началом выполнения
+                {t("ui.obsudite_vse_detali_raboty")}
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
               <p className="text-sm text-muted-foreground">
-                Проверяйте прогресс работ через статус выполнения
+                {t("ui.proveriaite_progress_rabot_cherez")}
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
               <p className="text-sm text-muted-foreground">
-                Подтверждайте каждый этап только после проверки качества
+                {t("ui.podtverzhdaite_kazhdyi_etap_tolko")}
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
               <p className="text-sm text-muted-foreground">
-                Оставьте отзыв после завершения работ
+                {t("ui.ostavte_otzyv_posle_zaversheniia")}
               </p>
             </div>
           </div>
@@ -534,7 +536,7 @@ export function JobApplicationsList({
             const profileName = application.profiles?.full_name ||
               (application.profiles?.first_name && application.profiles?.last_name
                 ? `${application.profiles.first_name} ${application.profiles.last_name}`
-                : 'Специалист');
+                : t("menu.role_pro"));
 
             // Only show current card
             if (index !== currentIndex) return null;
@@ -597,7 +599,7 @@ export function JobApplicationsList({
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
                       <div className="flex items-center justify-center gap-2">
                         <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
-                          СПЕЦИАЛИСТ
+                          {t("ui.specialist")}
                         </p>
                         <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
                           {application.responseLabel}
@@ -608,7 +610,7 @@ export function JobApplicationsList({
                       {/* Experience/Bio */}
                       <div className="text-center">
                         <p className="text-sm text-gray-600 leading-relaxed">
-                          {application.proProfile?.bio || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
+                          {application.proProfile?.bio || t("ui.opytnyi_specialist_gotov_vypolnit")}
                         </p>
                       </div>
 
@@ -644,7 +646,7 @@ export function JobApplicationsList({
                           {formatPrice(application.price_cents)}
                         </div>
                         <div className="text-sm text-gray-500">
-                          Предложенная цена
+                          {t("ui.predlozhennaia_cena")}
                         </div>
                       </div>
                     )}
@@ -675,7 +677,7 @@ export function JobApplicationsList({
                           className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200"
                         >
                           <Eye className="w-4 h-4 mr-2" />
-                          Портфолио
+                          {t("dash.pro.portfolio")}
                         </Button>
 
                        {/* Action button */}
@@ -685,7 +687,7 @@ export function JobApplicationsList({
                            disabled={selecting === application.id}
                            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                          >
-                           {selecting === application.id ? 'Принимаем предложение...' : 'Принять предложение'}
+                           {selecting === application.id ? t("ui.prinimaem_predlozhenie") : t("ui.priniat_predlozhenie")}
                          </Button>
                        )}
 
@@ -755,7 +757,7 @@ export function JobApplicationsList({
               <Avatar className="w-10 h-10">
                 <AvatarImage
                   src={selectedPortfolio?.profiles?.avatar_url || ''}
-                  alt={selectedPortfolio?.profiles?.full_name || 'Специалист'}
+                  alt={selectedPortfolio?.profiles?.full_name || t("menu.role_pro")}
                 />
                 <AvatarFallback>
                   {selectedPortfolio?.profiles?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'С'}
@@ -764,7 +766,7 @@ export function JobApplicationsList({
               <div>
                 <span className="text-xl">Портфолио {selectedPortfolio?.profiles?.full_name || 'специалиста'}</span>
                 <p className="text-sm text-muted-foreground font-normal">
-                  {selectedPortfolio?.proProfile?.bio || 'Опытный специалист'}
+                  {selectedPortfolio?.proProfile?.bio || t("ui.opytnyi_specialist")}
                 </p>
               </div>
             </DialogTitle>
@@ -802,7 +804,7 @@ export function JobApplicationsList({
                         {allPortfolioImages[currentImageIndex]?.isMain && (
                           <div className="inline-flex items-center gap-2 mt-2 bg-primary/20 text-primary-foreground px-3 py-1 rounded-lg text-sm">
                             <Star className="w-4 h-4" />
-                            Главное фото
+                            {t("ui.glavnoe_foto")}
                           </div>
                         )}
                       </div>
@@ -892,16 +894,16 @@ export function JobApplicationsList({
                     className="flex items-center gap-2"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    Открыть в полном размере
+                    {t("ui.otkryt_v_polnom_razmere")}
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="text-center py-12">
                 <Image className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">Портфолио пока пусто</h3>
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">{t("ui.portfolio_poka_pusto")}</h3>
                 <p className="text-gray-500">
-                  Специалист еще не добавил работы в свое портфолио
+                  {t("ui.specialist_esche_ne_dobavil")}
                 </p>
               </div>
             )}
@@ -926,7 +928,7 @@ export function JobApplicationsList({
                   onClick={() => window.open(`/pro/${selectedPortfolio.pro_id}`, '_blank')}
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  Полный профиль
+                  {t("ui.polnyi_profil")}
                 </Button>
               </div>
             </div>

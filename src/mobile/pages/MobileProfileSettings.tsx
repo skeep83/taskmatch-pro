@@ -219,8 +219,8 @@ export default function MobileProfileSettings() {
     } catch (error) {
       console.error('Error loading user data:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить данные профиля",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_zagruzit_dannye"),
         variant: "destructive"
       });
     } finally {
@@ -269,14 +269,14 @@ export default function MobileProfileSettings() {
       }
 
       toast({
-        title: "Профиль обновлен",
-        description: "Ваши данные успешно сохранены"
+        title: t("dash.client.profile_updated"),
+        description: t("ui.vashi_dannye_uspeshno_sohraneny")
       });
     } catch (error: any) {
       console.error('Error saving profile:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось сохранить профиль",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_sohranit_profil"),
         variant: "destructive"
       });
     } finally {
@@ -392,13 +392,13 @@ export default function MobileProfileSettings() {
         location_source: resolved.source,
       }));
       toast({
-        title: 'Локация определена',
-        description: resolved.publicLabel || 'Базовый адрес профиля обновлён',
+        title: t("ui.lokaciia_opredelena"),
+        description: resolved.publicLabel || t("ui.bazovyi_adres_profilia_obnovlen"),
       });
     } catch (error) {
       toast({
-        title: 'Не удалось определить локацию',
-        description: error instanceof Error ? error.message : 'Попробуйте указать адрес вручную',
+        title: t("ui.ne_udalos_opredelit_lokaciiu"),
+        description: error instanceof Error ? error.message : t("ui.poprobuite_ukazat_adres_vruchnuiu"),
         variant: 'destructive',
       });
     }
@@ -421,13 +421,13 @@ export default function MobileProfileSettings() {
         location_source: resolved.source,
       }));
       toast({
-        title: 'Адрес подтверждён',
-        description: resolved.publicLabel || 'Координаты профиля обновлены',
+        title: t("ui.adres_podtverzhden"),
+        description: resolved.publicLabel || t("ui.koordinaty_profilia_obnovleny"),
       });
     } catch (error) {
       toast({
-        title: 'Адрес не распознан',
-        description: error instanceof Error ? error.message : 'Уточните адрес и попробуйте ещё раз',
+        title: t("ui.adres_ne_raspoznan"),
+        description: error instanceof Error ? error.message : t("ui.utochnite_adres_i_poprobuite"),
         variant: 'destructive',
       });
     }
@@ -466,13 +466,13 @@ export default function MobileProfileSettings() {
   };
 
   const tabItems = [
-    { id: 'basic', label: 'Основное', icon: User },
-    { id: 'contact', label: 'Контакты', icon: Phone },
+    { id: 'basic', label: t("ui.osnovnoe"), icon: User },
+    { id: 'contact', label: t("ui.kontakty"), icon: Phone },
     ...(userRole === 'pro' ? [
-      { id: 'professional', label: 'Специалист', icon: Briefcase },
-      { id: 'categories', label: 'Категории', icon: Wrench },
-      { id: 'schedule', label: 'График', icon: Calendar },
-      { id: 'notifications', label: 'Уведомления', icon: Settings }
+      { id: 'professional', label: t("menu.role_pro"), icon: Briefcase },
+      { id: 'categories', label: t("ui.kategorii"), icon: Wrench },
+      { id: 'schedule', label: t("ui.grafik"), icon: Calendar },
+      { id: 'notifications', label: t("dash.client.notifications"), icon: Settings }
     ] : [])
   ];
 
@@ -483,7 +483,7 @@ export default function MobileProfileSettings() {
       <div className="min-h-screen bg-neo flex items-center justify-center">
         <MobileCard className="text-center p-8">
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p>Загружаем профиль...</p>
+          <p>{t("ui.zagruzhaem_profil")}</p>
         </MobileCard>
       </div>
     );
@@ -492,7 +492,7 @@ export default function MobileProfileSettings() {
   return (
     <div className="min-h-screen bg-neo">
       <MobileHeader
-        title="Настройки профиля"
+        title={t("menu.profile_settings")}
         showBack={true}
       />
 
@@ -528,7 +528,7 @@ export default function MobileProfileSettings() {
             <MobileCard className="text-center">
               <h3 className="text-lg font-semibold mb-4 flex items-center justify-center gap-2">
                 <Camera className="h-5 w-5" />
-                Фото профиля
+                {t("ui.foto_profilia")}
               </h3>
               <MobileAvatarUpload
                 userId={user.id}
@@ -542,26 +542,26 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Личная информация
+                {t("ui.lichnaia_informaciia")}
               </h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="firstName">Имя</Label>
+                  <Label htmlFor="firstName">{t("ui.imia")}</Label>
                   <Input
                     id="firstName"
                     value={profile.first_name}
                     onChange={(e) => updateProfile('first_name', e.target.value)}
-                    placeholder="Введите имя"
+                    placeholder={t("ui.vvedite_imia")}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="lastName">Фамилия</Label>
+                  <Label htmlFor="lastName">{t("ui.familiia")}</Label>
                   <Input
                     id="lastName"
                     value={profile.last_name}
                     onChange={(e) => updateProfile('last_name', e.target.value)}
-                    placeholder="Введите фамилию"
+                    placeholder={t("ui.vvedite_familiiu")}
                     className="mt-1"
                   />
                 </div>
@@ -572,96 +572,96 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
-                Базовый адрес клиента
+                {t("ui.bazovyi_adres_klienta")}
               </h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <Button type="button" variant="outline" onClick={handleUseCurrentLocation}>
-                    Определить геолокацию
+                    {t("ui.opredelit_geolokaciiu")}
                   </Button>
                   <Button type="button" variant="outline" onClick={handleResolveAddress}>
-                    Подтвердить адрес
+                    {t("ui.podtverdit_adres")}
                   </Button>
                 </div>
                 <div>
-                  <Label htmlFor="addressLine1">Адрес</Label>
+                  <Label htmlFor="addressLine1">{t("ui.adres")}</Label>
                   <Input
                     id="addressLine1"
                     value={profile.address_line1}
                     onChange={(e) => updateProfile('address_line1', e.target.value)}
-                    placeholder="Улица, дом"
+                    placeholder={t("ui.ulica_dom")}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="addressLine2">Квартира / подъезд / этаж</Label>
+                  <Label htmlFor="addressLine2">{t("ui.kvartira_podezd_etazh")}</Label>
                   <Input
                     id="addressLine2"
                     value={profile.address_line2}
                     onChange={(e) => updateProfile('address_line2', e.target.value)}
-                    placeholder="Дополнительные детали адреса"
+                    placeholder={t("ui.dopolnitelnye_detali_adresa")}
                     className="mt-1"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="city">Город</Label>
+                    <Label htmlFor="city">{t("ui.gorod")}</Label>
                     <Input
                       id="city"
                       value={profile.city}
                       onChange={(e) => updateProfile('city', e.target.value)}
-                      placeholder="Город"
+                      placeholder={t("ui.gorod")}
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="postalCode">Индекс</Label>
+                    <Label htmlFor="postalCode">{t("ui.indeks")}</Label>
                     <Input
                       id="postalCode"
                       value={profile.postal_code}
                       onChange={(e) => updateProfile('postal_code', e.target.value)}
-                      placeholder="Почтовый индекс"
+                      placeholder={t("ui.pochtovyi_indeks")}
                       className="mt-1"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="country">Страна</Label>
+                  <Label htmlFor="country">{t("ui.strana")}</Label>
                   <Input
                     id="country"
                     value={profile.country}
                     onChange={(e) => updateProfile('country', e.target.value)}
-                    placeholder="Страна"
+                    placeholder={t("ui.strana")}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="publicLabel">Публичная зона для специалистов</Label>
+                  <Label htmlFor="publicLabel">{t("ui.publichnaia_zona_dlia_specialistov")}</Label>
                   <Input
                     id="publicLabel"
                     value={profile.location_public_label}
                     onChange={(e) => updateProfile('location_public_label', e.target.value)}
-                    placeholder="Например: Центр, Кишинёв"
+                    placeholder={t("ui.naprimer_centr_kishinev")}
                     className="mt-1"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    До принятия заказа специалистам лучше показывать район/город, а не точный адрес.
+                    {t("ui.do_priniatiia_zakaza_specialistam")}
                   </p>
                 </div>
                 <div>
-                  <Label htmlFor="addressNotes">Комментарий для доступа</Label>
+                  <Label htmlFor="addressNotes">{t("ui.kommentarii_dlia_dostupa")}</Label>
                   <Textarea
                     id="addressNotes"
                     value={profile.address_notes}
                     onChange={(e) => updateProfile('address_notes', e.target.value)}
-                    placeholder="Домофон, ориентир, парковка, особенности входа"
+                    placeholder={t("ui.domofon_orientir_parkovka_osobennosti")}
                     className="mt-1"
                     rows={3}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="latitude">Широта</Label>
+                    <Label htmlFor="latitude">{t("ui.shirota")}</Label>
                     <Input
                       id="latitude"
                       type="number"
@@ -673,7 +673,7 @@ export default function MobileProfileSettings() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="longitude">Долгота</Label>
+                    <Label htmlFor="longitude">{t("ui.dolgota")}</Label>
                     <Input
                       id="longitude"
                       type="number"
@@ -695,28 +695,28 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Phone className="h-5 w-5" />
-                Контактные данные
+                {t("ui.kontaktnye_dannye")}
               </h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="phone">Телефон</Label>
+                  <Label htmlFor="phone">{t("dash.client.phone")}</Label>
                   <Input
                     id="phone"
                     value={profile.phone}
                     onChange={(e) => updateProfile('phone', e.target.value)}
-                    placeholder="Введите номер телефона"
+                    placeholder={t("ui.vvedite_nomer_telefona")}
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="locale">Язык интерфейса</Label>
+                  <Label htmlFor="locale">{t("ui.iazyk_interfeisa")}</Label>
                   <select
                     id="locale"
                     value={profile.locale}
                     onChange={(e) => updateProfile('locale', e.target.value)}
                     className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                   >
-                    <option value="ru">Русский</option>
+                    <option value="ru">{t("ui.russkii")}</option>
                     <option value="ro">Română</option>
                   </select>
                 </div>
@@ -730,22 +730,22 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Briefcase className="h-5 w-5" />
-                Профессиональная информация
+                {t("ui.professionalnaia_informaciia")}
               </h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="bio">О себе</Label>
+                  <Label htmlFor="bio">{t("ui.o_sebe")}</Label>
                   <Textarea
                     id="bio"
                     value={proProfile.bio}
                     onChange={(e) => updateProProfile('bio', e.target.value)}
-                    placeholder="Расскажите о своем опыте и навыках"
+                    placeholder={t("ui.rasskazhite_o_svoem_opyte_2")}
                     className="mt-1"
                     rows={4}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="radius">Радиус работы (км)</Label>
+                  <Label htmlFor="radius">{t("ui.radius_raboty_km")}</Label>
                   <Input
                     id="radius"
                     type="number"
@@ -761,11 +761,11 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                Стоимость услуг
+                {t("ui.stoimost_uslug")}
               </h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="hourlyRate">Почасовая ставка (копейки)</Label>
+                  <Label htmlFor="hourlyRate">{t("ui.pochasovaia_stavka_kopeiki")}</Label>
                   <Input
                     id="hourlyRate"
                     type="number"
@@ -776,7 +776,7 @@ export default function MobileProfileSettings() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fixedPrice">Фиксированная цена (копейки)</Label>
+                  <Label htmlFor="fixedPrice">{t("ui.fiksirovannaia_cena_kopeiki")}</Label>
                   <Input
                     id="fixedPrice"
                     type="number"
@@ -796,18 +796,18 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Wrench className="h-5 w-5" />
-                Категории услуг
+                {t("ui.kategorii_uslug")}
               </h3>
               <div className="space-y-4">
                 <p className="text-gray-600 text-sm">
-                  Выберите категории, в которых вы предоставляете услуги:
+                  {t("ui.vyberite_kategorii_v_kotoryh")}
                 </p>
 
                 <MobileCategorySelector
                   categories={categories}
                   selectedCategories={selectedCategories}
                   onSelectionChange={setSelectedCategories}
-                  placeholder="Выберите категории услуг"
+                  placeholder={t("ui.vyberite_kategorii_uslug")}
                   maxSelection={20}
                   disabled={categories.length === 0}
                 />
@@ -815,8 +815,8 @@ export default function MobileProfileSettings() {
                 {categories.length === 0 && (
                   <div className="p-6 text-center text-gray-500 bg-neo rounded-2xl neo-inset-2">
                     <Wrench className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>Нет доступных категорий</p>
-                    <p className="text-xs mt-1">Попробуйте обновить страницу</p>
+                    <p>{t("ui.net_dostupnyh_kategorii")}</p>
+                    <p className="text-xs mt-1">{t("ui.poprobuite_obnovit_stranicu")}</p>
                   </div>
                 )}
               </div>
@@ -830,21 +830,21 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                График работы
+                {t("ui.grafik_raboty")}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Укажите дни и время, когда вы доступны для выполнения заказов
+                {t("ui.ukazhite_dni_i_vremia")}
               </p>
 
               <div className="space-y-4">
                 {[
-                  { id: 1, name: 'Понедельник', short: 'Пн' },
-                  { id: 2, name: 'Вторник', short: 'Вт' },
-                  { id: 3, name: 'Среда', short: 'Ср' },
-                  { id: 4, name: 'Четверг', short: 'Чт' },
-                  { id: 5, name: 'Пятница', short: 'Пт' },
-                  { id: 6, name: 'Суббота', short: 'Сб' },
-                  { id: 0, name: 'Воскресенье', short: 'Вс' }
+                  { id: 1, name: t("ui.ponedelnik"), short: t("ui.pn") },
+                  { id: 2, name: t("ui.vtornik"), short: t("ui.vt") },
+                  { id: 3, name: t("ui.sreda"), short: t("ui.sr") },
+                  { id: 4, name: t("ui.chetverg"), short: t("ui.cht") },
+                  { id: 5, name: t("ui.piatnica"), short: t("ui.pt") },
+                  { id: 6, name: t("ui.subbota"), short: t("ui.sb") },
+                  { id: 0, name: t("ui.voskresene"), short: t("ui.vs") }
                 ].map((day) => {
                   const schedule = availability.find(a => a.weekday === day.id);
                   const isActive = !!schedule;
@@ -877,7 +877,7 @@ export default function MobileProfileSettings() {
                       {isActive && (
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <Label className="text-xs">Начало</Label>
+                            <Label className="text-xs">{t("ui.nachalo")}</Label>
                             <Input
                               type="time"
                               value={schedule?.start_time || '09:00'}
@@ -894,7 +894,7 @@ export default function MobileProfileSettings() {
                             />
                           </div>
                           <div>
-                            <Label className="text-xs">Окончание</Label>
+                            <Label className="text-xs">{t("ui.okonchanie")}</Label>
                             <Input
                               type="time"
                               value={schedule?.end_time || '18:00'}
@@ -921,9 +921,9 @@ export default function MobileProfileSettings() {
                 <div className="flex items-start gap-2">
                   <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-blue-900">Время автоматического ответа</p>
+                    <p className="text-sm font-medium text-blue-900">{t("ui.vremia_avtomaticheskogo_otveta")}</p>
                     <p className="text-xs text-blue-700 mt-1">
-                      Специалисты с быстрым временем ответа получают больше заказов
+                      {t("ui.specialisty_s_bystrym_vremenem")}
                     </p>
                   </div>
                 </div>
@@ -938,17 +938,17 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Настройки уведомлений
+                {t("ui.nastroiki_uvedomlenii")}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Управляйте способами получения уведомлений
+                {t("ui.upravliaite_sposobami_polucheniia_uvedom")}
               </p>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium">Новые заказы</label>
-                    <p className="text-xs text-muted-foreground">Получать уведомления о новых заказах</p>
+                    <label className="text-sm font-medium">{t("ui.novye_zakazy")}</label>
+                    <p className="text-xs text-muted-foreground">{t("ui.poluchat_uvedomleniia_o_novyh")}</p>
                   </div>
                   <Switch
                     checked={notifications.newJobs}
@@ -960,8 +960,8 @@ export default function MobileProfileSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium">SMS уведомления</label>
-                    <p className="text-xs text-muted-foreground">Получать SMS уведомления</p>
+                    <label className="text-sm font-medium">{t("dash.client.sms_notif")}</label>
+                    <p className="text-xs text-muted-foreground">{t("ui.poluchat_sms_uvedomleniia")}</p>
                   </div>
                   <Switch
                     checked={notifications.sms}
@@ -973,8 +973,8 @@ export default function MobileProfileSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium">Email уведомления</label>
-                    <p className="text-xs text-muted-foreground">Получать уведомления на почту</p>
+                    <label className="text-sm font-medium">{t("dash.client.email_notif")}</label>
+                    <p className="text-xs text-muted-foreground">{t("ui.poluchat_uvedomleniia_na_pochtu")}</p>
                   </div>
                   <Switch
                     checked={notifications.email}
@@ -986,8 +986,8 @@ export default function MobileProfileSettings() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium">Push уведомления</label>
-                    <p className="text-xs text-muted-foreground">Получать push уведомления в приложении</p>
+                    <label className="text-sm font-medium">{t("ui.push_uvedomleniia")}</label>
+                    <p className="text-xs text-muted-foreground">{t("ui.poluchat_push_uvedomleniia_v")}</p>
                   </div>
                   <Switch
                     checked={notifications.push}
@@ -1011,12 +1011,12 @@ export default function MobileProfileSettings() {
             {saving ? (
               <div className="flex items-center gap-2">
                 <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
-                Сохраняем...
+                {t("ui.sohraniaem")}
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Save className="h-4 w-4" />
-                Сохранить изменения
+                {t("dash.client.save_changes")}
               </div>
             )}
           </Button>

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, Clock, Shield, MessageCircle, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface JobResponse {
   id: string;
@@ -44,6 +45,7 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
   onViewProfile,
   className
 }) => {
+  const { t } = useEnhancedI18n();
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
@@ -64,9 +66,9 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
   const getVerificationBadge = (level: string) => {
     switch (level) {
       case 'premium':
-        return <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">Премиум</Badge>;
+        return <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">{t("ui.premium")}</Badge>;
       case 'verified':
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">Профиль</Badge>;
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">{t("nav.profile_tab")}</Badge>;
       default:
         return null;
     }
@@ -111,9 +113,9 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
                 {response.provider.name}
               </h3>
               {getVerificationBadge(response.provider.verificationLevel)}
-              {response.status === 'pending' && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">На рассмотрении</Badge>}
-              {response.status === 'selected' && <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">Выбран</Badge>}
-              {response.status === 'declined' && <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 text-xs">Отклонён</Badge>}
+              {response.status === 'pending' && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">{t("ui.na_rassmotrenii")}</Badge>}
+              {response.status === 'selected' && <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">{t("ui.vybran")}</Badge>}
+              {response.status === 'declined' && <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 text-xs">{t("ui.otklonen")}</Badge>}
             </div>
 
             <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
@@ -146,20 +148,20 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
           <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <Clock size={16} className="mx-auto mb-1 text-gray-600 dark:text-gray-400" />
             <div className="text-sm font-medium">{response.estimatedHours} ч</div>
-            <div className="text-xs text-gray-500">Время работы</div>
+            <div className="text-xs text-gray-500">{t("ui.vremia_raboty")}</div>
           </div>
         )}
 
         <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <Shield size={16} className="mx-auto mb-1 text-gray-600 dark:text-gray-400" />
           <div className="text-sm font-medium">{response.warranty} дн</div>
-          <div className="text-xs text-gray-500">Гарантия</div>
+          <div className="text-xs text-gray-500">{t("ui.garantiia")}</div>
         </div>
 
         <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <Calendar size={16} className="mx-auto mb-1 text-gray-600 dark:text-gray-400" />
           <div className="text-sm font-medium">{response.eta}</div>
-          <div className="text-xs text-gray-500">Готов выехать</div>
+          <div className="text-xs text-gray-500">{t("ui.gotov_vyehat")}</div>
         </div>
       </div>
 
@@ -200,19 +202,19 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
             onClick={() => onSelect?.(response.id)}
             className="flex-1"
           >
-            Выбрать исполнителя
+            {t("dash.client.act_new")}
           </Button>
         )}
 
         {response.status === 'selected' && (
           <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200 px-4 py-2">
-            Выбран
+            {t("ui.vybran")}
           </Badge>
         )}
 
         {response.status === 'declined' && (
           <Badge variant="secondary" className="bg-gray-100 text-gray-700 border-gray-200 px-4 py-2">
-            Отклонён
+            {t("ui.otklonen")}
           </Badge>
         )}
 
@@ -223,7 +225,7 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
           className="gap-1"
         >
           <MessageCircle size={16} />
-          Сообщение
+          {t("ui.soobschenie")}
         </Button>
       </div>
     </div>

@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { submitJobResponse } from '@/lib/jobResponseSubmission';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 export default function MobileJobRespond() {
+  const { t } = useEnhancedI18n();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,8 +40,8 @@ export default function MobileJobRespond() {
 
       if (authData.user && data.client_id === authData.user.id) {
         toast({
-          title: "Недоступно",
-          description: "Нельзя откликаться на собственный заказ",
+          title: t("ui.nedostupno"),
+          description: t("ui.nelzia_otklikatsia_na_sobstvennyi_2"),
           variant: "destructive"
         });
         navigate(`/job/${jobId}`);
@@ -75,8 +77,8 @@ export default function MobileJobRespond() {
     if (!formData.price) {
       console.error('Validation failed: empty price field');
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, укажите цену",
+        title: t("notifications.error"),
+        description: t("ui.pozhaluista_ukazhite_cenu"),
         variant: "destructive"
       });
       return;
@@ -92,8 +94,8 @@ export default function MobileJobRespond() {
     if (isNaN(price) || price <= 0) {
       console.error('Validation failed: invalid price number', { price: formData.price, converted: price });
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, укажите корректную цену",
+        title: t("notifications.error"),
+        description: t("ui.pozhaluista_ukazhite_korrektnuiu_cenu"),
         variant: "destructive"
       });
       return;
@@ -126,8 +128,8 @@ export default function MobileJobRespond() {
       if (error) throw error;
 
       toast({
-        title: "Предложение отправлено!",
-        description: "Ваше предложение успешно отправлено заказчику"
+        title: t("ui.predlozhenie_otpravleno"),
+        description: t("ui.vashe_predlozhenie_uspeshno_otpravleno")
       });
 
       navigate(`/job/${id}`);
@@ -157,44 +159,44 @@ export default function MobileJobRespond() {
       // Special handling for role-related errors
       if (errorInfo.message.includes('Only professionals can apply to jobs')) {
         toast({
-          title: "Необходима роль специалиста",
-          description: "Чтобы отправлять предложения на заказы, вам нужно включить роль специалиста в профиле.",
+          title: t("ui.neobhodima_rol_specialista"),
+          description: t("ui.chtoby_otpravliat_predlozheniia_na"),
           variant: "destructive"
         });
       } else if (errorInfo.message.includes('You cannot send a proposal to your own job')) {
         toast({
-          title: "Это ваш собственный заказ",
-          description: "Нельзя откликаться на собственный заказ от имени специалиста.",
+          title: t("ui.eto_vash_sobstvennyi_zakaz"),
+          description: t("ui.nelzia_otklikatsia_na_sobstvennyi"),
           variant: "destructive"
         });
       } else if (errorInfo.message.includes('You need to configure your services first')) {
         toast({
-          title: "Сначала настройте услуги",
-          description: "Добавьте в профиле хотя бы одну услугу, чтобы откликаться на заказы.",
+          title: t("ui.snachala_nastroite_uslugi"),
+          description: t("ui.dobavte_v_profile_hotia"),
           variant: "destructive"
         });
       } else if (errorInfo.message.includes('You do not offer services in')) {
         toast({
-          title: "Категория не подключена",
-          description: "У вас не подключена эта категория услуг. Добавьте её в профиле специалиста.",
+          title: t("ui.kategoriia_ne_podkliuchena"),
+          description: t("ui.u_vas_ne_podkliuchena"),
           variant: "destructive"
         });
       } else if (errorInfo.message.includes('You have already applied to this job')) {
         toast({
-          title: "Предложение уже отправлено",
-          description: "Вы уже отправили предложение на этот заказ.",
+          title: t("ui.predlozhenie_uzhe_otpravleno"),
+          description: t("ui.vy_uzhe_otpravili_predlozhenie"),
           variant: "destructive"
         });
       } else if (errorInfo.message.includes('Job not found or no longer available')) {
         toast({
-          title: "Заказ уже недоступен",
-          description: "Заказ был закрыт, удалён или уже недоступен для новых откликов.",
+          title: t("ui.zakaz_uzhe_nedostupen"),
+          description: t("ui.zakaz_byl_zakryt_udalen"),
           variant: "destructive"
         });
       } else {
         toast({
-          title: "Ошибка",
-          description: errorInfo.message || "Не удалось отправить предложение",
+          title: t("notifications.error"),
+          description: errorInfo.message || t("ui.ne_udalos_otpravit_predlozhenie"),
           variant: "destructive"
         });
       }
@@ -214,7 +216,7 @@ export default function MobileJobRespond() {
           >
             <ArrowLeft className="w-5 h-5 text-[#374151]" />
           </button>
-          <h1 className="text-lg font-semibold text-[#374151]">Отправить предложение</h1>
+          <h1 className="text-lg font-semibold text-[#374151]">{t("dash.pro.send_offer")}</h1>
           <div className="w-9 h-9" />
         </div>
       </div>
@@ -224,7 +226,7 @@ export default function MobileJobRespond() {
         {jobTitle && (
           <MobileCard>
             <div className="space-y-2">
-              <h3 className="font-semibold text-[#374151]">Заказ</h3>
+              <h3 className="font-semibold text-[#374151]">{t("dash.client.col_job")}</h3>
               <p className="text-[#6B7280]">{jobTitle}</p>
             </div>
           </MobileCard>
@@ -242,7 +244,7 @@ export default function MobileJobRespond() {
                 type="number"
                 value={formData.price}
                 onChange={(e) => handleInputChange('price', e.target.value)}
-                placeholder="Введите цену в MDL"
+                placeholder={t("ui.vvedite_cenu_v_mdl")}
                 className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                 required
               />
@@ -262,19 +264,19 @@ export default function MobileJobRespond() {
             </h3>
             <Select value={formData.eta} onValueChange={(value) => handleInputChange('eta', value)}>
               <SelectTrigger className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4">
-                <SelectValue placeholder="Выберите время выполнения" />
+                <SelectValue placeholder={t("ui.vyberite_vremia_vypolneniia")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1_hour">1 час</SelectItem>
-                <SelectItem value="2_hours">2 часа</SelectItem>
-                <SelectItem value="3_hours">3 часа</SelectItem>
-                <SelectItem value="same_day">В тот же день</SelectItem>
-                <SelectItem value="next_day">На следующий день</SelectItem>
-                <SelectItem value="2_days">2 дня</SelectItem>
-                <SelectItem value="3_days">3 дня</SelectItem>
-                <SelectItem value="1_week">1 неделя</SelectItem>
-                <SelectItem value="2_weeks">2 недели</SelectItem>
-                <SelectItem value="1_month">1 месяц</SelectItem>
+                <SelectItem value="1_hour">{t("ui.1_chas")}</SelectItem>
+                <SelectItem value="2_hours">{t("ui.2_chasa")}</SelectItem>
+                <SelectItem value="3_hours">{t("ui.3_chasa")}</SelectItem>
+                <SelectItem value="same_day">{t("dash.client.urg_same_day")}</SelectItem>
+                <SelectItem value="next_day">{t("ui.na_sleduiuschii_den")}</SelectItem>
+                <SelectItem value="2_days">{t("ui.2_dnia")}</SelectItem>
+                <SelectItem value="3_days">{t("ui.3_dnia")}</SelectItem>
+                <SelectItem value="1_week">{t("ui.1_nedelia")}</SelectItem>
+                <SelectItem value="2_weeks">{t("ui.2_nedeli")}</SelectItem>
+                <SelectItem value="1_month">{t("ui.1_mesiac")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -292,7 +294,7 @@ export default function MobileJobRespond() {
                 type="number"
                 value={formData.warranty}
                 onChange={(e) => handleInputChange('warranty', e.target.value)}
-                placeholder="Количество дней"
+                placeholder={t("ui.kolichestvo_dnei")}
                 className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
               />
               <p className="text-xs text-[#6B7280] mt-2">
@@ -312,7 +314,7 @@ export default function MobileJobRespond() {
             <Textarea
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Опишите, как вы будете выполнять работу, какие материалы понадобятся..."
+              placeholder={t("ui.opishite_kak_vy_budete")}
               rows={4}
               className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50 resize-none"
             />
@@ -326,7 +328,7 @@ export default function MobileJobRespond() {
             disabled={loading}
             className="w-full h-12 bg-primary text-white rounded-xl font-semibold neo-8 disabled:opacity-50"
           >
-            {loading ? 'Отправка...' : 'Отправить предложение'}
+            {loading ? t("ui.otpravka") : t("dash.pro.send_offer")}
           </Button>
         </div>
       </form>

@@ -9,18 +9,21 @@ import { Label } from '@/components/ui/label';
 import { Trash2, Clock, Plus, ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
-const weekdayNames: Record<number, string> = {
-  0: 'Воскресенье',
-  1: 'Понедельник', 
-  2: 'Вторник',
-  3: 'Среда',
-  4: 'Четверг',
-  5: 'Пятница',
-  6: 'Суббота'
-};
+
 
 export default function ProSchedule() {
+  const { t } = useEnhancedI18n();
+  const weekdayNames: Record<number, string> = {
+    0: t("ui.voskresene"),
+    1: t("ui.ponedelnik"), 
+    2: t("ui.vtornik"),
+    3: t("ui.sreda"),
+    4: t("ui.chetverg"),
+    5: t("ui.piatnica"),
+    6: t("ui.subbota")
+  };
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
   const [availability, setAvailability] = useState<any[]>([]);
@@ -70,8 +73,8 @@ export default function ProSchedule() {
 
     if (endMinutes <= startMinutes) {
       toast({
-        title: "Некорректное время",
-        description: "Время окончания должно быть позже времени начала",
+        title: t("ui.nekorrektnoe_vremia"),
+        description: t("ui.vremia_okonchaniia_dolzhno_byt"),
         variant: "destructive"
       });
       return;
@@ -90,16 +93,16 @@ export default function ProSchedule() {
       if (error) throw error;
 
       toast({
-        title: "Успешно!",
-        description: "Время работы добавлено"
+        title: t("ui.uspeshno"),
+        description: t("ui.vremia_raboty_dobavleno")
       });
 
       await loadAvailability(userId);
     } catch (error: any) {
       console.error('Error adding availability slot:', error);
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось добавить время работы",
+        title: t("notifications.error"),
+        description: error.message || t("ui.ne_udalos_dobavit_vremia"),
         variant: "destructive"
       });
     }
@@ -117,14 +120,14 @@ export default function ProSchedule() {
       setAvailability(prev => prev.filter(item => item.id !== id));
 
       toast({
-        title: "Успешно!",
-        description: "Время работы удалено"
+        title: t("ui.uspeshno"),
+        description: t("ui.vremia_raboty_udaleno")
       });
     } catch (error: any) {
       console.error('Error removing availability slot:', error);
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось удалить время работы",
+        title: t("notifications.error"),
+        description: error.message || t("ui.ne_udalos_udalit_vremia"),
         variant: "destructive"
       });
     }
@@ -142,7 +145,7 @@ export default function ProSchedule() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">Расписание</h1>
+          <h1 className="text-lg font-semibold">{t("dash.pro.schedule")}</h1>
         </div>
       </div>
 
@@ -150,7 +153,7 @@ export default function ProSchedule() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-6 lg:mb-8 hidden lg:block">
-            <h1 className="text-2xl lg:text-3xl font-bold mb-2">Расписание работы</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold mb-2">{t("ui.raspisanie_raboty")}</h1>
             <p className="text-muted-foreground">
               Установите удобное для вас время работы
             </p>
@@ -172,7 +175,7 @@ export default function ProSchedule() {
               <CardContent className="p-4 lg:p-6 space-y-4">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                   <div className="space-y-2">
-                    <Label>День недели</Label>
+                    <Label>{t("ui.den_nedeli")}</Label>
                     <Select 
                       value={selectedWeekday.toString()} 
                       onValueChange={(value) => setSelectedWeekday(parseInt(value))}
@@ -181,19 +184,19 @@ export default function ProSchedule() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Понедельник</SelectItem>
-                        <SelectItem value="2">Вторник</SelectItem>
-                        <SelectItem value="3">Среда</SelectItem>
-                        <SelectItem value="4">Четверг</SelectItem>
-                        <SelectItem value="5">Пятница</SelectItem>
-                        <SelectItem value="6">Суббота</SelectItem>
-                        <SelectItem value="0">Воскресенье</SelectItem>
+                        <SelectItem value="1">{t("ui.ponedelnik")}</SelectItem>
+                        <SelectItem value="2">{t("ui.vtornik")}</SelectItem>
+                        <SelectItem value="3">{t("ui.sreda")}</SelectItem>
+                        <SelectItem value="4">{t("ui.chetverg")}</SelectItem>
+                        <SelectItem value="5">{t("ui.piatnica")}</SelectItem>
+                        <SelectItem value="6">{t("ui.subbota")}</SelectItem>
+                        <SelectItem value="0">{t("ui.voskresene")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>Начало</Label>
+                    <Label>{t("ui.nachalo")}</Label>
                     <Input
                       type="time"
                       value={startTime}
@@ -202,7 +205,7 @@ export default function ProSchedule() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>Окончание</Label>
+                    <Label>{t("ui.okonchanie")}</Label>
                     <Input
                       type="time"
                       value={endTime}

@@ -6,6 +6,7 @@ import { SUPABASE_URL } from '@/integrations/supabase/client';
 import { MobileCard } from '../ui/MobileCard';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface MobileJobCardProps {
   job: {
@@ -29,6 +30,7 @@ interface MobileJobCardProps {
 }
 
 export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
+  const { t } = useEnhancedI18n();
   const urgencyColors = {
     low: 'bg-green-500/10 text-green-700 border-green-500/20',
     medium: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
@@ -58,8 +60,8 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
                 variant="outline"
                 className={cn("text-xs", urgencyColors[job.urgency])}
               >
-                {job.urgency === 'high' ? 'Срочно' :
-                 job.urgency === 'medium' ? 'Средне' : 'Обычно'}
+                {job.urgency === 'high' ? t("dash.client.urg_urgent") :
+                 job.urgency === 'medium' ? t("ui.sredne") : t("ui.obychno")}
               </Badge>
             )}
           </div>
@@ -117,7 +119,7 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
             ? `${job.budget_min}-${job.budget_max} MDL`
             : job.budget_min
               ? `от ${job.budget_min} MDL`
-              : 'Договорная'}
+              : t("dash.pro.negotiable")}
         </span>
       </div>
 
@@ -166,17 +168,17 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
           >
             {(() => {
               const labelMap: Record<string, string> = {
-                'Published': 'Опубликован',
-                'Assigned': 'Назначен',
-                'InProgress': 'В работе',
-                'Submitted': 'На проверке',
-                'Completed': 'Завершен',
-                'Cancelled': 'Отменен',
-                'active': 'Активен',
-                'completed': 'Завершен',
-                'in_progress': 'В работе',
-                'pending': 'В ожидании',
-                'cancelled': 'Отменен',
+                'Published': t("ui.opublikovan"),
+                'Assigned': t("ui.naznachen"),
+                'InProgress': t("status.in_progress"),
+                'Submitted': t("ui.na_proverke"),
+                'Completed': t("biz.tenders.status_done"),
+                'Cancelled': t("status.canceled"),
+                'active': t("ui.aktiven"),
+                'completed': t("biz.tenders.status_done"),
+                'in_progress': t("status.in_progress"),
+                'pending': t("ui.v_ozhidanii"),
+                'cancelled': t("status.canceled"),
               };
               return labelMap[job.status] || job.status;
             })()}

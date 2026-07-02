@@ -54,6 +54,7 @@ interface Job {
 }
 
 export default function Feed() {
+  const { t } = useEnhancedI18n();
 
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
@@ -137,7 +138,7 @@ export default function Feed() {
     } catch (error) {
       console.error(error);
       toast({
-        title: "Ошибка загрузки",
+        title: t("dash.pro.load_error_title"),
         description: error instanceof Error ? error.message : undefined,
         variant: "destructive"
       });
@@ -206,25 +207,25 @@ export default function Feed() {
 
   return (
     <main className="min-h-screen">
-      <Seo title="ServiceHub — Лента заказов" description="Заказы для отправки предложений на ServiceHub" canonical="/feed" />
+      <Seo title={t("ui.servicehub_lenta_zakazov")} description={t("ui.zakazy_dlia_otpravki_predlozhenii")} canonical="/feed" />
 
       {/* Header Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            {userRole === "pro" ? "Заказы для предложений" : "Лента заказов"}
+            {userRole === "pro" ? t("dash.pro.jobs_for_offers") : t("footer.feed")}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {userRole === "pro" ? "Показываем только новые заказы, по которым вы ещё не откликались" : "Смотрите новые заказы на платформе"}
+            {userRole === "pro" ? t("ui.pokazyvaem_tolko_novye_zakazy") : t("ui.smotrite_novye_zakazy_na")}
           </p>
           <div className="flex flex-wrap gap-4 justify-center mt-8">
             <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               <AnimatedIcon icon={Zap} className="text-primary" />
-              <span className="text-sm font-medium">Новые заказы</span>
+              <span className="text-sm font-medium">{t("ui.novye_zakazy")}</span>
             </div>
             <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               <AnimatedIcon icon={Shield} className="text-green-500" />
-              <span className="text-sm font-medium">Отклики и сообщения</span>
+              <span className="text-sm font-medium">{t("ui.otkliki_i_soobscheniia")}</span>
             </div>
           </div>
         </div>
@@ -236,7 +237,7 @@ export default function Feed() {
               <TabsList className="grid w-full grid-cols-4 bg-transparent">
                 <TabsTrigger value="all" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Briefcase className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Все заказы</span>
+                  <span className="hidden sm:inline">{t("ui.vse_zakazy")}</span>
                   {activeTab === "all" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -248,7 +249,7 @@ export default function Feed() {
                 </TabsTrigger>
                 <TabsTrigger value="new" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <AlertCircle className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Новые</span>
+                  <span className="hidden sm:inline">{t("ui.novye")}</span>
                   {activeTab === "new" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -260,7 +261,7 @@ export default function Feed() {
                 </TabsTrigger>
                 <TabsTrigger value="urgent" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Clock className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Срочные</span>
+                  <span className="hidden sm:inline">{t("ui.srochnye")}</span>
                   {activeTab === "urgent" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -272,7 +273,7 @@ export default function Feed() {
                 </TabsTrigger>
                 <TabsTrigger value="filters" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Filter className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Фильтры</span>
+                  <span className="hidden sm:inline">{t("ui.filtry")}</span>
                   {activeTab === "filters" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -294,7 +295,7 @@ export default function Feed() {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                       <input
                         type="text"
-                        placeholder="Поиск заказов..."
+                        placeholder={t("ui.poisk_zakazov")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 bg-white/50 border border-white/20 rounded-xl focus:ring-2 focus:ring-primary/50 transition-all"
@@ -307,7 +308,7 @@ export default function Feed() {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         className="bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50"
                       >
-                        <option value="">Все категории</option>
+                        <option value="">{t("feed.category.all")}</option>
                         {categories.map((cat) => (
                           <option key={cat.id} value={cat.id}>{cat.label_ru || cat.key}</option>
                         ))}
@@ -324,7 +325,7 @@ export default function Feed() {
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between mb-2">
                         <Badge variant="secondary" className="mb-2">
-                          {job.category?.label_ru || "Услуга"}
+                          {job.category?.label_ru || t("ui.usluga")}
                         </Badge>
                         {job.scheduled_at && (
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -348,17 +349,17 @@ export default function Feed() {
                                 ? `от ${formatPrice(job.budget_min_cents)}`
                                 : job.budget_max_cents
                                 ? `до ${formatPrice(job.budget_max_cents)}`
-                                : 'Договорная'}
+                                : t("dash.pro.negotiable")}
                             </span>
                           </div>
                         )}
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-blue-500" />
-                          <span className="text-sm text-muted-foreground">В радиусе 5км</span>
+                          <span className="text-sm text-muted-foreground">{t("ui.v_radiuse_5km")}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Star className="w-4 h-4 text-yellow-500" />
-                          <span className="text-sm text-muted-foreground">Срочность: обычная</span>
+                          <span className="text-sm text-muted-foreground">{t("ui.srochnost_obychnaia")}</span>
                         </div>
                       </div>
 
@@ -368,7 +369,7 @@ export default function Feed() {
                             onClick={() => navigate(`/job/${job.id}/respond`)}
                             className="bg-neo neo-8 hover:neo-inset-4 text-black border-none flex-1"
                           >
-                            Отправить предложение
+                            {t("dash.pro.send_offer")}
                           </Button>
                           <Button
                             variant="outline"
@@ -392,8 +393,8 @@ export default function Feed() {
                 <Card className="bg-neo neo-8 border-none">
                   <CardContent className="text-center py-12">
                     <div className="text-6xl mb-4">🔍</div>
-                    <h2 className="text-xl font-semibold mb-2">Заказы не найдены</h2>
-                    <p className="text-muted-foreground">Попробуйте изменить фильтры или создать новый заказ</p>
+                    <h2 className="text-xl font-semibold mb-2">{t("ui.zakazy_ne_naideny")}</h2>
+                    <p className="text-muted-foreground">{t("ui.poprobuite_izmenit_filtry_ili")}</p>
                   </CardContent>
                 </Card>
               )}
@@ -403,8 +404,8 @@ export default function Feed() {
               <Card className="bg-neo neo-8 border-none">
                 <CardContent className="text-center py-12">
                   <AlertCircle className="w-16 h-16 mx-auto mb-4 text-primary" />
-                  <h2 className="text-xl font-semibold mb-2">Новые заказы</h2>
-                  <p className="text-muted-foreground">Здесь будут отображаться только новые заказы</p>
+                  <h2 className="text-xl font-semibold mb-2">{t("ui.novye_zakazy")}</h2>
+                  <p className="text-muted-foreground">{t("ui.zdes_budut_otobrazhatsia_tolko")}</p>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -413,8 +414,8 @@ export default function Feed() {
               <Card className="bg-neo neo-8 border-none">
                 <CardContent className="text-center py-12">
                   <Clock className="w-16 h-16 mx-auto mb-4 text-orange-500" />
-                  <h2 className="text-xl font-semibold mb-2">Срочные заказы</h2>
-                  <p className="text-muted-foreground">Здесь будут отображаться срочные заказы</p>
+                  <h2 className="text-xl font-semibold mb-2">{t("ui.srochnye_zakazy")}</h2>
+                  <p className="text-muted-foreground">{t("ui.zdes_budut_otobrazhatsia_srochnye")}</p>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -424,21 +425,21 @@ export default function Feed() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Filter className="w-5 h-5" />
-                    Расширенные фильтры
+                    {t("ui.rasshirennye_filtry")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Бюджет от</label>
-                      <input type="number" className="w-full p-3 bg-white/50 border border-white/20 rounded-xl" placeholder="Минимальная сумма" />
+                      <label className="block text-sm font-medium mb-2">{t("job.new.budget_from")}</label>
+                      <input type="number" className="w-full p-3 bg-white/50 border border-white/20 rounded-xl" placeholder={t("ui.minimalnaia_summa")} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Бюджет до</label>
-                      <input type="number" className="w-full p-3 bg-white/50 border border-white/20 rounded-xl" placeholder="Максимальная сумма" />
+                      <label className="block text-sm font-medium mb-2">{t("ui.biudzhet_do")}</label>
+                      <input type="number" className="w-full p-3 bg-white/50 border border-white/20 rounded-xl" placeholder={t("ui.maksimalnaia_summa")} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Радиус (км)</label>
+                      <label className="block text-sm font-medium mb-2">{t("ui.radius_km")}</label>
                       <select className="w-full p-3 bg-white/50 border border-white/20 rounded-xl">
                         <option value="5">5 км</option>
                         <option value="10">10 км</option>
@@ -447,17 +448,17 @@ export default function Feed() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Срочность</label>
+                      <label className="block text-sm font-medium mb-2">{t("ui.srochnost")}</label>
                       <select className="w-full p-3 bg-white/50 border border-white/20 rounded-xl">
-                        <option value="">Любая</option>
-                        <option value="normal">Обычная</option>
-                        <option value="urgent">Срочно</option>
-                        <option value="same_day">В тот же день</option>
+                        <option value="">{t("ui.liubaia")}</option>
+                        <option value="normal">{t("ui.obychnaia")}</option>
+                        <option value="urgent">{t("dash.client.urg_urgent")}</option>
+                        <option value="same_day">{t("dash.client.urg_same_day")}</option>
                       </select>
                     </div>
                   </div>
                   <Button className="bg-neo neo-8 hover:neo-inset-4 text-black border-none">
-                    Применить фильтры
+                    {t("ui.primenit_filtry")}
                   </Button>
                 </CardContent>
               </Card>

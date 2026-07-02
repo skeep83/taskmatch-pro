@@ -119,6 +119,7 @@ interface AssignedProData {
 }
 
 const JobDetail = () => {
+  const { t } = useEnhancedI18n();
   const { id: jobId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -248,8 +249,8 @@ const JobDetail = () => {
     if (paymentSuccess !== '1') return;
 
     toast({
-      title: 'Платёж подтверждён',
-      description: 'Эскроу создан. Можно продолжать работу по заказу.',
+      title: t("ui.platezh_podtverzhden"),
+      description: t("ui.eskrou_sozdan_mozhno_prodolzhat"),
     });
     navigate(`/job/${jobId}`, { replace: true });
   }, [jobId, navigate, searchParams, toast]);
@@ -383,8 +384,8 @@ const JobDetail = () => {
     } catch (error: unknown) {
       console.error('Error fetching job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось загрузить заказ: ${error instanceof Error ? error.message : 'неизвестная ошибка'}`,
+        title: t("notifications.error"),
+        description: `Не удалось загрузить заказ: ${error instanceof Error ? error.message : t("dash.client.unknown_error")}`,
         variant: 'destructive'
       });
       navigate('/dashboard/client');
@@ -562,7 +563,7 @@ const JobDetail = () => {
   };
 
   const handleDeleteJob = async () => {
-    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) {
+    if (!confirm(t("dash.client.delete_confirm"))) {
       return;
     }
 
@@ -570,22 +571,22 @@ const JobDetail = () => {
       const result = await deleteClientJob(jobId);
 
       toast({
-        title: result === 'hard' ? 'Заказ удален' : 'Заказ скрыт из активных',
-        description: result === 'hard' ? 'Заказ был успешно удален' : 'Заказ отменён и больше не показывается в активном кабинете'
+        title: result === 'hard' ? t("dash.client.job_deleted") : t("dash.client.job_hidden"),
+        description: result === 'hard' ? t("dash.client.job_deleted_desc") : t("ui.zakaz_otmenen_i_bolshe")
       });
       navigate('/dashboard/client');
     } catch (error: unknown) {
       console.error('Error deleting job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось удалить заказ: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t("notifications.error"),
+        description: `Не удалось удалить заказ: ${getErrorMessage(error, t("dash.client.unknown_error"))}`,
         variant: 'destructive'
       });
     }
   };
 
   const handleCancelJob = async () => {
-    if (!confirm('После выбора исполнителя заказ больше нельзя редактировать или удалять. Отменить заказ?')) {
+    if (!confirm(t("dash.client.cancel_confirm"))) {
       return;
     }
 
@@ -612,7 +613,7 @@ const JobDetail = () => {
           body: {
             user_id: job.pro_id,
             type: 'job_cancelled',
-            title: 'Клиент отменил заказ',
+            title: t("ui.klient_otmenil_zakaz"),
             title_ro: 'Clientul a anulat comanda',
             message: `Заказ "${job.title}" отменён заказчиком.`,
             message_ro: `Comanda "${job.title}" a fost anulată de client.`,
@@ -623,15 +624,15 @@ const JobDetail = () => {
       }
 
       toast({
-        title: 'Заказ отменён',
-        description: 'Заказ сохранён в истории как отменённый'
+        title: t("dash.client.job_canceled"),
+        description: t("dash.client.job_canceled_desc")
       });
       navigate('/dashboard/client');
     } catch (error: unknown) {
       console.error('Error cancelling job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось отменить заказ: ${error instanceof Error ? error.message : 'неизвестная ошибка'}`,
+        title: t("notifications.error"),
+        description: `Не удалось отменить заказ: ${error instanceof Error ? error.message : t("dash.client.unknown_error")}`,
         variant: 'destructive'
       });
     }
@@ -640,8 +641,8 @@ const JobDetail = () => {
   const handleStartWork = async () => {
     if (!job || !currentUser || currentUser.id !== job.pro_id) {
       toast({
-        title: 'Ошибка',
-        description: 'У вас нет прав для выполнения этого действия',
+        title: t("notifications.error"),
+        description: t("ui.u_vas_net_prav"),
         variant: 'destructive'
       });
       return;
@@ -663,7 +664,7 @@ const JobDetail = () => {
         body: {
           user_id: job.client_id,
           type: 'job_update',
-          title: 'Работа начата',
+          title: t("ui.rabota_nachata"),
           title_ro: 'Lucrul a început',
           message: `Специалист начал выполнение работы: ${job.title}`,
           message_ro: `Specialistul a început să lucreze: ${job.title}`,
@@ -677,16 +678,16 @@ const JobDetail = () => {
       }
 
       toast({
-        title: 'Работа начата',
-        description: 'Статус заказа изменен на "В работе"'
+        title: t("ui.rabota_nachata"),
+        description: t("ui.status_zakaza_izmenen_na")
       });
 
       await fetchJob();
     } catch (error: unknown) {
       console.error('Error starting work:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось обновить статус: ${error instanceof Error ? error.message : 'неизвестная ошибка'}`,
+        title: t("notifications.error"),
+        description: `Не удалось обновить статус: ${error instanceof Error ? error.message : t("dash.client.unknown_error")}`,
         variant: 'destructive'
       });
     }
@@ -695,8 +696,8 @@ const JobDetail = () => {
   const handleCompleteWork = async () => {
     if (!job || !currentUser || currentUser.id !== job.pro_id) {
       toast({
-        title: 'Ошибка',
-        description: 'У вас нет прав для выполнения этого действия',
+        title: t("notifications.error"),
+        description: t("ui.u_vas_net_prav"),
         variant: 'destructive'
       });
       return;
@@ -718,7 +719,7 @@ const JobDetail = () => {
         body: {
           user_id: job.client_id,
           type: 'job_update',
-          title: 'Работа завершена',
+          title: t("ui.rabota_zavershena"),
           title_ro: 'Lucrul este terminat',
           message: `Специалист завершил работу: ${job.title}`,
           message_ro: `Specialistul a terminat lucrul: ${job.title}`,
@@ -732,16 +733,16 @@ const JobDetail = () => {
       }
 
       toast({
-        title: 'Работа завершена',
-        description: 'Статус заказа изменен на "Выполнен"'
+        title: t("ui.rabota_zavershena"),
+        description: t("ui.status_zakaza_izmenen_na_2")
       });
 
       await fetchJob();
     } catch (error: unknown) {
       console.error('Error completing work:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось обновить статус: ${error instanceof Error ? error.message : 'неизвестная ошибка'}`,
+        title: t("notifications.error"),
+        description: `Не удалось обновить статус: ${error instanceof Error ? error.message : t("dash.client.unknown_error")}`,
         variant: 'destructive'
       });
     }
@@ -750,8 +751,8 @@ const JobDetail = () => {
   const handleSubmitRating = async () => {
     if (!job || !currentUser || !job.pro_id || rating === 0) {
       toast({
-        title: 'Ошибка',
-        description: 'Пожалуйста, выберите оценку',
+        title: t("notifications.error"),
+        description: t("ui.pozhaluista_vyberite_ocenku"),
         variant: 'destructive'
       });
       return;
@@ -776,7 +777,7 @@ const JobDetail = () => {
         body: {
           user_id: job.pro_id,
           type: 'rating',
-          title: 'Новая оценка',
+          title: t("ui.novaia_ocenka"),
           title_ro: 'Evaluare nouă',
           message: `Вы получили оценку ${rating} звезд за работу: ${job.title}`,
           message_ro: `Ați primit o evaluare de ${rating} stele pentru lucrarea: ${job.title}`,
@@ -788,8 +789,8 @@ const JobDetail = () => {
       if (notifyError) {
         console.error('Error sending rating notification:', notifyError);
         toast({
-          title: 'Предупреждение',
-          description: 'Оценка отправлена, но уведомление не удалось доставить',
+          title: t("ui.preduprezhdenie"),
+          description: t("ui.ocenka_otpravlena_no_uvedomlenie"),
           variant: 'default'
         });
       } else {
@@ -797,8 +798,8 @@ const JobDetail = () => {
       }
 
       toast({
-        title: 'Оценка отправлена',
-        description: 'Спасибо за вашу оценку!'
+        title: t("ui.ocenka_otpravlena"),
+        description: t("ui.spasibo_za_vashu_ocenku")
       });
 
       setHasSubmittedRating(true);
@@ -831,16 +832,16 @@ const JobDetail = () => {
         setRating(0);
         setRatingComment('');
         toast({
-          title: 'Оценка уже отправлена',
-          description: 'Повторно оценить этот заказ нельзя.',
+          title: t("ui.ocenka_uzhe_otpravlena"),
+          description: t("ui.povtorno_ocenit_etot_zakaz"),
         });
         await fetchJob();
         return;
       }
 
       toast({
-        title: 'Ошибка',
-        description: `Не удалось отправить оценку: ${errorMessage || 'неизвестная ошибка'}`,
+        title: t("notifications.error"),
+        description: `Не удалось отправить оценку: ${errorMessage || t("dash.client.unknown_error")}`,
         variant: 'destructive'
       });
     }
@@ -848,11 +849,11 @@ const JobDetail = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
-      new: { label: 'Новый', variant: 'default' as const },
-      accepted: { label: 'Исполнитель выбран', variant: 'secondary' as const },
-      in_progress: { label: 'Работа выполняется', variant: 'default' as const },
-      done: { label: jobStatusData.end_confirmed ? 'Выполнен' : 'Ждёт подтверждения', variant: 'secondary' as const },
-      'canceled': { label: 'Отменён', variant: 'destructive' as const }
+      new: { label: t("status.new"), variant: 'default' as const },
+      accepted: { label: t("dash.client.st_accepted"), variant: 'secondary' as const },
+      in_progress: { label: t("dash.client.st_in_progress"), variant: 'default' as const },
+      done: { label: jobStatusData.end_confirmed ? t("status.done") : t("status.awaiting_confirm"), variant: 'secondary' as const },
+      'canceled': { label: t("ui.otmenen"), variant: 'destructive' as const }
     };
 
     const getStatusIcon = (status: string) => {
@@ -891,22 +892,22 @@ const JobDetail = () => {
   const isDoneAwaitingConfirmation = job?.status === 'done' && !jobStatusData.end_confirmed;
   const isDoneConfirmed = job?.status === 'done' && jobStatusData.end_confirmed;
   const cancelledStatusMessage = isJobOwner
-    ? 'Вы отменили этот заказ. Новые действия по нему больше не требуются.'
-    : 'Заказ был отменён. Отклик и выполнение по нему больше недоступны.';
+    ? t("ui.vy_otmenili_etot_zakaz")
+    : t("ui.zakaz_byl_otmenen_otklik");
   const professionalStatusMessage = currentUser?.id === job?.client_id
-    ? 'Это ваш собственный заказ — отправить предложение самому себе нельзя.'
+    ? t("ui.eto_vash_sobstvennyi_zakaz_2")
     : job?.pro_id
-      ? 'Заказ уже принят другим исполнителем'
+      ? t("ui.zakaz_uzhe_priniat_drugim")
       : hasExistingResponse
-        ? 'Вы уже отправили предложение по этому заказу'
-        : 'Сейчас отправка предложения недоступна';
+        ? t("ui.vy_uzhe_otpravili_predlozhenie_3")
+        : t("ui.seichas_otpravka_predlozheniia_nedostupn");
 
   if (loading) {
-    return <div className="container mx-auto py-8">Загрузка...</div>;
+    return <div className="container mx-auto py-8">{t("common.loading")}</div>;
   }
 
   if (!job) {
-    return <div className="container mx-auto py-8">Заказ не найден</div>;
+    return <div className="container mx-auto py-8">{t("ui.zakaz_ne_naiden")}</div>;
   }
 
   return (
@@ -929,10 +930,10 @@ const JobDetail = () => {
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-[#4B5563]">
-            Детали заказа
+            {t("job.new.service_details")}
           </h2>
           <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
-            Подробная информация о заказе
+            {t("ui.podrobnaia_informaciia_o_zakaze")}
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 mb-6 mt-8">
@@ -950,7 +951,7 @@ const JobDetail = () => {
               className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Назад
+              {t("ui.nazad")}
             </Button>
 
             {/* Edit and Delete buttons for job owner */}
@@ -962,7 +963,7 @@ const JobDetail = () => {
                   className="px-4 py-2 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none text-sm"
                 >
                   <Edit className="w-3 h-3 mr-1" />
-                  Редактировать
+                  {t("ui.redaktirovat")}
                 </Button>
                 {canDelete && (
                   <Button
@@ -971,7 +972,7 @@ const JobDetail = () => {
                     className="px-4 py-2 bg-red-500 neo-8 hover:bg-red-600 hover:neo-4 rounded-xl transition-all duration-300 text-white border-none text-sm"
                   >
                     <Trash2 className="w-3 h-3 mr-1" />
-                    Удалить
+                    {t("common.delete")}
                   </Button>
                 )}
               </div>
@@ -984,7 +985,7 @@ const JobDetail = () => {
                   className="px-4 py-2 bg-red-500 neo-8 hover:bg-red-600 hover:neo-4 rounded-xl transition-all duration-300 text-white border-none text-sm"
                 >
                   <XCircle className="w-3 h-3 mr-1" />
-                  Отменить заказ
+                  {t("ui.otmenit_zakaz")}
                 </Button>
               </div>
             )}
@@ -1005,13 +1006,13 @@ const JobDetail = () => {
             <div className="p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md bg-neo rounded-2xl neo-8">
               <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3 text-[#374151]">
                 <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                Информация о заказчике
+                {t("ui.informaciia_o_zakazchike")}
               </h3>
               <div className="flex items-center gap-3">
                 <Avatar className="w-10 h-10 md:w-12 md:h-12">
                   <AvatarImage
                     src={clientProfile.avatar_url || ''}
-                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'}
+                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || t("menu.role_client")}
                   />
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                     {clientProfile.full_name
@@ -1027,9 +1028,9 @@ const JobDetail = () => {
                       {clientProfile.full_name ||
                        (clientProfile.first_name && clientProfile.last_name
                          ? `${clientProfile.first_name} ${clientProfile.last_name}`
-                         : 'Клиент')}
+                         : t("menu.role_client"))}
                     </h4>
-                    <Badge variant="secondary" className="text-xs w-fit">Клиент</Badge>
+                    <Badge variant="secondary" className="text-xs w-fit">{t("menu.role_client")}</Badge>
                   </div>
                   <div>
                     {clientRating && clientRating.count > 0 ? (
@@ -1040,7 +1041,7 @@ const JobDetail = () => {
                         readonly
                       />
                     ) : (
-                      <p className="text-xs text-[#6B7280]">Новый клиент</p>
+                      <p className="text-xs text-[#6B7280]">{t("ui.novyi_klient")}</p>
                     )}
                   </div>
                 </div>
@@ -1057,7 +1058,7 @@ const JobDetail = () => {
               {/* Description Card */}
               <div className="bg-neo rounded-2xl p-6 neo-8">
                 <h2 className="text-2xl font-semibold mb-4 text-[#374151]">
-                  Описание заказа
+                  {t("ui.opisanie_zakaza_2")}
                 </h2>
                 <p className="text-[#6B7280] whitespace-pre-wrap">{job.description}</p>
               </div>
@@ -1068,7 +1069,7 @@ const JobDetail = () => {
                   <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div className="flex items-center gap-3 mb-2">
                       <Euro className="w-5 h-5 text-green-500" />
-                      <span className="font-semibold text-lg text-[#374151]">Бюджет</span>
+                      <span className="font-semibold text-lg text-[#374151]">{t("hero.mock.budget")}</span>
                     </div>
                     <p className="text-xl font-bold text-green-600">
                       {job.budget_min_cents && job.budget_max_cents
@@ -1077,7 +1078,7 @@ const JobDetail = () => {
                         ? `от ${formatPrice(job.budget_min_cents)}`
                         : job.budget_max_cents
                         ? `до ${formatPrice(job.budget_max_cents)}`
-                        : 'Договорная'}
+                        : t("dash.pro.negotiable")}
                     </p>
                   </div>
                 )}
@@ -1086,7 +1087,7 @@ const JobDetail = () => {
                   <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div className="flex items-center gap-3 mb-2">
                       <MapPin className="w-5 h-5 text-blue-500" />
-                      <span className="font-semibold text-lg text-[#374151]">Адрес</span>
+                      <span className="font-semibold text-lg text-[#374151]">{t("ui.adres")}</span>
                     </div>
                     <p className="text-[#6B7280]">{job.location_address}</p>
                   </div>
@@ -1096,7 +1097,7 @@ const JobDetail = () => {
                   <div className="bg-neo rounded-2xl p-6 md:col-span-2 neo-8">
                     <div className="flex items-center gap-3 mb-2">
                       <Calendar className="w-5 h-5 text-orange-500" />
-                      <span className="font-semibold text-lg text-[#374151]">Запланировано</span>
+                      <span className="font-semibold text-lg text-[#374151]">{t("ui.zaplanirovano")}</span>
                     </div>
                     <p className="text-[#6B7280]">{new Date(job.scheduled_at).toLocaleString('ru-RU')}</p>
                   </div>
@@ -1110,7 +1111,7 @@ const JobDetail = () => {
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
                       <User className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
                     </div>
-                    <span className="font-semibold text-base md:text-lg">Назначен специалист</span>
+                    <span className="font-semibold text-base md:text-lg">{t("ui.naznachen_specialist")}</span>
                   </div>
 
                   <div className="border border-border/50 rounded-lg p-3 md:p-4">
@@ -1118,7 +1119,7 @@ const JobDetail = () => {
                       <Avatar className="w-16 h-16 md:w-20 md:h-20 mx-auto sm:mx-0">
                         <AvatarImage
                           src={assignedPro.profile?.avatar_url || ''}
-                          alt={assignedPro.profile?.full_name || `${assignedPro.profile?.first_name} ${assignedPro.profile?.last_name}` || 'Специалист'}
+                          alt={assignedPro.profile?.full_name || `${assignedPro.profile?.first_name} ${assignedPro.profile?.last_name}` || t("menu.role_pro")}
                         />
                         <AvatarFallback className="bg-primary/10 text-primary font-semibold text-base md:text-lg">
                           {assignedPro.profile?.full_name
@@ -1135,10 +1136,10 @@ const JobDetail = () => {
                             {assignedPro.profile?.full_name ||
                              (assignedPro.profile?.first_name && assignedPro.profile?.last_name
                                ? `${assignedPro.profile.first_name} ${assignedPro.profile.last_name}`
-                               : 'Специалист')}
+                               : t("menu.role_pro"))}
                           </h4>
                           <Badge variant="default" className="bg-orange-100 text-orange-800 hover:bg-orange-200 w-fit mx-auto sm:mx-0">
-                            Специалист
+                            {t("menu.role_pro")}
                           </Badge>
                         </div>
 
@@ -1163,7 +1164,7 @@ const JobDetail = () => {
                                 showValue={false}
                                 readonly
                               />
-                              <span className="text-xs md:text-sm text-muted-foreground">Новый специалист</span>
+                              <span className="text-xs md:text-sm text-muted-foreground">{t("catalog.new_specialist")}</span>
                             </div>
                           )}
                         </div>
@@ -1185,7 +1186,7 @@ const JobDetail = () => {
 
                         {assignedPro.portfolio && assignedPro.portfolio.length > 0 && (
                           <div className="mt-3">
-                            <p className="text-xs md:text-sm font-medium text-muted-foreground mb-3">Примеры работ:</p>
+                            <p className="text-xs md:text-sm font-medium text-muted-foreground mb-3">{t("ui.primery_rabot")}</p>
                             <div className="flex gap-2 md:gap-3 flex-wrap justify-center sm:justify-start">
                               {assignedPro.portfolio.map((item: PortfolioItem) =>
                                 item.portfolio_media?.map((media: PortfolioMedia, mediaIndex: number) => {
@@ -1213,7 +1214,7 @@ const JobDetail = () => {
                               onClick={() => navigate(`/pro/${job.pro_id}`)}
                               className="w-full sm:w-auto bg-neo neo-8 hover:neo-inset-4 rounded-xl transition-all duration-300 text-black hover:text-black"
                             >
-                              Профиль
+                              {t("nav.profile_tab")}
                             </Button>
                           </div>
                           <div className="p-2 rounded-2xl bg-neo neo-inset-8">
@@ -1224,7 +1225,7 @@ const JobDetail = () => {
                               className="w-full sm:w-auto bg-neo neo-8 hover:neo-inset-4 rounded-xl transition-all duration-300 text-black hover:text-black"
                             >
                               <MessageSquare className="w-4 h-4 mr-1" />
-                              Написать
+                              {t("ui.napisat")}
                             </Button>
                           </div>
                         </div>
@@ -1239,7 +1240,7 @@ const JobDetail = () => {
                 <div className="pt-6 md:pt-8 px-4 md:px-8 pb-0 overflow-hidden rounded-2xl bg-neo neo-8">
                   <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                    Фото и видео заказа
+                    {t("ui.foto_i_video_zakaza")}
                     <Badge variant="secondary" className="ml-3 text-sm md:text-lg px-2 md:px-3 py-1">{jobPhotos.length}</Badge>
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0 -mx-4 md:-mx-8 -mb-0">
@@ -1252,7 +1253,7 @@ const JobDetail = () => {
                             <div className="relative group cursor-pointer p-1 md:p-2">
                               <div className="aspect-square rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 bg-black/5">
                                 {mediaKind === 'video' ? (
-                                  <VideoThumbnail src={imageUrl} overlayLabel="Видео" />
+                                  <VideoThumbnail src={imageUrl} overlayLabel={t("ui.video")} />
                                 ) : (
                                   <MediaViewer
                                     src={imageUrl}
@@ -1283,7 +1284,7 @@ const JobDetail = () => {
                                   />
                                   <div className="text-center">
                                     <a href={imageUrl} target="_blank" rel="noreferrer" className="text-sm text-primary underline">
-                                      Открыть видео отдельно
+                                      {t("ui.otkryt_video_otdelno")}
                                     </a>
                                   </div>
                                 </div>
@@ -1314,12 +1315,12 @@ const JobDetail = () => {
                 <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-neo neo-8">
                   <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                    Статус и статистика заказа
+                    {t("ui.status_i_statistika_zakaza")}
                   </h3>
 
                   {/* Job Status Progress */}
                   <div className="mb-6 md:mb-8">
-                    <h4 className="text-base md:text-lg font-medium mb-3 md:mb-4 text-muted-foreground">Прогресс выполнения</h4>
+                    <h4 className="text-base md:text-lg font-medium mb-3 md:mb-4 text-muted-foreground">{t("ui.progress_vypolneniia")}</h4>
                   <JobStatusProgress
                     status={job.status}
                     startConfirmed={jobStatusData.start_confirmed}
@@ -1331,12 +1332,12 @@ const JobDetail = () => {
                 {canRate ? (
                   <div className="mb-6 md:mb-8">
                     <div className="p-3 md:p-4 mb-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
-                      <h4 className="font-medium text-amber-900 mb-1 text-sm md:text-base">Нужен последний шаг от заказчика</h4>
+                      <h4 className="font-medium text-amber-900 mb-1 text-sm md:text-base">{t("ui.nuzhen_poslednii_shag_ot")}</h4>
                       <p className="text-xs md:text-sm text-amber-700">
-                        Подтвердите завершение и оставьте отзыв, чтобы закрыть заказ полностью.
+                        {t("ui.podtverdite_zavershenie_i_ostavte")}
                       </p>
                     </div>
-                    <h4 className="text-base md:text-lg font-medium mb-4 md:mb-6 text-center text-primary animate-pulse">Оцените выполнение услуги специалистом</h4>
+                    <h4 className="text-base md:text-lg font-medium mb-4 md:mb-6 text-center text-primary animate-pulse">{t("ui.ocenite_vypolnenie_uslugi_specialistom")}</h4>
 
                     {/* Professional Avatar and Info */}
                     {proProfile && (
@@ -1344,7 +1345,7 @@ const JobDetail = () => {
                         <Avatar className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 mb-3 md:mb-4 border-4 border-white/50 shadow-2xl">
                           <AvatarImage
                             src={proProfile.avatar_url || ''}
-                            alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || 'Специалист'}
+                            alt={proProfile.full_name || `${proProfile.first_name} ${proProfile.last_name}` || t("menu.role_pro")}
                           />
                           <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white font-bold text-lg md:text-2xl lg:text-3xl">
                             {proProfile.full_name
@@ -1358,16 +1359,16 @@ const JobDetail = () => {
                           {proProfile.full_name ||
                            (proProfile.first_name && proProfile.last_name
                              ? `${proProfile.first_name} ${proProfile.last_name}`
-                             : 'Специалист')}
+                             : t("menu.role_pro"))}
                         </h5>
-                        <Badge variant="default" className="bg-gradient-to-r from-primary to-accent text-white">Специалист</Badge>
+                        <Badge variant="default" className="bg-gradient-to-r from-primary to-accent text-white">{t("menu.role_pro")}</Badge>
                       </div>
                     )}
 
                     {/* Rating Section */}
                     <div className="space-y-4 md:space-y-6">
                       <div className="text-center">
-                        <p className="text-xs md:text-sm text-muted-foreground mb-4 md:mb-6 font-medium animate-fade-in">Поставьте оценку от 1 до 5 звезд</p>
+                        <p className="text-xs md:text-sm text-muted-foreground mb-4 md:mb-6 font-medium animate-fade-in">{t("ui.postavte_ocenku_ot_1")}</p>
                         <div className="relative group">
                           <div className="absolute -inset-3 bg-gradient-to-r from-yellow-400/20 via-orange-400/20 to-red-400/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                           <div className="relative transform hover:scale-110 transition-all duration-300">
@@ -1383,9 +1384,9 @@ const JobDetail = () => {
                       </div>
 
                       <div>
-                        <label className="text-xs md:text-sm font-medium mb-2 md:mb-3 block">Комментарий (необязательно)</label>
+                        <label className="text-xs md:text-sm font-medium mb-2 md:mb-3 block">{t("ui.kommentarii_neobiazatelno")}</label>
                         <Textarea
-                          placeholder="Расскажите о качестве выполненной работы..."
+                          placeholder={t("ui.rasskazhite_o_kachestve_vypolnennoi")}
                           value={ratingComment}
                           onChange={(e) => setRatingComment(e.target.value)}
                           className="min-h-[100px] md:min-h-[120px] transition-all duration-300 focus:scale-[1.02] text-sm md:text-base"
@@ -1400,7 +1401,7 @@ const JobDetail = () => {
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
                           <Send className="w-4 h-4 md:w-5 md:h-5 mr-2 relative z-10" />
-                          <span className="relative z-10 text-sm md:text-base">Отправить оценку</span>
+                          <span className="relative z-10 text-sm md:text-base">{t("ui.otpravit_ocenku")}</span>
                         </Button>
                       </div>
                     </div>
@@ -1408,43 +1409,43 @@ const JobDetail = () => {
                 ) : shouldShowRatingSuccess ? (
                   <div className="mb-6 md:mb-8 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-center">
                     <Star className="mx-auto mb-2 h-8 w-8 text-emerald-600" />
-                    <h4 className="mb-1 font-medium text-emerald-900 text-sm md:text-base">Отзыв уже отправлен</h4>
+                    <h4 className="mb-1 font-medium text-emerald-900 text-sm md:text-base">{t("ui.otzyv_uzhe_otpravlen")}</h4>
                     <p className="text-xs md:text-sm text-emerald-700">
-                      Спасибо, заказ закрыт с вашей стороны. Специалист уже видит, что оценка оставлена.
+                      {t("ui.spasibo_zakaz_zakryt_s")}
                     </p>
                   </div>
                 ) : null}
 
                 {/* Statistics - Always shown, but moved below rating when rating is available */}
                 <div>
-                  <h4 className="text-base md:text-lg font-medium mb-3 md:mb-4 text-muted-foreground">Информация о заказе</h4>
+                  <h4 className="text-base md:text-lg font-medium mb-3 md:mb-4 text-muted-foreground">{t("ui.informaciia_o_zakaze")}</h4>
                   <div className="space-y-3 md:space-y-4">
                     <div className="flex items-center justify-between py-2 md:py-3 border-b border-border/50">
-                      <span className="text-muted-foreground text-sm md:text-base">Статус:</span>
+                      <span className="text-muted-foreground text-sm md:text-base">{t("ui.status")}</span>
                       {getStatusBadge(job.status)}
                     </div>
 
                     <div className="flex items-center justify-between py-2 md:py-3 border-b border-border/50">
-                      <span className="text-muted-foreground text-sm md:text-base">Создан:</span>
+                      <span className="text-muted-foreground text-sm md:text-base">{t("ui.sozdan")}</span>
                       <span className="font-medium text-sm md:text-base">{new Date(job.created_at).toLocaleDateString('ru-RU')}</span>
                     </div>
 
                     <div className="flex items-center justify-between py-2 md:py-3">
-                      <span className="text-muted-foreground text-sm md:text-base">Категория:</span>
+                      <span className="text-muted-foreground text-sm md:text-base">{t("ui.kategoriia")}</span>
                       <span className="font-medium text-sm md:text-base">{job.categories.label_ru}</span>
                     </div>
 
                     {isCancelled && (
                       <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
                         <XCircle className="mx-auto mb-2 h-7 w-7 text-red-600" />
-                        <h4 className="mb-1 font-medium text-red-900 text-sm md:text-base">Заказ отменён</h4>
+                        <h4 className="mb-1 font-medium text-red-900 text-sm md:text-base">{t("dash.client.job_canceled")}</h4>
                         <p className="text-xs md:text-sm text-red-700">{cancelledStatusMessage}</p>
                         <div className="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
                           <Button variant="outline" onClick={() => navigate('/dashboard/client')}>
-                            К моим заказам
+                            {t("ui.k_moim_zakazam")}
                           </Button>
                           <Button variant="ghost" onClick={() => navigate(-1)}>
-                            Назад
+                            {t("ui.nazad")}
                           </Button>
                         </div>
                       </div>
@@ -1471,7 +1472,7 @@ const JobDetail = () => {
                 <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-neo neo-8">
                   <div className="space-y-4">
                     <h3 className="text-lg md:text-xl font-semibold mb-4">
-                      Заинтересованы в заказе?
+                      {t("ui.zainteresovany_v_zakaze")}
                     </h3>
 
                     {!showPriceProposal ? (
@@ -1484,7 +1485,7 @@ const JobDetail = () => {
                                 onClick={() => setShowPriceProposal(true)}
                               >
                                 <User className="w-4 h-4 mr-2" />
-                                Отправить предложение
+                                {t("dash.pro.send_offer")}
                               </Button>
                             </div>
                           </div>
@@ -1493,12 +1494,12 @@ const JobDetail = () => {
                           {/* Client Info */}
                           {clientProfile && (
                             <div className="p-3 bg-muted rounded-lg">
-                              <p className="text-sm font-medium mb-1">Заказчик:</p>
+                              <p className="text-sm font-medium mb-1">{t("ui.zakazchik_2")}</p>
                               <div className="flex items-center gap-3">
                                 <Avatar className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
                                   <AvatarImage
                                     src={clientProfile.avatar_url || ''}
-                                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || 'Клиент'}
+                                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || t("menu.role_client")}
                                   />
                                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                                     {clientProfile.full_name
@@ -1516,17 +1517,17 @@ const JobDetail = () => {
                                           {clientProfile.full_name ||
                                            (clientProfile.first_name && clientProfile.last_name
                                              ? `${clientProfile.first_name} ${clientProfile.last_name}`
-                                             : 'Клиент')}
+                                             : t("menu.role_client"))}
                                         </span>
                                       </h4>
                                       <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                                        <Badge variant="secondary" className="text-xs w-fit">Клиент</Badge>
+                                        <Badge variant="secondary" className="text-xs w-fit">{t("menu.role_client")}</Badge>
                                         {clientRating && clientRating.count > 0 ? (
                                           <span className="text-xs text-muted-foreground">
                                             Рейтинг: {clientRating.average.toFixed(1)} ({clientRating.count})
                                           </span>
                                         ) : (
-                                          <span className="text-xs text-muted-foreground">Новый клиент</span>
+                                          <span className="text-xs text-muted-foreground">{t("ui.novyi_klient")}</span>
                                         )}
                                       </div>
                                     </div>
@@ -1538,7 +1539,7 @@ const JobDetail = () => {
 
                           {/* Job Description */}
                           <div>
-                            <p className="text-sm font-medium mb-1">Описание заказа:</p>
+                            <p className="text-sm font-medium mb-1">{t("ui.opisanie_zakaza")}</p>
                             <p className="text-sm text-muted-foreground line-clamp-2">
                               {job.description}
                             </p>
@@ -1565,7 +1566,7 @@ const JobDetail = () => {
                               className="w-full bg-neo neo-8 hover:neo-inset-4 rounded-xl transition-all duration-300 text-black hover:text-black"
                               onClick={() => setShowPriceProposal(false)}
                             >
-                              Отмена
+                              {t("common.cancel")}
                             </Button>
                           </div>
                         </CardContent>
@@ -1580,16 +1581,16 @@ const JobDetail = () => {
                 <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-neo neo-8">
                   <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                    Управление работой
+                    {t("ui.upravlenie_rabotoi")}
                   </h3>
 
                   <div className="space-y-4">
                     {canStartWork && (
                       <div className="p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <h4 className="font-medium text-blue-900 mb-2 text-sm md:text-base">Готовы начать работу?</h4>
+                        <h4 className="font-medium text-blue-900 mb-2 text-sm md:text-base">{t("ui.gotovy_nachat_rabotu")}</h4>
                         <p className="text-xs md:text-sm text-blue-700 mb-3 md:mb-4">
-                          Нажмите кнопку, когда приступите к выполнению заказа.
-                          Статус заказа изменится на "В работе".
+                          {t("ui.nazhmite_knopku_kogda_pristupite")}
+                          Статус заказа изменится на t("status.in_progress").
                         </p>
                         <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                           <Button
@@ -1597,7 +1598,7 @@ const JobDetail = () => {
                             className="w-full bg-blue-600 hover:bg-blue-700 text-sm md:text-base rounded-xl"
                           >
                             <Clock className="w-4 h-4 mr-2" />
-                            Начать выполнение работы
+                            {t("ui.nachat_vypolnenie_raboty")}
                           </Button>
                         </div>
                       </div>
@@ -1605,10 +1606,10 @@ const JobDetail = () => {
 
                     {canCompleteWork && (
                       <div className="p-3 md:p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <h4 className="font-medium text-green-900 mb-2 text-sm md:text-base">Работа выполнена?</h4>
+                        <h4 className="font-medium text-green-900 mb-2 text-sm md:text-base">{t("ui.rabota_vypolnena")}</h4>
                         <p className="text-xs md:text-sm text-green-700 mb-3 md:mb-4">
-                          Нажмите кнопку, когда закончите выполнение заказа.
-                          Статус заказа изменится на "Выполнен".
+                          {t("ui.nazhmite_knopku_kogda_zakonchite")}
+                          Статус заказа изменится на t("status.done").
                         </p>
                         <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                           <Button
@@ -1616,7 +1617,7 @@ const JobDetail = () => {
                             className="w-full bg-green-600 hover:bg-green-700 text-sm md:text-base rounded-xl"
                           >
                             <Star className="w-4 h-4 mr-2" />
-                            Завершить работу
+                            {t("ui.zavershit_rabotu")}
                           </Button>
                         </div>
                       </div>
@@ -1625,13 +1626,13 @@ const JobDetail = () => {
                     {job.status === 'done' && (
                       <div className={`p-3 md:p-4 rounded-lg text-center ${isDoneConfirmed ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
                         <Star className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mx-auto mb-2" />
-                        <h4 className={`font-medium mb-1 text-sm md:text-base ${isDoneConfirmed ? 'text-emerald-900' : 'text-amber-900'}`}>{isDoneConfirmed ? 'Заказ завершён' : 'Работа завершена'}</h4>
+                        <h4 className={`font-medium mb-1 text-sm md:text-base ${isDoneConfirmed ? 'text-emerald-900' : 'text-amber-900'}`}>{isDoneConfirmed ? t("ui.zakaz_zavershen") : t("ui.rabota_zavershena")}</h4>
                         <p className={`text-xs md:text-sm ${isDoneConfirmed ? 'text-emerald-700' : 'text-amber-700'}`}>
                           {isDoneConfirmed
                             ? hasClientRatedAssignedPro
-                              ? 'Заказчик уже оставил отзыв. Этот заказ полностью закрыт.'
-                              : 'Заказ подтверждён. Как только заказчик оставит отзыв, заказ будет полностью закрыт.'
-                            : 'Заказ ожидает подтверждения от заказчика.'}
+                              ? t("ui.zakazchik_uzhe_ostavil_otzyv")
+                              : t("ui.zakaz_podtverzhden_kak_tolko")
+                            : t("ui.zakaz_ozhidaet_podtverzhdeniia_ot")}
                         </p>
                       </div>
                     )}
@@ -1639,9 +1640,9 @@ const JobDetail = () => {
                     {isCancelled && (
                       <div className="p-3 md:p-4 rounded-lg text-center bg-red-50 border border-red-200">
                         <XCircle className="w-6 h-6 md:w-8 md:h-8 text-red-600 mx-auto mb-2" />
-                        <h4 className="font-medium mb-1 text-sm md:text-base text-red-900">Работа по заказу остановлена</h4>
+                        <h4 className="font-medium mb-1 text-sm md:text-base text-red-900">{t("ui.rabota_po_zakazu_ostanovlena")}</h4>
                         <p className="text-xs md:text-sm text-red-700">
-                          Заказ отменён. Продолжать выполнение и ожидать подтверждения больше не нужно.
+                          {t("ui.zakaz_otmenen_prodolzhat_vypolnenie")}
                         </p>
                       </div>
                     )}

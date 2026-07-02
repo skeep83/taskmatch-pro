@@ -21,6 +21,7 @@ import {
   Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface Provider {
   id: string;
@@ -51,6 +52,7 @@ interface Provider {
 }
 
 export const HallOfFame: React.FC = () => {
+  const { t } = useEnhancedI18n();
   const { isMobile } = useDeviceDetection();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -62,21 +64,21 @@ export const HallOfFame: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const categories = [
-    { value: 'all', label: 'Все категории' },
-    { value: 'plumbing', label: 'Сантехника' },
-    { value: 'electric', label: 'Электрика' },
-    { value: 'cleaning', label: 'Уборка' },
-    { value: 'appliance', label: 'Бытовая техника' },
-    { value: 'painting', label: 'Покраска' },
-    { value: 'moving', label: 'Переезды' },
+    { value: 'all', label: t("feed.category.all") },
+    { value: 'plumbing', label: t("landing.cat_plumbing") },
+    { value: 'electric', label: t("landing.cat_electric") },
+    { value: 'cleaning', label: t("landing.cat_cleaning") },
+    { value: 'appliance', label: t("landing.cat_appliance") },
+    { value: 'painting', label: t("landing.cat_painting") },
+    { value: 'moving', label: t("landing.cat_moving") },
   ];
 
   const sortOptions = [
-    { value: 'rating', label: 'По рейтингу' },
-    { value: 'reviews', label: 'По отзывам' },
-    { value: 'price_low', label: 'Цена: низкая' },
-    { value: 'price_high', label: 'Цена: высокая' },
-    { value: 'response_time', label: 'Время отклика' },
+    { value: 'rating', label: t("ui.po_reitingu") },
+    { value: 'reviews', label: t("ui.po_otzyvam") },
+    { value: 'price_low', label: t("ui.cena_nizkaia") },
+    { value: 'price_high', label: t("ui.cena_vysokaia") },
+    { value: 'response_time', label: t("ui.vremia_otklika") },
   ];
 
   useEffect(() => {
@@ -108,20 +110,20 @@ export const HallOfFame: React.FC = () => {
           category: 'plumbing',
           location: 'Кишинев',
           verificationLevel: 'premium',
-          badges: ['100% срок', '5★ ×10 подряд', 'Эксперт года'],
+          badges: [t("ui.100_srok"), t("ui.5_10_podriad"), t("ui.ekspert_goda")],
           portfolioSamples: [
             {
               id: '1',
               beforeImage: '/api/placeholder/300/200',
               afterImage: '/api/placeholder/300/200',
-              title: 'Замена сантехники в ванной',
-              description: 'Полная замена труб и установка нового смесителя'
+              title: t("ui.zamena_santehniki_v_vannoi"),
+              description: t("ui.polnaia_zamena_trub_i")
             },
             {
               id: '2',
               beforeImage: '/api/placeholder/300/200',
-              title: 'Устранение протечки',
-              description: 'Быстрое устранение аварийной протечки'
+              title: t("ui.ustranenie_protechki"),
+              description: t("ui.bystroe_ustranenie_avariinoi_protechki")
             }
           ],
           priceRange: { min: 200, max: 800, currency: 'MDL' },
@@ -139,14 +141,14 @@ export const HallOfFame: React.FC = () => {
           category: 'cleaning',
           location: 'Бельцы',
           verificationLevel: 'verified',
-          badges: ['Чистота+', 'Отклик'],
+          badges: [t("ui.chistota"), t("ui.otklik")],
           portfolioSamples: [
             {
               id: '1',
               beforeImage: '/api/placeholder/300/200',
               afterImage: '/api/placeholder/300/200',
-              title: 'Генеральная уборка офиса',
-              description: 'Уборка офиса площадью 200 кв.м'
+              title: t("ui.generalnaia_uborka_ofisa"),
+              description: t("ui.uborka_ofisa_ploschadiu_200")
             }
           ],
           priceRange: { min: 150, max: 500, currency: 'MDL' },
@@ -216,7 +218,7 @@ export const HallOfFame: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Загрузка зала славы...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t("ui.zagruzka_zala_slavy")}</p>
         </div>
       </div>
     );
@@ -233,10 +235,10 @@ export const HallOfFame: React.FC = () => {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Исполнители с отзывами
+            {t("ui.ispolniteli_s_otzyvami")}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400">
-            Сравните профили, отзывы и условия перед созданием заказа
+            {t("ui.sravnite_profili_otzyvy_i")}
           </p>
         </div>
 
@@ -246,7 +248,7 @@ export const HallOfFame: React.FC = () => {
             <div className="relative">
               <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
-                placeholder="Поиск по профилям..."
+                placeholder={t("ui.poisk_po_profiliam")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -255,7 +257,7 @@ export const HallOfFame: React.FC = () => {
 
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Категория" />
+                <SelectValue placeholder={t("job.new.category")} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map(category => (
@@ -268,7 +270,7 @@ export const HallOfFame: React.FC = () => {
 
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
-                <SelectValue placeholder="Сортировка" />
+                <SelectValue placeholder={t("ui.sortirovka")} />
               </SelectTrigger>
               <SelectContent>
                 {sortOptions.map(option => (
@@ -281,7 +283,7 @@ export const HallOfFame: React.FC = () => {
 
             <Button variant="outline" className="gap-2">
               <Filter size={16} />
-              Фильтры
+              {t("ui.filtry")}
             </Button>
           </div>
         </div>
@@ -374,7 +376,7 @@ export const HallOfFame: React.FC = () => {
                         />
                         {sample.afterImage && (
                           <div className="absolute inset-0 bg-black/80 opacity-0 group-hover/sample:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                            <span className="text-white text-xs font-medium">До/После</span>
+                            <span className="text-white text-xs font-medium">{t("ui.do_posle")}</span>
                           </div>
                         )}
                       </div>
@@ -392,14 +394,14 @@ export const HallOfFame: React.FC = () => {
                   {provider.guaranteeOffered && (
                     <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
                       <Shield size={12} />
-                      <span>Гарантия</span>
+                      <span>{t("ui.garantiia")}</span>
                     </div>
                   )}
                 </div>
 
                 <Button size="sm" className="gap-1">
                   <Eye size={14} />
-                  Профиль
+                  {t("nav.profile_tab")}
                 </Button>
               </div>
             </div>
@@ -411,10 +413,10 @@ export const HallOfFame: React.FC = () => {
           <div className="text-center py-12">
             <Trophy size={48} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-              Профили не найдены
+              {t("ui.profili_ne_naideny")}
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить фильтры поиска
+              {t("catalog.try_filters")}
             </p>
           </div>
         )}

@@ -69,13 +69,13 @@ const JobNew = () => {
       const location = await getCurrentResolvedLocation();
       applyResolvedLocation(location);
       toast({
-        title: "Местоположение определено",
-        description: location.publicLabel || "Будем искать специалистов рядом с вами",
+        title: t("ui.mestopolozhenie_opredeleno"),
+        description: location.publicLabel || t("ui.budem_iskat_specialistov_riadom"),
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Не удалось определить местоположение";
+      const message = error instanceof Error ? error.message : t("ui.ne_udalos_opredelit_mestopolozhenie");
       setLocationError(message);
-      toast({ title: "Ошибка геолокации", description: message, variant: "destructive" });
+      toast({ title: t("ui.oshibka_geolokacii"), description: message, variant: "destructive" });
     } finally {
       setLocationLoading(false);
     }
@@ -88,13 +88,13 @@ const JobNew = () => {
       const location = await geocodeAddress(locationQuery);
       applyResolvedLocation(location);
       toast({
-        title: "Адрес подтверждён",
-        description: location.publicLabel || "Локация готова для поиска nearby-исполнителей",
+        title: t("ui.adres_podtverzhden"),
+        description: location.publicLabel || t("ui.lokaciia_gotova_dlia_poiska"),
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Не удалось распознать адрес";
+      const message = error instanceof Error ? error.message : t("ui.ne_udalos_raspoznat_adres");
       setLocationError(message);
-      toast({ title: "Не удалось определить адрес", description: message, variant: "destructive" });
+      toast({ title: t("ui.ne_udalos_opredelit_adres"), description: message, variant: "destructive" });
     } finally {
       setLocationLoading(false);
     }
@@ -118,8 +118,8 @@ const JobNew = () => {
 
     if (!resolvedLocation) {
       toast({
-        title: "Нужна геолокация",
-        description: "Укажите адрес или используйте текущее местоположение, чтобы платформа нашла специалистов рядом.",
+        title: t("ui.nuzhna_geolokaciia"),
+        description: t("ui.ukazhite_adres_ili_ispolzuite"),
         variant: "destructive"
       });
       return;
@@ -127,8 +127,8 @@ const JobNew = () => {
 
     if ((budget_min > 0 || budget_max > 0) && budget_max > 0 && budget_min > budget_max) {
       toast({
-        title: "Проверьте бюджет",
-        description: "Максимальный бюджет не может быть меньше минимального.",
+        title: t("ui.proverte_biudzhet"),
+        description: t("ui.maksimalnyi_biudzhet_ne_mozhet"),
         variant: "destructive"
       });
       return;
@@ -138,7 +138,7 @@ const JobNew = () => {
       const { data: s } = await supabase.auth.getSession();
       const userId = s.session?.user?.id;
       if (!userId) {
-        toast({ title: "Требуется вход", description: "Пожалуйста, войдите" , variant: "destructive"});
+        toast({ title: t("messages.login_required"), description: t("messages.please_login") , variant: "destructive"});
         navigate("/auth");
         return;
       }
@@ -261,8 +261,8 @@ const JobNew = () => {
     } catch (err) {
       console.error(err);
       toast({
-        title: "Ошибка",
-        description: err instanceof Error ? err.message : "Не удалось создать заказ",
+        title: t("notifications.error"),
+        description: err instanceof Error ? err.message : t("job.new.error.create_failed"),
         variant: "destructive"
       });
     } finally {
@@ -307,7 +307,7 @@ const JobNew = () => {
 
     if (skippedCount > 0) {
       toast({
-        title: "Лимит файлов достигнут",
+        title: t("ui.limit_failov_dostignut"),
         description: `Можно прикрепить не более ${MAX_MEDIA_FILES} фото/видео к одному заказу.`,
       });
     }
@@ -321,7 +321,7 @@ const JobNew = () => {
   const openMediaPicker = (accept: string, capture?: 'environment') => {
     if (uploadedFiles.length >= MAX_MEDIA_FILES) {
       toast({
-        title: "Лимит файлов достигнут",
+        title: t("ui.limit_failov_dostignut"),
         description: `Удалите лишние вложения, чтобы добавить новые. Максимум: ${MAX_MEDIA_FILES}.`,
       });
       return;
@@ -421,11 +421,11 @@ const JobNew = () => {
                   </div>
 
                   <div className="bg-neo rounded-2xl p-6 neo-8">
-                    <label className="block text-sm font-medium mb-3 text-[#374151]">Приоритет</label>
+                    <label className="block text-sm font-medium mb-3 text-[#374151]">{t("job.new.priority")}</label>
                     <select name="urgency" className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]">
-                      <option value="normal">Обычный</option>
-                      <option value="urgent">Срочно (+30%)</option>
-                      <option value="same_day">В тот же день (+50%)</option>
+                      <option value="normal">{t("dash.client.urg_normal")}</option>
+                      <option value="urgent">{t("job.new.priority_urgent")}</option>
+                      <option value="same_day">{t("job.new.priority_same_day")}</option>
                     </select>
                   </div>
                 </div>
@@ -436,7 +436,7 @@ const JobNew = () => {
                     name="description"
                     className="w-full bg-neo border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                     rows={4}
-                    placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
+                    placeholder={t("job.new.description_placeholder")}
                     required
                   />
                   <p className="text-xs text-[#6B7280] mt-2">
@@ -458,7 +458,7 @@ const JobNew = () => {
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
                           <Euro className="w-4 h-4 text-green-500" />
-                          Бюджет от
+                          {t("job.new.budget_from")}
                         </label>
                         <input
                           name="budget_min"
@@ -468,7 +468,7 @@ const JobNew = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3 text-[#374151]">до</label>
+                        <label className="block text-sm font-medium mb-3 text-[#374151]">{t("dash.pro.to")}</label>
                         <input
                           name="budget_max"
                           type="number"
@@ -484,7 +484,7 @@ const JobNew = () => {
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
                           <Clock className="w-4 h-4 text-blue-500" />
-                          Дата
+                          {t("dash.client.col_date")}
                         </label>
                         <input
                           name="date"
@@ -493,7 +493,7 @@ const JobNew = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3 text-[#374151]">Время</label>
+                        <label className="block text-sm font-medium mb-3 text-[#374151]">{t("job.new.time")}</label>
                         <input
                           name="time"
                           type="time"
@@ -509,13 +509,13 @@ const JobNew = () => {
               <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
                   <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">3</span>
-                  Геолокация заказа
+                  {t("ui.geolokaciia_zakaza")}
                 </h2>
 
                 <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-6">
                   <div className="bg-neo rounded-2xl p-6 neo-8 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-3 text-[#374151]">Адрес или район</label>
+                      <label className="block text-sm font-medium mb-3 text-[#374151]">{t("ui.adres_ili_raion")}</label>
                       <div className="flex gap-3">
                         <input
                           value={locationQuery}
@@ -523,7 +523,7 @@ const JobNew = () => {
                             setLocationQuery(e.target.value);
                             setLocationError(null);
                           }}
-                          placeholder="Например: Кишинёв, Буюканы, ул. ..."
+                          placeholder={t("ui.naprimer_kishinev_buiukany_ul")}
                           className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                         />
                         <button
@@ -533,7 +533,7 @@ const JobNew = () => {
                           className="shrink-0 bg-primary text-white hover:bg-primary/90 px-5 py-3 rounded-xl font-semibold transition-colors disabled:opacity-60 inline-flex items-center gap-2"
                         >
                           {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                          Уточнить
+                          {t("ui.utochnit")}
                         </button>
                       </div>
                     </div>
@@ -545,18 +545,18 @@ const JobNew = () => {
                       className="w-full bg-neo text-[#374151] hover:bg-[#DDE1E7] px-5 py-4 rounded-xl font-semibold transition-colors neo-8 inline-flex items-center justify-center gap-2 disabled:opacity-60"
                     >
                       {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4 text-primary" />}
-                      Использовать моё местоположение
+                      {t("ui.ispolzovat_moe_mestopolozhenie")}
                     </button>
 
                     <p className="text-sm text-[#6B7280]">
-                      Мы используем локацию, чтобы сначала показать заказ специалистам поблизости и потом считать расстояние до заказа.
+                      {t("ui.my_ispolzuem_lokaciiu_chtoby")}
                     </p>
                   </div>
 
                   <div className="bg-neo rounded-2xl p-6 neo-8 space-y-3">
                     <div className="flex items-center gap-2 text-[#374151] font-semibold">
                       <MapPin className="w-5 h-5 text-primary" />
-                      Статус геолокации
+                      {t("ui.status_geolokacii")}
                     </div>
 
                     {resolvedLocation ? (
@@ -564,22 +564,22 @@ const JobNew = () => {
                         <div className="flex items-start gap-2 text-green-700 bg-green-50 rounded-xl px-4 py-3">
                           <CheckCircle className="w-5 h-5 mt-0.5" />
                           <div>
-                            <div className="font-medium">Локация готова</div>
+                            <div className="font-medium">{t("ui.lokaciia_gotova")}</div>
                             <div className="text-sm">{resolvedLocation.publicLabel || resolvedLocation.address}</div>
                           </div>
                         </div>
                         <div className="text-sm text-[#6B7280] space-y-1">
-                          <div><span className="font-medium text-[#374151]">Адрес:</span> {resolvedLocation.address}</div>
-                          <div><span className="font-medium text-[#374151]">Координаты:</span> {resolvedLocation.latitude.toFixed(5)}, {resolvedLocation.longitude.toFixed(5)}</div>
-                          <div><span className="font-medium text-[#374151]">Источник:</span> {resolvedLocation.source === 'device_gps' ? 'Геолокация устройства' : resolvedLocation.source === 'ip_geolocate' ? 'Примерная локация по IP (HTTP fallback)' : 'Ручной адрес'}</div>
+                          <div><span className="font-medium text-[#374151]">{t("ui.adres_2")}</span> {resolvedLocation.address}</div>
+                          <div><span className="font-medium text-[#374151]">{t("ui.koordinaty")}</span> {resolvedLocation.latitude.toFixed(5)}, {resolvedLocation.longitude.toFixed(5)}</div>
+                          <div><span className="font-medium text-[#374151]">{t("ui.istochnik")}</span> {resolvedLocation.source === 'device_gps' ? t("ui.geolokaciia_ustroistva") : resolvedLocation.source === 'ip_geolocate' ? t("ui.primernaia_lokaciia_po_ip") : t("ui.ruchnoi_adres")}</div>
                           {resolvedLocation.source === 'ip_geolocate' && (
-                            <div className="text-amber-700">Точность приблизительная: используйте HTTPS или уточните адрес вручную для более точного подбора специалистов.</div>
+                            <div className="text-amber-700">{t("ui.tochnost_priblizitelnaia_ispolzuite_http")}</div>
                           )}
                         </div>
                       </div>
                     ) : (
                       <div className="text-sm text-[#6B7280] bg-amber-50 rounded-xl px-4 py-3">
-                        До публикации заказа укажите адрес или используйте текущее местоположение.
+                        {t("ui.do_publikacii_zakaza_ukazhite")}
                       </div>
                     )}
 
@@ -608,7 +608,7 @@ const JobNew = () => {
                     onDrop={handleDrop}
                   >
                     <AnimatedIcon icon={Camera} className="w-12 h-12 text-primary mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2 text-[#374151]">Фото и видео</h3>
+                    <h3 className="text-lg font-medium mb-2 text-[#374151]">{t("job.new.photos")}</h3>
                     <p className="text-[#6B7280] mb-4">
                       Перетащите до {MAX_MEDIA_FILES} фото/видео сюда или выберите файлы
                     </p>
@@ -629,7 +629,7 @@ const JobNew = () => {
                         className="bg-neo text-[#374151] hover:bg-[#DDE1E7] px-5 py-3 rounded-xl font-semibold transition-colors neo-8 inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Camera className="w-4 h-4 text-primary" />
-                        Фото
+                        {t("ui.foto")}
                       </button>
                       <button
                         type="button"
@@ -638,11 +638,11 @@ const JobNew = () => {
                         className="bg-neo text-[#374151] hover:bg-[#DDE1E7] px-5 py-3 rounded-xl font-semibold transition-colors neo-8 inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Upload className="w-4 h-4 text-primary" />
-                        Видео
+                        {t("ui.video")}
                       </button>
                       <label htmlFor="media-upload" className={`bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 inline-flex items-center gap-2 ${mediaLimitReached ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}>
                         <Upload className="w-4 h-4" />
-                        Выбрать любые файлы
+                        {t("ui.vybrat_liubye_faily")}
                       </label>
                     </div>
                     <p className="mt-4 text-sm text-[#6B7280]">
@@ -690,10 +690,10 @@ const JobNew = () => {
               {/* Submit */}
               <div className="flex justify-between items-center pt-8 border-t border-[#D1D5DB]">
                 <button type="button" className="bg-neo text-[#374151] hover:bg-[#D1D5DB] px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 hover:neo-inset-4" onClick={() => navigate(-1)}>
-                  Отмена
+                  {t("common.cancel")}
                 </button>
                 <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8" disabled={loading}>
-                  {loading ? 'Создаем заказ...' : 'Создать заказ'}
+                  {loading ? t("job.new.creating") : t("footer.create_job")}
                 </button>
               </div>
             </form>

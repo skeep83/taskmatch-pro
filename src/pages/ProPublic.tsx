@@ -1,4 +1,5 @@
 import { Seo } from "@/components/Seo";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { StarRating } from "@/components/ui/star-rating";
@@ -12,6 +13,7 @@ import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { supabase } from "@/integrations/supabase/client";
 
 const ProPublic = () => {
+  const { t } = useEnhancedI18n();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any | null>(null);
@@ -112,7 +114,7 @@ const ProPublic = () => {
             <div className="w-full h-40 cursor-zoom-in rounded-md overflow-hidden">
               <OptimizedImage
                 src={allMedia[0].file_url}
-                alt={item.title || 'Работа специалиста'}
+                alt={item.title || t("ui.rabota_specialista")}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 bucket="portfolio"
               />
@@ -121,7 +123,7 @@ const ProPublic = () => {
           <DialogContent className="max-w-4xl w-full p-2">
             <OptimizedImage
               src={allMedia[0].file_url}
-              alt={item.title || 'Работа специалиста'}
+              alt={item.title || t("ui.rabota_specialista")}
               className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
               bucket="portfolio"
             />
@@ -160,7 +162,7 @@ const ProPublic = () => {
           >
             <OptimizedImage
               src={allMedia[currentIndex]?.file_url}
-              alt={`${item.title || 'Работа специалиста'} - ${currentIndex + 1}`}
+              alt={`${item.title || t("ui.rabota_specialista")} - ${currentIndex + 1}`}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               bucket="portfolio"
             />
@@ -219,7 +221,7 @@ const ProPublic = () => {
             <div className="relative">
               <OptimizedImage
                 src={allMedia[modalIndex]?.file_url}
-                alt={`${item.title || 'Работа специалиста'} - ${modalIndex + 1}`}
+                alt={`${item.title || t("ui.rabota_specialista")} - ${modalIndex + 1}`}
                 className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
                 bucket="portfolio"
               />
@@ -285,7 +287,7 @@ const ProPublic = () => {
 
   if (!profile || !userProfile) return (
     <main className="container mx-auto py-12">
-      <section className="max-w-4xl mx-auto card-surface"><h1 className="text-xl">Загрузка…</h1></section>
+      <section className="max-w-4xl mx-auto card-surface"><h1 className="text-xl">{t("ui.zagruzka")}</h1></section>
     </main>
   );
 
@@ -317,7 +319,7 @@ const ProPublic = () => {
                   {kycStatus === 'approved' && (
                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 border border-emerald-200/50 dark:border-emerald-700/50 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.1)] dark:shadow-[inset_2px_2px_4px_rgba(255,255,255,0.1),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Профиль</span>
+                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">{t("nav.profile_tab")}</span>
                     </div>
                   )}
                 </div>
@@ -331,18 +333,18 @@ const ProPublic = () => {
                     count={rating.rating_count}
                   />
                 </div>
-                <p className="text-sm mt-2">Ставки: {profile.hourly_rate_cents ? `${formatPrice(profile.hourly_rate_cents)}/ч` : 'по договоренности'}{profile.fixed_price_cents ? ` • фикс. ${formatPrice(profile.fixed_price_cents)}` : ''}</p>
-                <p className="text-sm mt-4 whitespace-pre-wrap">{profile.bio || 'Описание отсутствует'}</p>
+                <p className="text-sm mt-2">Ставки: {profile.hourly_rate_cents ? `${formatPrice(profile.hourly_rate_cents)}/ч` : t("ui.po_dogovorennosti")}{profile.fixed_price_cents ? ` • фикс. ${formatPrice(profile.fixed_price_cents)}` : ''}</p>
+                <p className="text-sm mt-4 whitespace-pre-wrap">{profile.bio || t("ui.opisanie_otsutstvuet")}</p>
               </div>
             </div>
             <div className="shrink-0">
-              <Link to={`/job/new?${new URLSearchParams({ category_id: categories[0]?.id || '', pro_id: String(id) })}`} className="btn-hero !text-primary">Забронировать</Link>
+              <Link to={`/job/new?${new URLSearchParams({ category_id: categories[0]?.id || '', pro_id: String(id) })}`} className="btn-hero !text-primary">{t("ui.zabronirovat")}</Link>
             </div>
           </div>
 
           {portfolio.length > 0 && (
             <div className="mt-8">
-              <h2 className="text-lg font-medium mb-3">Портфолио</h2>
+              <h2 className="text-lg font-medium mb-3">{t("dash.pro.portfolio")}</h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {portfolio.map((item) => (
                   <figure key={item.id} className="border rounded-md overflow-hidden">

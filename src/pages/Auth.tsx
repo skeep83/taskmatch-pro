@@ -34,7 +34,7 @@ const Auth = () => {
     const desiredRole = roleValue;
 
     if (!email || !password) {
-      toast({ title: "Проверьте поля", description: "Введите email и пароль", variant: "destructive" });
+      toast({ title: t("auth.error.fields"), description: t("auth.error.email_password"), variant: "destructive" });
       return;
     }
 
@@ -64,7 +64,7 @@ const Auth = () => {
           // Redirect by role priority: admin -> pro -> business -> client
           const { data: roles2 } = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
           const roleList = (roles2 || []).map((r: any) => r.role);
-          toast({ title: "Успешный вход", description: `Добро пожаловать, ${email}` });
+          toast({ title: t("auth.success.welcome"), description: `Добро пожаловать, ${email}` });
           if (roleList.some((role: string) => ['admin', 'superadmin', 'ops', 'kyc', 'finance', 'dispute_manager', 'content', 'risk', 'city_manager', 'tender'].includes(role))) redirectAfterAuth("/admin");
           else if (roleList.includes("pro")) redirectAfterAuth("/dashboard/pro");
           else if (roleList.includes("business")) redirectAfterAuth("/dashboard/business");
@@ -90,7 +90,7 @@ const Auth = () => {
 
           localStorage.removeItem("desired_role");
           setPendingConfirmationEmail(null);
-          toast({ title: "Аккаунт создан", description: "Добро пожаловать!" });
+          toast({ title: t("auth.success.account_created"), description: t("dash.pro.welcome") });
           if (desiredRole === "pro") redirectAfterAuth("/dashboard/pro");
           else if (desiredRole === "business") redirectAfterAuth("/dashboard/business");
           else redirectAfterAuth("/dashboard/client");
@@ -104,7 +104,7 @@ const Auth = () => {
           if (error) throw error;
           if (data.session?.user?.id) {
             await supabase.from("user_roles").insert({ user_id: data.session.user.id, role: desiredRole });
-            toast({ title: "Аккаунт создан", description: "Роль назначена. Добро пожаловать!" });
+            toast({ title: t("auth.success.account_created"), description: t("auth.success.role_assigned") });
             if (desiredRole === "pro") redirectAfterAuth("/dashboard/pro");
             else if (desiredRole === "business") redirectAfterAuth("/dashboard/business");
             else redirectAfterAuth("/dashboard/client");
@@ -114,8 +114,8 @@ const Auth = () => {
             setMode("signin");
             setPasswordValue("");
             toast({
-              title: "Аккаунт создан",
-              description: "Подтвердите email по письму и затем войдите в аккаунт",
+              title: t("auth.success.account_created"),
+              description: t("ui.podtverdite_email_po_pismu"),
             });
           }
         }
@@ -124,24 +124,24 @@ const Auth = () => {
       console.error(err);
 
       // Better error handling for authentication
-      let errorMessage = err?.message || "Не удалось выполнить действие";
-      let errorTitle = "Ошибка";
+      let errorMessage = err?.message || t("auth.error.action_failed");
+      let errorTitle = t("notifications.error");
 
       if (err?.message?.includes("Invalid login credentials")) {
-        errorTitle = "Неверные данные";
-        errorMessage = "Проверьте правильность email и пароля";
+        errorTitle = t("ui.nevernye_dannye");
+        errorMessage = t("ui.proverte_pravilnost_email_i");
       } else if (err?.message?.includes("Email not confirmed")) {
-        errorTitle = "Email не подтвержден";
-        errorMessage = "Проверьте почту и подтвердите регистрацию";
+        errorTitle = t("ui.email_ne_podtverzhden");
+        errorMessage = t("ui.proverte_pochtu_i_podtverdite");
       } else if (err?.message?.includes("User already registered")) {
-        errorTitle = "Пользователь уже зарегистрирован";
-        errorMessage = "Этот email уже используется. Попробуйте войти в систему";
+        errorTitle = t("ui.polzovatel_uzhe_zaregistrirovan");
+        errorMessage = t("ui.etot_email_uzhe_ispolzuetsia");
       } else if (err?.message?.includes("Password should be at least")) {
-        errorTitle = "Слабый пароль";
-        errorMessage = "Пароль должен содержать минимум 6 символов";
+        errorTitle = t("ui.slabyi_parol");
+        errorMessage = t("ui.parol_dolzhen_soderzhat_minimum");
       } else if (err?.message?.includes("email rate limit exceeded") || err?.code === "over_email_send_rate_limit") {
-        errorTitle = "Лимит писем исчерпан";
-        errorMessage = "Регистрация временно упёрлась в лимит отправки писем. Попробуйте ещё раз чуть позже.";
+        errorTitle = t("ui.limit_pisem_ischerpan");
+        errorMessage = t("ui.registraciia_vremenno_uperlas_v");
       }
 
       toast({
@@ -165,10 +165,10 @@ const Auth = () => {
         options: { emailRedirectTo: redirectUrl },
       });
       if (error) throw error;
-      toast({ title: 'Письмо отправлено повторно', description: `Проверьте почту: ${pendingConfirmationEmail}` });
+      toast({ title: t("ui.pismo_otpravleno_povtorno"), description: `Проверьте почту: ${pendingConfirmationEmail}` });
     } catch (err: any) {
       console.error(err);
-      toast({ title: 'Не удалось отправить письмо', description: err?.message || 'Попробуйте ещё раз позже', variant: 'destructive' });
+      toast({ title: t("ui.ne_udalos_otpravit_pismo"), description: err?.message || t("ui.poprobuite_esche_raz_pozzhe"), variant: 'destructive' });
     }
   };
 
@@ -198,12 +198,12 @@ const Auth = () => {
                 />
               </div>
               <h1 className="text-3xl font-display font-bold mb-2 text-gradient">
-                {mode === 'signin' ? 'Добро пожаловать!' : 'Создать аккаунт'}
+                {mode === 'signin' ? t("dash.pro.welcome") : t("auth.sign_up_btn")}
               </h1>
               <p className="text-muted-foreground">
                 {mode === 'signin'
-                  ? 'Войдите в свой аккаунт ServiceHub'
-                  : 'Присоединяйтесь к ServiceHub сегодня'
+                  ? t("auth.subtitle_sign_in")
+                  : t("auth.subtitle_sign_up")
                 }
               </p>
             </div>
@@ -211,9 +211,9 @@ const Auth = () => {
             <form key={`${mode}-${pendingConfirmationEmail ?? 'none'}`} className="space-y-6" onSubmit={onSubmit}>
               {pendingConfirmationEmail && mode === 'signin' && (
                 <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm space-y-3">
-                  <div className="font-medium text-foreground">Аккаунт создан. Подтвердите email</div>
+                  <div className="font-medium text-foreground">{t("ui.akkaunt_sozdan_podtverdite_email")}</div>
                   <div className="text-muted-foreground break-all">{pendingConfirmationEmail}</div>
-                  <div className="text-muted-foreground">После подтверждения вернитесь сюда и войдите в аккаунт.</div>
+                  <div className="text-muted-foreground">{t("ui.posle_podtverzhdeniia_vernites_siuda")}</div>
                   <Button type="button" variant="outline" className="w-full" onClick={resendConfirmation}>
                     Отправить письмо ещё раз
                   </Button>
@@ -324,9 +324,9 @@ const Auth = () => {
             <div className="mt-8 pt-6 border-t border-border/30 text-center animate-fade-in" style={{ animationDelay: '500ms' }}>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Продолжая, вы соглашаетесь с нашими{' '}
-                <span className="text-primary hover:underline cursor-pointer">условиями использования</span>
+                <span className="text-primary hover:underline cursor-pointer">{t("auth.terms_link")}</span>
                 {' '}и{' '}
-                <span className="text-primary hover:underline cursor-pointer">политикой конфиденциальности</span>
+                <span className="text-primary hover:underline cursor-pointer">{t("auth.privacy_link")}</span>
               </p>
             </div>
           </GlassMorphism>

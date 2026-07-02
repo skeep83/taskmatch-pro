@@ -43,7 +43,7 @@ const TendersList = () => {
         setItems(data || []);
       } catch (error) {
         console.error('Error loading tenders:', error);
-        toast({ title: "Ошибка загрузки тендеров", variant: "destructive" });
+        toast({ title: t("ui.oshibka_zagruzki_tenderov"), variant: "destructive" });
       } finally {
         setLoading(false);
       }
@@ -55,7 +55,7 @@ const TendersList = () => {
     const end = new Date(windowTo);
     const diff = end.getTime() - now.getTime();
 
-    if (diff <= 0) return "Завершен";
+    if (diff <= 0) return t("biz.tenders.status_done");
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -75,16 +75,16 @@ const TendersList = () => {
 
   return (
     <main className="min-h-screen">
-      <Seo title={`${t('app.name')} — Бизнес-заказы`} description="Корпоративные заказы и закупки для компаний" canonical="/tenders" />
+      <Seo title={`${t('app.name')} — Бизнес-заказы`} description={t("ui.korporativnye_zakazy_i_zakupki")} canonical="/tenders" />
 
       {/* Header Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Бизнес-заказы
+            {t("ui.biznes_zakazy")}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Отдельный контур для корпоративных заказов и крупных закупок
+            {t("ui.otdelnyi_kontur_dlia_korporativnyh")}
           </p>
 
           <div className="flex flex-wrap gap-6 justify-center mt-8">
@@ -97,7 +97,7 @@ const TendersList = () => {
               <div className="w-10 h-10 rounded-xl bg-neo neo-4 flex items-center justify-center">
                 <Gavel className="w-5 h-5 text-primary" />
               </div>
-              <span className="font-medium">Корпоративные закупки</span>
+              <span className="font-medium">{t("ui.korporativnye_zakupki")}</span>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -108,7 +108,7 @@ const TendersList = () => {
               <div className="w-10 h-10 rounded-xl bg-neo neo-4 flex items-center justify-center">
                 <Trophy className="w-5 h-5 text-primary" />
               </div>
-              <span className="font-medium">BAFO система</span>
+              <span className="font-medium">{t("ui.bafo_sistema")}</span>
             </motion.div>
           </div>
         </div>
@@ -120,7 +120,7 @@ const TendersList = () => {
               <TabsList className="grid w-full grid-cols-4 bg-transparent">
                 <TabsTrigger value="active" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Gavel className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Активные</span>
+                  <span className="hidden sm:inline">{t("ui.aktivnye")}</span>
                   {activeTab === "active" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -132,7 +132,7 @@ const TendersList = () => {
                 </TabsTrigger>
                 <TabsTrigger value="completed" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Trophy className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Завершенные</span>
+                  <span className="hidden sm:inline">{t("ui.zavershennye")}</span>
                   {activeTab === "completed" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -144,7 +144,7 @@ const TendersList = () => {
                 </TabsTrigger>
                 <TabsTrigger value="my-bids" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Users className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Мои предложения</span>
+                  <span className="hidden sm:inline">{t("ui.moi_predlozheniia")}</span>
                   {activeTab === "my-bids" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -156,7 +156,7 @@ const TendersList = () => {
                 </TabsTrigger>
                 <TabsTrigger value="stats" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Euro className="h-5 w-5 text-black" />
-                  <span className="hidden sm:inline">Статистика</span>
+                  <span className="hidden sm:inline">{t("dash.client.stats")}</span>
                   {activeTab === "stats" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -183,7 +183,7 @@ const TendersList = () => {
                     <NeumorphicIcon icon={Gavel} size={48} variant="behance" />
                     <div>
                       <div className="text-2xl font-bold text-primary">{items.length}</div>
-                      <div className="text-sm text-muted-foreground">Открытых бизнес-заказов</div>
+                      <div className="text-sm text-muted-foreground">{t("ui.otkrytyh_biznes_zakazov")}</div>
                     </div>
                   </div>
                 </motion.div>
@@ -200,7 +200,7 @@ const TendersList = () => {
                       <div className="text-2xl font-bold text-primary">
                         {items.reduce((sum, tender) => sum + (tender.bids?.length || 0), 0)}
                       </div>
-                      <div className="text-sm text-muted-foreground">Всего предложений</div>
+                      <div className="text-sm text-muted-foreground">{t("ui.vsego_predlozhenii")}</div>
                     </div>
                   </div>
                 </motion.div>
@@ -219,7 +219,7 @@ const TendersList = () => {
                           items.reduce((sum, tender) => sum + (tender.budget_max_cents || 0), 0)
                         )}
                       </div>
-                      <div className="text-sm text-muted-foreground">Общий бюджет</div>
+                      <div className="text-sm text-muted-foreground">{t("ui.obschii_biudzhet")}</div>
                     </div>
                   </div>
                 </motion.div>
@@ -233,8 +233,8 @@ const TendersList = () => {
                   <div className="flex items-center gap-4">
                     <NeumorphicIcon icon={Timer} size={48} variant="behance" />
                     <div>
-                      <div className="text-2xl font-bold text-primary">24ч</div>
-                      <div className="text-sm text-muted-foreground">Среднее время</div>
+                      <div className="text-2xl font-bold text-primary">{t("ui.24ch")}</div>
+                      <div className="text-sm text-muted-foreground">{t("ui.srednee_vremia")}</div>
                     </div>
                   </div>
                 </motion.div>
@@ -242,7 +242,7 @@ const TendersList = () => {
 
               {/* View Mode Toggle */}
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-display font-bold">Активные бизнес-заказы</h2>
+                <h2 className="text-2xl font-display font-bold">{t("ui.aktivnye_biznes_zakazy")}</h2>
                 <div className="flex gap-2 p-1 rounded-xl bg-neo neo-inset-4">
                   <button
                     onClick={() => setViewMode("grid")}
@@ -273,7 +273,7 @@ const TendersList = () => {
                   <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-neo neo-8 flex items-center justify-center">
                     <RefreshCw className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                  <p className="text-muted-foreground">Загружаем тендеры...</p>
+                  <p className="text-muted-foreground">{t("ui.zagruzhaem_tendery")}</p>
                 </div>
               ) : (
                 <div className={viewMode === "grid" ? "grid lg:grid-cols-2 gap-8" : "space-y-6"}>
@@ -282,8 +282,8 @@ const TendersList = () => {
                       <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-neo neo-8 flex items-center justify-center">
                         <Trophy className="h-10 w-10 text-muted-foreground" />
                       </div>
-                      <h2 className="text-xl font-semibold mb-2">Нет открытых тендеров</h2>
-                      <p className="text-muted-foreground">Новые тендеры появятся в ближайшее время</p>
+                      <h2 className="text-xl font-semibold mb-2">{t("ui.net_otkrytyh_tenderov")}</h2>
+                      <p className="text-muted-foreground">{t("ui.novye_tendery_poiaviatsia_v")}</p>
                     </div>
                   ) : (
                     items.map((tender, index) => (
@@ -300,7 +300,7 @@ const TendersList = () => {
                               variant="outline"
                               className="mb-3 bg-neo neo-4 border-0 text-primary"
                             >
-                              {tender.categories?.label_ru || "Тендер"}
+                              {tender.categories?.label_ru || t("dash.pro.tender_fallback")}
                             </Badge>
                             <h3 className="font-display font-bold text-xl mb-2">
                               {tender.title || `Тендер #${String(tender.id).slice(0, 8)}`}
@@ -311,7 +311,7 @@ const TendersList = () => {
                               variant="default"
                               className="bg-green-500/20 text-green-700 border-0 neo-4"
                             >
-                              {tender.status === 'open' ? 'Открыт' : tender.status}
+                              {tender.status === 'open' ? t("biz.tenders.status_open") : tender.status}
                             </Badge>
                           </div>
                         </div>
@@ -368,7 +368,7 @@ const TendersList = () => {
                               to={`/tenders/${tender.id}`}
                               className="px-6 py-3 rounded-xl bg-primary neo-4 hover:neo-2 transition-all duration-300 text-white font-medium"
                             >
-                              Откликнуться
+                              {t("dash.pro.respond")}
                             </Link>
                           </div>
                         </div>
@@ -385,8 +385,8 @@ const TendersList = () => {
                 <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-neo neo-8 flex items-center justify-center">
                   <Trophy className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Завершенные тендеры</h2>
-                <p className="text-muted-foreground">Здесь будут отображаться завершенные тендеры</p>
+                <h2 className="text-xl font-semibold mb-2">{t("ui.zavershennye_tendery")}</h2>
+                <p className="text-muted-foreground">{t("ui.zdes_budut_otobrazhatsia_zavershennye")}</p>
               </div>
             </TabsContent>
 
@@ -395,8 +395,8 @@ const TendersList = () => {
                 <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-neo neo-8 flex items-center justify-center">
                   <Users className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Мои предложения</h2>
-                <p className="text-muted-foreground">Здесь будут отображаться ваши предложения по бизнес-заказам</p>
+                <h2 className="text-xl font-semibold mb-2">{t("ui.moi_predlozheniia")}</h2>
+                <p className="text-muted-foreground">{t("ui.zdes_budut_otobrazhatsia_vashi")}</p>
               </div>
             </TabsContent>
 
@@ -405,8 +405,8 @@ const TendersList = () => {
                 <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-neo neo-8 flex items-center justify-center">
                   <Euro className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Статистика</h2>
-                <p className="text-muted-foreground">Здесь будет отображаться статистика по тендерам</p>
+                <h2 className="text-xl font-semibold mb-2">{t("dash.client.stats")}</h2>
+                <p className="text-muted-foreground">{t("ui.zdes_budet_otobrazhatsia_statistika")}</p>
               </div>
             </TabsContent>
           </Tabs>

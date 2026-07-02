@@ -26,17 +26,20 @@ import { BusinessJobs } from "@/components/business/BusinessJobs";
 import { BusinessInvoices } from "@/components/business/BusinessInvoices";
 import { BusinessAnalytics } from "@/components/business/BusinessAnalytics";
 import { BusinessTenders } from "@/components/business/BusinessTenders";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
-const tabItems = [
-  { id: 'overview', label: 'Обзор', icon: BarChart3 },
-  { id: 'company', label: 'Компания', icon: Building2 },
-  { id: 'jobs', label: 'Заказы', icon: Briefcase },
-  { id: 'tenders', label: 'Тендеры', icon: Gavel },
-  { id: 'invoices', label: 'Инвойсы', icon: FileText },
-  { id: 'analytics', label: 'Аналитика', icon: BarChart3 }
-];
+
 
 export default function MobileDashboardBusiness() {
+  const { t } = useEnhancedI18n();
+  const tabItems = [
+    { id: 'overview', label: t("dash.client.tab_overview"), icon: BarChart3 },
+    { id: 'company', label: t("dash.biz.company"), icon: Building2 },
+    { id: 'jobs', label: t("dash.client.tab_jobs"), icon: Briefcase },
+    { id: 'tenders', label: t("footer.tenders"), icon: Gavel },
+    { id: 'invoices', label: t("biz.invoices.title"), icon: FileText },
+    { id: 'analytics', label: t("dash.biz.analytics"), icon: BarChart3 }
+  ];
   const navigate = useNavigate();
   const { toast } = useToast();
   const { safeAreaInsets } = useMobile();
@@ -61,8 +64,8 @@ export default function MobileDashboardBusiness() {
       setLoading(false);
     } catch (error: any) {
       toast({ 
-        title: "Ошибка", 
-        description: error.message || "Ошибка аутентификации", 
+        title: t("notifications.error"), 
+        description: error.message || t("dash.biz.auth_error"), 
         variant: "destructive" 
       });
       setLoading(false);
@@ -73,7 +76,7 @@ export default function MobileDashboardBusiness() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <MobileCard className="text-center">
-          <h1 className="text-xl font-bold mb-4">Загружаем бизнес-панель...</h1>
+          <h1 className="text-xl font-bold mb-4">{t("dash.biz.loading")}</h1>
           <div className="animate-spin">⏳</div>
         </MobileCard>
       </div>
@@ -86,7 +89,7 @@ export default function MobileDashboardBusiness() {
       <div className="grid grid-cols-3 gap-3">
         <MobileCard className="text-center">
           <div className="space-y-2">
-            <p className="text-xs text-gray-600">Расходы</p>
+            <p className="text-xs text-gray-600">{t("ui.rashody")}</p>
             <p className="text-lg font-bold text-black">$0.00</p>
             <NeumorphicIcon icon={DollarSign} size={32} variant="behance" />
           </div>
@@ -94,7 +97,7 @@ export default function MobileDashboardBusiness() {
         
         <MobileCard className="text-center">
           <div className="space-y-2">
-            <p className="text-xs text-gray-600">Сотрудники</p>
+            <p className="text-xs text-gray-600">{t("ui.sotrudniki")}</p>
             <p className="text-lg font-bold text-black">0</p>
             <NeumorphicIcon icon={Users} size={32} variant="behance" />
           </div>
@@ -102,7 +105,7 @@ export default function MobileDashboardBusiness() {
         
         <MobileCard className="text-center">
           <div className="space-y-2">
-            <p className="text-xs text-gray-600">Заказы</p>
+            <p className="text-xs text-gray-600">{t("dash.client.tab_jobs")}</p>
             <p className="text-lg font-bold text-black">0</p>
             <NeumorphicIcon icon={Briefcase} size={32} variant="behance" />
           </div>
@@ -120,7 +123,7 @@ export default function MobileDashboardBusiness() {
             <div className="w-10 h-10 mx-auto rounded-full bg-neo neo-4 flex items-center justify-center">
               <Plus className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-sm font-medium text-black">Создать заказ</p>
+            <p className="text-sm font-medium text-black">{t("footer.create_job")}</p>
           </div>
         </MobileCard>
 
@@ -133,14 +136,14 @@ export default function MobileDashboardBusiness() {
             <div className="w-10 h-10 mx-auto rounded-full bg-neo neo-4 flex items-center justify-center">
               <CreditCard className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-sm font-medium text-black">Инвойсы</p>
+            <p className="text-sm font-medium text-black">{t("biz.invoices.title")}</p>
           </div>
         </MobileCard>
       </div>
 
       {/* Welcome Message */}
       <MobileCard>
-        <h2 className="text-lg font-semibold mb-2 text-black">Добро пожаловать в ServiceHub Business!</h2>
+        <h2 className="text-lg font-semibold mb-2 text-black">{t("ui.dobro_pozhalovat_v_servicehub")}</h2>
         <p className="text-sm text-gray-600 mb-3">
           Управляйте заказами компании, контролируйте расходы и координируйте команду в одном месте.
         </p>
@@ -176,7 +179,7 @@ export default function MobileDashboardBusiness() {
     <RoleGuard requiredRole="business">
       <div className="min-h-screen bg-neo">
         <MobileHeader 
-          title="Бизнес-панель"
+          title={t("dash.biz.title")}
           showBack={false}
           showLogout={true}
           showNotifications={true}

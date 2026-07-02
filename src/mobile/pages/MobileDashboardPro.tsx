@@ -240,23 +240,23 @@ export default function MobileDashboardPro() {
     return [
       {
         value: 'client',
-        label: 'Клиент',
+        label: t("menu.role_client"),
         icon: User,
-        description: 'Заказы и услуги',
+        description: t("ui.zakazy_i_uslugi"),
         available: true
       },
       {
         value: 'pro',
-        label: 'Специалист',
+        label: t("menu.role_pro"),
         icon: Briefcase,
-        description: 'Мои услуги и заказы',
+        description: t("ui.moi_uslugi_i_zakazy"),
         available: true
       },
       {
         value: 'business',
-        label: 'Бизнес',
+        label: t("menu.role_business"),
         icon: Building2,
-        description: 'Компания и тендеры',
+        description: t("ui.kompaniia_i_tendery"),
         available: true
       }
     ];
@@ -269,20 +269,20 @@ export default function MobileDashboardPro() {
   };
 
   const tabItems = [
-    { id: "overview", label: "Обзор", icon: User },
-    { id: "jobs", label: "Заказы", icon: Briefcase },
-    { id: "portfolio", label: "Портфолио", icon: Star },
-    { id: "schedule", label: "График", icon: Calendar },
-    { id: "earnings", label: "Доходы", icon: DollarSign }
+    { id: "overview", label: t("dash.client.tab_overview"), icon: User },
+    { id: "jobs", label: t("dash.client.tab_jobs"), icon: Briefcase },
+    { id: "portfolio", label: t("dash.pro.portfolio"), icon: Star },
+    { id: "schedule", label: t("ui.grafik"), icon: Calendar },
+    { id: "earnings", label: t("ui.dohody"), icon: DollarSign }
   ];
 
   return (
     <RoleGuard requiredRole="pro">
-      <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Управляйте откликами, заказами и доходами" canonical="/dashboard/pro" />
+      <Seo title={`${t('app.name')} — Кабинет специалиста`} description={t("ui.upravliaite_otklikami_zakazami_i")} canonical="/dashboard/pro" />
 
       <div className="min-h-screen bg-neo">
         <MobileHeader
-          title="Кабинет специалиста"
+          title={t("dash.pro.title")}
           showBack={false}
           showLogout={true}
           showNotifications={true}
@@ -299,7 +299,7 @@ export default function MobileDashboardPro() {
           {/* Welcome Section */}
           <MobileCard className="text-center">
             <h1 className="text-2xl font-bold mb-2">
-              Добро пожаловать!
+              {t("dash.pro.welcome")}
             </h1>
             <p className="text-muted-foreground">
               {userProfile?.full_name ||
@@ -319,7 +319,7 @@ export default function MobileDashboardPro() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Всего заказов</p>
+                  <p className="text-sm text-muted-foreground">{t("biz.analytics.total_jobs")}</p>
                   <p className="text-2xl font-bold">{stats.totalJobs}</p>
                 </div>
                 <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
@@ -329,7 +329,7 @@ export default function MobileDashboardPro() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Активных</p>
+                  <p className="text-sm text-muted-foreground">{t("biz.analytics.active")}</p>
                   <p className="text-2xl font-bold">{stats.activeJobs}</p>
                 </div>
                 <NeumorphicIcon icon={Clock} size={48} variant="behance" />
@@ -339,7 +339,7 @@ export default function MobileDashboardPro() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Выполнено</p>
+                  <p className="text-sm text-muted-foreground">{t("dash.pro.completed")}</p>
                   <p className="text-2xl font-bold">{stats.completedJobs}</p>
                 </div>
                 <NeumorphicIcon icon={CheckCircle} size={48} variant="behance" />
@@ -349,7 +349,7 @@ export default function MobileDashboardPro() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">На балансе</p>
+                  <p className="text-sm text-muted-foreground">{t("ui.na_balanse")}</p>
                   <p className="text-lg font-bold">{formatPrice(stats.walletBalance)}</p>
                 </div>
                 <NeumorphicIcon icon={DollarSign} size={48} variant="behance" />
@@ -392,7 +392,7 @@ export default function MobileDashboardPro() {
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Calendar className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">График</h3>
+                  <h3 className="font-semibold text-sm">{t("ui.grafik")}</h3>
                 </MobileCard>
 
                 <MobileCard
@@ -403,7 +403,7 @@ export default function MobileDashboardPro() {
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Star className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">Портфолио</h3>
+                  <h3 className="font-semibold text-sm">{t("dash.pro.portfolio")}</h3>
                 </MobileCard>
 
                 <MobileCard
@@ -414,7 +414,7 @@ export default function MobileDashboardPro() {
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <MessageCircle className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">Сообщения</h3>
+                  <h3 className="font-semibold text-sm">{t("nav.messages_tab")}</h3>
                 </MobileCard>
 
                 <MobileCard
@@ -425,27 +425,27 @@ export default function MobileDashboardPro() {
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Settings className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">Настройки</h3>
+                  <h3 className="font-semibold text-sm">{t("dash.client.tab_settings")}</h3>
                 </MobileCard>
               </div>
 
               {/* Performance Stats */}
               <MobileCard>
-                <h2 className="text-xl font-semibold mb-4">Производительность</h2>
+                <h2 className="text-xl font-semibold mb-4">{t("ui.proizvoditelnost")}</h2>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span>Рейтинг</span>
+                    <span>{t("dash.pro.rating")}</span>
                     <div className="flex items-center gap-2">
                       <StarRating rating={stats.averageRating} readonly size="sm" />
                       <span className="font-semibold">{stats.averageRating}</span>
                     </div>
                   </div>
                   <div className="flex justify-between">
-                    <span>Время ответа</span>
+                    <span>{t("dash.pro.response_time")}</span>
                     <span className="font-semibold">{stats.responseTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>На балансе</span>
+                    <span>{t("ui.na_balanse")}</span>
                     <span className="font-semibold">{formatPrice(stats.walletBalance)}</span>
                   </div>
                 </div>
@@ -453,21 +453,21 @@ export default function MobileDashboardPro() {
 
               {/* Nearby Jobs */}
               <MobileCard>
-                <h2 className="text-xl font-semibold mb-4">Заказы рядом</h2>
+                <h2 className="text-xl font-semibold mb-4">{t("ui.zakazy_riadom")}</h2>
                 {nearbyJobs.length === 0 ? (
                   <div className="text-center py-6 text-muted-foreground">
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p className="mb-2">
                       {hasProLocation
-                        ? 'Пока нет подходящих заказов рядом'
-                        : 'Добавьте свою точку в профиле, чтобы видеть расстояние до заказов'}
+                        ? t("ui.poka_net_podhodiaschih_zakazov")
+                        : t("ui.dobavte_svoiu_tochku_v")}
                     </p>
                     <Button
                       onClick={() => navigate("/mobile/profile-settings")}
                       className="bg-neo neo-8 hover:neo-4 text-gray-700"
                     >
                       <MapPin className="h-4 w-4 mr-2" />
-                      Настроить точку
+                      {t("ui.nastroit_tochku")}
                     </Button>
                   </div>
                 ) : (
@@ -475,9 +475,9 @@ export default function MobileDashboardPro() {
                     {nearbyJobs.slice(0, 3).map((job) => (
                       <div key={job.id} className="p-3 border rounded-lg bg-white/50">
                         <div className="flex items-center justify-between mb-2 gap-2">
-                          <h4 className="font-medium text-sm">{job.title || job.description || "Новый заказ"}</h4>
+                          <h4 className="font-medium text-sm">{job.title || job.description || t("dash.pro.new_order")}</h4>
                           <Badge variant={job.withinCoverage ? 'default' : 'outline'} className={job.withinCoverage ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}>
-                            {job.distanceKm !== null ? `${job.distanceKm.toFixed(1)} км` : 'без дистанции'}
+                            {job.distanceKm !== null ? `${job.distanceKm.toFixed(1)} км` : t("ui.bez_distancii")}
                           </Badge>
                         </div>
                         {job.location_address && (
@@ -493,7 +493,7 @@ export default function MobileDashboardPro() {
                             ? `от ${formatPrice(job.budget_min_cents)}`
                             : job.budget_max_cents
                             ? `до ${formatPrice(job.budget_max_cents)}`
-                            : 'Договорная'}
+                            : t("dash.pro.negotiable")}
                         </div>
                         <div className="flex items-center gap-2">
                           <Button
@@ -503,7 +503,7 @@ export default function MobileDashboardPro() {
                             onClick={() => navigate(`/job/${job.id}`)}
                           >
                             <Eye className="h-4 w-4 mr-1" />
-                            Просмотр
+                            {t("dash.client.act_canceled")}
                           </Button>
                         </div>
                       </div>
@@ -516,11 +516,11 @@ export default function MobileDashboardPro() {
 
           {activeTab === "jobs" && (
             <MobileCard>
-              <h3 className="text-lg font-semibold mb-4">Заказы для отклика</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("ui.zakazy_dlia_otklika")}</h3>
               {nearbyJobs.length === 0 ? (
                 <div className="text-center py-6 text-muted-foreground">
                   <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>{hasProLocation ? 'Пока нет подходящих заказов рядом' : 'Настройте точку специалиста в профиле'}</p>
+                  <p>{hasProLocation ? t("ui.poka_net_podhodiaschih_zakazov") : t("ui.nastroite_tochku_specialista_v")}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -528,7 +528,7 @@ export default function MobileDashboardPro() {
                     <div key={job.id} className="p-3 border rounded-lg bg-white/50">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div>
-                          <h4 className="font-medium text-sm">{job.title || job.description || 'Новый заказ'}</h4>
+                          <h4 className="font-medium text-sm">{job.title || job.description || t("dash.pro.new_order")}</h4>
                           {job.location_address && (
                             <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                               <MapPin className="h-3 w-3" />
@@ -537,7 +537,7 @@ export default function MobileDashboardPro() {
                           )}
                         </div>
                         <Badge variant={job.withinCoverage ? 'default' : 'outline'} className={job.withinCoverage ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}>
-                          {job.distanceKm !== null ? `${job.distanceKm.toFixed(1)} км` : 'без дистанции'}
+                          {job.distanceKm !== null ? `${job.distanceKm.toFixed(1)} км` : t("ui.bez_distancii")}
                         </Badge>
                       </div>
                       <div className="text-xs text-muted-foreground mb-3">
@@ -547,11 +547,11 @@ export default function MobileDashboardPro() {
                           ? `от ${formatPrice(job.budget_min_cents)}`
                           : job.budget_max_cents
                           ? `до ${formatPrice(job.budget_max_cents)}`
-                          : 'Договорная'}
+                          : t("dash.pro.negotiable")}
                       </div>
                       <Button variant="outline" size="sm" className="w-full" onClick={() => navigate(`/job/${job.id}`)}>
                         <Eye className="h-4 w-4 mr-1" />
-                        Открыть заказ
+                        {t("ui.otkryt_zakaz")}
                       </Button>
                     </div>
                   ))}
@@ -563,37 +563,37 @@ export default function MobileDashboardPro() {
           {activeTab === "portfolio" && (
             <MobileCard className="text-center py-8">
               <Star className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">Портфолио</h3>
-              <p className="text-muted-foreground">Здесь будут ваши работы и отзывы</p>
+              <h3 className="text-lg font-semibold mb-2">{t("dash.pro.portfolio")}</h3>
+              <p className="text-muted-foreground">{t("ui.zdes_budut_vashi_raboty")}</p>
             </MobileCard>
           )}
 
           {activeTab === "schedule" && (
             <MobileCard className="text-center py-8">
               <Calendar className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">График работы</h3>
-              <p className="text-muted-foreground">Настройте свой график работы</p>
+              <h3 className="text-lg font-semibold mb-2">{t("ui.grafik_raboty")}</h3>
+              <p className="text-muted-foreground">{t("ui.nastroite_svoi_grafik_raboty")}</p>
             </MobileCard>
           )}
 
           {activeTab === "earnings" && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Доходы</h2>
+              <h2 className="text-xl font-semibold">{t("ui.dohody")}</h2>
 
               <MobileCard>
-                <h4 className="font-semibold mb-3">Статистика доходов</h4>
+                <h4 className="font-semibold mb-3">{t("ui.statistika_dohodov")}</h4>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Доступно к выводу:</span>
+                    <span>{t("ui.dostupno_k_vyvodu")}</span>
                     <span className="font-semibold">{formatPrice(stats.walletBalance)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Живой monthly breakdown:</span>
-                    <span className="font-semibold text-muted-foreground">ещё не подключён</span>
+                    <span>{t("ui.zhivoi_monthly_breakdown")}</span>
+                    <span className="font-semibold text-muted-foreground">{t("ui.esche_ne_podkliuchen")}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Средний заказ:</span>
-                    <span className="font-semibold text-muted-foreground">ещё не подключён</span>
+                    <span>{t("ui.srednii_zakaz")}</span>
+                    <span className="font-semibold text-muted-foreground">{t("ui.esche_ne_podkliuchen")}</span>
                   </div>
                 </div>
               </MobileCard>

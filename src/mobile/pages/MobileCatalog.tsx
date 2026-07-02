@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useMobile } from '../providers/MobileProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { getCategoryIcon } from '@/utils/categoryIcons';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 type Category = {
   id: string;
@@ -22,6 +23,7 @@ type Category = {
 const ACTIVE_JOB_STATUSES = ['new'] as const;
 
 export default function MobileCatalog() {
+  const { t } = useEnhancedI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const { bottomNavHeight, safeAreaInsets } = useMobile();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -178,7 +180,7 @@ export default function MobileCatalog() {
   return (
     <div className="min-h-screen bg-neo">
       <MobileHeader
-        title="Каталог заказов"
+        title={t("ui.katalog_zakazov")}
         showBack
         showSearch
       />
@@ -197,7 +199,7 @@ export default function MobileCatalog() {
         >
           <div className="flex-1 relative">
             <Input
-              placeholder="Что вам нужно?"
+              placeholder={t("ui.chto_vam_nuzhno")}
               value={searchQuery}
               onChange={handleSearchChange}
               className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 neo-inset-4"
@@ -219,7 +221,7 @@ export default function MobileCatalog() {
           className="flex items-center text-gray-600 mb-3"
         >
           <MapPin size={16} className="mr-2" />
-          <span>Кишинёв, Молдова</span>
+          <span>{t("ui.kishinev_moldova")}</span>
         </motion.div>
 
         {(trimmedSearchQuery || activeCategory) && (
@@ -245,7 +247,7 @@ export default function MobileCatalog() {
               <div className="text-xs text-gray-500">
                 {activeCategory
                   ? `Показаны заявки по категории ${activeCategory.name}${trimmedSearchQuery ? ' с учетом текстового поиска.' : '.'}`
-                  : 'Показаны заявки по всем категориям с учетом текстового поиска.'}
+                  : t("ui.pokazany_zaiavki_po_vsem")}
               </div>
             </MobileCard>
           </motion.div>
@@ -257,7 +259,7 @@ export default function MobileCatalog() {
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <h3 className="text-lg font-semibold mb-3 text-gray-800">Популярные категории</h3>
+          <h3 className="text-lg font-semibold mb-3 text-gray-800">{t("section.categories")}</h3>
           <div className="grid grid-cols-2 gap-3">
             {topCategories.map((category) => (
               <Button
@@ -286,7 +288,7 @@ export default function MobileCatalog() {
           >
             <MobileCard className="p-4">
               <div className="flex items-center justify-between gap-3">
-                <h4 className="font-medium">Фильтры</h4>
+                <h4 className="font-medium">{t("ui.filtry")}</h4>
                 <Button
                   size="sm"
                   variant="outline"
@@ -296,11 +298,11 @@ export default function MobileCatalog() {
                     setSearchParams(new URLSearchParams(), { replace: true });
                   }}
                 >
-                  Сбросить
+                  {t("ui.sbrosit")}
                 </Button>
               </div>
               <div className="text-sm text-muted-foreground mt-3">
-                Категории отсортированы по реальной частоте заказов клиентов.
+                {t("ui.kategorii_otsortirovany_po_realnoi")}
               </div>
             </MobileCard>
           </motion.div>
@@ -313,11 +315,11 @@ export default function MobileCatalog() {
           className="flex items-center justify-between mb-2"
         >
           <h3 className="text-lg font-semibold text-gray-800">
-            {loading ? 'Загрузка...' : `Найдено ${jobs.length} заказов`}
+            {loading ? t("common.loading") : `Найдено ${jobs.length} заказов`}
           </h3>
           <Button className="text-sm bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo rounded-xl px-3 py-2">
             <Filter size={16} className="mr-2" />
-            Актуальные
+            {t("ui.aktualnye")}
           </Button>
         </motion.div>
 
@@ -330,11 +332,11 @@ export default function MobileCatalog() {
         <div className="space-y-4">
           {loading ? (
             <div className="text-center py-8">
-              <div className="text-gray-500">Загрузка заказов...</div>
+              <div className="text-gray-500">{t("biz.jobs.loading")}</div>
             </div>
           ) : jobs.length === 0 ? (
             <div className="text-center py-8 space-y-2">
-              <div className="text-gray-500">Заказы не найдены</div>
+              <div className="text-gray-500">{t("ui.zakazy_ne_naideny")}</div>
               {selectedCategory && (
                 <div className="text-xs text-gray-400">
                   Попробуйте сбросить текстовый поиск или выбрать другую категорию.

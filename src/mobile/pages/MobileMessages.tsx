@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useSoundSettings } from '@/hooks/useSoundSettings';
 import { notificationSounds } from '@/utils/notificationSounds';
 import { supabase } from "@/integrations/supabase/client";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,6 +47,7 @@ interface Profile {
 }
 
 function MobileMessages() {
+  const { t } = useEnhancedI18n();
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -100,7 +102,7 @@ function MobileMessages() {
       const uid = session.session?.user?.id;
 
       if (!uid) {
-        toast({ title: 'Требуется авторизация', variant: 'destructive' });
+        toast({ title: t("ui.trebuetsia_avtorizaciia"), variant: 'destructive' });
         navigate('/auth');
         return;
       }
@@ -137,7 +139,7 @@ function MobileMessages() {
       }
     } catch (error) {
       ;
-      toast({ title: 'Ошибка загрузки чатов', variant: 'destructive' });
+      toast({ title: t("ui.oshibka_zagruzki_chatov"), variant: 'destructive' });
     }
   };
 
@@ -310,7 +312,7 @@ function MobileMessages() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({ title: 'Ошибка отправки сообщения', variant: 'destructive' });
+      toast({ title: t("ui.oshibka_otpravki_soobscheniia"), variant: 'destructive' });
     }
   };
 
@@ -326,16 +328,16 @@ function MobileMessages() {
         navigate('/messages');
       }
 
-      toast({ title: 'Чат удален' });
+      toast({ title: t("ui.chat_udalen") });
     } catch (error) {
       console.error('Error deleting chat:', error);
-      toast({ title: 'Ошибка удаления чата', variant: 'destructive' });
+      toast({ title: t("ui.oshibka_udaleniia_chata"), variant: 'destructive' });
     }
   };
 
   const handleDeleteChat = (chatId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Удалить чат? Все сообщения будут удалены навсегда.')) {
+    if (confirm(t("ui.udalit_chat_vse_soobscheniia"))) {
       deleteChat(chatId);
     }
   };
@@ -347,7 +349,7 @@ function MobileMessages() {
     return (
       <div className="min-h-screen bg-neo">
         <MobileHeader
-          title="Сообщения"
+          title={t("nav.messages_tab")}
           showBack={false}
           showNotifications
         />
@@ -362,8 +364,8 @@ function MobileMessages() {
           {chats.length === 0 ? (
             <MobileCard className="p-8 text-center">
               <div className="text-4xl mb-4">💬</div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-800">Нет сообщений</h3>
-              <p className="text-gray-600">Ваши чаты появятся здесь</p>
+              <h3 className="text-lg font-semibold mb-2 text-gray-800">{t("ui.net_soobschenii")}</h3>
+              <p className="text-gray-600">{t("ui.vashi_chaty_poiaviatsia_zdes")}</p>
             </MobileCard>
           ) : (
             <div className="space-y-3">
@@ -373,7 +375,7 @@ function MobileMessages() {
                 const displayName = otherProfile?.full_name ||
                                   (otherProfile?.first_name && otherProfile?.last_name ?
                                      `${otherProfile.first_name} ${otherProfile.last_name}` :
-                                     'Пользователь');
+                                     t("menu.user"));
 
                 const initials = displayName
                   .split(' ')
@@ -441,7 +443,7 @@ function MobileMessages() {
                               className="text-red-600 hover:bg-red-50"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
-                              Удалить чат
+                              {t("ui.udalit_chat_2")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -466,7 +468,7 @@ function MobileMessages() {
   const displayName = otherProfile?.full_name ||
                      (otherProfile?.first_name && otherProfile?.last_name ?
                         `${otherProfile.first_name} ${otherProfile.last_name}` :
-                        'Пользователь');
+                        t("menu.user"));
 
   return (
     <div className="min-h-screen bg-neo flex flex-col">
@@ -499,12 +501,12 @@ function MobileMessages() {
                     otherOnline ? 'text-green-500' : 'text-gray-400'
                   }`} />
                   {otherTyping ? (
-                    <span className="text-primary animate-pulse font-medium">Печатает…</span>
+                    <span className="text-primary animate-pulse font-medium">{t("messages.typing")}</span>
                   ) : (
                     <span className={`transition-colors duration-200 ${
                       otherOnline ? 'text-green-600 font-medium' : 'text-gray-500'
                     }`}>
-                      {otherOnline ? 'В сети' : 'Не в сети'}
+                      {otherOnline ? t("messages.online") : t("messages.offline")}
                     </span>
                   )}
                 </div>
@@ -527,7 +529,7 @@ function MobileMessages() {
           const senderName = senderProfile?.full_name ||
                            (senderProfile?.first_name && senderProfile?.last_name ?
                               `${senderProfile.first_name} ${senderProfile.last_name}` :
-                              'Пользователь');
+                              t("menu.user"));
           const isOwn = message.sender_id === userId;
 
           return (
@@ -628,7 +630,7 @@ function MobileMessages() {
                   sendMessage();
                 }
               }}
-              placeholder="Написать сообщение..."
+              placeholder={t("ui.napisat_soobschenie_2")}
               className="w-full border-0 bg-transparent text-base min-h-[48px] px-4 py-3 rounded-[16px] focus:outline-none placeholder:text-gray-500"
               style={{ fontSize: '16px' }}
             />

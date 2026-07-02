@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 export const FloatingActionButton = () => {
+  const { t } = useEnhancedI18n();
   const location = useLocation();
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -50,21 +52,21 @@ export const FloatingActionButton = () => {
     {
       href: "/",
       icon: Home,
-      label: "Главная",
+      label: t("nav.home_tab"),
       variant: "secondary" as const,
       show: location.pathname !== "/"
     },
     {
       href: "/catalog",
       icon: Search,
-      label: "Поиск",
+      label: t("nav.search_tab"),
       variant: "secondary" as const,
       show: location.pathname !== "/catalog"
     },
     {
       href: "/job/new",
       icon: Plus,
-      label: "Заказать",
+      label: t("nav.order_tab"),
       variant: "default" as const,
       show: true,
       primary: true
@@ -72,7 +74,7 @@ export const FloatingActionButton = () => {
     {
       href: "/feed",
       icon: TrendingUp,
-      label: "Лента",
+      label: t("nav.feed_tab"),
       variant: "secondary" as const,
       badge: "5",
       show: location.pathname !== "/feed"
@@ -80,7 +82,7 @@ export const FloatingActionButton = () => {
     {
       href: "/messages",
       icon: MessageCircle,
-      label: "Чат",
+      label: t("nav.chat_tab"),
       variant: "secondary" as const,
       badge: "2",
       show: location.pathname !== "/messages"

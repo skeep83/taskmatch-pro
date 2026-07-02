@@ -19,6 +19,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface PersonalInfo {
   firstName: string;
@@ -41,14 +42,16 @@ interface KycWizardProps {
   onComplete: () => void;
 }
 
-const steps = [
-  { id: 'personal', title: 'Личные данные', icon: User },
-  { id: 'documents', title: 'Документы', icon: FileText },
-  { id: 'selfie', title: 'Селфи', icon: Camera },
-  { id: 'review', title: 'Проверка', icon: CheckCircle }
-];
+
 
 export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
+  const { t } = useEnhancedI18n();
+  const steps = [
+    { id: 'personal', title: t("ui.lichnye_dannye"), icon: User },
+    { id: 'documents', title: t("ui.dokumenty"), icon: FileText },
+    { id: 'selfie', title: t("ui.selfi_2"), icon: Camera },
+    { id: 'review', title: t("ui.proverka"), icon: CheckCircle }
+  ];
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
@@ -104,15 +107,15 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
       if (error) throw error;
       
       toast({
-        title: "Данные сохранены",
-        description: "Личная информация успешно обновлена"
+        title: t("ui.dannye_sohraneny"),
+        description: t("ui.lichnaia_informaciia_uspeshno_obnovlena")
       });
       nextStep();
     } catch (error) {
       console.error('Error saving personal info:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось сохранить личные данные",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_sohranit_lichnye"),
         variant: "destructive"
       });
     } finally {
@@ -150,14 +153,14 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
 
       setDocuments(prev => [...prev, data]);
       toast({
-        title: "Документ загружен",
-        description: "Файл успешно загружен и отправлен на проверку"
+        title: t("ui.dokument_zagruzhen"),
+        description: t("ui.fail_uspeshno_zagruzhen_i")
       });
     } catch (error) {
       console.error('Error uploading document:', error);
       toast({
-        title: "Ошибка загрузки",
-        description: "Не удалось загрузить документ",
+        title: t("dash.pro.load_error_title"),
+        description: t("ui.ne_udalos_zagruzit_dokument"),
         variant: "destructive"
       });
     } finally {
@@ -182,8 +185,8 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast({
-        title: "Ошибка камеры",
-        description: "Не удалось получить доступ к камере",
+        title: t("ui.oshibka_kamery"),
+        description: t("ui.ne_udalos_poluchit_dostup"),
         variant: "destructive"
       });
       setIsCapturing(false);
@@ -234,14 +237,14 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
 
       setDocuments(prev => prev.filter(doc => doc.id !== docId));
       toast({
-        title: "Документ удален",
-        description: "Документ успешно удален"
+        title: t("ui.dokument_udalen"),
+        description: t("ui.dokument_uspeshno_udalen")
       });
     } catch (error) {
       console.error('Error deleting document:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось удалить документ",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_udalit_dokument"),
         variant: "destructive"
       });
     } finally {
@@ -266,16 +269,16 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
       if (error) throw error;
 
       toast({
-        title: "Заявка подана!",
-        description: "Ваши документы отправлены на проверку. Мы уведомим вас о результате в течение 24 часов."
+        title: t("ui.zaiavka_podana"),
+        description: t("ui.vashi_dokumenty_otpravleny_na")
       });
       
       onComplete();
     } catch (error) {
       console.error('Error submitting for review:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось подать заявку на проверку",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_podat_zaiavku"),
         variant: "destructive"
       });
     } finally {
@@ -289,31 +292,31 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold mb-2">Личная информация</h3>
-              <p className="text-muted-foreground">Заполните ваши личные данные для верификации</p>
+              <h3 className="text-xl font-bold mb-2">{t("ui.lichnaia_informaciia")}</h3>
+              <p className="text-muted-foreground">{t("ui.zapolnite_vashi_lichnye_dannye")}</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName">Имя *</Label>
+                <Label htmlFor="firstName">{t("ui.imia_2")}</Label>
                 <Input
                   id="firstName"
                   value={personalInfo.firstName}
                   onChange={(e) => setPersonalInfo(prev => ({ ...prev, firstName: e.target.value }))}
-                  placeholder="Введите ваше имя"
+                  placeholder={t("ui.vvedite_vashe_imia")}
                 />
               </div>
               <div>
-                <Label htmlFor="lastName">Фамилия *</Label>
+                <Label htmlFor="lastName">{t("ui.familiia_2")}</Label>
                 <Input
                   id="lastName"
                   value={personalInfo.lastName}
                   onChange={(e) => setPersonalInfo(prev => ({ ...prev, lastName: e.target.value }))}
-                  placeholder="Введите вашу фамилию"
+                  placeholder={t("ui.vvedite_vashu_familiiu")}
                 />
               </div>
               <div>
-                <Label htmlFor="dateOfBirth">Дата рождения *</Label>
+                <Label htmlFor="dateOfBirth">{t("ui.data_rozhdeniia")}</Label>
                 <Input
                   id="dateOfBirth"
                   type="date"
@@ -322,7 +325,7 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
                 />
               </div>
               <div>
-                <Label htmlFor="nationality">Гражданство</Label>
+                <Label htmlFor="nationality">{t("ui.grazhdanstvo_2")}</Label>
                 <Input
                   id="nationality"
                   value={personalInfo.nationality}
@@ -331,19 +334,19 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
                 />
               </div>
               <div className="md:col-span-2">
-                <Label htmlFor="address">Адрес проживания</Label>
+                <Label htmlFor="address">{t("ui.adres_prozhivaniia")}</Label>
                 <Input
                   id="address"
                   value={personalInfo.address}
                   onChange={(e) => setPersonalInfo(prev => ({ ...prev, address: e.target.value }))}
-                  placeholder="Введите ваш адрес"
+                  placeholder={t("ui.vvedite_vash_adres")}
                 />
               </div>
             </div>
 
             <div className="flex justify-end">
               <Button onClick={savePersonalInfo} disabled={!canProceedToNext() || loading}>
-                {loading ? "Сохранение..." : "Продолжить"}
+                {loading ? t("common.saving") : t("ui.prodolzhit")}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
@@ -354,8 +357,8 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold mb-2">Документы удостоверения личности</h3>
-              <p className="text-muted-foreground">Загрузите фото вашего паспорта или ID карты</p>
+              <h3 className="text-xl font-bold mb-2">{t("ui.dokumenty_udostovereniia_lichnosti")}</h3>
+              <p className="text-muted-foreground">{t("ui.zagruzite_foto_vashego_pasporta")}</p>
             </div>
 
             <div className="border-2 border-dashed border-border rounded-lg p-6">
@@ -376,7 +379,7 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
                 />
                 <label htmlFor="document-upload">
                   <Button variant="outline" disabled={loading} asChild>
-                    <span>Выбрать файл</span>
+                    <span>{t("ui.vybrat_fail")}</span>
                   </Button>
                 </label>
               </div>
@@ -384,16 +387,16 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
 
             {documents.filter(doc => doc.doc_type === 'id_card').length > 0 && (
               <div className="space-y-3">
-                <h4 className="font-medium">Загруженные документы:</h4>
+                <h4 className="font-medium">{t("ui.zagruzhennye_dokumenty")}</h4>
                 {documents.filter(doc => doc.doc_type === 'id_card').map((doc) => (
                   <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <FileText className="w-4 h-4" />
                       <div>
-                        <p className="text-sm font-medium">Документ удостоверения личности</p>
+                        <p className="text-sm font-medium">{t("ui.dokument_udostovereniia_lichnosti")}</p>
                         <Badge variant={doc.status === 'approved' ? 'default' : 'secondary'}>
-                          {doc.status === 'pending' ? 'На проверке' : 
-                           doc.status === 'approved' ? 'Одобрено' : 'Отклонено'}
+                          {doc.status === 'pending' ? t("ui.na_proverke") : 
+                           doc.status === 'approved' ? t("ui.odobreno") : t("ui.otkloneno")}
                         </Badge>
                       </div>
                     </div>
@@ -434,8 +437,8 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold mb-2">Селфи для верификации</h3>
-              <p className="text-muted-foreground">Сделайте четкое фото себя для подтверждения личности</p>
+              <h3 className="text-xl font-bold mb-2">{t("ui.selfi_dlia_verifikacii")}</h3>
+              <p className="text-muted-foreground">{t("ui.sdelaite_chetkoe_foto_sebia")}</p>
             </div>
 
             {!isCapturing ? (
@@ -449,12 +452,12 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                       <div className="text-left">
-                        <h4 className="font-medium text-blue-900 mb-1">Рекомендации для селфи:</h4>
+                        <h4 className="font-medium text-blue-900 mb-1">{t("ui.rekomendacii_dlia_selfi")}</h4>
                         <ul className="text-sm text-blue-800 space-y-1">
-                          <li>• Убедитесь, что ваше лицо хорошо освещено</li>
-                          <li>• Смотрите прямо в камеру</li>
-                          <li>• Снимите головные уборы и очки</li>
-                          <li>• Убедитесь, что фон простой и не отвлекающий</li>
+                          <li>{t("ui.ubedites_chto_vashe_lico")}</li>
+                          <li>{t("ui.smotrite_priamo_v_kameru")}</li>
+                          <li>{t("ui.snimite_golovnye_ubory_i")}</li>
+                          <li>{t("ui.ubedites_chto_fon_prostoi")}</li>
                         </ul>
                       </div>
                     </div>
@@ -479,7 +482,7 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
                     />
                     <label htmlFor="selfie-upload">
                       <Button variant="outline" disabled={loading} asChild>
-                        <span>Загрузить фото</span>
+                        <span>{t("ui.zagruzit_foto")}</span>
                       </Button>
                     </label>
                   </div>
@@ -511,16 +514,16 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
 
             {documents.filter(doc => doc.doc_type === 'selfie').length > 0 && (
               <div className="space-y-3">
-                <h4 className="font-medium">Селфи:</h4>
+                <h4 className="font-medium">{t("ui.selfi")}</h4>
                 {documents.filter(doc => doc.doc_type === 'selfie').map((doc) => (
                   <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <Camera className="w-4 h-4" />
                       <div>
-                        <p className="text-sm font-medium">Селфи</p>
+                        <p className="text-sm font-medium">{t("ui.selfi_2")}</p>
                         <Badge variant={doc.status === 'approved' ? 'default' : 'secondary'}>
-                          {doc.status === 'pending' ? 'На проверке' : 
-                           doc.status === 'approved' ? 'Одобрено' : 'Отклонено'}
+                          {doc.status === 'pending' ? t("ui.na_proverke") : 
+                           doc.status === 'approved' ? t("ui.odobreno") : t("ui.otkloneno")}
                         </Badge>
                       </div>
                     </div>
@@ -561,45 +564,45 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold mb-2">Проверка данных</h3>
-              <p className="text-muted-foreground">Убедитесь, что все данные указаны корректно</p>
+              <h3 className="text-xl font-bold mb-2">{t("ui.proverka_dannyh")}</h3>
+              <p className="text-muted-foreground">{t("ui.ubedites_chto_vse_dannye")}</p>
             </div>
 
             <div className="space-y-6">
               <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-3">Личная информация</h4>
+                <h4 className="font-medium mb-3">{t("ui.lichnaia_informaciia")}</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Имя:</span>
+                    <span className="text-muted-foreground">{t("ui.imia_3")}</span>
                     <p className="font-medium">{personalInfo.firstName}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Фамилия:</span>
+                    <span className="text-muted-foreground">{t("ui.familiia_3")}</span>
                     <p className="font-medium">{personalInfo.lastName}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Дата рождения:</span>
+                    <span className="text-muted-foreground">{t("ui.data_rozhdeniia_2")}</span>
                     <p className="font-medium">{personalInfo.dateOfBirth}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Гражданство:</span>
-                    <p className="font-medium">{personalInfo.nationality || 'Не указано'}</p>
+                    <span className="text-muted-foreground">{t("ui.grazhdanstvo")}</span>
+                    <p className="font-medium">{personalInfo.nationality || t("common.not_specified")}</p>
                   </div>
                 </div>
               </div>
 
               <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-3">Загруженные документы</h4>
+                <h4 className="font-medium mb-3">{t("ui.zagruzhennye_dokumenty_2")}</h4>
                 <div className="space-y-2">
                   {documents.map((doc) => (
                     <div key={doc.id} className="flex items-center justify-between text-sm">
                       <span>
-                        {doc.doc_type === 'id_card' ? 'Документ удостоверения личности' : 
-                         doc.doc_type === 'selfie' ? 'Селфи' : doc.doc_type}
+                        {doc.doc_type === 'id_card' ? t("ui.dokument_udostovereniia_lichnosti") : 
+                         doc.doc_type === 'selfie' ? t("ui.selfi_2") : doc.doc_type}
                       </span>
                       <Badge variant={doc.status === 'approved' ? 'default' : 'secondary'}>
-                        {doc.status === 'pending' ? 'На проверке' : 
-                         doc.status === 'approved' ? 'Одобрено' : 'Отклонено'}
+                        {doc.status === 'pending' ? t("ui.na_proverke") : 
+                         doc.status === 'approved' ? t("ui.odobreno") : t("ui.otkloneno")}
                       </Badge>
                     </div>
                   ))}
@@ -610,7 +613,7 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-green-900 mb-1">Готово к отправке</h4>
+                    <h4 className="font-medium text-green-900 mb-1">{t("ui.gotovo_k_otpravke")}</h4>
                     <p className="text-sm text-green-800">
                       Ваши данные будут отправлены на проверку. Обычно проверка занимает до 24 часов.
                       Вы получите уведомление о результате.
@@ -626,7 +629,7 @@ export const KycWizard = ({ userId, onComplete }: KycWizardProps) => {
                 Назад
               </Button>
               <Button onClick={submitForReview} disabled={loading} size="lg">
-                {loading ? "Отправка..." : "Отправить на проверку"}
+                {loading ? t("ui.otpravka") : t("ui.otpravit_na_proverku")}
                 <CheckCircle className="w-4 h-4 ml-2" />
               </Button>
             </div>

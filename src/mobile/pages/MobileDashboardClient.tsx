@@ -415,14 +415,14 @@ export default function MobileDashboardClient() {
       if (error) throw error;
 
       toast({
-        title: 'Профиль обновлен',
-        description: 'Изменения сохранены успешно'
+        title: t("dash.client.profile_updated"),
+        description: t("dash.client.changes_saved")
       });
     } catch (error: unknown) {
       console.error('Error saving profile:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось сохранить изменения: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t("notifications.error"),
+        description: `Не удалось сохранить изменения: ${getErrorMessage(error, t("dash.client.unknown_error"))}`,
         variant: 'destructive'
       });
     } finally {
@@ -435,7 +435,7 @@ export default function MobileDashboardClient() {
   const canCancelJob = (job: Job) => canClientCancelJob({ job, isOwner: true });
 
   const handleDeleteJob = async (jobId: string) => {
-    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) {
+    if (!confirm(t("dash.client.delete_confirm"))) {
       return;
     }
 
@@ -443,23 +443,23 @@ export default function MobileDashboardClient() {
       const result = await deleteClientJob(jobId);
 
       toast({
-        title: result === 'hard' ? 'Заказ удален' : 'Заказ скрыт из активных',
-        description: result === 'hard' ? 'Заказ был успешно удален' : 'Заказ отменён и больше не показывается в активном кабинете'
+        title: result === 'hard' ? t("dash.client.job_deleted") : t("dash.client.job_hidden"),
+        description: result === 'hard' ? t("dash.client.job_deleted_desc") : t("ui.zakaz_otmenen_i_bolshe")
       });
 
       loadUserData();
     } catch (error: unknown) {
       console.error('Error deleting job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось удалить заказ: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t("notifications.error"),
+        description: `Не удалось удалить заказ: ${getErrorMessage(error, t("dash.client.unknown_error"))}`,
         variant: 'destructive'
       });
     }
   };
 
   const handleCancelJob = async (jobId: string) => {
-    if (!confirm('После выбора исполнителя заказ больше нельзя редактировать или удалять. Отменить заказ?')) {
+    if (!confirm(t("dash.client.cancel_confirm"))) {
       return;
     }
 
@@ -482,16 +482,16 @@ export default function MobileDashboardClient() {
       });
 
       toast({
-        title: 'Заказ отменён',
-        description: 'Заказ сохранён в истории как отменённый'
+        title: t("dash.client.job_canceled"),
+        description: t("dash.client.job_canceled_desc")
       });
 
       loadUserData();
     } catch (error: unknown) {
       console.error('Error cancelling job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось отменить заказ: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t("notifications.error"),
+        description: `Не удалось отменить заказ: ${getErrorMessage(error, t("dash.client.unknown_error"))}`,
         variant: 'destructive'
       });
     }
@@ -511,11 +511,11 @@ export default function MobileDashboardClient() {
   const getStatusBadge = (job: Job) => {
     const isDoneAwaitingConfirmation = job.status === 'done' && !job.end_confirmed;
     const statusMap = {
-      'new': { label: 'Ищем исполнителя', variant: 'secondary' as const },
-      'accepted': { label: 'Исполнитель выбран', variant: 'default' as const },
-      'in_progress': { label: 'Работа выполняется', variant: 'default' as const },
-      'done': { label: isDoneAwaitingConfirmation ? 'Ждёт подтверждения' : 'Выполнен', variant: 'default' as const },
-      'canceled': { label: 'Отменён', variant: 'destructive' as const }
+      'new': { label: t("hero.mock.status"), variant: 'secondary' as const },
+      'accepted': { label: t("dash.client.st_accepted"), variant: 'default' as const },
+      'in_progress': { label: t("dash.client.st_in_progress"), variant: 'default' as const },
+      'done': { label: isDoneAwaitingConfirmation ? t("status.awaiting_confirm") : t("status.done"), variant: 'default' as const },
+      'canceled': { label: t("ui.otmenen"), variant: 'destructive' as const }
     };
 
     const statusInfo = statusMap[job.status as keyof typeof statusMap] || { label: job.status, variant: 'default' as const };
@@ -529,9 +529,9 @@ export default function MobileDashboardClient() {
 
   const getUrgencyBadge = (urgency: string) => {
     const urgencyMap = {
-      'normal': { label: 'Обычный', variant: 'outline' as const },
-      'urgent': { label: 'Срочно', variant: 'secondary' as const },
-      'same_day': { label: 'В тот же день', variant: 'destructive' as const }
+      'normal': { label: t("dash.client.urg_normal"), variant: 'outline' as const },
+      'urgent': { label: t("dash.client.urg_urgent"), variant: 'secondary' as const },
+      'same_day': { label: t("dash.client.urg_same_day"), variant: 'destructive' as const }
     };
 
     const urgencyInfo = urgencyMap[urgency as keyof typeof urgencyMap] || { label: urgency, variant: 'outline' as const };
@@ -539,7 +539,7 @@ export default function MobileDashboardClient() {
   };
 
   const formatPrice = (minCents?: number, maxCents?: number) => {
-    if (!minCents && !maxCents) return "Не указан";
+    if (!minCents && !maxCents) return t("dash.client.budget_na");
 
     if (minCents && maxCents) {
       return `${formatCurrency(minCents)} - ${formatCurrency(maxCents)}`;
@@ -549,25 +549,25 @@ export default function MobileDashboardClient() {
   };
 
   const getClientNextStepText = (job: Job) => {
-    if (job.status === 'new') return 'Ожидайте отклики специалистов';
-    if (job.status === 'accepted') return 'Исполнитель выбран — можно открыть детали и написать ему';
-    if (job.status === 'in_progress') return 'Работа идёт — следите за прогрессом';
-    if (job.status === 'done') return 'Откройте заказ, чтобы подтвердить выполнение';
-    if (job.status === 'canceled') return 'Заказ отменён';
-    return 'Откройте детали заказа';
+    if (job.status === 'new') return t("ui.ozhidaite_otkliki_specialistov");
+    if (job.status === 'accepted') return t("ui.ispolnitel_vybran_mozhno_otkryt");
+    if (job.status === 'in_progress') return t("ui.rabota_idet_sledite_za");
+    if (job.status === 'done') return t("ui.otkroite_zakaz_chtoby_podtverdit");
+    if (job.status === 'canceled') return t("dash.client.job_canceled");
+    return t("ui.otkroite_detali_zakaza");
   };
 
   const getClientPrimaryActionLabel = (job: Job) => {
-    if (job.status === 'done') return 'Подтвердить';
-    if (job.status === 'accepted' || job.status === 'in_progress') return 'Открыть';
-    return 'Посмотреть';
+    if (job.status === 'done') return t("dash.client.act_done");
+    if (job.status === 'accepted' || job.status === 'in_progress') return t("dash.client.act_default");
+    return t("ui.posmotret");
   };
 
   const copyReferralCode = () => {
     navigator.clipboard.writeText(stats.refferalCode);
     toast({
-      title: 'Скопировано!',
-      description: 'Реферальный код скопирован в буфер обмена'
+      title: t("ui.skopirovano"),
+      description: t("ui.referalnyi_kod_skopirovan_v")
     });
   };
 
@@ -575,9 +575,9 @@ export default function MobileDashboardClient() {
     const options = [
       {
         value: 'client',
-        label: 'Клиент',
+        label: t("menu.role_client"),
         icon: User,
-        description: 'Заказы и услуги',
+        description: t("ui.zakazy_i_uslugi"),
         available: true
       }
     ];
@@ -585,9 +585,9 @@ export default function MobileDashboardClient() {
     if (userRoles.includes('pro') || hasPendingProRequest) {
       options.push({
         value: 'pro',
-        label: 'Специалист',
+        label: t("menu.role_pro"),
         icon: Briefcase,
-        description: 'Мои услуги и заказы',
+        description: t("ui.moi_uslugi_i_zakazy"),
         available: true
       });
     }
@@ -595,9 +595,9 @@ export default function MobileDashboardClient() {
     if (userRoles.includes('business')) {
       options.push({
         value: 'business',
-        label: 'Бизнес',
+        label: t("menu.role_business"),
         icon: Building2,
-        description: 'Компания и тендеры',
+        description: t("ui.kompaniia_i_tendery"),
         available: true
       });
     }
@@ -623,13 +623,13 @@ export default function MobileDashboardClient() {
   }
 
   const tabItems = [
-    { id: "overview", label: "Обзор", icon: User },
-    { id: "jobs", label: "Заказы", icon: Briefcase },
-    { id: "tenders", label: "Тендеры", icon: Gavel },
-    { id: "subscription", label: "Подписка", icon: Crown },
-    { id: "payments", label: "Платежи", icon: CreditCard },
-    { id: "referrals", label: "Рефералы", icon: Gift },
-    { id: "settings", label: "Настройки", icon: Settings }
+    { id: "overview", label: t("dash.client.tab_overview"), icon: User },
+    { id: "jobs", label: t("dash.client.tab_jobs"), icon: Briefcase },
+    { id: "tenders", label: t("footer.tenders"), icon: Gavel },
+    { id: "subscription", label: t("dash.client.tab_subscription"), icon: Crown },
+    { id: "payments", label: t("ui.platezhi"), icon: CreditCard },
+    { id: "referrals", label: t("ui.referaly"), icon: Gift },
+    { id: "settings", label: t("dash.client.tab_settings"), icon: Settings }
   ];
 
   return (
@@ -638,7 +638,7 @@ export default function MobileDashboardClient() {
 
       <div className="min-h-screen bg-neo">
         <MobileHeader
-          title="Панель клиента"
+          title={t("ui.panel_klienta")}
           showBack={false}
           showLogout={true}
           showNotifications={true}
@@ -655,7 +655,7 @@ export default function MobileDashboardClient() {
           {/* Welcome Section */}
           <MobileCard className="text-center">
             <h1 className="text-2xl font-bold mb-2">
-              Добро пожаловать!
+              {t("dash.pro.welcome")}
             </h1>
             <p className="text-muted-foreground">
               {userProfile?.full_name ||
@@ -670,7 +670,7 @@ export default function MobileDashboardClient() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Всего заказов</p>
+                  <p className="text-sm text-muted-foreground">{t("biz.analytics.total_jobs")}</p>
                   <p className="text-2xl font-bold">{stats.totalJobs}</p>
                 </div>
                 <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
@@ -680,7 +680,7 @@ export default function MobileDashboardClient() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Активных</p>
+                  <p className="text-sm text-muted-foreground">{t("biz.analytics.active")}</p>
                   <p className="text-2xl font-bold">{stats.activeJobs}</p>
                 </div>
                 <NeumorphicIcon icon={Clock} size={48} variant="behance" />
@@ -690,7 +690,7 @@ export default function MobileDashboardClient() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Выполнено</p>
+                  <p className="text-sm text-muted-foreground">{t("dash.pro.completed")}</p>
                   <p className="text-2xl font-bold">{stats.completedJobs}</p>
                 </div>
                 <NeumorphicIcon icon={CheckCircle} size={48} variant="behance" />
@@ -700,7 +700,7 @@ export default function MobileDashboardClient() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Потрачено</p>
+                  <p className="text-sm text-muted-foreground">{t("ui.potracheno")}</p>
                   <p className="text-lg font-bold">{formatCurrency(stats.totalSpent)}</p>
                 </div>
                 <NeumorphicIcon icon={DollarSign} size={48} variant="behance" />
@@ -743,7 +743,7 @@ export default function MobileDashboardClient() {
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Plus className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">Создать заказ</h3>
+                  <h3 className="font-semibold text-sm">{t("footer.create_job")}</h3>
                 </MobileCard>
 
                 <MobileCard
@@ -754,7 +754,7 @@ export default function MobileDashboardClient() {
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <MessageSquare className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">Сообщения</h3>
+                  <h3 className="font-semibold text-sm">{t("nav.messages_tab")}</h3>
                 </MobileCard>
 
                 <MobileCard
@@ -765,15 +765,15 @@ export default function MobileDashboardClient() {
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Crown className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm">Подписка</h3>
+                  <h3 className="font-semibold text-sm">{t("dash.client.tab_subscription")}</h3>
                 </MobileCard>
 
                 <MobileCard className="flex flex-col items-center justify-center text-center h-24 opacity-50">
                   <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Gavel className="h-5 w-5 text-muted-foreground" />
                   </div>
-                  <h3 className="font-semibold text-sm text-muted-foreground">Тендеры</h3>
-                  <p className="text-xs text-muted-foreground">Только бизнес</p>
+                  <h3 className="font-semibold text-sm text-muted-foreground">{t("footer.tenders")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("ui.tolko_biznes")}</p>
                 </MobileCard>
               </div>
 
@@ -789,10 +789,10 @@ export default function MobileDashboardClient() {
                         setHasPendingProRequest(true);
                       }
                       toast({
-                        title: "Заявка отправлена",
+                        title: t("dash.client.request_sent"),
                         description: newRole === 'pro'
-                          ? "Ваша заявка на статус специалиста отправлена на рассмотрение!"
-                          : "Ваша роль была успешно обновлена!"
+                          ? t("dash.client.pro_request_sent")
+                          : t("dash.client.role_updated")
                       });
                     }}
                   />
@@ -801,17 +801,17 @@ export default function MobileDashboardClient() {
 
               {/* Recent Jobs */}
               <MobileCard>
-                <h2 className="text-xl font-semibold mb-4">Последние заказы</h2>
+                <h2 className="text-xl font-semibold mb-4">{t("ui.poslednie_zakazy")}</h2>
                 {jobs.length === 0 ? (
                   <div className="text-center py-6 text-muted-foreground">
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="mb-2">У вас ещё нет заказов. Создайте первый!</p>
+                    <p className="mb-2">{t("ui.u_vas_esche_net")}</p>
                     <Button
                       onClick={() => navigate("/job/new")}
                       className="bg-neo neo-8 hover:neo-4 text-gray-700"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Создать заказ
+                      {t("footer.create_job")}
                     </Button>
                   </div>
                 ) : (
@@ -819,12 +819,12 @@ export default function MobileDashboardClient() {
                     {jobs.slice(0, 3).map((job) => (
                       <div key={job.id} className="p-3 border rounded-lg bg-white/50">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-sm">{job.title || "Без названия"}</h4>
+                          <h4 className="font-medium text-sm">{job.title || t("dash.client.untitled")}</h4>
                           {getStatusBadge(job)}
                         </div>
                         <div className="mb-2 text-[11px] font-mono text-muted-foreground">№ заявки: {job.public_id}</div>
                         <div className="text-xs text-muted-foreground mb-2">
-                          {job.categories?.label_ru || "Другое"} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                          {job.categories?.label_ru || t("dash.client.other")} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
                         </div>
                         <div className="text-xs text-muted-foreground mb-3">
                           {getClientNextStepText(job)}
@@ -901,21 +901,21 @@ export default function MobileDashboardClient() {
           {activeTab === "jobs" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Мои заказы</h2>
+                <h2 className="text-xl font-semibold">{t("dash.client.my_jobs")}</h2>
                 <Button
                   onClick={() => navigate("/job/new")}
                   size="sm"
                   className="bg-neo neo-8 text-gray-700"
                 >
                   <Plus className="h-4 w-4 mr-1" />
-                  Создать
+                  {t("nav.create_tab")}
                 </Button>
               </div>
 
               {jobs.length === 0 ? (
                 <MobileCard className="text-center py-8">
                   <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-muted-foreground">У вас ещё нет заказов. Создайте первый!</p>
+                  <p className="text-muted-foreground">{t("ui.u_vas_esche_net")}</p>
                 </MobileCard>
               ) : (
                 <div className="space-y-3">
@@ -929,11 +929,11 @@ export default function MobileDashboardClient() {
                         <div className="text-[11px] font-mono text-muted-foreground">№ заявки: {job.public_id}</div>
 
                         <div className="text-sm text-muted-foreground">
-                          {job.categories?.label_ru || "Другое"}
+                          {job.categories?.label_ru || t("dash.client.other")}
                         </div>
 
                         <div className="text-sm">
-                          <strong>Бюджет:</strong> {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                          <strong>{t("ui.biudzhet")}</strong> {formatPrice(job.budget_min_cents, job.budget_max_cents)}
                         </div>
 
                         <div className="text-sm text-muted-foreground">
@@ -1011,20 +1011,20 @@ export default function MobileDashboardClient() {
                   <span className="text-sm text-white font-bold">B</span>
                 </div>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Бизнес-заказы доступны только для компаний</h3>
-              <p className="text-muted-foreground mb-4">Для работы с корпоративными заказами используйте бизнес-аккаунт</p>
+              <h3 className="text-lg font-semibold mb-2">{t("ui.biznes_zakazy_dostupny_tolko")}</h3>
+              <p className="text-muted-foreground mb-4">{t("ui.dlia_raboty_s_korporativnymi")}</p>
               <Button
                 onClick={() => navigate("/dashboard/business")}
                 className="bg-neo neo-8 text-gray-700"
               >
-                Открыть бизнес-аккаунт
+                {t("dash.client.open_biz")}
               </Button>
             </MobileCard>
           )}
 
           {activeTab === "subscription" && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Планы подписки</h2>
+              <h2 className="text-xl font-semibold">{t("ui.plany_podpiski")}</h2>
 
               {/* Current Plan */}
               <MobileCard>
@@ -1032,8 +1032,8 @@ export default function MobileDashboardClient() {
                   <div className="w-16 h-16 rounded-full bg-neo neo-4 flex items-center justify-center mx-auto mb-4">
                     <User className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">Базовый план</h3>
-                  <p className="text-muted-foreground">Текущий план</p>
+                  <h3 className="text-lg font-semibold mb-2">{t("ui.bazovyi_plan")}</h3>
+                  <p className="text-muted-foreground">{t("ui.tekuschii_plan")}</p>
                 </div>
               </MobileCard>
 
@@ -1042,15 +1042,15 @@ export default function MobileDashboardClient() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold">HomeCare Basic</h4>
-                      <p className="text-sm text-muted-foreground">Основные функции</p>
-                      <p className="text-lg font-bold">99 ₽/мес</p>
+                      <p className="text-sm text-muted-foreground">{t("ui.osnovnye_funkcii")}</p>
+                      <p className="text-lg font-bold">{t("ui.99_mes")}</p>
                       <ul className="text-xs text-muted-foreground mt-2 space-y-1">
-                        <li>• Приоритетная поддержка</li>
-                        <li>• Скидка 5% на заказы</li>
-                        <li>• Расширенная гарантия</li>
+                        <li>{t("ui.prioritetnaia_podderzhka")}</li>
+                        <li>{t("ui.skidka_5_na_zakazy")}</li>
+                        <li>{t("ui.rasshirennaia_garantiia")}</li>
                       </ul>
                     </div>
-                    <Button variant="outline">Выбрать</Button>
+                    <Button variant="outline">{t("hero.mock.select")}</Button>
                   </div>
                 </MobileCard>
 
@@ -1059,18 +1059,18 @@ export default function MobileDashboardClient() {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold">HomeCare Plus</h4>
-                        <Badge>Популярный</Badge>
+                        <Badge>{t("dash.client.popular")}</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">Расширенные возможности</p>
-                      <p className="text-lg font-bold">199 ₽/мес</p>
+                      <p className="text-sm text-muted-foreground">{t("ui.rasshirennye_vozmozhnosti")}</p>
+                      <p className="text-lg font-bold">{t("ui.199_mes")}</p>
                       <ul className="text-xs text-muted-foreground mt-2 space-y-1">
-                        <li>• Все из Basic</li>
-                        <li>• Скидка 10% на заказы</li>
-                        <li>• Бесплатная диагностика</li>
-                        <li>• Приоритетная поддержка</li>
+                        <li>{t("ui.vse_iz_basic")}</li>
+                        <li>{t("ui.skidka_10_na_zakazy")}</li>
+                        <li>{t("ui.besplatnaia_diagnostika")}</li>
+                        <li>{t("ui.prioritetnaia_podderzhka")}</li>
                       </ul>
                     </div>
-                    <Button>Выбрать</Button>
+                    <Button>{t("hero.mock.select")}</Button>
                   </div>
                 </MobileCard>
 
@@ -1078,16 +1078,16 @@ export default function MobileDashboardClient() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold">HomeCare Max</h4>
-                      <p className="text-sm text-muted-foreground">Максимальный функционал</p>
-                      <p className="text-lg font-bold">399 ₽/мес</p>
+                      <p className="text-sm text-muted-foreground">{t("ui.maksimalnyi_funkcional")}</p>
+                      <p className="text-lg font-bold">{t("ui.399_mes")}</p>
                       <ul className="text-xs text-muted-foreground mt-2 space-y-1">
-                        <li>• Все из Plus</li>
-                        <li>• Скидка 15% на заказы</li>
-                        <li>• Персональный менеджер</li>
-                        <li>• VIP поддержка 24/7</li>
+                        <li>{t("ui.vse_iz_plus")}</li>
+                        <li>{t("ui.skidka_15_na_zakazy")}</li>
+                        <li>{t("ui.personalnyi_menedzher")}</li>
+                        <li>{t("ui.vip_podderzhka_24_7")}</li>
                       </ul>
                     </div>
-                    <Button variant="outline">Выбрать</Button>
+                    <Button variant="outline">{t("hero.mock.select")}</Button>
                   </div>
                 </MobileCard>
               </div>
@@ -1097,19 +1097,19 @@ export default function MobileDashboardClient() {
           {activeTab === "payments" && (
             <MobileCard className="text-center py-8">
               <CreditCard className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">История платежей</h3>
-              <p className="text-muted-foreground">Здесь будет отображаться история ваших платежей</p>
+              <h3 className="text-lg font-semibold mb-2">{t("dash.client.payments_history")}</h3>
+              <p className="text-muted-foreground">{t("ui.zdes_budet_otobrazhatsia_istoriia")}</p>
             </MobileCard>
           )}
 
           {activeTab === "referrals" && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Реферальная программа</h2>
+              <h2 className="text-xl font-semibold">{t("dash.client.referral")}</h2>
 
               <MobileCard>
                 <div className="text-center">
                   <Gift className="h-12 w-12 mx-auto mb-4 text-primary" />
-                  <h3 className="text-lg font-semibold mb-2">Ваш реферальный код</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t("dash.client.your_code")}</h3>
                   <div className="flex items-center gap-2 p-3 bg-white/50 rounded-lg mb-4">
                     <code className="flex-1 text-center font-mono text-lg">{stats.refferalCode}</code>
                     <Button
@@ -1121,20 +1121,20 @@ export default function MobileDashboardClient() {
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Поделитесь кодом с друзьями и получите бонусы за каждого нового пользователя
+                    {t("ui.podelites_kodom_s_druziami")}
                   </p>
                 </div>
               </MobileCard>
 
               <MobileCard>
-                <h4 className="font-semibold mb-3">Статистика рефералов</h4>
+                <h4 className="font-semibold mb-3">{t("ui.statistika_referalov")}</h4>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Приглашено пользователей:</span>
+                    <span>{t("ui.priglasheno_polzovatelei")}</span>
                     <span className="font-semibold">0</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Заработано бонусов:</span>
+                    <span>{t("ui.zarabotano_bonusov")}</span>
                     <span className="font-semibold">0 ₽</span>
                   </div>
                 </div>
@@ -1144,22 +1144,22 @@ export default function MobileDashboardClient() {
 
           {activeTab === "settings" && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Настройки</h2>
+              <h2 className="text-xl font-semibold">{t("dash.client.tab_settings")}</h2>
 
               <MobileCard>
-                <h4 className="font-semibold mb-4">Профиль клиента</h4>
+                <h4 className="font-semibold mb-4">{t("ui.profil_klienta")}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-14 h-14 rounded-full overflow-hidden bg-neo neo-inset-4 flex items-center justify-center text-lg font-semibold text-gray-600">
                       {userProfile?.avatar_url ? (
-                        <img src={userProfile.avatar_url} alt="Аватар клиента" className="w-full h-full object-cover" />
+                        <img src={userProfile.avatar_url} alt={t("ui.avatar_klienta")} className="w-full h-full object-cover" />
                       ) : (
                         (userProfile?.first_name || userProfile?.full_name || user?.email || 'К').slice(0, 1).toUpperCase()
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-medium truncate">{userProfile?.full_name || [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || 'Профиль клиента'}</p>
-                      <p className="text-xs text-muted-foreground">Фото, имя, адрес, контакты и приватная локация</p>
+                      <p className="font-medium truncate">{userProfile?.full_name || [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || t("ui.profil_klienta")}</p>
+                      <p className="text-xs text-muted-foreground">{t("ui.foto_imia_adres_kontakty")}</p>
                     </div>
                   </div>
 
@@ -1167,11 +1167,11 @@ export default function MobileDashboardClient() {
                     onClick={() => navigate('/mobile/profile-settings')}
                     className="w-full bg-neo neo-8 text-gray-700"
                   >
-                    Открыть полные настройки профиля
+                    {t("ui.otkryt_polnye_nastroiki_profilia")}
                   </Button>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Телефон</label>
+                    <label className="text-sm font-medium mb-2 block">{t("dash.client.phone")}</label>
                     <Input
                       type="tel"
                       value={profileData.phone}
@@ -1185,18 +1185,18 @@ export default function MobileDashboardClient() {
                     disabled={saving}
                     className="w-full bg-neo neo-8 text-gray-700"
                   >
-                    {saving ? 'Сохранение...' : 'Сохранить быстрые изменения'}
+                    {saving ? t("common.saving") : t("ui.sohranit_bystrye_izmeneniia")}
                   </Button>
                 </div>
               </MobileCard>
 
               <MobileCard>
-                <h4 className="font-semibold mb-4">Уведомления</h4>
+                <h4 className="font-semibold mb-4">{t("dash.client.notifications")}</h4>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium">Email уведомления</label>
-                      <p className="text-xs text-muted-foreground">Получать уведомления на email</p>
+                      <label className="text-sm font-medium">{t("dash.client.email_notif")}</label>
+                      <p className="text-xs text-muted-foreground">{t("dash.client.email_notif_desc")}</p>
                     </div>
                     <Switch
                       checked={profileData.emailNotifications}
@@ -1208,8 +1208,8 @@ export default function MobileDashboardClient() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium">SMS уведомления</label>
-                      <p className="text-xs text-muted-foreground">Получать SMS уведомления</p>
+                      <label className="text-sm font-medium">{t("dash.client.sms_notif")}</label>
+                      <p className="text-xs text-muted-foreground">{t("ui.poluchat_sms_uvedomleniia")}</p>
                     </div>
                     <Switch
                       checked={profileData.smsNotifications}

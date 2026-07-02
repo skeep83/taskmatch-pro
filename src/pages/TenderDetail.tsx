@@ -69,8 +69,8 @@ const TenderDetail = () => {
       } catch (error: any) {
         console.error('Error loading tender:', error);
         toast({
-          title: 'Ошибка',
-          description: error?.message || 'Не удалось загрузить тендер',
+          title: t("notifications.error"),
+          description: error?.message || t("ui.ne_udalos_zagruzit_tender"),
           variant: 'destructive'
         });
       } finally {
@@ -86,9 +86,9 @@ const TenderDetail = () => {
 
   const availabilityMessage = useMemo(() => {
     if (!tender) return '';
-    if (isOwnTender) return 'Это ваш собственный тендер.';
-    if (isClosed) return 'Тендер уже закрыт.';
-    if (isExpired) return 'Срок подачи предложений уже истёк.';
+    if (isOwnTender) return t("ui.eto_vash_sobstvennyi_tender");
+    if (isClosed) return t("ui.tender_uzhe_zakryt");
+    if (isExpired) return t("ui.srok_podachi_predlozhenii_uzhe");
     return '';
   }, [tender, isOwnTender, isClosed, isExpired]);
 
@@ -99,8 +99,8 @@ const TenderDetail = () => {
 
       if (!uid) {
         toast({
-          title: 'Требуется вход',
-          description: 'Сначала войдите в аккаунт специалиста.',
+          title: t("messages.login_required"),
+          description: t("ui.snachala_voidite_v_akkaunt_3"),
           variant: 'destructive'
         });
         navigate('/auth');
@@ -108,14 +108,14 @@ const TenderDetail = () => {
       }
 
       if (!tender) {
-        toast({ title: 'Тендер не найден', variant: 'destructive' });
+        toast({ title: t("ui.tender_ne_naiden"), variant: 'destructive' });
         return;
       }
 
       if (tender.client_id === uid) {
         toast({
-          title: 'Нельзя откликнуться на свой тендер',
-          description: 'Это ваш собственный тендер.',
+          title: t("ui.nelzia_otkliknutsia_na_svoi"),
+          description: t("ui.eto_vash_sobstvennyi_tender"),
           variant: 'destructive'
         });
         return;
@@ -123,8 +123,8 @@ const TenderDetail = () => {
 
       if (tender.status !== 'open') {
         toast({
-          title: 'Тендер уже закрыт',
-          description: 'Отклики по этому тендеру больше не принимаются.',
+          title: t("ui.tender_uzhe_zakryt_2"),
+          description: t("ui.otkliki_po_etomu_tenderu"),
           variant: 'destructive'
         });
         return;
@@ -132,8 +132,8 @@ const TenderDetail = () => {
 
       if (tender.deadline && new Date(tender.deadline).getTime() <= Date.now()) {
         toast({
-          title: 'Срок подачи истёк',
-          description: 'Отклики по этому тендеру больше не принимаются.',
+          title: t("ui.srok_podachi_istek"),
+          description: t("ui.otkliki_po_etomu_tenderu"),
           variant: 'destructive'
         });
         return;
@@ -141,8 +141,8 @@ const TenderDetail = () => {
 
       if (price === '' || Number(price) <= 0) {
         toast({
-          title: 'Укажите цену',
-          description: 'Введите цену предложения в обычной валюте, например 500.',
+          title: t("ui.ukazhite_cenu"),
+          description: t("ui.vvedite_cenu_predlozheniia_v"),
           variant: 'destructive'
         });
         return;
@@ -157,8 +157,8 @@ const TenderDetail = () => {
       if (error) throw error;
 
       toast({
-        title: 'Предложение отправлено',
-        description: 'Ваш отклик по тендеру успешно отправлен.'
+        title: t("ui.predlozhenie_otpravleno_2"),
+        description: t("ui.vash_otklik_po_tenderu")
       });
       setPrice('');
       setNote('');
@@ -169,12 +169,12 @@ const TenderDetail = () => {
       const unauthorized = /not authorized|row-level security|violates row-level security|JWT|auth/i.test(message);
 
       toast({
-        title: duplicateBid ? 'Предложение уже отправлено' : 'Ошибка',
+        title: duplicateBid ? t("ui.predlozhenie_uzhe_otpravleno") : t("notifications.error"),
         description: duplicateBid
-          ? 'Вы уже отправили предложение по этому тендеру.'
+          ? t("ui.vy_uzhe_otpravili_predlozhenie_4")
           : unauthorized
-            ? 'Сначала войдите в аккаунт специалиста и повторите попытку.'
-            : (message || 'Не удалось отправить предложение'),
+            ? t("ui.snachala_voidite_v_akkaunt_2")
+            : (message || t("ui.ne_udalos_otpravit_predlozhenie")),
         variant: 'destructive'
       });
     } finally {
@@ -184,14 +184,14 @@ const TenderDetail = () => {
 
   return (
     <main className="container mx-auto py-12">
-      <Seo title={`${t('app.name')} — Тендер`} description="Детали тендера" canonical={`/tenders/${id}`} />
+      <Seo title={`${t('app.name')} — Тендер`} description={t("ui.detali_tendera")} canonical={`/tenders/${id}`} />
       <section className="max-w-3xl mx-auto card-surface">
         {loading ? (
-          <h1 className="text-xl">Загрузка…</h1>
+          <h1 className="text-xl">{t("ui.zagruzka")}</h1>
         ) : !tender ? (
           <div className="space-y-3">
-            <h1 className="text-xl font-semibold">Тендер не найден</h1>
-            <p className="text-sm text-muted-foreground">Возможно, он был удалён или уже недоступен.</p>
+            <h1 className="text-xl font-semibold">{t("ui.tender_ne_naiden")}</h1>
+            <p className="text-sm text-muted-foreground">{t("ui.vozmozhno_on_byl_udalen")}</p>
           </div>
         ) : (
           <>
@@ -212,7 +212,7 @@ const TenderDetail = () => {
 
             {photos.length > 0 && (
               <div className="mb-6">
-                <h2 className="text-lg font-semibold mb-3">Вложения</h2>
+                <h2 className="text-lg font-semibold mb-3">{t("ui.vlozheniia")}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {photos.map((photo, index) => (
                     <a
@@ -246,20 +246,20 @@ const TenderDetail = () => {
                 type="number"
                 min={0}
                 step="1"
-                placeholder="Цена, MDL"
+                placeholder={t("ui.cena_mdl")}
                 value={price}
                 onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
                 disabled={cannotBid || submitting}
               />
               <input
                 className="border rounded-md px-3 py-2 bg-background sm:col-span-2"
-                placeholder="Комментарий (опц.)"
+                placeholder={t("ui.kommentarii_opc")}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 disabled={cannotBid || submitting}
               />
               <button className="btn-hero disabled:opacity-60" onClick={placeBid} disabled={cannotBid || submitting}>
-                {submitting ? 'Отправка…' : 'Откликнуться'}
+                {submitting ? t("ui.otpravka_2") : t("dash.pro.respond")}
               </button>
             </div>
           </>

@@ -11,8 +11,10 @@ import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 export default function ProPortfolio() {
+  const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
   const [portfolioItems, setPortfolioItems] = useState<any[]>([]);
@@ -53,8 +55,8 @@ export default function ProPortfolio() {
     } catch (error) {
       console.error('Error loading portfolio items:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить портфолио",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_zagruzit_portfolio"),
         variant: "destructive"
       });
     }
@@ -71,8 +73,8 @@ export default function ProPortfolio() {
     
     if (!userId || !newTitle.trim() || selectedFiles.length === 0) {
       toast({
-        title: "Ошибка",
-        description: "Заполните название и добавьте хотя бы одно фото",
+        title: t("notifications.error"),
+        description: t("ui.zapolnite_nazvanie_i_dobavte"),
         variant: "destructive"
       });
       return;
@@ -133,16 +135,16 @@ export default function ProPortfolio() {
       setSelectedFiles([]);
       
       toast({
-        title: "Успешно!",
-        description: "Работа добавлена в портфолио"
+        title: t("ui.uspeshno"),
+        description: t("ui.rabota_dobavlena_v_portfolio")
       });
 
       await refresh();
     } catch (error: any) {
       console.error('Error adding portfolio item:', error);
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось добавить работу",
+        title: t("notifications.error"),
+        description: error.message || t("ui.ne_udalos_dobavit_rabotu"),
         variant: "destructive"
       });
     } finally {
@@ -160,16 +162,16 @@ export default function ProPortfolio() {
       if (error) throw error;
 
       toast({
-        title: "Успешно!",
-        description: "Работа удалена из портфолио"
+        title: t("ui.uspeshno"),
+        description: t("ui.rabota_udalena_iz_portfolio")
       });
 
       await refresh();
     } catch (error: any) {
       console.error('Error deleting portfolio item:', error);
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось удалить работу",
+        title: t("notifications.error"),
+        description: error.message || t("ui.ne_udalos_udalit_rabotu"),
         variant: "destructive"
       });
     }
@@ -360,7 +362,7 @@ export default function ProPortfolio() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">Портфолио</h1>
+          <h1 className="text-lg font-semibold">{t("dash.pro.portfolio")}</h1>
         </div>
       </div>
 
@@ -399,22 +401,22 @@ export default function ProPortfolio() {
               <form onSubmit={addItem} className="space-y-4 lg:space-y-6">
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Название работы</Label>
+                    <Label htmlFor="title">{t("ui.nazvanie_raboty")}</Label>
                     <Input
                       id="title"
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
-                      placeholder="Например: Ремонт ванной комнаты"
+                      placeholder={t("ui.naprimer_remont_vannoi_komnaty")}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="description">Описание</Label>
+                    <Label htmlFor="description">{t("ui.opisanie")}</Label>
                     <Textarea
                       id="description"
                       value={newDescription}
                       onChange={(e) => setNewDescription(e.target.value)}
-                      placeholder="Расскажите о проделанной работе..."
+                      placeholder={t("ui.rasskazhite_o_prodelannoi_rabote")}
                       className="min-h-[80px]"
                     />
                   </div>
@@ -422,7 +424,7 @@ export default function ProPortfolio() {
 
                 {/* File Upload Area */}
                 <div className="space-y-4">
-                  <Label>Фото и видео</Label>
+                  <Label>{t("job.new.photos")}</Label>
                   <div 
                     className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 lg:p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
                     onClick={() => document.getElementById('fileInput')?.click()}
@@ -435,7 +437,7 @@ export default function ProPortfolio() {
                         <Upload className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
                       </div>
                       <div>
-                        <p className="text-base lg:text-lg font-medium">Загрузите файлы</p>
+                        <p className="text-base lg:text-lg font-medium">{t("ui.zagruzite_faily")}</p>
                         <p className="text-sm text-muted-foreground">
                           Перетащите файлы сюда или нажмите для выбора
                         </p>
@@ -513,7 +515,7 @@ export default function ProPortfolio() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">Мои работы</h2>
+          <h2 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6">{t("ui.moi_raboty")}</h2>
           
           {portfolioItems.length === 0 ? (
             <Card className="border-2 border-dashed border-muted-foreground/25 bg-muted/10">
@@ -521,7 +523,7 @@ export default function ProPortfolio() {
                 <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-muted flex items-center justify-center mb-3 lg:mb-4">
                   <Camera className="h-6 w-6 lg:h-8 lg:w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-base lg:text-lg font-medium mb-2">Портфолио пусто</h3>
+                <h3 className="text-base lg:text-lg font-medium mb-2">{t("ui.portfolio_pusto")}</h3>
                 <p className="text-muted-foreground text-center max-w-md text-sm lg:text-base">
                   Добавьте фотографии ваших работ, чтобы клиенты могли оценить качество ваших услуг
                 </p>

@@ -42,7 +42,7 @@ const MobileTenders = () => {
         setItems(data || []);
       } catch (error) {
         console.error('Error loading tenders:', error);
-        toast({ title: "Ошибка загрузки тендеров", variant: "destructive" });
+        toast({ title: t("ui.oshibka_zagruzki_tenderov"), variant: "destructive" });
       } finally {
         setLoading(false);
       }
@@ -54,7 +54,7 @@ const MobileTenders = () => {
     const end = new Date(windowTo);
     const diff = end.getTime() - now.getTime();
 
-    if (diff <= 0) return "Завершен";
+    if (diff <= 0) return t("biz.tenders.status_done");
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -68,18 +68,18 @@ const MobileTenders = () => {
   };
 
   const tabItems = [
-    { id: "active", label: "Активные", icon: Gavel },
-    { id: "completed", label: "Завершенные", icon: Trophy },
-    { id: "my-bids", label: "Мои предложения", icon: Users },
-    { id: "stats", label: "Статистика", icon: Euro }
+    { id: "active", label: t("ui.aktivnye"), icon: Gavel },
+    { id: "completed", label: t("ui.zavershennye"), icon: Trophy },
+    { id: "my-bids", label: t("ui.moi_predlozheniia"), icon: Users },
+    { id: "stats", label: t("dash.client.stats"), icon: Euro }
   ];
 
   return (
     <div className="min-h-screen bg-neo">
-      <Seo title={`${t('app.name')} — Бизнес-тендеры`} description="Тендеры для компаний и крупных закупок" canonical="/tenders" />
+      <Seo title={`${t('app.name')} — Бизнес-тендеры`} description={t("ui.tendery_dlia_kompanii_i")} canonical="/tenders" />
 
       <MobileHeader
-        title="Бизнес-тендеры"
+        title={t("dash.pro.biz_tenders")}
         showBack={true}
         showNotifications={true}
       />
@@ -107,7 +107,7 @@ const MobileTenders = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-primary">{items.length}</div>
-                <div className="text-xs text-muted-foreground">Открытых</div>
+                <div className="text-xs text-muted-foreground">{t("ui.otkrytyh")}</div>
               </div>
               <div className="w-10 h-10 rounded-xl bg-neo neo-4 flex items-center justify-center">
                 <Gavel className="w-5 h-5 text-primary" />
@@ -121,7 +121,7 @@ const MobileTenders = () => {
                 <div className="text-2xl font-bold text-primary">
                   {items.reduce((sum, tender) => sum + (tender.bids?.length || 0), 0)}
                 </div>
-                <div className="text-xs text-muted-foreground">Откликов</div>
+                <div className="text-xs text-muted-foreground">{t("ui.otklikov")}</div>
               </div>
               <div className="w-10 h-10 rounded-xl bg-neo neo-4 flex items-center justify-center">
                 <Users className="w-5 h-5 text-primary" />
@@ -161,7 +161,7 @@ const MobileTenders = () => {
           <>
             {/* View Toggle */}
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-bold">Активные бизнес-тендеры</h2>
+              <h2 className="text-lg font-bold">{t("ui.aktivnye_biznes_tendery")}</h2>
               <div className="flex gap-1 p-1 rounded-lg bg-neo neo-inset-2">
                 <button
                   onClick={() => setViewMode("list")}
@@ -192,7 +192,7 @@ const MobileTenders = () => {
                 <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-neo neo-4 flex items-center justify-center">
                   <RefreshCw className="h-6 w-6 animate-spin text-primary" />
                 </div>
-                <p className="text-muted-foreground">Загружаем бизнес-заказы...</p>
+                <p className="text-muted-foreground">{t("ui.zagruzhaem_biznes_zakazy")}</p>
               </MobileCard>
             ) : (
               <div className={viewMode === "grid" ? "grid grid-cols-1 gap-4" : "space-y-4"}>
@@ -201,8 +201,8 @@ const MobileTenders = () => {
                     <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-neo neo-4 flex items-center justify-center">
                       <Trophy className="h-8 w-8 text-muted-foreground" />
                     </div>
-                    <h3 className="font-semibold mb-2">Нет открытых бизнес-тендеров</h3>
-                    <p className="text-muted-foreground text-sm">Когда появятся новые корпоративные закупки, они будут здесь</p>
+                    <h3 className="font-semibold mb-2">{t("ui.net_otkrytyh_biznes_tenderov")}</h3>
+                    <p className="text-muted-foreground text-sm">{t("ui.kogda_poiaviatsia_novye_korporativnye")}</p>
                   </MobileCard>
                 ) : (
                   items.map((tender, index) => (
@@ -221,7 +221,7 @@ const MobileTenders = () => {
                                 variant="outline"
                                 className="mb-2 bg-neo neo-2 border-0 text-primary text-xs"
                               >
-                                {tender.categories?.label_ru || "Тендер"}
+                                {tender.categories?.label_ru || t("dash.pro.tender_fallback")}
                               </Badge>
                               <h3 className="font-bold text-base leading-tight">
                                 {tender.title || `Тендер #${String(tender.id).slice(0, 8)}`}
@@ -313,14 +313,14 @@ const MobileTenders = () => {
               {activeTab === "stats" && <Euro className="h-8 w-8 text-muted-foreground" />}
             </div>
             <h3 className="font-semibold mb-2">
-              {activeTab === "completed" && "Завершенные бизнес-тендеры"}
-              {activeTab === "my-bids" && "Мои предложения"}
-              {activeTab === "stats" && "Статистика"}
+              {activeTab === "completed" && t("ui.zavershennye_biznes_tendery")}
+              {activeTab === "my-bids" && t("ui.moi_predlozheniia")}
+              {activeTab === "stats" && t("dash.client.stats")}
             </h3>
             <p className="text-muted-foreground text-sm">
-              {activeTab === "completed" && "Здесь будут отображаться завершённые бизнес-тендеры"}
-              {activeTab === "my-bids" && "Здесь будут отображаться ваши отклики на бизнес-тендеры"}
-              {activeTab === "stats" && "Здесь будет отображаться статистика по бизнес-тендерам"}
+              {activeTab === "completed" && t("ui.zdes_budut_otobrazhatsia_zavershennye_2")}
+              {activeTab === "my-bids" && t("ui.zdes_budut_otobrazhatsia_vashi_2")}
+              {activeTab === "stats" && t("ui.zdes_budet_otobrazhatsia_statistika_2")}
             </p>
           </MobileCard>
         )}

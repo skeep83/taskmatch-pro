@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { 
   AlertTriangle, 
   Upload, 
@@ -35,6 +36,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
   onCancel,
   className
 }) => {
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState('reason');
@@ -49,43 +51,43 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
   const disputeReasons = [
     { 
       id: 'quality', 
-      title: 'Низкое качество работы',
-      description: 'Работа выполнена не в соответствии с договоренностями'
+      title: t("ui.nizkoe_kachestvo_raboty"),
+      description: t("ui.rabota_vypolnena_ne_v")
     },
     { 
       id: 'deadline', 
-      title: 'Нарушение сроков',
-      description: 'Работа не завершена в оговоренные сроки'
+      title: t("ui.narushenie_srokov"),
+      description: t("ui.rabota_ne_zavershena_v")
     },
     { 
       id: 'scope', 
-      title: 'Неполный объем работ',
-      description: 'Выполнена только часть оговоренных работ'
+      title: t("ui.nepolnyi_obem_rabot"),
+      description: t("ui.vypolnena_tolko_chast_ogovorennyh")
     },
     { 
       id: 'materials', 
-      title: 'Проблемы с материалами',
-      description: 'Использованы некачественные или неподходящие материалы'
+      title: t("ui.problemy_s_materialami"),
+      description: t("ui.ispolzovany_nekachestvennye_ili_nepodhod")
     },
     { 
       id: 'damage', 
-      title: 'Причинен ущерб',
-      description: 'В процессе работы было повреждено имущество'
+      title: t("ui.prichinen_uscherb"),
+      description: t("ui.v_processe_raboty_bylo")
     },
     { 
       id: 'communication', 
-      title: 'Проблемы с коммуникацией',
-      description: 'Специалист перестал отвечать или ведет себя неадекватно'
+      title: t("ui.problemy_s_kommunikaciei"),
+      description: t("ui.specialist_perestal_otvechat_ili")
     },
     { 
       id: 'payment', 
-      title: 'Финансовые разногласия',
-      description: 'Несогласие по стоимости или условиям оплаты'
+      title: t("ui.finansovye_raznoglasiia"),
+      description: t("ui.nesoglasie_po_stoimosti_ili")
     },
     { 
       id: 'other', 
-      title: 'Другая причина',
-      description: 'Опишите проблему в деталях'
+      title: t("ui.drugaia_prichina"),
+      description: t("ui.opishite_problemu_v_detaliah")
     }
   ];
 
@@ -99,8 +101,8 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
 
     if (validFiles.length !== files.length) {
       toast({
-        title: 'Внимание',
-        description: 'Некоторые файлы не были добавлены. Поддерживаются только изображения и PDF до 10MB.',
+        title: t("ui.vnimanie"),
+        description: t("ui.nekotorye_faily_ne_byli"),
         variant: 'destructive'
       });
     }
@@ -121,8 +123,8 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
   const handleSubmit = async () => {
     if (!formData.reason || !formData.description) {
       toast({
-        title: 'Ошибка',
-        description: 'Выберите причину и опишите проблему',
+        title: t("notifications.error"),
+        description: t("ui.vyberite_prichinu_i_opishite"),
         variant: 'destructive'
       });
       return;
@@ -132,7 +134,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Пользователь не авторизован');
+      if (!user) throw new Error(t("ui.polzovatel_ne_avtorizovan"));
 
       // Загружаем файлы доказательств
       const evidenceUrls: string[] = [];
@@ -176,16 +178,16 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
       });
 
       toast({
-        title: 'Спор открыт',
-        description: 'Ваше обращение передано на рассмотрение. Мы свяжемся с вами в течение 48 часов.'
+        title: t("ui.spor_otkryt"),
+        description: t("ui.vashe_obraschenie_peredano_na")
       });
 
       onSuccess?.();
     } catch (error) {
       console.error('Error creating dispute:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось создать спор',
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_sozdat_spor"),
         variant: 'destructive'
       });
     } finally {
@@ -200,7 +202,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
           <AlertTriangle size={20} className="text-red-600 dark:text-red-400" />
         </div>
         <div>
-          <h3 className="text-xl font-semibold">Открыть спор</h3>
+          <h3 className="text-xl font-semibold">{t("ui.otkryt_spor")}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Заказ: {jobTitle}
           </p>
@@ -211,12 +213,12 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
         <div className="flex items-start gap-3">
           <Clock size={16} className="text-yellow-600 dark:text-yellow-400 mt-0.5" />
           <div className="text-sm text-yellow-700 dark:text-yellow-300">
-            <p className="font-medium mb-1">Важная информация:</p>
+            <p className="font-medium mb-1">{t("ui.vazhnaia_informaciia")}</p>
             <ul className="list-disc list-inside space-y-0.5">
-              <li>Рассмотрение спора займет до 48 часов</li>
-              <li>Администрация изучит все доказательства</li>
-              <li>Решение будет принято справедливо для обеих сторон</li>
-              <li>До разрешения спора платеж заблокирован</li>
+              <li>{t("ui.rassmotrenie_spora_zaimet_do")}</li>
+              <li>{t("ui.administraciia_izuchit_vse_dokazatelstva")}</li>
+              <li>{t("ui.reshenie_budet_priniato_spravedlivo")}</li>
+              <li>{t("ui.do_razresheniia_spora_platezh")}</li>
             </ul>
           </div>
         </div>
@@ -224,14 +226,14 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="reason">1. Причина</TabsTrigger>
-          <TabsTrigger value="evidence">2. Доказательства</TabsTrigger>
-          <TabsTrigger value="summary">3. Отправка</TabsTrigger>
+          <TabsTrigger value="reason">{t("ui.1_prichina")}</TabsTrigger>
+          <TabsTrigger value="evidence">{t("ui.2_dokazatelstva")}</TabsTrigger>
+          <TabsTrigger value="summary">{t("ui.3_otpravka")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="reason" className="space-y-4">
           <div>
-            <h4 className="font-medium mb-4">Выберите причину спора:</h4>
+            <h4 className="font-medium mb-4">{t("ui.vyberite_prichinu_spora")}</h4>
             <div className="grid gap-3">
               {disputeReasons.map(reason => (
                 <div
@@ -268,7 +270,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
               Детальное описание проблемы *
             </label>
             <Textarea
-              placeholder="Опишите в деталях, что произошло. Чем больше информации вы предоставите, тем быстрее мы сможем разрешить спор."
+              placeholder={t("ui.opishite_v_detaliah_chto")}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={6}
@@ -288,7 +290,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
 
         <TabsContent value="evidence" className="space-y-4">
           <div>
-            <h4 className="font-medium mb-4">Приложите доказательства (необязательно):</h4>
+            <h4 className="font-medium mb-4">{t("ui.prilozhite_dokazatelstva_neobiazatelno")}</h4>
             
             <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
               <input
@@ -343,7 +345,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
               Фрагменты переписки (необязательно)
             </label>
             <Textarea
-              placeholder="Скопируйте важные сообщения из чата с исполнителем, которые могут помочь в разрешении спора"
+              placeholder={t("ui.skopiruite_vazhnye_soobscheniia_iz")}
               value={formData.chatMessages}
               onChange={(e) => setFormData({ ...formData, chatMessages: e.target.value })}
               rows={4}
@@ -362,13 +364,13 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
 
         <TabsContent value="summary" className="space-y-6">
           <div>
-            <h4 className="font-medium mb-4">Проверьте данные перед отправкой:</h4>
+            <h4 className="font-medium mb-4">{t("ui.proverte_dannye_pered_otpravkoi")}</h4>
             
             <div className="space-y-4">
               <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <AlertTriangle size={20} className="text-red-500 mt-0.5" />
                 <div>
-                  <p className="font-medium">Причина спора:</p>
+                  <p className="font-medium">{t("ui.prichina_spora")}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {disputeReasons.find(r => r.id === formData.reason)?.title}
                   </p>
@@ -378,7 +380,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
               <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <MessageCircle size={20} className="text-blue-500 mt-0.5" />
                 <div>
-                  <p className="font-medium">Описание:</p>
+                  <p className="font-medium">{t("ui.opisanie_2")}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {formData.description}
                   </p>
@@ -389,7 +391,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
                 <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <FileText size={20} className="text-green-500 mt-0.5" />
                   <div>
-                    <p className="font-medium">Доказательства:</p>
+                    <p className="font-medium">{t("ui.dokazatelstva")}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Загружено файлов: {formData.evidence.length}
                     </p>
@@ -400,7 +402,7 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
               <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <Shield size={20} className="text-purple-500 mt-0.5" />
                 <div>
-                  <p className="font-medium">Ответчик:</p>
+                  <p className="font-medium">{t("ui.otvetchik")}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {respondentName}
                   </p>
@@ -413,12 +415,12 @@ export const DisputeForm: React.FC<DisputeFormProps> = ({
             <div className="flex items-start gap-3">
               <Clock size={16} className="text-blue-600 dark:text-blue-400 mt-0.5" />
               <div className="text-sm text-blue-700 dark:text-blue-300">
-                <p className="font-medium mb-1">Что происходит дальше:</p>
+                <p className="font-medium mb-1">{t("ui.chto_proishodit_dalshe")}</p>
                 <ol className="list-decimal list-inside space-y-0.5">
-                  <li>Спор передается на рассмотрение администрации</li>
-                  <li>Обе стороны получат уведомления</li>
-                  <li>Платеж по заказу блокируется до решения</li>
-                  <li>Решение принимается в течение 48 часов</li>
+                  <li>{t("ui.spor_peredaetsia_na_rassmotrenie")}</li>
+                  <li>{t("ui.obe_storony_poluchat_uvedomleniia")}</li>
+                  <li>{t("ui.platezh_po_zakazu_blokiruetsia")}</li>
+                  <li>{t("ui.reshenie_prinimaetsia_v_techenie")}</li>
                 </ol>
               </div>
             </div>

@@ -24,6 +24,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface RoleUpgradeWizardProps {
   userId: string;
@@ -48,26 +49,7 @@ interface ProfileData {
   bio?: string;
 }
 
-const roleConfig = {
-  pro: {
-    title: "Специалист",
-    icon: Briefcase,
-    requirements: [
-      "Заполненный профиль (имя, телефон, город)",
-      "Краткое био описание ваших услуг", 
-      "Загрузка документа удостоверения личности"
-    ]
-  },
-  business: {
-    title: "Бизнес",
-    icon: Building2,
-    requirements: [
-      "Заполненные данные компании",
-      "Документы регистрации бизнеса",
-      "Контактная информация и реквизиты"
-    ]
-  }
-};
+
 
 export const RoleUpgradeWizard = ({ 
   userId, 
@@ -77,6 +59,27 @@ export const RoleUpgradeWizard = ({
   onClose, 
   onSuccess 
 }: RoleUpgradeWizardProps) => {
+  const { t } = useEnhancedI18n();
+  const roleConfig = {
+    pro: {
+      title: t("menu.role_pro"),
+      icon: Briefcase,
+      requirements: [
+        t("ui.zapolnennyi_profil_imia_telefon"),
+        t("ui.kratkoe_bio_opisanie_vashih"), 
+        t("ui.zagruzka_dokumenta_udostovereniia_lichno")
+      ]
+    },
+    business: {
+      title: t("menu.role_business"),
+      icon: Building2,
+      requirements: [
+        t("ui.zapolnennye_dannye_kompanii"),
+        t("ui.dokumenty_registracii_biznesa"),
+        t("ui.kontaktnaia_informaciia_i_rekvizity")
+      ]
+    }
+  };
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -190,16 +193,16 @@ export const RoleUpgradeWizard = ({
       }
 
       toast({
-        title: "Профиль обновлен",
-        description: "Данные профиля успешно сохранены"
+        title: t("dash.client.profile_updated"),
+        description: t("ui.dannye_profilia_uspeshno_sohraneny")
       });
 
       setStep(2);
       await checkRequirements();
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось сохранить профиль",
+        title: t("notifications.error"),
+        description: error.message || t("ui.ne_udalos_sohranit_profil"),
         variant: "destructive"
       });
     } finally {
@@ -236,16 +239,16 @@ export const RoleUpgradeWizard = ({
       if (docError) throw docError;
 
       toast({
-        title: "Документ загружен",
-        description: "Документ отправлен на проверку"
+        title: t("ui.dokument_zagruzhen"),
+        description: t("ui.dokument_otpravlen_na_proverku")
       });
 
       await checkRequirements();
       setStep(3);
     } catch (error: any) {
       toast({
-        title: "Ошибка загрузки",
-        description: error.message || "Не удалось загрузить документ",
+        title: t("dash.pro.load_error_title"),
+        description: error.message || t("ui.ne_udalos_zagruzit_dokument"),
         variant: "destructive"
       });
     } finally {
@@ -277,8 +280,8 @@ export const RoleUpgradeWizard = ({
         if (error) throw error;
 
         toast({
-          title: "Заявка подана!",
-          description: "Ваша заявка на статус специалиста отправлена на рассмотрение администрации. Мы свяжемся с вами в течение 24 часов."
+          title: t("ui.zaiavka_podana"),
+          description: t("ui.vasha_zaiavka_na_status")
         });
       } else {
         // For business role, use direct upgrade
@@ -289,7 +292,7 @@ export const RoleUpgradeWizard = ({
         }
 
         toast({
-          title: "Апгрейд завершен!",
+          title: t("ui.apgreid_zavershen"),
           description: `Вы успешно стали ${config.title.toLowerCase()}ом`
         });
         onSuccess(targetRole);
@@ -298,8 +301,8 @@ export const RoleUpgradeWizard = ({
       onClose();
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось завершить операцию",
+        title: t("notifications.error"),
+        description: error.message || t("ui.ne_udalos_zavershit_operaciiu"),
         variant: "destructive"
       });
     } finally {
@@ -341,7 +344,7 @@ export const RoleUpgradeWizard = ({
           {/* Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Прогресс</span>
+              <span>{t("ui.progress")}</span>
               <span>Шаг {step} из {totalSteps}</span>
             </div>
             <Progress value={getStepProgress()} className="h-2" />
@@ -367,28 +370,28 @@ export const RoleUpgradeWizard = ({
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="firstName">Имя</Label>
+                        <Label htmlFor="firstName">{t("ui.imia")}</Label>
                         <Input
                           id="firstName"
                           value={profileData.first_name || ''}
                           onChange={(e) => setProfileData(prev => ({ ...prev, first_name: e.target.value }))}
-                          placeholder="Ваше имя"
+                          placeholder={t("ui.vashe_imia")}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="lastName">Фамилия</Label>
+                        <Label htmlFor="lastName">{t("ui.familiia")}</Label>
                         <Input
                           id="lastName"
                           value={profileData.last_name || ''}
                           onChange={(e) => setProfileData(prev => ({ ...prev, last_name: e.target.value }))}
-                          placeholder="Ваша фамилия"
+                          placeholder={t("ui.vasha_familiia")}
                         />
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="phone">Телефон</Label>
+                        <Label htmlFor="phone">{t("dash.client.phone")}</Label>
                         <Input
                           id="phone"
                           value={profileData.phone || ''}
@@ -397,31 +400,31 @@ export const RoleUpgradeWizard = ({
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city">Город</Label>
+                        <Label htmlFor="city">{t("ui.gorod")}</Label>
                         <Input
                           id="city"
                           value={profileData.city || ''}
                           onChange={(e) => setProfileData(prev => ({ ...prev, city: e.target.value }))}
-                          placeholder="Ваш город"
+                          placeholder={t("ui.vash_gorod")}
                         />
                       </div>
                     </div>
 
                     {targetRole === 'pro' && (
                       <div>
-                        <Label htmlFor="bio">Описание услуг</Label>
+                        <Label htmlFor="bio">{t("ui.opisanie_uslug")}</Label>
                         <Textarea
                           id="bio"
                           value={profileData.bio || ''}
                           onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                          placeholder="Расскажите о ваших услугах и опыте"
+                          placeholder={t("ui.rasskazhite_o_vashih_uslugah")}
                           rows={3}
                         />
                       </div>
                     )}
 
                     <Button onClick={saveProfileData} disabled={loading} className="w-full">
-                      {loading ? "Сохраняем..." : "Сохранить и продолжить"}
+                      {loading ? t("ui.sohraniaem") : t("ui.sohranit_i_prodolzhit")}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </CardContent>
@@ -463,7 +466,7 @@ export const RoleUpgradeWizard = ({
                       />
                       <Button asChild variant="outline" disabled={uploadingDoc}>
                         <label htmlFor="documentUpload" className="cursor-pointer">
-                          {uploadingDoc ? "Загружаем..." : "Выбрать файл"}
+                          {uploadingDoc ? t("ui.zagruzhaem") : t("ui.vybrat_fail")}
                         </label>
                       </Button>
                     </div>
@@ -492,7 +495,7 @@ export const RoleUpgradeWizard = ({
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4" />
-                      {targetRole === 'pro' ? 'Готово к отправке' : 'Готово к активации'}
+                      {targetRole === 'pro' ? t("ui.gotovo_k_otpravke") : t("ui.gotovo_k_aktivacii")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -508,16 +511,16 @@ export const RoleUpgradeWizard = ({
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <p className="text-sm text-blue-800">
                         {targetRole === 'pro' ? (
-                          "Все требования выполнены! После отправки заявки администрация рассмотрит вашу кандидатуру в течение 24 часов."
+                          t("ui.vse_trebovaniia_vypolneny_posle")
                         ) : (
-                          "Все требования выполнены! Теперь вы можете активировать аккаунт бизнеса."
+                          t("ui.vse_trebovaniia_vypolneny_teper")
                         )}
                       </p>
                     </div>
 
                     <Button onClick={completeUpgrade} disabled={loading} className="w-full" size="lg">
-                      {loading ? "Обрабатываем..." : (
-                        targetRole === 'pro' ? "Отправить заявку на рассмотрение" : `Стать ${config.title.toLowerCase()}ом`
+                      {loading ? t("ui.obrabatyvaem") : (
+                        targetRole === 'pro' ? t("ui.otpravit_zaiavku_na_rassmotrenie") : `Стать ${config.title.toLowerCase()}ом`
                       )}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>

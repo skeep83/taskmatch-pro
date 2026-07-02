@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Clock, Euro, Shield, Send } from 'lucide-react';
 import { submitJobResponse } from '@/lib/jobResponseSubmission';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface JobResponseFormProps {
   jobId: string;
@@ -24,6 +25,7 @@ export const JobResponseForm = ({
   budgetMaxCents,
   onApplicationSubmit
 }: JobResponseFormProps) => {
+  const { t } = useEnhancedI18n();
   const [formData, setFormData] = useState({
     price: '',
     etaSlot: '',
@@ -42,49 +44,49 @@ export const JobResponseForm = ({
 
     if (message.includes('Only professionals can apply to jobs')) {
       return {
-        title: 'Необходима роль специалиста',
-        description: 'Чтобы отправлять предложения на заказы, вам нужно включить роль специалиста в профиле.'
+        title: t("ui.neobhodima_rol_specialista"),
+        description: t("ui.chtoby_otpravliat_predlozheniia_na")
       };
     }
 
     if (message.includes('You cannot send a proposal to your own job')) {
       return {
-        title: 'Это ваш собственный заказ',
-        description: 'Нельзя откликаться на собственный заказ от имени специалиста.'
+        title: t("ui.eto_vash_sobstvennyi_zakaz"),
+        description: t("ui.nelzia_otklikatsia_na_sobstvennyi")
       };
     }
 
     if (message.includes('You need to configure your services first')) {
       return {
-        title: 'Сначала настройте услуги',
-        description: 'Добавьте в профиле хотя бы одну услугу, чтобы откликаться на заказы.'
+        title: t("ui.snachala_nastroite_uslugi"),
+        description: t("ui.dobavte_v_profile_hotia")
       };
     }
 
     if (message.includes('You do not offer services in')) {
       return {
-        title: 'Категория не подключена',
-        description: 'У вас не подключена эта категория услуг. Добавьте её в настройках профиля.'
+        title: t("ui.kategoriia_ne_podkliuchena"),
+        description: t("ui.u_vas_ne_podkliuchena_2")
       };
     }
 
     if (message.includes('You have already applied to this job')) {
       return {
-        title: 'Предложение уже отправлено',
-        description: 'Вы уже отправили предложение на этот заказ.'
+        title: t("ui.predlozhenie_uzhe_otpravleno"),
+        description: t("ui.vy_uzhe_otpravili_predlozhenie")
       };
     }
 
     if (message.includes('Job not found or no longer available')) {
       return {
-        title: 'Заказ уже недоступен',
-        description: 'Заказ был закрыт, удалён или уже недоступен для новых откликов.'
+        title: t("ui.zakaz_uzhe_nedostupen"),
+        description: t("ui.zakaz_byl_zakryt_udalen")
       };
     }
 
     return {
-      title: 'Ошибка',
-      description: message || 'Не удалось отправить предложение'
+      title: t("notifications.error"),
+      description: message || t("ui.ne_udalos_otpravit_predlozhenie")
     };
   };
 
@@ -97,8 +99,8 @@ export const JobResponseForm = ({
     if (!formData.price) {
       console.error('Validation failed: empty price field');
       toast({
-        title: 'Ошибка',
-        description: 'Введите цену',
+        title: t("notifications.error"),
+        description: t("ui.vvedite_cenu"),
         variant: 'destructive'
       });
       return;
@@ -114,8 +116,8 @@ export const JobResponseForm = ({
     if (isNaN(priceNumber) || priceNumber <= 0) {
       console.error('Validation failed: invalid price number', { price: formData.price, converted: priceNumber });
       toast({
-        title: 'Ошибка',
-        description: 'Укажите корректную цену',
+        title: t("notifications.error"),
+        description: t("ui.ukazhite_korrektnuiu_cenu"),
         variant: 'destructive'
       });
       return;
@@ -143,8 +145,8 @@ export const JobResponseForm = ({
       if (error) throw error;
 
       toast({
-        title: 'Предложение отправлено!',
-        description: 'Заказчик получит ваше предложение и сможет выбрать исполнителя'
+        title: t("ui.predlozhenie_otpravleno"),
+        description: t("ui.zakazchik_poluchit_vashe_predlozhenie")
       });
 
       // Reset form
@@ -232,7 +234,7 @@ export const JobResponseForm = ({
                 ? `от ${formatPrice(budgetMin * 100)}`
                 : budgetMax
                 ? `до ${formatPrice(budgetMax * 100)}`
-                : 'Не указан'}
+                : t("dash.client.budget_na")}
             </span>
           </div>
         )}
@@ -256,7 +258,7 @@ export const JobResponseForm = ({
               type="number"
               min="1"
               step="1"
-              placeholder="Введите цену"
+              placeholder={t("ui.vvedite_cenu")}
               value={formData.price}
               onChange={(e) => handleInputChange('price', e.target.value)}
               required
@@ -275,12 +277,12 @@ export const JobResponseForm = ({
               value={formData.etaSlot}
               onChange={(e) => handleInputChange('etaSlot', e.target.value)}
             >
-              <option value="">Выберите время</option>
-              <option value="today">Сегодня</option>
-              <option value="tomorrow">Завтра</option>
-              <option value="2-3_days">Через 2-3 дня</option>
-              <option value="next_week">На следующей неделе</option>
-              <option value="flexible">По договоренности</option>
+              <option value="">{t("ui.vyberite_vremia")}</option>
+              <option value="today">{t("hero.mock.urgency")}</option>
+              <option value="tomorrow">{t("ui.zavtra")}</option>
+              <option value="2-3_days">{t("ui.cherez_2_3_dnia")}</option>
+              <option value="next_week">{t("ui.na_sleduiuschei_nedele")}</option>
+              <option value="flexible">{t("biz.jobs.by_agreement")}</option>
             </select>
           </div>
 
@@ -302,7 +304,7 @@ export const JobResponseForm = ({
 
           {/* Note */}
           <div className="space-y-2">
-            <Label htmlFor="note">Комментарий к отклику</Label>
+            <Label htmlFor="note">{t("ui.kommentarii_k_otkliku")}</Label>
             <Textarea
               id="note"
               placeholder="Расскажите о своем опыте, подходе к решению задачи, используемых материалах..."
@@ -313,7 +315,7 @@ export const JobResponseForm = ({
           </div>
 
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? 'Отправляю...' : 'Отправить предложение'}
+            {loading ? t("ui.otpravliaiu") : t("dash.pro.send_offer")}
           </Button>
         </form>
       </CardContent>

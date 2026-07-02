@@ -66,8 +66,8 @@ const TenderNew = () => {
         if (error) {
           console.error('Error checking business account:', error);
           toast({
-            title: 'Ошибка',
-            description: 'Не удалось проверить бизнес-аккаунт',
+            title: t("notifications.error"),
+            description: t("ui.ne_udalos_proverit_biznes"),
             variant: 'destructive'
           });
           return;
@@ -77,8 +77,8 @@ const TenderNew = () => {
       } catch (error: any) {
         console.error('Error loading business account:', error);
         toast({
-          title: 'Ошибка',
-          description: 'Не удалось загрузить бизнес-аккаунт',
+          title: t("notifications.error"),
+          description: t("ui.ne_udalos_zagruzit_biznes"),
           variant: 'destructive'
         });
       } finally {
@@ -100,29 +100,29 @@ const TenderNew = () => {
     const time = String(fd.get("time") || "");
 
     if (!title.trim()) {
-      toast({ title: 'Ошибка', description: 'Введите название тендера', variant: 'destructive' });
+      toast({ title: t("notifications.error"), description: t("ui.vvedite_nazvanie_tendera"), variant: 'destructive' });
       return;
     }
 
     if (!description.trim()) {
-      toast({ title: 'Ошибка', description: 'Введите описание тендера', variant: 'destructive' });
+      toast({ title: t("notifications.error"), description: t("ui.vvedite_opisanie_tendera"), variant: 'destructive' });
       return;
     }
 
     if (!budget_max) {
-      toast({ title: 'Ошибка', description: 'Укажите максимальный бюджет', variant: 'destructive' });
+      toast({ title: t("notifications.error"), description: t("ui.ukazhite_maksimalnyi_biudzhet"), variant: 'destructive' });
       return;
     }
 
     if (!date || !time) {
-      toast({ title: 'Ошибка', description: 'Укажите срок подачи заявок', variant: 'destructive' });
+      toast({ title: t("notifications.error"), description: t("ui.ukazhite_srok_podachi_zaiavok"), variant: 'destructive' });
       return;
     }
 
     if (!businessAccount) {
       toast({
-        title: 'Ошибка',
-        description: 'У вас нет бизнес-аккаунта. Только бизнес-аккаунты могут создавать тендеры.',
+        title: t("notifications.error"),
+        description: t("ui.u_vas_net_biznes"),
         variant: 'destructive'
       });
       return;
@@ -133,7 +133,7 @@ const TenderNew = () => {
       const { data: s } = await supabase.auth.getSession();
       const userId = s.session?.user?.id;
       if (!userId) {
-        toast({ title: "Требуется вход", description: "Пожалуйста, войдите" , variant: "destructive"});
+        toast({ title: t("messages.login_required"), description: t("messages.please_login") , variant: "destructive"});
         navigate("/auth");
         return;
       }
@@ -180,17 +180,17 @@ const TenderNew = () => {
       }
 
       toast({
-        title: failedPhotos > 0 ? 'Тендер создан частично' : 'Успех',
+        title: failedPhotos > 0 ? t("ui.tender_sozdan_chastichno") : t("ui.uspeh"),
         description: failedPhotos > 0
           ? `Тендер создан, но ${failedPhotos} из ${uploadedFiles.length} фото не загрузил${failedPhotos === 1 ? 'ось' : failedPhotos < 5 ? 'ись' : 'ось'}. Проверьте вложения на странице тендера.`
           : uploadedPhotos > 0
             ? `Тендер создан успешно. Загружено фото: ${uploadedPhotos}. Исполнители смогут откликаться до указанного срока.`
-            : 'Тендер создан успешно. Исполнители смогут откликаться до указанного срока.'
+            : t("ui.tender_sozdan_uspeshno_ispolniteli")
       });
       navigate(`/tenders/${created.id}`, { replace: true });
     } catch (err: any) {
       console.error(err);
-      toast({ title: "Ошибка", description: err?.message || "Не удалось создать тендер", variant: "destructive" });
+      toast({ title: t("notifications.error"), description: err?.message || t("ui.ne_udalos_sozdat_tender"), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -233,8 +233,8 @@ const TenderNew = () => {
     return (
       <main className="min-h-screen flex items-center justify-center bg-neo">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Загрузка...</h2>
-          <p className="text-muted-foreground">Проверяем ваш бизнес-аккаунт</p>
+          <h2 className="text-xl font-semibold mb-2">{t("common.loading")}</h2>
+          <p className="text-muted-foreground">{t("ui.proveriaem_vash_biznes_akkaunt")}</p>
         </div>
       </main>
     );
@@ -243,7 +243,7 @@ const TenderNew = () => {
   return (
     <RoleGuard requiredRole="business">
       <main className="min-h-screen bg-neo">
-        <Seo title={`${t('app.name')} — Создать тендер`} description="Создайте тендер для получения откликов от исполнителей" canonical="/tenders/new" />
+        <Seo title={`${t('app.name')} — Создать тендер`} description={t("ui.sozdaite_tender_dlia_polucheniia")} canonical="/tenders/new" />
 
         {/* Hero Section */}
         <section className="relative overflow-hidden">
@@ -254,22 +254,22 @@ const TenderNew = () => {
           <div className="relative container mx-auto px-4 py-24">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-                Создать тендер
+                {t("biz.tenders.create")}
               </h1>
               <p className="text-xl text-white/90 mb-8">
-                Получите отклики от исполнителей
+                {t("ui.poluchite_otkliki_ot_ispolnitelei")}
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
                   <div className="flex items-center gap-2 text-white">
                     <AnimatedIcon icon={Gavel} className="text-purple-300" />
-                    <span>Прозрачный аукцион</span>
+                    <span>{t("ui.prozrachnyi_aukcion")}</span>
                   </div>
                 </div>
                 <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
                   <div className="flex items-center gap-2 text-white">
                     <AnimatedIcon icon={Shield} className="text-green-300" />
-                    <span>Гарантия качества</span>
+                    <span>{t("ui.garantiia_kachestva")}</span>
                   </div>
                 </div>
               </div>
@@ -286,15 +286,15 @@ const TenderNew = () => {
                     <AlertTriangle className="h-6 w-6 text-orange-500" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground mb-2">Требуется бизнес-аккаунт</h3>
+                    <h3 className="font-semibold text-foreground mb-2">{t("ui.trebuetsia_biznes_akkaunt")}</h3>
                     <p className="text-muted-foreground mb-4">
-                      Для создания тендеров необходим бизнес-аккаунт. Тендеры доступны только для корпоративных клиентов.
+                      {t("ui.dlia_sozdaniia_tenderov_neobhodim")}
                     </p>
                     <button
                       onClick={() => navigate('/dashboard/business')}
                       className="bg-neo neo-4 hover:neo-inset-2 border-0 px-6 py-3 rounded-xl font-semibold transition-all"
                     >
-                      Создать бизнес-аккаунт
+                      {t("dashboard.business.create_btn")}
                     </button>
                   </div>
                 </div>
@@ -307,10 +307,10 @@ const TenderNew = () => {
         <section className="container mx-auto py-16 px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-[#4B5563]">
-              Детали тендера
+              {t("ui.detali_tendera")}
             </h2>
             <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
-              Опишите проект подробно для получения откликов
+              {t("ui.opishite_proekt_podrobno_dlia")}
             </p>
           </div>
 
@@ -322,7 +322,7 @@ const TenderNew = () => {
                 className="gap-2 bg-neo neo-4 hover:neo-inset-2 border-0 px-6 py-3 rounded-xl font-semibold transition-all flex items-center"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Назад к тендерам
+                {t("ui.nazad_k_tenderam")}
               </button>
             </div>
 
@@ -332,7 +332,7 @@ const TenderNew = () => {
                 {businessAccount && (
                   <div className="p-4 rounded-xl bg-neo neo-inset-4">
                     <p className="text-sm text-muted-foreground">
-                      <strong>Бизнес-аккаунт:</strong> {businessAccount.company_name}
+                      <strong>{t("ui.biznes_akkaunt")}</strong> {businessAccount.company_name}
                     </p>
                   </div>
                 )}
@@ -341,17 +341,17 @@ const TenderNew = () => {
                 <div className="space-y-6">
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
                     <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">1</span>
-                    Информация о тендере
+                    {t("ui.informaciia_o_tendere")}
                   </h2>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="bg-neo rounded-2xl p-6 neo-8">
-                      <label className="block text-sm font-medium mb-3 text-[#374151]">Категория услуги</label>
+                      <label className="block text-sm font-medium mb-3 text-[#374151]">{t("ui.kategoriia_uslugi")}</label>
                       <select
                         name="category_id"
                         className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                       >
-                        <option value="">Выберите категорию</option>
+                        <option value="">{t("job.new.select_category")}</option>
                         {categoryOptions}
                       </select>
                     </div>
@@ -359,7 +359,7 @@ const TenderNew = () => {
                     <div className="bg-neo rounded-2xl p-6 neo-8">
                       <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
                         <Euro className="w-4 h-4 text-green-500" />
-                        Максимальный бюджет *
+                        {t("ui.maksimalnyi_biudzhet_2")}
                       </label>
                       <input
                         name="budget_max"
@@ -373,28 +373,28 @@ const TenderNew = () => {
                   </div>
 
                   <div className="bg-neo rounded-2xl p-6 neo-8">
-                    <label className="block text-sm font-medium mb-3 text-[#374151]">Название тендера *</label>
+                    <label className="block text-sm font-medium mb-3 text-[#374151]">{t("ui.nazvanie_tendera")}</label>
                     <input
                       name="title"
                       className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
-                      placeholder="Например: Ремонт офисного помещения"
+                      placeholder={t("ui.naprimer_remont_ofisnogo_pomescheniia")}
                       maxLength={200}
                       required
                     />
                   </div>
 
                   <div className="bg-neo rounded-2xl p-6 neo-8">
-                    <label className="block text-sm font-medium mb-3 text-[#374151]">Описание проекта *</label>
+                    <label className="block text-sm font-medium mb-3 text-[#374151]">{t("ui.opisanie_proekta")}</label>
                     <textarea
                       name="description"
                       className="w-full bg-neo border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                       rows={4}
-                      placeholder="Подробно опишите проект, требования к материалам, сроки выполнения, критерии оценки..."
+                      placeholder={t("ui.podrobno_opishite_proekt_trebovaniia")}
                       maxLength={1000}
                       required
                     />
                     <p className="text-xs text-[#6B7280] mt-2">
-                      Подробное описание поможет исполнителям подготовить отклики
+                      {t("ui.podrobnoe_opisanie_pomozhet_ispolnitelia")}
                     </p>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ const TenderNew = () => {
                 <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
                     <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">2</span>
-                    Срок подачи заявок
+                    {t("ui.srok_podachi_zaiavok")}
                   </h2>
 
                   <div className="bg-neo rounded-2xl p-6 neo-8">
@@ -411,7 +411,7 @@ const TenderNew = () => {
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
                           <Clock className="w-4 h-4 text-blue-500" />
-                          Дата окончания *
+                          {t("ui.data_okonchaniia")}
                         </label>
                         <input
                           name="date"
@@ -422,7 +422,7 @@ const TenderNew = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-3 text-[#374151]">Время *</label>
+                        <label className="block text-sm font-medium mb-3 text-[#374151]">{t("ui.vremia")}</label>
                         <input
                           name="time"
                           type="time"
@@ -432,7 +432,7 @@ const TenderNew = () => {
                       </div>
                     </div>
                     <p className="text-xs text-[#6B7280] mt-2">
-                      После этого времени подача заявок будет закрыта
+                      {t("ui.posle_etogo_vremeni_podacha")}
                     </p>
                   </div>
                 </div>
@@ -441,7 +441,7 @@ const TenderNew = () => {
                 <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
                     <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">3</span>
-                    Дополнительные материалы
+                    {t("ui.dopolnitelnye_materialy")}
                   </h2>
 
                   <div className="bg-neo rounded-2xl p-6 neo-8">
@@ -455,9 +455,9 @@ const TenderNew = () => {
                       onDrop={handleDrop}
                     >
                       <AnimatedIcon icon={Camera} className="w-12 h-12 text-primary mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2 text-[#374151]">Добавьте фотографии или документы</h3>
+                      <h3 className="text-lg font-medium mb-2 text-[#374151]">{t("ui.dobavte_fotografii_ili_dokumenty")}</h3>
                       <p className="text-[#6B7280] mb-4">
-                        Перетащите файлы сюда или выберите их
+                        {t("ui.peretaschite_faily_siuda_ili")}
                       </p>
                       <input
                         type="file"
@@ -470,7 +470,7 @@ const TenderNew = () => {
                       />
                       <label htmlFor="file-upload" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 inline-flex items-center gap-2 cursor-pointer">
                         <Upload className="w-4 h-4" />
-                        Выбрать файлы
+                        {t("job.new.select_files")}
                       </label>
                     </div>
 
@@ -506,10 +506,10 @@ const TenderNew = () => {
                 {/* Submit */}
                 <div className="flex justify-between items-center pt-8 border-t border-[#D1D5DB]">
                   <button type="button" className="bg-neo text-[#374151] hover:bg-[#D1D5DB] px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 hover:neo-inset-4" onClick={() => navigate('/dashboard/business?tab=tenders')}>
-                    Отмена
+                    {t("common.cancel")}
                   </button>
                   <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8" disabled={loading || !businessAccount}>
-                    {loading ? 'Создаем тендер...' : 'Создать тендер'}
+                    {loading ? t("ui.sozdaem_tender") : t("biz.tenders.create")}
                   </button>
                 </div>
               </form>

@@ -150,8 +150,8 @@ export default function MobileJobDetail() {
       if (error) {
         console.error('Error fetching job:', error);
         toast({
-          title: "Ошибка",
-          description: "Не удалось загрузить детали заказа",
+          title: t("notifications.error"),
+          description: t("ui.ne_udalos_zagruzit_detali"),
           variant: "destructive"
         });
         navigate(-1);
@@ -194,8 +194,8 @@ export default function MobileJobDetail() {
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: "Ошибка",
-        description: "Произошла ошибка при загрузке",
+        title: t("notifications.error"),
+        description: t("ui.proizoshla_oshibka_pri_zagruzke"),
         variant: "destructive"
       });
     } finally {
@@ -298,8 +298,8 @@ export default function MobileJobDetail() {
     if (paymentSuccess !== '1') return;
 
     toast({
-      title: 'Платёж подтверждён',
-      description: 'Эскроу создан. Можно продолжать работу по заказу.',
+      title: t("ui.platezh_podtverzhden"),
+      description: t("ui.eskrou_sozdan_mozhno_prodolzhat"),
     });
     navigate(`/job/${id}`, { replace: true });
   }, [id, navigate, searchParams, toast]);
@@ -344,8 +344,8 @@ export default function MobileJobDetail() {
   const handleResponse = async () => {
     if (currentUserId && job?.client_id === currentUserId) {
       toast({
-        title: "Недоступно",
-        description: "Нельзя откликаться на собственный заказ",
+        title: t("ui.nedostupno"),
+        description: t("ui.nelzia_otklikatsia_na_sobstvennyi_2"),
         variant: "destructive"
       });
       return;
@@ -358,8 +358,8 @@ export default function MobileJobDetail() {
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось отправить отклик",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_otpravit_otklik"),
         variant: "destructive"
       });
     } finally {
@@ -370,8 +370,8 @@ export default function MobileJobDetail() {
   const handleStartWork = async () => {
     if (!job || !currentUserId || currentUserId !== job.pro_id) {
       toast({
-        title: 'Ошибка',
-        description: 'У вас нет прав для выполнения этого действия',
+        title: t("notifications.error"),
+        description: t("ui.u_vas_net_prav"),
         variant: 'destructive'
       });
       return;
@@ -392,7 +392,7 @@ export default function MobileJobDetail() {
         body: {
           user_id: job.client_id,
           type: 'job_update',
-          title: 'Работа начата',
+          title: t("ui.rabota_nachata"),
           title_ro: 'Lucrul a început',
           message: `Специалист начал выполнение работы: ${job.title}`,
           message_ro: `Specialistul a început să lucreze: ${job.title}`,
@@ -402,16 +402,16 @@ export default function MobileJobDetail() {
       });
 
       toast({
-        title: 'Работа начата',
-        description: 'Статус заказа изменён на "В работе"'
+        title: t("ui.rabota_nachata"),
+        description: t("ui.status_zakaza_izmenen_na_4")
       });
 
       await fetchJobDetail(job.id);
     } catch (error) {
       console.error('Error starting work:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось обновить статус заказа',
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_obnovit_status"),
         variant: 'destructive'
       });
     }
@@ -420,8 +420,8 @@ export default function MobileJobDetail() {
   const handleCompleteWork = async () => {
     if (!job || !currentUserId || currentUserId !== job.pro_id) {
       toast({
-        title: 'Ошибка',
-        description: 'У вас нет прав для выполнения этого действия',
+        title: t("notifications.error"),
+        description: t("ui.u_vas_net_prav"),
         variant: 'destructive'
       });
       return;
@@ -442,7 +442,7 @@ export default function MobileJobDetail() {
         body: {
           user_id: job.client_id,
           type: 'job_update',
-          title: 'Работа завершена',
+          title: t("ui.rabota_zavershena"),
           title_ro: 'Lucrul este terminat',
           message: `Специалист завершил работу: ${job.title}`,
           message_ro: `Specialistul a terminat lucrul: ${job.title}`,
@@ -452,16 +452,16 @@ export default function MobileJobDetail() {
       });
 
       toast({
-        title: 'Работа завершена',
-        description: 'Статус заказа изменён на "Выполнен"'
+        title: t("ui.rabota_zavershena"),
+        description: t("ui.status_zakaza_izmenen_na_3")
       });
 
       await fetchJobDetail(job.id);
     } catch (error) {
       console.error('Error completing work:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось обновить статус заказа',
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_obnovit_status"),
         variant: 'destructive'
       });
     }
@@ -470,8 +470,8 @@ export default function MobileJobDetail() {
   const handleSubmitRating = async () => {
     if (!job || !currentUserId || !job.pro_id || rating === 0) {
       toast({
-        title: 'Ошибка',
-        description: 'Пожалуйста, выберите оценку',
+        title: t("notifications.error"),
+        description: t("ui.pozhaluista_vyberite_ocenku"),
         variant: 'destructive'
       });
       return;
@@ -495,7 +495,7 @@ export default function MobileJobDetail() {
         body: {
           user_id: job.pro_id,
           type: 'rating',
-          title: 'Новая оценка',
+          title: t("ui.novaia_ocenka"),
           title_ro: 'Evaluare nouă',
           message: `Вы получили оценку ${rating} звезд за работу: ${job.title}`,
           message_ro: `Ați primit o evaluare de ${rating} stele pentru lucrarea: ${job.title}`,
@@ -509,8 +509,8 @@ export default function MobileJobDetail() {
       }
 
       toast({
-        title: 'Оценка отправлена',
-        description: 'Спасибо за вашу оценку!'
+        title: t("ui.ocenka_otpravlena"),
+        description: t("ui.spasibo_za_vashu_ocenku")
       });
 
       setHasSubmittedRating(true);
@@ -533,15 +533,15 @@ export default function MobileJobDetail() {
         setRating(0);
         setRatingComment('');
         toast({
-          title: 'Оценка уже отправлена',
-          description: 'Мы уже сохранили ваш отзыв по этому заказу.'
+          title: t("ui.ocenka_uzhe_otpravlena"),
+          description: t("ui.my_uzhe_sohranili_vash")
         });
         return;
       }
 
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось отправить оценку',
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_otpravit_ocenku"),
         variant: 'destructive'
       });
     } finally {
@@ -571,27 +571,27 @@ export default function MobileJobDetail() {
   };
 
   const handleDeleteJob = async () => {
-    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) return;
+    if (!confirm(t("dash.client.delete_confirm"))) return;
 
     try {
       const result = await deleteClientJob(id);
       toast({
-        title: result === 'hard' ? 'Заказ удалён' : 'Заказ скрыт из активных',
-        description: result === 'hard' ? 'Заказ был успешно удалён' : 'Заказ отменён и больше не показывается в активном кабинете'
+        title: result === 'hard' ? t("ui.zakaz_udalen") : t("dash.client.job_hidden"),
+        description: result === 'hard' ? t("ui.zakaz_byl_uspeshno_udalen") : t("ui.zakaz_otmenen_i_bolshe")
       });
       navigate('/dashboard/client');
     } catch (error) {
       console.error('Error deleting job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось удалить заказ: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t("notifications.error"),
+        description: `Не удалось удалить заказ: ${getErrorMessage(error, t("dash.client.unknown_error"))}`,
         variant: 'destructive'
       });
     }
   };
 
   const handleCancelJob = async () => {
-    if (!job || !confirm('После выбора исполнителя заказ больше нельзя редактировать или удалять. Отменить заказ?')) return;
+    if (!job || !confirm(t("dash.client.cancel_confirm"))) return;
 
     try {
       const { error } = await supabase
@@ -616,7 +616,7 @@ export default function MobileJobDetail() {
           body: {
             user_id: job.pro_id,
             type: 'job_cancelled',
-            title: 'Клиент отменил заказ',
+            title: t("ui.klient_otmenil_zakaz"),
             title_ro: 'Clientul a anulat comanda',
             message: `Заказ "${job.title}" отменён заказчиком.`,
             message_ro: `Comanda "${job.title}" a fost anulată de client.`,
@@ -626,11 +626,11 @@ export default function MobileJobDetail() {
         });
       }
 
-      toast({ title: 'Заказ отменён', description: 'Заказ сохранён в истории как отменённый' });
+      toast({ title: t("dash.client.job_canceled"), description: t("dash.client.job_canceled_desc") });
       navigate('/dashboard/client');
     } catch (error) {
       console.error('Error cancelling job:', error);
-      toast({ title: 'Ошибка', description: 'Не удалось отменить заказ', variant: 'destructive' });
+      toast({ title: t("notifications.error"), description: t("ui.ne_udalos_otmenit_zakaz"), variant: 'destructive' });
     }
   };
 
@@ -641,15 +641,15 @@ export default function MobileJobDetail() {
   };
 
   const urgencyLabels = {
-    normal: 'Обычно',
-    urgent: 'Срочно',
-    same_day: 'В тот же день'
+    normal: t("ui.obychno"),
+    urgent: t("dash.client.urg_urgent"),
+    same_day: t("dash.client.urg_same_day")
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-neo flex items-center justify-center">
-        <div className="text-[#374151]">Загрузка...</div>
+        <div className="text-[#374151]">{t("common.loading")}</div>
       </div>
     );
   }
@@ -657,7 +657,7 @@ export default function MobileJobDetail() {
   if (!job) {
     return (
       <div className="min-h-screen bg-neo flex items-center justify-center">
-        <div className="text-[#374151]">Заказ не найден</div>
+        <div className="text-[#374151]">{t("ui.zakaz_ne_naiden")}</div>
       </div>
     );
   }
@@ -676,9 +676,9 @@ export default function MobileJobDetail() {
   const showResponseStatusCard = job.status === 'new' && !isOwnJob && !canRespond;
 
   const responseStatusMessage = (() => {
-    if (currentUserRole !== 'pro') return 'Отклики на заказ доступны только исполнителям.';
-    if (hasExistingResponse) return 'Вы уже отправили предложение по этому заказу.';
-    return 'Сейчас отправка предложения недоступна.';
+    if (currentUserRole !== 'pro') return t("ui.otkliki_na_zakaz_dostupny");
+    if (hasExistingResponse) return t("ui.vy_uzhe_otpravili_predlozhenie_2");
+    return t("ui.seichas_otpravka_predlozheniia_nedostupn_2");
   })();
 
   return (
@@ -760,7 +760,7 @@ export default function MobileJobDetail() {
                       rel="noreferrer"
                       className="text-sm text-white underline"
                     >
-                      Открыть видео отдельно
+                      {t("ui.otkryt_video_otdelno")}
                     </a>
                   </div>
                 </div>
@@ -815,7 +815,7 @@ export default function MobileJobDetail() {
           >
             <ArrowLeft className="w-5 h-5 text-[#374151]" />
           </button>
-          <h1 className="text-lg font-semibold text-[#374151]">Заказ</h1>
+          <h1 className="text-lg font-semibold text-[#374151]">{t("dash.client.col_job")}</h1>
           <div className="w-9 h-9" />
         </div>
       </div>
@@ -841,15 +841,15 @@ export default function MobileJobDetail() {
                 variant="outline"
                 className={urgencyColors[job.urgency as keyof typeof urgencyColors] || urgencyColors.normal}
               >
-                {urgencyLabels[job.urgency as keyof typeof urgencyLabels] || 'Обычно'}
+                {urgencyLabels[job.urgency as keyof typeof urgencyLabels] || t("ui.obychno")}
               </Badge>
 
               <Badge variant={job.status === 'new' ? 'default' : job.status === 'canceled' ? 'destructive' : 'secondary'}>
-                {job.status === 'new' ? 'Новый' :
-                 job.status === 'accepted' ? 'Исполнитель выбран' :
-                 job.status === 'in_progress' ? 'Работа выполняется' :
-                 job.status === 'done' ? (job.end_confirmed ? 'Выполнен' : 'Ждёт подтверждения') :
-                 job.status === 'canceled' ? 'Отменён' :
+                {job.status === 'new' ? t("status.new") :
+                 job.status === 'accepted' ? t("dash.client.st_accepted") :
+                 job.status === 'in_progress' ? t("dash.client.st_in_progress") :
+                 job.status === 'done' ? (job.end_confirmed ? t("status.done") : t("status.awaiting_confirm")) :
+                 job.status === 'canceled' ? t("ui.otmenen") :
                  job.status}
               </Badge>
             </div>
@@ -859,19 +859,19 @@ export default function MobileJobDetail() {
                 {canClientEdit && (
                   <Button variant="outline" onClick={handleEditJob}>
                     <Edit className="w-4 h-4 mr-2" />
-                    Редактировать
+                    {t("ui.redaktirovat")}
                   </Button>
                 )}
                 {canClientDelete && (
                   <Button variant="destructive" onClick={handleDeleteJob}>
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Удалить
+                    {t("common.delete")}
                   </Button>
                 )}
                 {canClientCancel && (
                   <Button variant="destructive" onClick={handleCancelJob}>
                     <XCircle className="w-4 h-4 mr-2" />
-                    Отменить заказ
+                    {t("ui.otmenit_zakaz")}
                   </Button>
                 )}
               </div>
@@ -882,7 +882,7 @@ export default function MobileJobDetail() {
         {/* Description */}
         <MobileCard>
           <div className="space-y-3">
-            <h3 className="font-semibold text-[#374151]">Описание</h3>
+            <h3 className="font-semibold text-[#374151]">{t("ui.opisanie")}</h3>
             <p className="text-[#6B7280] leading-relaxed">{job.description}</p>
           </div>
         </MobileCard>
@@ -890,19 +890,19 @@ export default function MobileJobDetail() {
         {/* Details */}
         <MobileCard>
           <div className="space-y-4">
-            <h3 className="font-semibold text-[#374151]">Детали</h3>
+            <h3 className="font-semibold text-[#374151]">{t("ui.detali")}</h3>
 
             {/* Budget */}
             <div className="flex items-center text-[#374151]">
               <DollarSign size={18} className="mr-3 text-green-500" />
               <div>
-                <div className="font-medium">Бюджет</div>
+                <div className="font-medium">{t("hero.mock.budget")}</div>
                 <div className="text-sm text-[#6B7280]">
                   {job.budget_min_cents && job.budget_max_cents
                     ? `${Math.round(job.budget_min_cents / 100)}-${Math.round(job.budget_max_cents / 100)} MDL`
                     : job.budget_min_cents
                       ? `от ${Math.round(job.budget_min_cents / 100)} MDL`
-                      : 'Договорная'}
+                      : t("dash.pro.negotiable")}
                 </div>
               </div>
             </div>
@@ -912,7 +912,7 @@ export default function MobileJobDetail() {
               <div className="flex items-center text-[#374151]">
                 <MapPin size={18} className="mr-3 text-blue-500" />
                 <div>
-                  <div className="font-medium">Адрес</div>
+                  <div className="font-medium">{t("ui.adres")}</div>
                   <div className="text-sm text-[#6B7280]">{job.location_address}</div>
                 </div>
               </div>
@@ -922,7 +922,7 @@ export default function MobileJobDetail() {
             <div className="flex items-center text-[#374151]">
               <Clock size={18} className="mr-3 text-orange-500" />
               <div>
-                <div className="font-medium">Дата публикации</div>
+                <div className="font-medium">{t("ui.data_publikacii")}</div>
                 <div className="text-sm text-[#6B7280]">
                   {new Date(job.created_at).toLocaleDateString('ru', {
                     day: 'numeric',
@@ -955,7 +955,7 @@ export default function MobileJobDetail() {
                     {inferMediaKind(photo.file_url) === 'video' ? (
                       <VideoThumbnail
                         src={supabase.storage.from('evidence').getPublicUrl(photo.file_url).data.publicUrl}
-                        overlayLabel="Видео"
+                        overlayLabel={t("ui.video")}
                       />
                     ) : (
                       <MediaViewer
@@ -977,7 +977,7 @@ export default function MobileJobDetail() {
         {isOwnJob && job.pro_id && assignedProProfile && (
           <MobileCard>
             <div className="space-y-3">
-              <h3 className="font-semibold text-[#374151]">Назначенный специалист</h3>
+              <h3 className="font-semibold text-[#374151]">{t("ui.naznachennyi_specialist")}</h3>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center min-w-0">
                   <Avatar className="h-12 w-12 mr-3">
@@ -992,9 +992,9 @@ export default function MobileJobDetail() {
                       {assignedProProfile.full_name ||
                        (assignedProProfile.first_name && assignedProProfile.last_name
                         ? `${assignedProProfile.first_name} ${assignedProProfile.last_name.charAt(0)}.`
-                        : assignedProProfile.first_name || 'Специалист')}
+                        : assignedProProfile.first_name || t("menu.role_pro"))}
                     </div>
-                    <div className="text-sm text-[#6B7280]">Исполнитель уже выбран — следующий шаг в чате</div>
+                    <div className="text-sm text-[#6B7280]">{t("ui.ispolnitel_uzhe_vybran_sleduiuschii")}</div>
                   </div>
                 </div>
 
@@ -1002,12 +1002,12 @@ export default function MobileJobDetail() {
                   <button
                     onClick={() => navigate(`/messages?user=${job.pro_id || ''}&job=${job.id}`)}
                     className="p-2 rounded-lg bg-neo neo-4 active:neo-inset-2 hover:neo-6 transition-all duration-200"
-                    title="Написать специалисту"
+                    title={t("ui.napisat_specialistu")}
                   >
                     <MessageCircle size={18} className="text-[#374151]" />
                   </button>
                   <Button variant="outline" size="sm" onClick={() => navigate(`/pro/${job.pro_id}`)}>
-                    Профиль
+                    {t("nav.profile_tab")}
                   </Button>
                 </div>
               </div>
@@ -1019,25 +1019,25 @@ export default function MobileJobDetail() {
         {isAssignedPro && (
           <MobileCard>
             <div className="space-y-3">
-              <h3 className="font-semibold text-[#374151]">Статус выполнения</h3>
+              <h3 className="font-semibold text-[#374151]">{t("ui.status_vypolneniia")}</h3>
 
               {canStartWork && (
                 <Button className="w-full" onClick={handleStartWork}>
-                  Начать работу
+                  {t("ui.nachat_rabotu")}
                 </Button>
               )}
 
               {canCompleteWork && (
                 <Button className="w-full" onClick={handleCompleteWork}>
-                  Завершить работу
+                  {t("ui.zavershit_rabotu")}
                 </Button>
               )}
 
               {isDoneAwaitingConfirmation && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900">
-                  <div className="font-medium">Ожидание подтверждения завершения</div>
+                  <div className="font-medium">{t("ui.ozhidanie_podtverzhdeniia_zaversheniia")}</div>
                   <div className="text-sm mt-1">
-                    Работа отмечена как выполненная. Теперь клиент должен подтвердить завершение заказа.
+                    {t("ui.rabota_otmechena_kak_vypolnennaia")}
                   </div>
                 </div>
               )}
@@ -1049,7 +1049,7 @@ export default function MobileJobDetail() {
         {job.profiles && (
           <MobileCard>
             <div className="space-y-3">
-              <h3 className="font-semibold text-[#374151]">Заказчик</h3>
+              <h3 className="font-semibold text-[#374151]">{t("ui.zakazchik")}</h3>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Avatar className="h-12 w-12 mr-3">
@@ -1064,9 +1064,9 @@ export default function MobileJobDetail() {
                       {job.profiles.full_name ||
                        (job.profiles.first_name && job.profiles.last_name
                          ? `${job.profiles.first_name} ${job.profiles.last_name.charAt(0)}.`
-                         : job.profiles.first_name || 'Клиент')}
+                         : job.profiles.first_name || t("menu.role_client"))}
                     </div>
-                    <div className="text-sm text-[#6B7280]">Заказчик</div>
+                    <div className="text-sm text-[#6B7280]">{t("ui.zakazchik")}</div>
                   </div>
                 </div>
 
@@ -1075,7 +1075,7 @@ export default function MobileJobDetail() {
                     <button
                       onClick={() => navigate(`/messages?user=${job.client_id || ''}&job=${job.id}`)}
                       className="p-2 rounded-lg bg-neo neo-4 active:neo-inset-2 hover:neo-6 transition-all duration-200"
-                      title="Написать сообщение"
+                      title={t("ui.napisat_soobschenie")}
                     >
                       <MessageCircle size={18} className="text-[#374151]" />
                     </button>
@@ -1084,7 +1084,7 @@ export default function MobileJobDetail() {
                     <button
                       onClick={() => window.open(`tel:${job.profiles.phone}`, '_self')}
                       className="p-2 rounded-lg bg-neo neo-4 active:neo-inset-2 hover:neo-6 transition-all duration-200"
-                      title="Позвонить"
+                      title={t("ui.pozvonit")}
                     >
                       <Phone size={18} className="text-[#374151]" />
                     </button>
@@ -1100,9 +1100,9 @@ export default function MobileJobDetail() {
           <MobileCard>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-[#374151]">Предложения по заказу</h3>
+                <h3 className="font-semibold text-[#374151]">{t("ui.predlozheniia_po_zakazu")}</h3>
                 <p className="text-sm text-[#6B7280] mt-1">
-                  Здесь видно, кто откликнулся, их цену и кнопку принятия предложения.
+                  {t("ui.zdes_vidno_kto_otkliknulsia")}
                 </p>
               </div>
               <JobApplicationsList
@@ -1120,32 +1120,32 @@ export default function MobileJobDetail() {
         {(canRateAssignedPro || shouldShowRatingSuccess) && (
           <MobileCard>
             <div className="space-y-4">
-              <h3 className="font-semibold text-[#374151]">Оцените работу специалиста</h3>
+              <h3 className="font-semibold text-[#374151]">{t("ui.ocenite_rabotu_specialista")}</h3>
 
               {shouldShowRatingSuccess ? (
                 <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-green-800">
-                  <div className="font-medium">Отзыв уже отправлен</div>
-                  <div className="text-sm mt-1">Спасибо! Ваша оценка уже сохранена в профиле специалиста.</div>
+                  <div className="font-medium">{t("ui.otzyv_uzhe_otpravlen")}</div>
+                  <div className="text-sm mt-1">{t("ui.spasibo_vasha_ocenka_uzhe")}</div>
                 </div>
               ) : (
                 <>
                   <div className="space-y-2">
-                    <div className="text-sm text-[#6B7280]">Ваша оценка</div>
+                    <div className="text-sm text-[#6B7280]">{t("ui.vasha_ocenka")}</div>
                     <StarRating rating={rating} onRatingChange={setRating} size="lg" />
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-sm text-[#6B7280]">Комментарий (необязательно)</div>
+                    <div className="text-sm text-[#6B7280]">{t("ui.kommentarii_neobiazatelno")}</div>
                     <Textarea
                       value={ratingComment}
                       onChange={(e) => setRatingComment(e.target.value)}
-                      placeholder="Что понравилось в работе специалиста?"
+                      placeholder={t("ui.chto_ponravilos_v_rabote")}
                       rows={4}
                     />
                   </div>
 
                   <Button className="w-full" onClick={handleSubmitRating} disabled={submittingRating || rating === 0}>
-                    {submittingRating ? 'Отправка...' : 'Отправить оценку'}
+                    {submittingRating ? t("ui.otpravka") : t("ui.otpravit_ocenku")}
                   </Button>
                 </>
               )}
@@ -1157,11 +1157,11 @@ export default function MobileJobDetail() {
         {job.status === 'canceled' && (
           <MobileCard>
             <div className="space-y-2 text-red-700">
-              <div className="font-semibold text-[#374151]">Заказ отменён</div>
+              <div className="font-semibold text-[#374151]">{t("dash.client.job_canceled")}</div>
               <div className="text-sm text-[#6B7280]">
                 {isOwnJob
-                  ? 'Вы отменили этот заказ. Дальнейшие действия недоступны.'
-                  : 'Заказ был отменён. Отклик и другие действия недоступны.'}
+                  ? t("ui.vy_otmenili_etot_zakaz_2")
+                  : t("ui.zakaz_byl_otmenen_otklik_2")}
               </div>
             </div>
           </MobileCard>
@@ -1171,9 +1171,9 @@ export default function MobileJobDetail() {
         {job.status === 'done' && (
           <MobileCard>
             <div className="space-y-2 text-emerald-700">
-              <div className="font-semibold text-[#374151]">Заказ выполнен</div>
+              <div className="font-semibold text-[#374151]">{t("ui.zakaz_vypolnen")}</div>
               <div className="text-sm text-[#6B7280]">
-                Заказ уже подтверждён. Все основные действия завершены.
+                {t("ui.zakaz_uzhe_podtverzhden_vse")}
               </div>
             </div>
           </MobileCard>
@@ -1187,7 +1187,7 @@ export default function MobileJobDetail() {
               disabled={responding}
               className="w-full h-12 bg-primary text-white rounded-xl font-semibold neo-8 disabled:opacity-50"
             >
-              {responding ? 'Отправка...' : 'Отправить предложение'}
+              {responding ? t("ui.otpravka") : t("dash.pro.send_offer")}
             </Button>
           </div>
         )}
@@ -1196,7 +1196,7 @@ export default function MobileJobDetail() {
           <MobileCard className="mb-20">
             <div className="text-center space-y-3">
               <MessageCircle className="w-8 h-8 mx-auto text-[#6B7280]" />
-              <div className="font-medium text-[#374151]">Отклик недоступен</div>
+              <div className="font-medium text-[#374151]">{t("ui.otklik_nedostupen")}</div>
               <div className="text-sm text-[#6B7280]">{responseStatusMessage}</div>
             </div>
           </MobileCard>

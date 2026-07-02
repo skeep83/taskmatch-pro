@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Camera, Upload, X, ImagePlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageCropper } from './ImageCropper';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface MobileAvatarUploadProps {
   userId: string;
@@ -16,6 +17,7 @@ interface MobileAvatarUploadProps {
 }
 
 export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvatarUpdate }: MobileAvatarUploadProps) {
+  const { t } = useEnhancedI18n();
   const [uploading, setUploading] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [showCropper, setShowCropper] = useState(false);
@@ -29,12 +31,12 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
 
       // Validate file
       if (file instanceof File && !file.type.startsWith('image/')) {
-        throw new Error('Файл должен быть изображением');
+        throw new Error(t("ui.fail_dolzhen_byt_izobrazheniem"));
       }
 
       const fileSize = file instanceof File ? file.size : file.size;
       if (fileSize > 5 * 1024 * 1024) {
-        throw new Error('Размер файла не должен превышать 5MB');
+        throw new Error(t("ui.razmer_faila_ne_dolzhen"));
       }
 
       // Create unique filename with user ID folder structure
@@ -68,15 +70,15 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
       setShowActions(false);
       
       toast({
-        title: 'Аватар обновлен',
-        description: 'Ваш аватар успешно загружен'
+        title: t("ui.avatar_obnovlen"),
+        description: t("ui.vash_avatar_uspeshno_zagruzhen")
       });
 
     } catch (error: any) {
       console.error('Avatar upload error:', error);
       toast({
-        title: 'Ошибка загрузки',
-        description: error.message || 'Не удалось загрузить аватар',
+        title: t("dash.pro.load_error_title"),
+        description: error.message || t("ui.ne_udalos_zagruzit_avatar"),
         variant: 'destructive'
       });
     } finally {
@@ -100,15 +102,15 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
       setShowActions(false);
       
       toast({
-        title: 'Аватар удален',
-        description: 'Ваш аватар успешно удален'
+        title: t("ui.avatar_udalen"),
+        description: t("ui.vash_avatar_uspeshno_udalen")
       });
 
     } catch (error: any) {
       console.error('Avatar remove error:', error);
       toast({
-        title: 'Ошибка',
-        description: error.message || 'Не удалось удалить аватар',
+        title: t("notifications.error"),
+        description: error.message || t("ui.ne_udalos_udalit_avatar"),
         variant: 'destructive'
       });
     } finally {
@@ -220,7 +222,7 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <ImagePlus className="w-4 h-4 text-primary" />
                   </div>
-                  <span>Изменить фото</span>
+                  <span>{t("ui.izmenit_foto")}</span>
                 </Button>
 
                 {currentAvatarUrl && (
@@ -234,7 +236,7 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
                     <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
                       <X className="w-4 h-4 text-red-600" />
                     </div>
-                    <span>Удалить фото</span>
+                    <span>{t("ui.udalit_foto")}</span>
                   </Button>
                 )}
 
@@ -244,7 +246,7 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
                   onClick={() => setShowActions(false)}
                   className="w-full flex items-center justify-center p-2 text-sm text-gray-600"
                 >
-                  Отмена
+                  {t("common.cancel")}
                 </Button>
               </div>
             </motion.div>
@@ -261,12 +263,12 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
             className="flex items-center gap-2 text-primary"
           >
             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm font-medium">Загружаем...</span>
+            <span className="text-sm font-medium">{t("ui.zagruzhaem")}</span>
           </motion.div>
         ) : (
           <div className="space-y-1">
             <p className="text-sm font-medium text-gray-800">
-              {currentAvatarUrl ? 'Нажмите для изменения' : 'Добавьте фото профиля'}
+              {currentAvatarUrl ? t("ui.nazhmite_dlia_izmeneniia") : t("ui.dobavte_foto_profilia")}
             </p>
             <p className="text-xs text-muted-foreground">
               JPG, PNG или GIF. Максимум 5MB

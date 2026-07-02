@@ -171,8 +171,8 @@ export default function MobileFeed() {
     } catch (error) {
       console.error("Error loading jobs:", error);
       toast({
-        title: "Ошибка",
-        description: error instanceof Error ? error.message : "Не удалось загрузить заказы",
+        title: t("notifications.error"),
+        description: error instanceof Error ? error.message : t("biz.jobs.load_error"),
         variant: "destructive"
       });
     } finally {
@@ -269,9 +269,9 @@ export default function MobileFeed() {
 
   const getUrgencyLabel = (urgency: string) => {
     switch (urgency) {
-      case 'urgent': return 'Срочно';
-      case 'same_day': return 'В тот же день';
-      default: return 'Обычный';
+      case 'urgent': return t("dash.client.urg_urgent");
+      case 'same_day': return t("dash.client.urg_same_day");
+      default: return t("dash.client.urg_normal");
     }
   };
 
@@ -282,7 +282,7 @@ export default function MobileFeed() {
           <div className="animate-spin mb-4">
             <RefreshCw className="h-8 w-8 mx-auto" />
           </div>
-          <p className="text-lg">Загрузка...</p>
+          <p className="text-lg">{t("common.loading")}</p>
         </MobileCard>
       </div>
     );
@@ -291,14 +291,14 @@ export default function MobileFeed() {
   return (
     <>
       <Seo
-        title="Лента заказов — ServiceHub"
-        description="Заказы для отправки предложений на ServiceHub"
+        title={t("ui.lenta_zakazov_servicehub")}
+        description={t("ui.zakazy_dlia_otpravki_predlozhenii")}
         canonical="/feed"
       />
 
       <div className="min-h-screen bg-neo">
         <MobileHeader
-          title="Лента заказов"
+          title={t("footer.feed")}
           showBack={true}
           showNotifications={true}
         />
@@ -310,23 +310,23 @@ export default function MobileFeed() {
           {/* Hero Section */}
           <MobileCard className="text-center">
             <h1 className="text-2xl font-bold mb-2">
-              {userRole === "pro" ? "Заказы для предложений" : "Лента заказов"}
+              {userRole === "pro" ? t("dash.pro.jobs_for_offers") : t("footer.feed")}
             </h1>
             <p className="text-muted-foreground mb-4">
               {userRole === "pro"
-                ? "Показываем только новые заказы, по которым вы ещё не откликались"
-                : "Смотрите новые заказы на платформе"
+                ? t("ui.pokazyvaem_tolko_novye_zakazy")
+                : t("ui.smotrite_novye_zakazy_na")
               }
             </p>
 
             <div className="flex flex-wrap gap-2 justify-center">
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                 <AnimatedIcon icon={Zap} className="text-primary h-3 w-3" />
-                <span className="text-xs font-medium">Новые заказы</span>
+                <span className="text-xs font-medium">{t("ui.novye_zakazy")}</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 border border-green-200">
                 <AnimatedIcon icon={Shield} className="text-green-500 h-3 w-3" />
-                <span className="text-xs font-medium">Отклики и сообщения</span>
+                <span className="text-xs font-medium">{t("ui.otkliki_i_soobscheniia")}</span>
               </div>
             </div>
           </MobileCard>
@@ -338,7 +338,7 @@ export default function MobileFeed() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   type="text"
-                  placeholder="Поиск заказов..."
+                  placeholder={t("ui.poisk_zakazov")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -352,7 +352,7 @@ export default function MobileFeed() {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="flex-1 bg-white/50 border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50"
                 >
-                  <option value="">Все категории</option>
+                  <option value="">{t("feed.category.all")}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.label_ru || cat.key}
@@ -368,7 +368,7 @@ export default function MobileFeed() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Всего заказов</p>
+                  <p className="text-sm text-muted-foreground">{t("biz.analytics.total_jobs")}</p>
                   <p className="text-xl font-bold">{filteredJobs.length}</p>
                 </div>
                 <NeumorphicIcon icon={AlertCircle} size={32} variant="behance" />
@@ -378,8 +378,8 @@ export default function MobileFeed() {
             <MobileCard>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Обновлено</p>
-                  <p className="text-sm font-medium">Сейчас</p>
+                  <p className="text-sm text-muted-foreground">{t("ui.obnovleno")}</p>
+                  <p className="text-sm font-medium">{t("ui.seichas")}</p>
                 </div>
                 <Button
                   variant="ghost"
@@ -399,9 +399,9 @@ export default function MobileFeed() {
             {filteredJobs.length === 0 ? (
               <MobileCard className="text-center py-8">
                 <div className="text-4xl mb-4">🔍</div>
-                <h3 className="text-lg font-semibold mb-2">Заказы не найдены</h3>
+                <h3 className="text-lg font-semibold mb-2">{t("ui.zakazy_ne_naideny")}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Попробуйте изменить фильтры поиска
+                  {t("catalog.try_filters")}
                 </p>
               </MobileCard>
             ) : (
@@ -411,7 +411,7 @@ export default function MobileFeed() {
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <Badge variant="secondary" className="text-xs">
-                        {job.categories?.label_ru || "Услуга"}
+                        {job.categories?.label_ru || t("ui.usluga")}
                       </Badge>
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3 text-muted-foreground" />
@@ -423,7 +423,7 @@ export default function MobileFeed() {
 
                     {/* Title */}
                     <h3 className="font-semibold text-base mb-2 line-clamp-2">
-                      {job.title || job.description || "Заказ без описания"}
+                      {job.title || job.description || t("ui.zakaz_bez_opisaniia")}
                     </h3>
 
                     {/* Info */}
@@ -438,7 +438,7 @@ export default function MobileFeed() {
                               ? `от ${formatPrice(job.budget_min_cents)}`
                               : job.budget_max_cents
                               ? `до ${formatPrice(job.budget_max_cents)}`
-                              : 'Договорная'}
+                              : t("dash.pro.negotiable")}
                           </span>
                         </div>
                       )}
@@ -467,7 +467,7 @@ export default function MobileFeed() {
                           <img
                             key={index}
                             src={`${SUPABASE_URL}/storage/v1/object/public/evidence/${photo.file_url}`}
-                            alt="Фото заказа"
+                            alt={t("ui.foto_zakaza")}
                             className="w-16 h-16 object-cover rounded-lg border border-border"
                             onError={(e) => {
                               console.log("Failed to load image:", photo.file_url);
@@ -496,9 +496,9 @@ export default function MobileFeed() {
                             {job.profiles.full_name ||
                              (job.profiles.first_name && job.profiles.last_name
                                ? `${job.profiles.first_name} ${job.profiles.last_name.charAt(0)}.`
-                               : 'Клиент')}
+                               : t("menu.role_client"))}
                           </p>
-                          <p className="text-xs text-muted-foreground">Заказчик</p>
+                          <p className="text-xs text-muted-foreground">{t("ui.zakazchik")}</p>
                         </div>
                       </div>
                     )}
@@ -513,7 +513,7 @@ export default function MobileFeed() {
                       className="flex-1"
                     >
                       <Eye className="h-4 w-4 mr-2" />
-                      Подробнее
+                      {t("dash.pro.details")}
                     </Button>
 
                     {userRole === "pro" && job.status === "new" && job.client_id !== user?.id && (
@@ -523,7 +523,7 @@ export default function MobileFeed() {
                         className="flex-1"
                       >
                         <MessageSquare className="h-4 w-4 mr-2" />
-                        Отправить предложение
+                        {t("dash.pro.send_offer")}
                       </Button>
                     )}
 

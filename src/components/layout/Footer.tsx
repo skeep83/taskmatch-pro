@@ -12,30 +12,30 @@ const Footer = () => {
           <div>
             <div className="text-lg font-display font-bold mb-3">ServiceHub</div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Платформа заказа услуг: проверенные специалисты, безопасные сделки и общение внутри заказа.
+              {t("footer.about")}
             </p>
           </div>
           <div>
-            <div className="text-sm font-semibold mb-3 text-foreground/80">Заказчикам</div>
+            <div className="text-sm font-semibold mb-3 text-foreground/80">{t("footer.clients")}</div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/catalog" className="hover:text-primary transition-colors">Каталог услуг</Link></li>
-              <li><Link to="/job/new" className="hover:text-primary transition-colors">Создать заказ</Link></li>
-              <li><Link to="/how-it-works" className="hover:text-primary transition-colors">Как это работает</Link></li>
+              <li><Link to="/catalog" className="hover:text-primary transition-colors">{t("footer.catalog")}</Link></li>
+              <li><Link to="/job/new" className="hover:text-primary transition-colors">{t("footer.create_job")}</Link></li>
+              <li><Link to="/how-it-works" className="hover:text-primary transition-colors">{t("footer.how")}</Link></li>
             </ul>
           </div>
           <div>
-            <div className="text-sm font-semibold mb-3 text-foreground/80">Специалистам</div>
+            <div className="text-sm font-semibold mb-3 text-foreground/80">{t("footer.pros")}</div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/feed" className="hover:text-primary transition-colors">Лента заказов</Link></li>
-              <li><Link to="/auth" className="hover:text-primary transition-colors">Регистрация</Link></li>
-              <li><Link to="/hall-of-fame" className="hover:text-primary transition-colors">Лучшие специалисты</Link></li>
+              <li><Link to="/feed" className="hover:text-primary transition-colors">{t("footer.feed")}</Link></li>
+              <li><Link to="/auth" className="hover:text-primary transition-colors">{t("footer.signup")}</Link></li>
+              <li><Link to="/hall-of-fame" className="hover:text-primary transition-colors">{t("footer.top_pros")}</Link></li>
             </ul>
           </div>
           <div>
-            <div className="text-sm font-semibold mb-3 text-foreground/80">Компаниям</div>
+            <div className="text-sm font-semibold mb-3 text-foreground/80">{t("footer.companies")}</div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/tenders" className="hover:text-primary transition-colors">Тендеры</Link></li>
-              <li><Link to="/dashboard/business" className="hover:text-primary transition-colors">Бизнес-кабинет</Link></li>
+              <li><Link to="/tenders" className="hover:text-primary transition-colors">{t("footer.tenders")}</Link></li>
+              <li><Link to="/dashboard/business" className="hover:text-primary transition-colors">{t("footer.biz_cabinet")}</Link></li>
             </ul>
           </div>
         </div>

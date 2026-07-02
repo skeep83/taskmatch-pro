@@ -11,6 +11,7 @@ import { JobResponseCard } from '@/components/servicehub/JobResponseCard';
 import { MobileTabNavigation } from '@/components/servicehub/MobileTabNavigation';
 import { useToast } from '@/hooks/use-toast';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import {
   PlusCircle,
   Search,
@@ -64,6 +65,7 @@ interface DashboardStats {
 }
 
 const ServiceHubDashboard: React.FC = () => {
+  const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isMobile } = useDeviceDetection();
@@ -128,7 +130,7 @@ const ServiceHubDashboard: React.FC = () => {
           tags: job.tags || [],
           media_urls: job.media_urls || [],
           client: {
-            name: `${job.profiles?.first_name || ''} ${job.profiles?.last_name || ''}`.trim() || 'Аноним',
+            name: `${job.profiles?.first_name || ''} ${job.profiles?.last_name || ''}`.trim() || t("ui.anonim"),
             avatar: job.profiles?.avatar_url,
             rating: 4.8 // Заглушка
           },
@@ -156,8 +158,8 @@ const ServiceHubDashboard: React.FC = () => {
     } catch (error) {
       console.error('Error loading dashboard:', error);
       toast({
-        title: 'Ошибка загрузки',
-        description: 'Не удалось загрузить данные дашборда',
+        title: t("dash.pro.load_error_title"),
+        description: t("ui.ne_udalos_zagruzit_dannye_2"),
         variant: 'destructive'
       });
     } finally {
@@ -186,22 +188,22 @@ const ServiceHubDashboard: React.FC = () => {
 
       if (data) {
         toast({
-          title: 'Статус обновлен',
-          description: 'Статус заказа успешно изменен'
+          title: t("ui.status_obnovlen"),
+          description: t("ui.status_zakaza_uspeshno_izmenen")
         });
         loadDashboardData();
       } else {
         toast({
-          title: 'Ошибка',
-          description: 'Не удалось изменить статус заказа',
+          title: t("notifications.error"),
+          description: t("ui.ne_udalos_izmenit_status"),
           variant: 'destructive'
         });
       }
     } catch (error) {
       console.error('Error transitioning status:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Произошла ошибка при изменении статуса',
+        title: t("notifications.error"),
+        description: t("ui.proizoshla_oshibka_pri_izmenenii"),
         variant: 'destructive'
       });
     }
@@ -212,7 +214,7 @@ const ServiceHubDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Загрузка...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -227,19 +229,19 @@ const ServiceHubDashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {userRole === 'client' ? 'Мои заказы' : 'Заказы для предложений'}
+              {userRole === 'client' ? t("dash.client.my_jobs") : t("dash.pro.jobs_for_offers")}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               {userRole === 'client'
-                ? 'Управляйте своими заказами и отслеживайте прогресс'
-                : 'Найдите заказы и отправляйте отклики'
+                ? t("ui.upravliaite_svoimi_zakazami_i")
+                : t("ui.naidite_zakazy_i_otpravliaite")
               }
             </p>
           </div>
 
           <Button onClick={() => navigate('/job/new')} className="gap-2">
             <PlusCircle size={20} />
-            {isMobile ? 'Создать' : 'Создать заказ'}
+            {isMobile ? t("nav.create_tab") : t("footer.create_job")}
           </Button>
         </div>
 
@@ -251,7 +253,7 @@ const ServiceHubDashboard: React.FC = () => {
                 <Briefcase size={20} className="text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Всего заказов</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("biz.analytics.total_jobs")}</p>
                 <p className="text-xl font-bold">{stats.totalJobs}</p>
               </div>
             </div>
@@ -263,7 +265,7 @@ const ServiceHubDashboard: React.FC = () => {
                 <Clock size={20} className="text-orange-600 dark:text-orange-400" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Активных</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("biz.analytics.active")}</p>
                 <p className="text-xl font-bold">{stats.activeJobs}</p>
               </div>
             </div>
@@ -275,7 +277,7 @@ const ServiceHubDashboard: React.FC = () => {
                 <TrendingUp size={20} className="text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Завершено</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("biz.analytics.completed")}</p>
                 <p className="text-xl font-bold">{stats.completedJobs}</p>
               </div>
             </div>
@@ -287,7 +289,7 @@ const ServiceHubDashboard: React.FC = () => {
                 <Star size={20} className="text-yellow-600 dark:text-yellow-400" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Рейтинг</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("dash.pro.rating")}</p>
                 <p className="text-xl font-bold">{stats.averageRating}</p>
               </div>
             </div>
@@ -301,11 +303,11 @@ const ServiceHubDashboard: React.FC = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
               <div className="flex items-center justify-between">
                 <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="all">Все</TabsTrigger>
-                  <TabsTrigger value="Published">Новые</TabsTrigger>
-                  <TabsTrigger value="InProgress">В работе</TabsTrigger>
-                  <TabsTrigger value="Submitted">На проверке</TabsTrigger>
-                  <TabsTrigger value="Completed">Готовые</TabsTrigger>
+                  <TabsTrigger value="all">{t("ui.vse")}</TabsTrigger>
+                  <TabsTrigger value="Published">{t("ui.novye")}</TabsTrigger>
+                  <TabsTrigger value="InProgress">{t("status.in_progress")}</TabsTrigger>
+                  <TabsTrigger value="Submitted">{t("ui.na_proverke")}</TabsTrigger>
+                  <TabsTrigger value="Completed">{t("ui.gotovye")}</TabsTrigger>
                 </TabsList>
 
                 <Button variant="outline" size="sm" className="gap-2">
@@ -331,7 +333,7 @@ const ServiceHubDashboard: React.FC = () => {
                           </h3>
                           <JobStatusBadge status={job.status_new} size="sm" />
                           {job.urgency === 'urgent' && (
-                            <Badge variant="destructive" className="text-xs">Срочно</Badge>
+                            <Badge variant="destructive" className="text-xs">{t("dash.client.urg_urgent")}</Badge>
                           )}
                         </div>
 
@@ -440,8 +442,8 @@ const ServiceHubDashboard: React.FC = () => {
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400">
                       {userRole === 'client'
-                        ? 'У вас пока нет заказов в этой категории'
-                        : 'Нет подходящих заказов в этой категории'
+                        ? t("ui.u_vas_poka_net")
+                        : t("ui.net_podhodiaschih_zakazov_v")
                       }
                     </p>
                   </div>
@@ -462,7 +464,7 @@ const ServiceHubDashboard: React.FC = () => {
 
                 {selectedJob.assigned_provider && (
                   <Card className="p-6">
-                    <h3 className="font-semibold mb-4">Выбранный исполнитель</h3>
+                    <h3 className="font-semibold mb-4">{t("ui.vybrannyi_ispolnitel")}</h3>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
                       <div>

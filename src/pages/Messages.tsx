@@ -106,8 +106,8 @@ const Messages = () => {
 
       if (userParam && userParam === uid) {
         toast({
-          title: "Недоступно",
-          description: "Нельзя создать чат с самим собой",
+          title: t("ui.nedostupno"),
+          description: t("ui.nelzia_sozdat_chat_s"),
           variant: "destructive"
         });
         navigate('/messages', { replace: true });
@@ -243,8 +243,8 @@ const Messages = () => {
       if (!clientId || !professionalId) {
         ;
         toast({
-          title: "Ошибка",
-          description: "Недостаточно данных для создания чата",
+          title: t("notifications.error"),
+          description: t("ui.nedostatochno_dannyh_dlia_sozdaniia"),
           variant: "destructive"
         });
         return;
@@ -252,8 +252,8 @@ const Messages = () => {
 
       if (clientId === professionalId) {
         toast({
-          title: "Недоступно",
-          description: "Нельзя создать чат с самим собой",
+          title: t("ui.nedostupno"),
+          description: t("ui.nelzia_sozdat_chat_s"),
           variant: "destructive"
         });
         navigate('/messages', { replace: true });
@@ -307,7 +307,7 @@ const Messages = () => {
       }
     } catch (error) {
       ;
-      toast({ title: "Ошибка", description: "Не удалось создать чат", variant: "destructive" });
+      toast({ title: t("notifications.error"), description: t("ui.ne_udalos_sozdat_chat"), variant: "destructive" });
     }
   };
 
@@ -337,15 +337,15 @@ const Messages = () => {
       }
 
       toast({
-        title: "Чат удален",
-        description: "Чат и все сообщения были удалены"
+        title: t("ui.chat_udalen"),
+        description: t("ui.chat_i_vse_soobscheniia")
       });
 
     } catch (error) {
       ;
       toast({
-        title: "Ошибка",
-        description: "Не удалось удалить чат",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_udalit_chat"),
         variant: "destructive"
       });
     }
@@ -472,12 +472,12 @@ const Messages = () => {
     const currentSelectedChat = chats.find(c => String(c.id) === String(id));
     if (!currentSelectedChat) {
       ;
-      toast({ title: "Ошибка", description: "Чат не найден", variant: "destructive" });
+      toast({ title: t("notifications.error"), description: t("ui.chat_ne_naiden"), variant: "destructive" });
       return;
     }
 
     if (currentSelectedChat.client_id === currentSelectedChat.professional_id) {
-      toast({ title: "Недоступно", description: "Нельзя отправить сообщение самому себе", variant: "destructive" });
+      toast({ title: t("ui.nedostupno"), description: t("ui.nelzia_otpravit_soobschenie_samomu"), variant: "destructive" });
       return;
     }
 
@@ -505,8 +505,8 @@ const Messages = () => {
       // Send notification to other participant
       if (newMessage && currentSelectedChat) {
         const receiverId = currentSelectedChat.client_id === userId ? currentSelectedChat.professional_id : currentSelectedChat.client_id;
-        const senderProfile = profiles[userId] || { full_name: 'Пользователь' };
-        const senderName = senderProfile.full_name || senderProfile.first_name || 'Пользователь';
+        const senderProfile = profiles[userId] || { full_name: t("menu.user") };
+        const senderName = senderProfile.full_name || senderProfile.first_name || t("menu.user");
         const messagePreview = text.length > 50 ? text.substring(0, 50) + '...' : text;
 
         ;
@@ -515,7 +515,7 @@ const Messages = () => {
 
     } catch (error) {
       ;
-      toast({ title: "Ошибка", description: "Не удалось отправить сообщение", variant: "destructive" });
+      toast({ title: t("notifications.error"), description: t("ui.ne_udalos_otpravit_soobschenie"), variant: "destructive" });
     }
   };
 
@@ -535,7 +535,7 @@ const Messages = () => {
     if (profile?.full_name) return profile.full_name;
     if (profile?.first_name && profile?.last_name) return `${profile.first_name} ${profile.last_name}`;
     if (profile?.first_name) return profile.first_name;
-    return 'Пользователь';
+    return t("menu.user");
   };
 
   const renderProfileInitials = (profile: any) => {
@@ -549,7 +549,7 @@ const Messages = () => {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background-neomorphic)' }}>
-      <Seo title={`${t('app.name')} — ${t('messages.title', 'Сообщения')}`} description="Chat messages" canonical="/messages" />
+      <Seo title={`${t('app.name')} — ${t('messages.title', t("nav.messages_tab"))}`} description="Chat messages" canonical="/messages" />
 
       <div className="flex h-screen">{/* Основной контейнер с neumorphic фоном */}
         {/* Chat List Sidebar */}
@@ -558,7 +558,7 @@ const Messages = () => {
           selectedChatId ? "w-0 lg:w-80 overflow-hidden lg:overflow-visible" : "w-full lg:w-80"
         )}>
           <div className="p-4 border-b flex items-center justify-between">
-            <h1 className="text-lg font-semibold">{t('messages.title', 'Сообщения')}</h1>
+            <h1 className="text-lg font-semibold">{t('messages.title', t("nav.messages_tab"))}</h1>
             {selectedChatId && (
               <Button
                 variant="ghost"
@@ -575,7 +575,7 @@ const Messages = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder={t('messages.search_placeholder', 'Поиск чатов...')}
+                placeholder={t('messages.search_placeholder', t("ui.poisk_chatov"))}
                 className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -587,7 +587,7 @@ const Messages = () => {
           <div className="overflow-y-auto">
             {chats.length === 0 ? (
               <div className="p-8 text-center">
-                <p className="text-muted-foreground">{t('messages.no_chats', 'Нет сообщений')}</p>
+                <p className="text-muted-foreground">{t('messages.no_chats', t("ui.net_soobschenii"))}</p>
               </div>
             ) : (
               <div>
@@ -628,7 +628,7 @@ const Messages = () => {
                                     className="text-destructive focus:text-destructive"
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
-                                    {t('messages.delete_chat', 'Удалить чат')}
+                                    {t('messages.delete_chat', t("ui.udalit_chat_2"))}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -679,7 +679,7 @@ const Messages = () => {
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Circle className={cn("h-2 w-2", otherOnline ? "text-green-500 fill-green-500" : "text-muted-foreground")} />
                       <span>
-                        {otherTyping ? 'печатает...' : otherOnline ? 'в сети' : 'не в сети'}
+                        {otherTyping ? t("ui.pechataet") : otherOnline ? t("ui.v_seti") : t("ui.ne_v_seti")}
                       </span>
                     </div>
                   </div>
@@ -699,7 +699,7 @@ const Messages = () => {
               <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20 lg:pb-4">
                 {messages.length === 0 ? (
                   <div className="text-center text-muted-foreground py-8">
-                    {t('messages.no_messages', 'Нет сообщений')}
+                    {t('messages.no_messages', t("ui.net_soobschenii"))}
                   </div>
                 ) : (
                   messages.map((message) => {
@@ -773,7 +773,7 @@ const Messages = () => {
                       type="text"
                       value={text}
                       onChange={(e) => setText(e.target.value)}
-                      placeholder="Введите сообщение..."
+                      placeholder={t("ui.vvedite_soobschenie")}
                       className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background min-h-[44px]"
                       disabled={false}
                       autoFocus
@@ -802,10 +802,10 @@ const Messages = () => {
                   <Send className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">
-                  {t('messages.select_chat', 'Выберите чат')}
+                  {t('messages.select_chat', t("messages.select_chat"))}
                 </h3>
                 <p className="text-muted-foreground">
-                  {t('messages.select_chat_description', 'Выберите беседу из списка для начала общения')}
+                  {t('messages.select_chat_description', t("ui.vyberite_besedu_iz_spiska"))}
                 </p>
               </div>
             </div>
@@ -817,18 +817,18 @@ const Messages = () => {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить чат?</AlertDialogTitle>
+            <AlertDialogTitle>{t("ui.udalit_chat")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие нельзя отменить. Чат и все сообщения будут удалены навсегда.
+              {t("ui.eto_deistvie_nelzia_otmenit")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Удалить
+              {t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

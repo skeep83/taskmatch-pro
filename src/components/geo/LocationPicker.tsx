@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useGeolocation, formatDistance } from '@/hooks/useGeolocation';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface LocationPickerProps {
   onLocationSelect: (location: { lat: number; lng: number; address: string }) => void;
@@ -22,6 +23,7 @@ const predefinedLocations = [
 ];
 
 export const LocationPicker = ({ onLocationSelect, initialLocation, className }: LocationPickerProps) => {
+  const { t } = useEnhancedI18n();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(initialLocation);
   const { latitude, longitude, loading, getCurrentLocation, hasLocation } = useGeolocation();
@@ -31,13 +33,13 @@ export const LocationPicker = ({ onLocationSelect, initialLocation, className }:
       const location = {
         lat: latitude,
         lng: longitude,
-        address: 'Моё местоположение'
+        address: t("ui.moe_mestopolozhenie")
       };
       setSelectedLocation(location);
       onLocationSelect(location);
       toast({
-        title: 'Местоположение установлено',
-        description: 'Используется ваше текущее местоположение',
+        title: t("ui.mestopolozhenie_ustanovleno"),
+        description: t("ui.ispolzuetsia_vashe_tekuschee_mestopolozh"),
       });
     } else {
       getCurrentLocation();
@@ -59,8 +61,8 @@ export const LocationPicker = ({ onLocationSelect, initialLocation, className }:
 
     // Simulate geocoding - in real app, use Google Maps Geocoding API or similar
     toast({
-      title: 'Поиск адреса',
-      description: 'Функция поиска будет добавлена в следующих версиях',
+      title: t("ui.poisk_adresa_2"),
+      description: t("ui.funkciia_poiska_budet_dobavlena"),
     });
   };
 
@@ -75,7 +77,7 @@ export const LocationPicker = ({ onLocationSelect, initialLocation, className }:
       <CardContent className="p-6 space-y-4">
         <div className="flex items-center gap-2 mb-4">
           <MapPin className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-semibold">Выберите местоположение</h3>
+          <h3 className="text-lg font-semibold">{t("ui.vyberite_mestopolozhenie")}</h3>
         </div>
 
         {/* Current Location Button */}
@@ -86,14 +88,14 @@ export const LocationPicker = ({ onLocationSelect, initialLocation, className }:
           className="w-full justify-start gap-2"
         >
           <Navigation className="h-4 w-4" />
-          {loading ? 'Определение местоположения...' : 'Использовать моё местоположение'}
+          {loading ? t("ui.opredelenie_mestopolozheniia") : t("ui.ispolzovat_moe_mestopolozhenie")}
           {hasLocation && <CheckCircle className="h-4 w-4 text-green-500 ml-auto" />}
         </Button>
 
         {/* Search Input */}
         <div className="flex gap-2">
           <Input
-            placeholder="Поиск адреса..."
+            placeholder={t("ui.poisk_adresa")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -140,7 +142,7 @@ export const LocationPicker = ({ onLocationSelect, initialLocation, className }:
           <div className="mt-4 p-3 bg-primary/5 rounded-md border">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
-              <span className="font-medium">Выбранное местоположение:</span>
+              <span className="font-medium">{t("ui.vybrannoe_mestopolozhenie")}</span>
             </div>
             <p className="text-sm text-muted-foreground mt-1">{selectedLocation.address}</p>
           </div>

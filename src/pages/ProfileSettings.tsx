@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -45,6 +46,7 @@ interface ProProfile {
 }
 
 export default function ProfileSettings() {
+  const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -95,8 +97,8 @@ export default function ProfileSettings() {
     } catch (error: any) {
       console.error('Auth error:', error);
       toast({
-        title: "Ошибка",
-        description: error.message || "Ошибка аутентификации",
+        title: t("notifications.error"),
+        description: error.message || t("dash.biz.auth_error"),
         variant: "destructive"
       });
     } finally {
@@ -139,8 +141,8 @@ export default function ProfileSettings() {
     } catch (error: any) {
       console.error('Error loading profile:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить профиль",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_zagruzit_profil"),
         variant: "destructive"
       });
     }
@@ -189,8 +191,8 @@ export default function ProfileSettings() {
     } catch (error: any) {
       console.error('Error loading categories:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить категории услуг",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_zagruzit_kategorii"),
         variant: "destructive"
       });
     }
@@ -262,14 +264,14 @@ export default function ProfileSettings() {
       }
 
       toast({
-        title: "Профиль обновлен",
-        description: "Ваши данные успешно сохранены"
+        title: t("dash.client.profile_updated"),
+        description: t("ui.vashi_dannye_uspeshno_sohraneny")
       });
     } catch (error: any) {
       console.error('Error saving profile:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось сохранить профиль",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_sohranit_profil"),
         variant: "destructive"
       });
     } finally {
@@ -368,7 +370,7 @@ export default function ProfileSettings() {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="card-surface p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Загружаем профиль...</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("ui.zagruzhaem_profil")}</h1>
           <div className="animate-spin">⏳</div>
         </div>
       </main>
@@ -383,15 +385,15 @@ export default function ProfileSettings() {
           <div className="flex items-center justify-center gap-4 mb-6">
             <Button variant="outline" onClick={() => navigate(-1)} className="card-surface">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Назад
+              {t("ui.nazad")}
             </Button>
           </div>
 
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            Настройки профиля
+            {t("menu.profile_settings")}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Управляйте своими личными данными и настройками
+            {t("ui.upravliaite_svoimi_lichnymi_dannymi")}
           </p>
         </div>
 
@@ -404,7 +406,7 @@ export default function ProfileSettings() {
               <div className="card-surface p-8 text-center">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center justify-center gap-3">
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                  Фото профиля
+                  {t("ui.foto_profilia")}
                 </h2>
                 <AvatarUpload
                   userId={user.id}
@@ -418,26 +420,26 @@ export default function ProfileSettings() {
               <div className="card-surface p-8">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                  Основная информация
+                  {t("ui.osnovnaia_informaciia")}
                 </h2>
 
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="first_name">Имя</Label>
+                      <Label htmlFor="first_name">{t("ui.imia")}</Label>
                       <Input
                         id="first_name"
-                        placeholder="Введите ваше имя"
+                        placeholder={t("ui.vvedite_vashe_imia")}
                         value={profile.first_name}
                         onChange={(e) => updateProfile('first_name', e.target.value)}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="last_name">Фамилия</Label>
+                      <Label htmlFor="last_name">{t("ui.familiia")}</Label>
                       <Input
                         id="last_name"
-                        placeholder="Введите вашу фамилию"
+                        placeholder={t("ui.vvedite_vashu_familiiu")}
                         value={profile.last_name}
                         onChange={(e) => updateProfile('last_name', e.target.value)}
                       />
@@ -445,7 +447,7 @@ export default function ProfileSettings() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Телефон</Label>
+                    <Label htmlFor="phone">{t("dash.client.phone")}</Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -464,13 +466,13 @@ export default function ProfileSettings() {
               <div className="card-surface p-8">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                  Местоположение
+                  {t("ui.mestopolozhenie")}
                 </h2>
 
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="city">Город</Label>
+                      <Label htmlFor="city">{t("ui.gorod")}</Label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
@@ -484,7 +486,7 @@ export default function ProfileSettings() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="country">Страна</Label>
+                      <Label htmlFor="country">{t("ui.strana")}</Label>
                       <div className="relative">
                         <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
@@ -500,26 +502,26 @@ export default function ProfileSettings() {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="latitude">Широта</Label>
+                      <Label htmlFor="latitude">{t("ui.shirota")}</Label>
                       <Input
                         id="latitude"
                         type="number"
                         step="any"
                         value={profile.latitude ?? ''}
                         onChange={(e) => updateProfile('latitude', e.target.value === '' ? null : Number(e.target.value))}
-                        placeholder="Например 47.0105"
+                        placeholder={t("ui.naprimer_47_0105")}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="longitude">Долгота</Label>
+                      <Label htmlFor="longitude">{t("ui.dolgota")}</Label>
                       <Input
                         id="longitude"
                         type="number"
                         step="any"
                         value={profile.longitude ?? ''}
                         onChange={(e) => updateProfile('longitude', e.target.value === '' ? null : Number(e.target.value))}
-                        placeholder="Например 28.8638"
+                        placeholder={t("ui.naprimer_28_8638")}
                       />
                     </div>
                   </div>
@@ -530,7 +532,7 @@ export default function ProfileSettings() {
               <div className="card-surface p-8">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                  Статус аккаунта
+                  {t("ui.status_akkaunta")}
                 </h2>
                 <RoleUpgrade
                   userId={user.id}
@@ -545,15 +547,15 @@ export default function ProfileSettings() {
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
                     <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     <Briefcase className="w-6 h-6 text-primary" />
-                    Настройки специалиста
+                    {t("ui.nastroiki_specialista")}
                   </h2>
 
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="bio">О себе</Label>
+                      <Label htmlFor="bio">{t("ui.o_sebe")}</Label>
                       <Textarea
                         id="bio"
-                        placeholder="Расскажите о своем опыте и услугах..."
+                        placeholder={t("ui.rasskazhite_o_svoem_opyte")}
                         value={proProfile.bio}
                         onChange={(e) => updateProProfile('bio', e.target.value)}
                         className="min-h-[120px]"
@@ -562,7 +564,7 @@ export default function ProfileSettings() {
 
                     <div className="grid md:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="radius">Радиус работы (км)</Label>
+                        <Label htmlFor="radius">{t("ui.radius_raboty_km")}</Label>
                         <Input
                           id="radius"
                           type="number"
@@ -573,7 +575,7 @@ export default function ProfileSettings() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="hourly">Ставка (¢/час)</Label>
+                        <Label htmlFor="hourly">{t("ui.stavka_chas")}</Label>
                         <Input
                           id="hourly"
                           type="number"
@@ -584,7 +586,7 @@ export default function ProfileSettings() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="fixed">Фикс. цена (¢)</Label>
+                        <Label htmlFor="fixed">{t("ui.fiks_cena")}</Label>
                         <Input
                           id="fixed"
                           type="number"
@@ -600,20 +602,20 @@ export default function ProfileSettings() {
                     {/* Categories Section */}
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <Label className="text-lg font-medium">Категории услуг</Label>
+                        <Label className="text-lg font-medium">{t("ui.kategorii_uslug")}</Label>
                         <span className="text-sm text-muted-foreground">
                           Выбрано: {selectedCategories.length}
                         </span>
                       </div>
 
                       <p className="text-sm text-muted-foreground">
-                        Выберите категории услуг, которые вы предоставляете. Это поможет клиентам найти вас.
+                        {t("ui.vyberite_kategorii_uslug_kotorye")}
                       </p>
 
                       {/* Search for categories */}
                       <div className="space-y-3">
                         <Input
-                          placeholder="Поиск категорий..."
+                          placeholder={t("ui.poisk_kategorii")}
                           value={categorySearch}
                           onChange={(e) => setCategorySearch(e.target.value)}
                           className="w-full"
@@ -621,8 +623,8 @@ export default function ProfileSettings() {
 
                         {/* Quick filters */}
                         <div className="flex flex-wrap gap-2">
-                          <span className="text-xs text-muted-foreground">Популярные:</span>
-                          {['Сантехника', 'Электрика', 'Уборка', 'Переезды/грузчики', 'Ремонт'].map((popular) => (
+                          <span className="text-xs text-muted-foreground">{t("ui.populiarnye")}</span>
+                          {[t("landing.cat_plumbing"), t("landing.cat_electric"), t("landing.cat_cleaning"), t("ui.pereezdy_gruzchiki"), t("ui.remont")].map((popular) => (
                             <button
                               key={popular}
                               onClick={() => setCategorySearch(popular)}
@@ -636,7 +638,7 @@ export default function ProfileSettings() {
                               onClick={() => setCategorySearch('')}
                               className="px-2 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground rounded-full transition-colors"
                             >
-                              Очистить
+                              {t("ui.ochistit")}
                             </button>
                           )}
                         </div>
@@ -644,7 +646,7 @@ export default function ProfileSettings() {
 
                       {categories.length === 0 ? (
                         <div className="p-4 border border-dashed border-border rounded-lg text-center">
-                          <p className="text-muted-foreground">Загружаем категории...</p>
+                          <p className="text-muted-foreground">{t("ui.zagruzhaem_kategorii")}</p>
                         </div>
                       ) : (
                         <>
@@ -665,7 +667,7 @@ export default function ProfileSettings() {
                                     onClick={() => setCategorySearch('')}
                                     className="mt-2 text-sm text-primary hover:underline"
                                   >
-                                    Показать все категории
+                                    {t("ui.pokazat_vse_kategorii")}
                                   </button>
                                 </div>
                               );
@@ -714,7 +716,7 @@ export default function ProfileSettings() {
                                   <button
                                     onClick={() => toggleCategory(catId)}
                                     className="ml-2 w-4 h-4 rounded-full bg-success/30 hover:bg-success/50 flex items-center justify-center text-xs transition-colors"
-                                    title="Убрать категорию"
+                                    title={t("ui.ubrat_kategoriiu")}
                                   >
                                     ×
                                   </button>
@@ -737,7 +739,7 @@ export default function ProfileSettings() {
                   className="btn-hero w-full text-lg py-3"
                 >
                   <Save className="w-5 h-5 mr-2" />
-                  {saving ? 'Сохранение...' : 'Сохранить изменения'}
+                  {saving ? t("common.saving") : t("dash.client.save_changes")}
                 </Button>
               </div>
             </div>
@@ -748,7 +750,7 @@ export default function ProfileSettings() {
               <div className="card-surface p-6">
                 <h3 className="text-xl font-semibold mb-6 flex items-center gap-3">
                   <div className="w-1 h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                  Информация об аккаунте
+                  {t("ui.informaciia_ob_akkaunte")}
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between py-3 border-b border-border/50">
@@ -762,8 +764,8 @@ export default function ProfileSettings() {
                   </div>
 
                   <div className="flex items-center justify-between py-3">
-                    <span className="text-muted-foreground">Статус:</span>
-                    <span className="font-medium text-sm text-success">Активен</span>
+                    <span className="text-muted-foreground">{t("ui.status")}</span>
+                    <span className="font-medium text-sm text-success">{t("ui.aktiven")}</span>
                   </div>
                 </div>
               </div>
@@ -772,12 +774,12 @@ export default function ProfileSettings() {
               <div className="card-surface p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <User className="w-5 h-5 text-primary" />
-                  Советы
+                  {t("dash.pro.tips")}
                 </h3>
                 <div className="space-y-3 text-sm text-muted-foreground">
-                  <p>• Указание реального имени и фамилии поможет клиентам узнать вас</p>
-                  <p>• Корректный номер телефона важен для связи</p>
-                  <p>• Местоположение поможет в поиске заказов поблизости</p>
+                  <p>{t("ui.ukazanie_realnogo_imeni_i")}</p>
+                  <p>{t("ui.korrektnyi_nomer_telefona_vazhen")}</p>
+                  <p>{t("ui.mestopolozhenie_pomozhet_v_poiske")}</p>
                 </div>
               </div>
             </div>

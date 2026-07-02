@@ -11,6 +11,7 @@ import { User, DollarSign, Clock, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
 import { submitJobResponse } from '@/lib/jobResponseSubmission';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface PriceProposalFormProps {
   jobId: string;
@@ -32,6 +33,7 @@ export const PriceProposalForm = ({
   clientRating,
   onProposalSubmit
 }: PriceProposalFormProps) => {
+  const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
@@ -43,12 +45,12 @@ export const PriceProposalForm = ({
   });
 
   const etaOptions = [
-    { value: 'same_day', label: 'Сегодня' },
-    { value: 'next_day', label: 'Завтра' },
-    { value: 'within_3_days', label: 'В течение 3 дней' },
-    { value: 'within_week', label: 'В течение недели' },
-    { value: 'within_2_weeks', label: 'В течение 2 недель' },
-    { value: 'custom', label: 'Другое (укажите в примечании)' }
+    { value: 'same_day', label: t("hero.mock.urgency") },
+    { value: 'next_day', label: t("ui.zavtra") },
+    { value: 'within_3_days', label: t("ui.v_techenie_3_dnei") },
+    { value: 'within_week', label: t("ui.v_techenie_nedeli") },
+    { value: 'within_2_weeks', label: t("ui.v_techenie_2_nedel") },
+    { value: 'custom', label: t("ui.drugoe_ukazhite_v_primechanii") }
   ];
 
   const getReadableErrorMessage = (error: unknown) => {
@@ -56,35 +58,35 @@ export const PriceProposalForm = ({
 
     if (message.includes('Pro role required')) {
       return {
-        title: 'Необходима роль специалиста',
-        description: 'Чтобы отправлять ценовые предложения, вам нужно включить роль специалиста в профиле.'
+        title: t("ui.neobhodima_rol_specialista"),
+        description: t("ui.chtoby_otpravliat_cenovye_predlozheniia")
       };
     }
 
     if (message.includes('Unauthorized')) {
       return {
-        title: 'Требуется вход',
-        description: 'Сначала войдите в аккаунт, затем повторите отправку предложения.'
+        title: t("messages.login_required"),
+        description: t("ui.snachala_voidite_v_akkaunt")
       };
     }
 
     if (message.includes('Job not found or not available')) {
       return {
-        title: 'Заказ уже недоступен',
-        description: 'Этот заказ больше не принимает предложения.'
+        title: t("ui.zakaz_uzhe_nedostupen"),
+        description: t("ui.etot_zakaz_bolshe_ne")
       };
     }
 
     if (message.includes('Failed to create proposal') || message.includes('Failed to update proposal')) {
       return {
-        title: 'Не удалось сохранить предложение',
-        description: 'Предложение не было сохранено. Попробуйте ещё раз.'
+        title: t("ui.ne_udalos_sohranit_predlozhenie"),
+        description: t("ui.predlozhenie_ne_bylo_sohraneno")
       };
     }
 
     return {
-      title: 'Ошибка',
-      description: message || 'Не удалось отправить предложение'
+      title: t("notifications.error"),
+      description: message || t("ui.ne_udalos_otpravit_predlozhenie")
     };
   };
 
@@ -98,8 +100,8 @@ export const PriceProposalForm = ({
 
       if (!priceCents || priceCents <= 0) {
         toast({
-          title: "Ошибка",
-          description: "Укажите корректную цену",
+          title: t("notifications.error"),
+          description: t("ui.ukazhite_korrektnuiu_cenu"),
           variant: "destructive"
         });
         return;
@@ -116,8 +118,8 @@ export const PriceProposalForm = ({
       if (error) throw error;
 
       toast({
-        title: "Предложение отправлено",
-        description: "Заказчик получит ваше предложение и сможет выбрать исполнителя"
+        title: t("ui.predlozhenie_otpravleno_2"),
+        description: t("ui.zakazchik_poluchit_vashe_predlozhenie")
       });
 
       // Reset form
@@ -192,8 +194,8 @@ export const PriceProposalForm = ({
                 />
               </div>
               <Badge variant={clientRating.average >= 4.5 ? "default" : "secondary"}>
-                {clientRating.average >= 4.8 ? "Отличный" :
-                 clientRating.average >= 4.0 ? "Хороший" : "Средний"} заказчик
+                {clientRating.average >= 4.8 ? t("ui.otlichnyi") :
+                 clientRating.average >= 4.0 ? t("ui.horoshii") : t("ui.srednii")} заказчик
               </Badge>
             </div>
           </CardContent>
@@ -219,7 +221,7 @@ export const PriceProposalForm = ({
                 ? `от ${formatPrice(budgetMinCents)}`
                 : budgetMaxCents
                 ? `до ${formatPrice(budgetMaxCents)}`
-                : 'Не указан'
+                : t("dash.client.budget_na")
               }
             </div>
           )}
@@ -227,10 +229,10 @@ export const PriceProposalForm = ({
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="price">Ваша цена *</Label>
+              <Label htmlFor="price">{t("ui.vasha_cena")}</Label>
               <Input
                 id="price"
-                placeholder="Например: 1500"
+                placeholder={t("ui.naprimer_1500")}
                 value={formData.price}
                 onChange={(e) => handleInputChange('price', e.target.value)}
                 required
@@ -241,10 +243,10 @@ export const PriceProposalForm = ({
             </div>
 
             <div>
-              <Label htmlFor="eta">Срок выполнения *</Label>
+              <Label htmlFor="eta">{t("ui.srok_vypolneniia")}</Label>
               <Select value={formData.etaSlot} onValueChange={(value) => handleInputChange('etaSlot', value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите срок" />
+                  <SelectValue placeholder={t("ui.vyberite_srok")} />
                 </SelectTrigger>
                 <SelectContent>
                   {etaOptions.map((option) => (
@@ -257,7 +259,7 @@ export const PriceProposalForm = ({
             </div>
 
             <div>
-              <Label htmlFor="warranty">Гарантия (дней)</Label>
+              <Label htmlFor="warranty">{t("ui.garantiia_dnei")}</Label>
               <Input
                 id="warranty"
                 type="number"
@@ -272,10 +274,10 @@ export const PriceProposalForm = ({
             </div>
 
             <div>
-              <Label htmlFor="note">Комментарий к предложению</Label>
+              <Label htmlFor="note">{t("ui.kommentarii_k_predlozheniiu")}</Label>
               <Textarea
                 id="note"
-                placeholder="Дополнительная информация о работе, материалах, особенностях..."
+                placeholder={t("ui.dopolnitelnaia_informaciia_o_rabote")}
                 value={formData.note}
                 onChange={(e) => handleInputChange('note', e.target.value)}
                 rows={3}
@@ -287,7 +289,7 @@ export const PriceProposalForm = ({
               className="w-full"
               disabled={loading}
             >
-              {loading ? "Отправляем..." : "Отправить предложение"}
+              {loading ? t("ui.otpravliaem") : t("dash.pro.send_offer")}
             </Button>
           </form>
         </CardContent>

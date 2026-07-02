@@ -21,6 +21,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import { Seo } from '@/components/Seo';
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface ProUpgradeRequest {
   id: string;
@@ -45,6 +46,7 @@ interface ProUpgradeRequest {
 }
 
 export default function ProUpgradeStatus() {
+  const { t } = useEnhancedI18n();
   const [request, setRequest] = useState<ProUpgradeRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -76,8 +78,8 @@ export default function ProUpgradeStatus() {
     } catch (error: any) {
       console.error('Error loading upgrade request:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить информацию о заявке",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_zagruzit_informaciiu"),
         variant: "destructive"
       });
     } finally {
@@ -90,28 +92,28 @@ export default function ProUpgradeStatus() {
       case 'pending':
         return {
           icon: Clock,
-          label: 'На рассмотрении',
+          label: t("ui.na_rassmotrenii"),
           color: 'bg-yellow-100 text-yellow-800',
-          description: 'Ваша заявка находится на рассмотрении администратором'
+          description: t("ui.vasha_zaiavka_nahoditsia_na")
         };
       case 'approved':
         return {
           icon: CheckCircle,
-          label: 'Одобрена',
+          label: t("ui.odobrena"),
           color: 'bg-green-100 text-green-800',
-          description: 'Поздравляем! Ваша заявка одобрена. Теперь вы можете принимать заказы'
+          description: t("ui.pozdravliaem_vasha_zaiavka_odobrena")
         };
       case 'rejected':
         return {
           icon: XCircle,
-          label: 'Отклонена',
+          label: t("ui.otklonena"),
           color: 'bg-red-100 text-red-800',
-          description: 'Заявка была отклонена. Ознакомьтесь с причиной и подайте заявку повторно'
+          description: t("ui.zaiavka_byla_otklonena_oznakomtes")
         };
       default:
         return {
           icon: Clock,
-          label: 'Неизвестно',
+          label: t("common.unknown"),
           color: 'bg-gray-100 text-gray-800',
           description: ''
         };
@@ -135,8 +137,8 @@ export default function ProUpgradeStatus() {
     return (
       <div className="container mx-auto px-4 py-8">
         <Seo 
-          title="Статус заявки специалиста"
-          description="Проверьте статус вашей заявки на получение статуса специалиста"
+          title={t("ui.status_zaiavki_specialista")}
+          description={t("ui.proverte_status_vashei_zaiavki")}
         />
         
         <div className="max-w-2xl mx-auto">
@@ -150,7 +152,7 @@ export default function ProUpgradeStatus() {
             <CardContent className="text-center">
               <div className="py-8">
                 <AlertTriangle className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Заявка не найдена</h3>
+                <h3 className="text-lg font-medium mb-2">{t("ui.zaiavka_ne_naidena")}</h3>
                 <p className="text-muted-foreground mb-6">
                   У вас пока нет активной заявки на статус специалиста.
                 </p>
@@ -171,13 +173,13 @@ export default function ProUpgradeStatus() {
   return (
     <div className="container mx-auto px-4 py-8">
       <Seo 
-        title="Статус заявки специалиста"
-        description="Проверьте статус вашей заявки на получение статуса специалиста"
+        title={t("ui.status_zaiavki_specialista")}
+        description={t("ui.proverte_status_vashei_zaiavki")}
       />
       
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">Статус заявки специалиста</h1>
+          <h1 className="text-3xl font-bold mb-2">{t("ui.status_zaiavki_specialista")}</h1>
           <p className="text-muted-foreground">
             Отслеживайте прогресс рассмотрения вашей заявки
           </p>
@@ -225,7 +227,7 @@ export default function ProUpgradeStatus() {
               <Alert className="border-red-200 bg-red-50">
                 <MessageCircle className="w-4 h-4 text-red-600" />
                 <AlertDescription className="text-red-800">
-                  <strong>Причина отклонения:</strong><br />
+                  <strong>{t("ui.prichina_otkloneniia")}</strong><br />
                   {request.rejection_reason}
                 </AlertDescription>
               </Alert>
@@ -236,7 +238,7 @@ export default function ProUpgradeStatus() {
               <Alert className="border-green-200 bg-green-50">
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <AlertDescription className="text-green-800">
-                  <strong>Поздравляем!</strong><br />
+                  <strong>{t("ui.pozdravliaem")}</strong><br />
                   Ваша заявка одобрена. Теперь вы можете принимать заказы как специалист.
                 </AlertDescription>
               </Alert>
@@ -247,27 +249,27 @@ export default function ProUpgradeStatus() {
         {/* Profile Data */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Данные профиля</CardTitle>
+            <CardTitle className="text-sm">{t("ui.dannye_profilia")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <strong>Имя:</strong> {request.profile_data.first_name || 'Не указано'}
+                <strong>{t("ui.imia_3")}</strong> {request.profile_data.first_name || t("common.not_specified")}
               </div>
               <div>
-                <strong>Фамилия:</strong> {request.profile_data.last_name || 'Не указано'}
+                <strong>{t("ui.familiia_3")}</strong> {request.profile_data.last_name || t("common.not_specified")}
               </div>
               <div>
-                <strong>Телефон:</strong> {request.profile_data.phone || 'Не указан'}
+                <strong>{t("ui.telefon")}</strong> {request.profile_data.phone || t("dash.client.budget_na")}
               </div>
               <div>
-                <strong>Город:</strong> {request.profile_data.city || 'Не указан'}
+                <strong>{t("ui.gorod_2")}</strong> {request.profile_data.city || t("dash.client.budget_na")}
               </div>
             </div>
             
             {request.profile_data.bio && (
               <div className="mt-4 text-sm">
-                <strong>Описание услуг:</strong>
+                <strong>{t("ui.opisanie_uslug_2")}</strong>
                 <p className="mt-1 p-2 bg-gray-50 rounded">{request.profile_data.bio}</p>
               </div>
             )}
@@ -284,7 +286,7 @@ export default function ProUpgradeStatus() {
           </CardHeader>
           <CardContent>
             {request.kyc_documents.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Документы не загружены</p>
+              <p className="text-sm text-muted-foreground">{t("ui.dokumenty_ne_zagruzheny")}</p>
             ) : (
               <div className="space-y-3">
                 {request.kyc_documents.map((doc, index) => (

@@ -7,6 +7,7 @@ import { AlertCircle, Clock, CheckCircle, XCircle, RefreshCw, Send } from "lucid
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 
 interface ProUpgradeStatus {
   id: string;
@@ -21,6 +22,7 @@ interface ProUpgradeStatusProps {
 }
 
 export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
+  const { t } = useEnhancedI18n();
   const [request, setRequest] = useState<ProUpgradeStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [resubmitting, setResubmitting] = useState(false);
@@ -159,8 +161,8 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
       if (error) throw error;
 
       toast({
-        title: "Заявка подана!",
-        description: "Ваша новая заявка на статус специалиста подана на рассмотрение"
+        title: t("ui.zaiavka_podana"),
+        description: t("ui.vasha_novaia_zaiavka_na")
       });
 
       // Refresh status
@@ -168,8 +170,8 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
     } catch (error) {
       console.error('Error submitting new request:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось подать заявку. Попробуйте позже.",
+        title: t("notifications.error"),
+        description: t("ui.ne_udalos_podat_zaiavku_2"),
         variant: "destructive"
       });
     } finally {
@@ -182,7 +184,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
       <div className="p-8 bg-neo neo-8 rounded-2xl">
         <div className="flex items-center gap-2">
           <RefreshCw className="w-4 h-4 animate-spin" />
-          <span>Проверяем статус заявки...</span>
+          <span>{t("ui.proveriaem_status_zaiavki")}</span>
         </div>
       </div>
     );
@@ -201,33 +203,33 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
       case 'pending':
         return {
           icon: Clock,
-          title: "Заявка рассматривается",
-          description: "Ваша заявка на статус специалиста находится на рассмотрении у администрации",
-          badge: <Badge variant="outline" className="text-yellow-600 bg-neo neo-4 border-yellow-300"><Clock className="w-3 h-3 mr-1" />Ожидает</Badge>,
+          title: t("ui.zaiavka_rassmatrivaetsia"),
+          description: t("ui.vasha_zaiavka_na_status_2"),
+          badge: <Badge variant="outline" className="text-yellow-600 bg-neo neo-4 border-yellow-300"><Clock className="w-3 h-3 mr-1" />{t("ui.ozhidaet")}</Badge>,
           color: "bg-neo neo-8"
         };
       case 'approved':
         return {
           icon: CheckCircle,
-          title: "Заявка одобрена!",
-          description: "Поздравляем! Ваша заявка одобрена, и вы получили статус специалиста",
-          badge: <Badge variant="default" className="text-green-600 bg-neo neo-4 border-green-300"><CheckCircle className="w-3 h-3 mr-1" />Одобрено</Badge>,
+          title: t("ui.zaiavka_odobrena"),
+          description: t("ui.pozdravliaem_vasha_zaiavka_odobrena_2"),
+          badge: <Badge variant="default" className="text-green-600 bg-neo neo-4 border-green-300"><CheckCircle className="w-3 h-3 mr-1" />{t("ui.odobreno")}</Badge>,
           color: "bg-neo neo-8"
         };
       case 'rejected':
         return {
           icon: XCircle,
-          title: "Заявка отклонена",
-          description: "К сожалению, ваша заявка была отклонена. Ознакомьтесь с причиной отклонения ниже и подайте новую заявку с исправлениями.",
-          badge: <Badge variant="destructive" className="bg-neo neo-4"><XCircle className="w-3 h-3 mr-1" />Отклонено</Badge>,
+          title: t("ui.zaiavka_otklonena"),
+          description: t("ui.k_sozhaleniiu_vasha_zaiavka"),
+          badge: <Badge variant="destructive" className="bg-neo neo-4"><XCircle className="w-3 h-3 mr-1" />{t("ui.otkloneno")}</Badge>,
           color: "bg-neo neo-8"
         };
       default:
         return {
           icon: AlertCircle,
-          title: "Статус неизвестен",
-          description: "Не удалось определить статус заявки",
-          badge: <Badge variant="outline" className="bg-neo neo-4">Неизвестно</Badge>,
+          title: t("ui.status_neizvesten"),
+          description: t("ui.ne_udalos_opredelit_status"),
+          badge: <Badge variant="outline" className="bg-neo neo-4">{t("common.unknown")}</Badge>,
           color: "bg-neo neo-8"
         };
     }
@@ -269,7 +271,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
 
         {request.status === 'rejected' && request.rejection_reason && (
           <div className="p-4 bg-neo neo-inset-4 rounded-xl border-l-4 border-red-400">
-            <p className="text-sm font-medium text-red-800 mb-2">Причина отклонения:</p>
+            <p className="text-sm font-medium text-red-800 mb-2">{t("ui.prichina_otkloneniia")}</p>
             <p className="text-sm text-red-700">{request.rejection_reason}</p>
           </div>
         )}
@@ -291,7 +293,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
                 className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed mr-3"
               >
                 <Send className="w-4 h-4" />
-                {resubmitting ? 'Подача заявки...' : 'Подать новую заявку'}
+                {resubmitting ? t("ui.podacha_zaiavki") : t("ui.podat_novuiu_zaiavku")}
               </button>
             )}
           </div>
