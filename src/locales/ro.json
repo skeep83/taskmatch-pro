@@ -1748,5 +1748,10 @@
   "rate.reply_label": "Răspuns",
   "rate.reply_placeholder": "Răspunsul dvs. public la recenzie...",
   "rate.reply_send": "Răspunde",
-  "rate.reply_sent": "Răspunsul a fost publicat"
+  "rate.reply_sent": "Răspunsul a fost publicat",
+  "settings.hub_title": "Setările profilului",
+  "settings.hub_desc": "Nume, contacte, adresă, serviciile specialistului și metodele de plată — totul într-un singur loc.",
+  "settings.open_full": "Deschide setările profilului",
+  "reviews.about_me": "Recenzii despre mine",
+  "reviews.about_me_desc": "Evaluări publice de la participanții platformei. Un rating înalt vă ajută să primiți mai multe comenzi."
 }

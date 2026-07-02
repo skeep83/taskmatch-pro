@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useEnhancedI18n } from "@/i18n/enhanced";
+import { PaymentMethodsCard } from "@/components/PaymentMethodsCard";
+import { UserReviews } from "@/components/UserReviews";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -21,8 +23,7 @@ import {
   MapPin,
   Globe,
   Settings,
-  Briefcase
-} from "lucide-react";
+  Briefcase, Star } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -153,8 +154,15 @@ export default function ProfileSettings() {
       const result = await getUserRole(userId);
       if (result.success) {
         setUserRole(result.role);
-        setShowProSettings(result.role === 'pro');
       }
+      // Show pro settings whenever the user HAS the pro role,
+      // even if their primary role is business/client
+      const { data: roleRows } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
+      const roles = (roleRows || []).map(r => String(r.role));
+      setShowProSettings(roles.includes('pro'));
     } catch (error: any) {
       console.error('Error loading user role:', error);
     }
@@ -769,6 +777,21 @@ export default function ProfileSettings() {
                   </div>
                 </div>
               </div>
+
+              {/* Payment methods */}
+              {user?.id && <PaymentMethodsCard userId={user.id} />}
+
+              {/* Reviews about me */}
+              {user?.id && (
+                <div className="card-surface p-6">
+                  <h3 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-primary" />
+                    {t("reviews.about_me")}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-2">{t("reviews.about_me_desc")}</p>
+                  <UserReviews userId={user.id} />
+                </div>
+              )}
 
               {/* Tips */}
               <div className="card-surface p-6">

@@ -660,7 +660,7 @@ const DashboardPro = () => {
                     <div className="text-center py-12">
                       <NeumorphicIcon icon={Clock} size={64} variant="behance" className="mb-4 mx-auto" />
                       <p className="text-muted-foreground mb-4">{t("dash.pro.no_active_jobs")}</p>
-                      <Link to="/jobs" className="btn-hero px-6 py-3 rounded-xl font-semibold inline-block">
+                      <Link to="/feed" className="btn-hero px-6 py-3 rounded-xl font-semibold inline-block">
                         {t("dash.pro.find_jobs")}
                       </Link>
                     </div>

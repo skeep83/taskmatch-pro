@@ -40,7 +40,12 @@ export const JobResponseForm = ({
   const budgetMax = budgetMaxCents ? Math.round(budgetMaxCents / 100) : null;
 
   const getReadableErrorMessage = (error: unknown) => {
-    const message = error instanceof Error ? error.message.trim() : String(error ?? '').trim();
+    const raw = error instanceof Error
+      ? error.message
+      : (typeof error === 'object' && error !== null && 'message' in error)
+        ? String((error as { message: unknown }).message)
+        : String(error ?? '');
+    const message = raw.trim();
 
     if (message.includes('Only professionals can apply to jobs')) {
       return {

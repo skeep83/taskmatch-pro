@@ -1,4 +1,4 @@
-import { SUPABASE_PUBLISHABLE_KEY, supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface SubmitJobResponseInput {
   jobId: string;
@@ -19,17 +19,6 @@ const cleanText = (value?: string | null) => {
   return normalized ? normalized : undefined;
 };
 
-const JOB_APPLICATION_CREATE_URL = `${window.location.origin}/marketplace-api/functions/job-application-create`;
-
-const tryParseJson = (text: string) => {
-  if (!text) return null;
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
-};
-
 export async function submitJobResponse({
   jobId,
   priceCents,
@@ -45,33 +34,26 @@ export async function submitJobResponse({
     return { data: null, error: { message: 'Unauthorized' } };
   }
 
-  const response = await fetch(JOB_APPLICATION_CREATE_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify({
+  const { data, error } = await supabase.functions.invoke('job-application-create', {
+    body: {
       jobId,
       priceCents,
       etaSlot: cleanText(etaSlot),
       note: cleanText(note),
       warrantyDays: typeof warrantyDays === 'number' ? warrantyDays : 0,
-    }),
+    },
   });
 
-  const text = await response.text();
-  const data = tryParseJson(text);
-
-  if (!response.ok) {
+  if (error) {
     const message =
-      data?.error ||
-      data?.message ||
-      text ||
-      `Function job-application-create failed with ${response.status}`;
-
+      (typeof error === 'object' && error !== null && 'message' in error && String((error as { message: unknown }).message)) ||
+      'Не удалось отправить предложение';
     return { data: null, error: { message } };
+  }
+
+  const payload = data as { error?: string } | null;
+  if (payload?.error) {
+    return { data: null, error: { message: payload.error } };
   }
 
   return { data, error: null };

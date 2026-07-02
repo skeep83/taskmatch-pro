@@ -78,6 +78,7 @@ const ProUpgradeRequests = lazy(() => import("./pages/admin/ProUpgradeRequests")
 const AdminKycVerification = lazy(() => import("./pages/admin/KycVerification"));
 import PageTransition from "./components/PageTransition";
 import { GlobalHaze } from "./components/GlobalHaze";
+import { ChatWidget } from "./components/chat/ChatWidget";
 
 const AppContent = () => {
   const location = useLocation();
@@ -175,6 +176,7 @@ const AppContent = () => {
           </Routes>
         </Suspense>
       </PageTransition>
+      {!hidePublicShell && !isMobile && <ChatWidget />}
       {!hidePublicShell && !isMobile && <FloatingActionButton />}
       {!hidePublicShell && !isMobile && <Footer />}
       {!hidePublicShell && isMobile && <MobileBottomNav />}

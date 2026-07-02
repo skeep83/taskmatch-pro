@@ -7,6 +7,7 @@ import { Search, Filter, Star, Clock, MapPin, Zap, Briefcase } from "lucide-reac
 import { StarRating } from "@/components/ui/star-rating";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from "@/lib/categoryLabel";
 import { useCurrency } from "@/hooks/useCurrency";
 import proPlaceholder from "@/assets/pro-placeholder.jpg";
 import servicesHero from "@/assets/services-hero.jpg";
@@ -32,8 +33,15 @@ type Job = {
   category_id: string;
   budget_min_cents?: number | null;
   budget_max_cents?: number | null;
+  profiles?: {
+    full_name?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
+    avatar_url?: string | null;
+  } | null;
   categories?: {
     label_ru?: string | null;
+    label_ro?: string | null;
     key?: string | null;
   } | null;
 };
@@ -57,7 +65,7 @@ const ACTIVE_JOB_STATUSES = ["new", "accepted", "in_progress", "done"] as const;
 const ROTATION_WINDOW = 6;
 
 const Catalog = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { formatPrice } = useCurrency();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCat, setSelectedCat] = useState<string>("");
@@ -150,7 +158,7 @@ const Catalog = () => {
     (async () => {
       let query = supabase
         .from("jobs")
-        .select("id,public_id,title,description,status,created_at,location_address,urgency,category_id,budget_min_cents,budget_max_cents,categories(label_ru,key)")
+        .select("id,public_id,title,description,status,created_at,location_address,urgency,category_id,budget_min_cents,budget_max_cents,categories(label_ru,label_ro,key),profiles!jobs_client_id_fkey(full_name,first_name,last_name,avatar_url)")
         .eq("status", "new")
         .order("created_at", { ascending: false })
         .limit(30);
@@ -250,7 +258,7 @@ const Catalog = () => {
 
   const categoryOptions = useMemo(() => categories.map((category) => (
     <option key={category.id} value={category.id}>
-      {category.label_ru || category.key}{category.popularity > 0 ? ` · ${category.popularity}` : ""}
+      {categoryLabel(category, language) || category.key}{category.popularity > 0 ? ` · ${category.popularity}` : ""}
     </option>
   )), [categories]);
 
@@ -364,12 +372,22 @@ const Catalog = () => {
 
         {jobs.length > 0 ? (
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {jobs.map((job) => (
-              <article key={job.id} className="rounded-3xl border border-border/50 bg-background/90 shadow-lg p-6 flex flex-col gap-4">
+            {jobs.map((job) => {
+              const clientName = job.profiles?.full_name
+                || [job.profiles?.first_name, job.profiles?.last_name].filter(Boolean).join(" ")
+                || t("menu.role_client");
+              const clientInitials = clientName
+                .split(" ")
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((w) => w[0]?.toUpperCase())
+                .join("") || "К";
+              return (
+              <article key={job.id} className="neo-card neo-aura p-6 flex flex-col gap-4 transition-shadow hover:neo-4">
                 <div className="flex items-start justify-between gap-4">
-                  <div>
+                  <div className="min-w-0">
                     <div className="text-xs font-mono text-muted-foreground mb-2">{job.public_id || job.id}</div>
-                    <h3 className="text-xl font-semibold leading-tight">{job.title || t("dash.client.untitled")}</h3>
+                    <h3 className="text-xl font-semibold leading-tight line-clamp-2">{job.title || t("dash.client.untitled")}</h3>
                   </div>
                   <span className={`shrink-0 rounded-full px-3 py-1 text-xs border ${job.urgency === "urgent" ? "bg-red-500/10 text-red-700 border-red-300" : job.urgency === "same_day" ? "bg-orange-500/10 text-orange-700 border-orange-300" : "bg-slate-500/10 text-slate-700 border-slate-300"}`}>
                     {getUrgencyLabel(job.urgency)}
@@ -378,38 +396,43 @@ const Catalog = () => {
 
                 <div className="flex flex-wrap gap-2 text-sm">
                   <span className="rounded-full bg-primary/10 text-primary px-3 py-1">
-                    {job.categories?.label_ru || catById[job.category_id]?.label_ru || t("ui.bez_kategorii")}
+                    {categoryLabel(job.categories, language) || categoryLabel(catById[job.category_id], language) || t("ui.bez_kategorii")}
                   </span>
-                  <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground">
-                    {new Date(job.created_at).toLocaleDateString("ru-RU")}
+                  <span className="neo-chip px-3 py-1 text-muted-foreground">
+                    {new Date(job.created_at).toLocaleDateString(language === "ro" ? "ro-RO" : "ru-RU")}
                   </span>
                 </div>
 
-                <p className="text-sm text-muted-foreground line-clamp-4 min-h-[5rem]">
+                <p className="text-sm text-muted-foreground line-clamp-3 min-h-[3.75rem]">
                   {job.description || t("ui.opisanie_ne_ukazano")}
                 </p>
 
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    <span className="line-clamp-1">{job.location_address || t("ui.adres_ne_ukazan")}</span>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="neo-icon-well w-9 h-9 text-xs font-bold text-primary shrink-0 overflow-hidden">
+                    {job.profiles?.avatar_url
+                      ? <img src={job.profiles.avatar_url} alt={clientName} className="w-full h-full object-cover rounded-full" />
+                      : clientInitials}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>Создан: {new Date(job.created_at).toLocaleString("ru-RU")}</span>
+                  <div className="min-w-0">
+                    <div className="text-foreground font-medium truncate">{clientName}</div>
+                    <div className="flex items-center gap-1 text-xs">
+                      <MapPin className="h-3 w-3" />
+                      <span className="line-clamp-1">{job.location_address || t("ui.adres_ne_ukazan")}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-auto flex items-center justify-between gap-4">
+                <div className="mt-auto flex items-center justify-between gap-4 pt-2">
                   <div className="font-semibold text-lg text-primary">
                     {job.budget_min_cents || job.budget_max_cents ? formatPrice((job.budget_min_cents || job.budget_max_cents || 0) / 100) + (job.budget_min_cents && job.budget_max_cents && job.budget_min_cents !== job.budget_max_cents ? ` – ${formatPrice(job.budget_max_cents / 100)}` : "") : t("ui.biudzhet_ne_ukazan")}
                   </div>
-                  <Link to={`/job/${job.id}`} className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors">
+                  <Link to={`/job/${job.id}`} className="neo-btn-primary px-4 py-2 text-sm">
                     {t("ui.otkryt_zakaz")}
                   </Link>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-16 rounded-3xl border border-dashed border-border/60 bg-background/70 max-w-5xl mx-auto">
@@ -440,7 +463,7 @@ const Catalog = () => {
                   <div className="text-center mt-4">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">{displayName}</h3>
                     <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-3">
-                      {selectedCat ? catById[selectedCat]?.label_ru || t("catalog.professional_bio") : t("catalog.professional_bio")}
+                      {selectedCat ? categoryLabel(catById[selectedCat], language) || t("catalog.professional_bio") : t("catalog.professional_bio")}
                     </p>
                     <div className="flex justify-center mb-1">
                       <StarRating rating={rating.avg_score} size="sm" showValue={false} readonly />

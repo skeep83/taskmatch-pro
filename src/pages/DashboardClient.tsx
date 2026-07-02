@@ -12,6 +12,7 @@ import { HallOfFame } from "@/pages/HallOfFame";
 import { canClientCancelJob, canClientDeleteJob, canClientEditJob } from "@/utils/jobLifecycle";
 import { deleteClientJob } from "@/utils/deleteClientJob";
 import { PaymentMethodsCard } from "@/components/PaymentMethodsCard";
+import { UserReviews } from "@/components/UserReviews";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -1097,39 +1098,17 @@ export default function DashboardClient() {
             <TabsContent value="settings">
               <div className="space-y-6">
                 <div className="p-8 bg-neo neo-8 rounded-2xl">
-                  <h2 className="text-2xl font-semibold mb-6">{t("dash.client.profile")}</h2>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Email</label>
-                      <input
-                        type="email"
-                        value={user?.email || ''}
-                        disabled
-                        className="w-full p-3 border rounded-lg bg-muted"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">{t("dash.client.phone")}</label>
-                      <input
-                        type="tel"
-                        value={profileData.phone}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="+373 XX XXX XXX"
-                        className="w-full p-3 border rounded-lg"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <button
-                      onClick={saveProfile}
-                      disabled={saving}
-                      className="w-full md:w-auto px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800 disabled:opacity-50"
-                    >
-                      {saving ? t('common.saving') : t('dash.client.save_changes')}
-                    </button>
-                  </div>
+                  <h2 className="text-2xl font-semibold mb-2">{t("settings.hub_title")}</h2>
+                  <p className="text-muted-foreground mb-6">{t("settings.hub_desc")}</p>
+                  <button
+                    onClick={() => navigate('/profile/settings')}
+                    className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800 font-medium"
+                  >
+                    {t("settings.open_full")}
+                  </button>
                 </div>
+
+                {user?.id && <UserReviews userId={user.id} />}
 
                 <div className="p-8 bg-neo neo-8 rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">{t("dash.client.notifications")}</h2>

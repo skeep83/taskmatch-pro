@@ -136,8 +136,15 @@ export const useNotifications = () => {
     let channel: any = null;
     
     const setupRealtimeSubscription = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) return;
+
+      // Realtime respects RLS: the socket must carry the user's JWT,
+      // otherwise events for user-scoped tables never arrive.
+      if (session?.access_token) {
+        supabase.realtime.setAuth(session.access_token);
+      }
 
       await fetchNotifications();
 
@@ -212,7 +219,20 @@ export const useNotifications = () => {
 
     setupRealtimeSubscription();
 
+    // Re-establish the subscription when auth state changes (login/refresh)
+    const { data: authSub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+        if (session?.access_token) {
+          supabase.realtime.setAuth(session.access_token);
+        }
+        if (event === 'SIGNED_IN' && !channel) {
+          setupRealtimeSubscription();
+        }
+      }
+    });
+
     return () => {
+      authSub.subscription.unsubscribe();
       if (channel) {
         supabase.removeChannel(channel);
       }

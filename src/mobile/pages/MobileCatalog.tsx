@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useMobile } from '../providers/MobileProvider';
 import { supabase } from '@/integrations/supabase/client';
+import { categoryLabel } from '@/lib/categoryLabel';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import { useEnhancedI18n } from "@/i18n/enhanced";
 
@@ -23,7 +24,7 @@ type Category = {
 const ACTIVE_JOB_STATUSES = ['new'] as const;
 
 export default function MobileCatalog() {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const { bottomNavHeight, safeAreaInsets } = useMobile();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -36,7 +37,7 @@ export default function MobileCatalog() {
   useEffect(() => {
     (async () => {
       const [{ data: categoriesData, error: categoriesError }, { data: jobsForCounts, error: jobsError }] = await Promise.all([
-        supabase.from('categories').select('id,label_ru,key').order('label_ru'),
+        supabase.from('categories').select('id,label_ru,label_ro,key').order('label_ru'),
         supabase.from('jobs').select('category_id,status').in('status', ACTIVE_JOB_STATUSES).limit(1000),
       ]);
 
@@ -57,7 +58,7 @@ export default function MobileCatalog() {
       const nextCategories = (categoriesData || []).map((category: any) => ({
         id: category.id,
         key: category.key,
-        name: category.label_ru || category.key,
+        name: categoryLabel(category, language) || category.key,
         icon: getCategoryIcon(category.label_ru, category.key),
         popularity: counts.get(category.id) || 0,
       })).sort((a, b) => {
@@ -78,7 +79,7 @@ export default function MobileCatalog() {
 
       let query = supabase
         .from('jobs')
-        .select('id,public_id,title,description,created_at,location_address,urgency,status,budget_min_cents,budget_max_cents,category_id,categories(label_ru,key),client_id')
+        .select('id,public_id,title,description,created_at,location_address,urgency,status,budget_min_cents,budget_max_cents,category_id,categories(label_ru,label_ro,key),client_id')
         .eq('status', 'new')
         .order('created_at', { ascending: false })
         .limit(20);
@@ -119,7 +120,7 @@ export default function MobileCatalog() {
         budget_max: job.budget_max_cents ? Math.round(job.budget_max_cents / 100) : undefined,
         location: job.location_address,
         created_at: job.created_at,
-        category_name: job.categories?.label_ru || job.categories?.key,
+        category_name: categoryLabel(job.categories, language) || job.categories?.key,
         urgency: job.urgency === 'urgent' ? 'high' : job.urgency === 'same_day' ? 'medium' : 'low',
         status: job.status,
         job_photos: [],

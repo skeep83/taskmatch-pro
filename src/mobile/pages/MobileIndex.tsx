@@ -8,6 +8,7 @@ import { MobileHeader } from '../components/navigation/MobileHeader';
 import { MobileCard } from '../components/ui/MobileCard';
 import { useMobile } from '../providers/MobileProvider';
 import { supabase } from '@/integrations/supabase/client';
+import { categoryLabel } from '@/lib/categoryLabel';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import heroImage from '@/assets/services-hero.jpg';
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -24,7 +25,7 @@ const ACTIVE_JOB_STATUSES = ['new', 'accepted', 'in_progress', 'done'] as const;
 
 
 function MobileIndex() {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const features = [
     { icon: Zap, title: t("ui.predlozheniia"), description: t("ui.poluchaite_predlozheniia_po_zadache") },
     { icon: Shield, title: t("ui.bezopasno"), description: t("ui.profili_ispolnitelei_i_poniatnye") },
@@ -38,7 +39,7 @@ function MobileIndex() {
   useEffect(() => {
     (async () => {
       const [{ data: categoriesData, error: categoriesError }, { data: jobsData, error: jobsError }] = await Promise.all([
-        supabase.from('categories').select('id,label_ru,key').order('label_ru'),
+        supabase.from('categories').select('id,label_ru,label_ro,key').order('label_ru'),
         supabase.from('jobs').select('category_id,status').in('status', ACTIVE_JOB_STATUSES).limit(1000),
       ]);
 
@@ -59,7 +60,7 @@ function MobileIndex() {
       const next = (categoriesData || [])
         .map((category: any) => ({
           id: category.id,
-          name: category.label_ru || category.key,
+          name: categoryLabel(category, language) || category.key,
           icon: getCategoryIcon(category.label_ru, category.key),
           color: 'from-slate-500 to-slate-600',
           popularity: counts.get(category.id) || 0,
