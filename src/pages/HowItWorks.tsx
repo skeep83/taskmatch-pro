@@ -6,7 +6,7 @@ import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { 
+import {
   Search, MessageSquare, CreditCard, Star, Users, Shield, Zap, CheckCircle,
   ArrowRight, Sparkles, Globe, Clock, Award, TrendingUp, Heart, Target,
   ChevronDown, Play, Phone, Mail, MapPin, Eye, Lock, Coins, Settings
@@ -110,10 +110,10 @@ const HowItWorks = () => {
   ];
 
   const stats = [
-    { icon: Users, number: "50K+", label: t("how_it_works.stats.happy_clients") },
-    { icon: Star, number: "25K+", label: t("how_it_works.stats.completed_orders") },
-    { icon: Shield, number: "99.8%", label: t("how_it_works.stats.secure_payments") },
-    { icon: Clock, number: "15 мин", label: t("how_it_works.stats.avg_response") }
+    { icon: Search, number: "01", label: t("how_it_works.steps.step1.title") },
+    { icon: MessageSquare, number: "02", label: t("how_it_works.steps.step2.title") },
+    { icon: Shield, number: "03", label: t("how_it_works.steps.step3.title") },
+    { icon: Clock, number: "04", label: t("how_it_works.steps.step4.title") }
   ];
 
   const faq = [
@@ -149,12 +149,12 @@ const HowItWorks = () => {
 
   return (
     <main className="min-h-screen">
-      <Seo 
+      <Seo
         title={t("how_it_works.title")}
         description={t("how_it_works.description")}
-        canonical="/how-it-works" 
+        canonical="/how-it-works"
       />
-      
+
       {/* Hero Section */}
       <section className="py-24">
         <div className="container mx-auto">
@@ -168,39 +168,39 @@ const HowItWorks = () => {
                 </div>
               </div>
             </div>
-            
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-gradient mb-8 leading-tight px-4">
               {t("how_it_works.hero.title")}<br />
               <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                 {t("how_it_works.hero.subtitle")}
               </span>
             </h1>
-            
+
             <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed mb-10 px-4">
               {t("how_it_works.hero.description")}
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/catalog" className="btn-hero px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
                 <NeumorphicIcon icon={Search} size={24} variant="behance" />
                 {t("how_it_works.hero.find_specialist")}
                 <ArrowRight size={20} />
               </Link>
-              
+
               <button className="btn-ghost px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
                 <NeumorphicIcon icon={Play} size={20} variant="behance" />
                 {t("how_it_works.hero.watch_video")}
               </button>
             </div>
           </div>
-          
+
           {/* Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             {stats.map((stat, index) => (
               <div key={index} className="card-surface p-6 text-center">
-                <NeumorphicIcon 
+                <NeumorphicIcon
                   icon={stat.icon}
-                  size={64} 
+                  size={64}
                   variant="behance"
                   className="mx-auto mb-3"
                 />
@@ -228,12 +228,12 @@ const HowItWorks = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="relative h-full">
-                <div 
+                <div
                   className="card-surface p-8 text-center relative overflow-hidden border-0 transition-all duration-500 h-full flex flex-col"
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
@@ -241,22 +241,22 @@ const HowItWorks = () => {
                   <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-bold text-primary">{step.number}</span>
                   </div>
-                  
+
                   {/* Icon with Neumorphic Style */}
                   <div className="relative mb-8">
-                    <NeumorphicIcon 
+                    <NeumorphicIcon
                       icon={step.icon}
                       size={80}
                       variant="behance"
                       className="mx-auto"
                     />
                   </div>
-                  
+
                   <h3 className="text-xl font-bold mb-4 text-gradient-subtle">{step.title}</h3>
                   <p className="text-muted-foreground leading-relaxed text-sm flex-1">
                     {step.description}
                   </p>
-                  
+
                   {/* Arrow for desktop */}
                   {index < steps.length - 1 && (
                     <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2">
@@ -286,24 +286,24 @@ const HowItWorks = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
                 className="card-surface group p-8 text-center transition-all duration-500 hover:shadow-2xl"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="mb-6">
-                  <NeumorphicIcon 
+                  <NeumorphicIcon
                     icon={feature.icon}
                     size={80}
                     variant="behance"
                     className="mx-auto animate-heartbeat"
                   />
                 </div>
-                
+
                 <h3 className="text-2xl font-bold mb-3 text-gradient-subtle">{feature.title}</h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   {feature.description}
@@ -333,7 +333,7 @@ const HowItWorks = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="max-w-4xl mx-auto space-y-4">
           {faq.map((item, index) => (
             <div
@@ -347,13 +347,13 @@ const HowItWorks = () => {
                 <h3 className="text-lg font-semibold text-primary">
                   {item.question}
                 </h3>
-                <ChevronDown 
+                <ChevronDown
                   className={`w-5 h-5 text-primary transition-transform ${
                     openFAQ === index ? 'rotate-180' : ''
                   }`}
                 />
               </button>
-              
+
               <div className={`overflow-hidden transition-all duration-300 ${
                 openFAQ === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
@@ -372,7 +372,7 @@ const HowItWorks = () => {
       <section className="container mx-auto py-20 px-6">
         <div className="card-surface relative p-16 text-center max-w-6xl mx-auto overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10"></div>
-          
+
           <div className="relative">
             <div className="flex justify-center mb-8">
               <div className="flex gap-4">
@@ -381,14 +381,14 @@ const HowItWorks = () => {
                 <NeumorphicIcon icon={Shield} size={64} variant="behance" />
               </div>
             </div>
-            
+
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-bold mb-6 text-gradient leading-tight px-4">
               {t("how_it_works.cta.title")}
             </h2>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto px-4">
               {t("how_it_works.cta.subtitle")}
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
               <Link to="/catalog" className="btn-hero px-10 py-5 rounded-xl font-semibold text-xl flex items-center gap-3">
                 <NeumorphicIcon icon={Search} size={24} variant="behance" />
@@ -400,7 +400,7 @@ const HowItWorks = () => {
                 {t("hero.cta_secondary")}
               </Link>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-8 justify-center items-center text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Lock size={16} />

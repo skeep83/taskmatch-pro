@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -15,16 +15,16 @@ import { MobileCard } from "@/mobile/components/ui/MobileCard";
 import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
-import { 
-  Search, 
-  Filter, 
-  MapPin, 
-  Clock, 
-  Euro, 
-  Star, 
-  Video, 
-  Shield, 
-  Zap, 
+import {
+  Search,
+  Filter,
+  MapPin,
+  Clock,
+  Euro,
+  Star,
+  Video,
+  Shield,
+  Zap,
   Eye,
   MessageSquare,
   Heart,
@@ -67,6 +67,10 @@ interface Category {
   label_ro: string;
 }
 
+interface ResponseJobRef {
+  job_id: string;
+}
+
 export default function MobileFeed() {
   console.log("MobileFeed component loading...", { React });
   const navigate = useNavigate();
@@ -74,7 +78,7 @@ export default function MobileFeed() {
   const { formatPrice } = useCurrency();
   const { t } = useEnhancedI18n();
   const { safeAreaInsets } = useMobile();
-  
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -82,48 +86,103 @@ export default function MobileFeed() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [userRole, setUserRole] = useState<string>("client");
-  const [user, setUser] = useState<any>(null);
-  const [acceptingJob, setAcceptingJob] = useState<string | null>(null);
+  const [user, setUser] = useState<{ id: string } | null>(null);
+
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    void checkAuth();
+  }, [checkAuth]);
 
   useEffect(() => {
     if (user) {
-      loadJobs();
+      void loadJobs();
     }
-  }, [user, selectedCategory]);
+  }, [loadJobs, user]);
 
-  const checkAuth = async () => {
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        void loadJobs();
+      }
+    };
+
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+
+    const jobsChannel = supabase
+      .channel(`mobile-feed-jobs-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'jobs',
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    const applicationsChannel = supabase
+      .channel(`mobile-feed-applications-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'job_applications',
+        filter: `pro_id=eq.${user.id}`,
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    const proposalsChannel = supabase
+      .channel(`mobile-feed-proposals-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'job_price_proposals',
+        filter: `pro_id=eq.${user.id}`,
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      void supabase.removeChannel(jobsChannel);
+      void supabase.removeChannel(applicationsChannel);
+      void supabase.removeChannel(proposalsChannel);
+    };
+  }, [loadJobs, user?.id]);
+
+  const checkAuth = useCallback(async () => {
     try {
       const { data: session } = await supabase.auth.getSession();
-      
+
       if (!session.session?.user) {
         navigate("/auth");
         return;
       }
 
       setUser(session.session.user);
-      
+
       // Load user role
       const roleResult = await getUserRole(session.session.user.id);
       if (roleResult.success) {
         setUserRole(roleResult.role);
       }
-      
+
       setLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Auth error:", error);
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     try {
       setRefreshing(true);
 
-      // Load categories first
       const { data: categoriesData, error: categoriesError } = await supabase
         .from("categories")
         .select("*")
@@ -135,7 +194,6 @@ export default function MobileFeed() {
         setCategories(categoriesData || []);
       }
 
-      // Load jobs via edge function
       const params = new URLSearchParams({
         page: "1",
         limit: "20"
@@ -153,62 +211,40 @@ export default function MobileFeed() {
         body: { params: Object.fromEntries(params) }
       });
 
-      if (error) {
-        throw error;
+      if (error) throw error;
+      if (response.error) throw new Error(response.error);
+
+      let respondedJobIds = new Set<string>();
+
+      if (userRole === 'pro' && user?.id) {
+        const [{ data: applications }, { data: proposals }] = await Promise.all([
+          supabase.from('job_applications').select('job_id').eq('pro_id', user.id),
+          supabase.from('job_price_proposals').select('job_id').eq('pro_id', user.id),
+        ]);
+
+        respondedJobIds = new Set([
+          ...((applications as ResponseJobRef[] | null) || []).map((row) => row.job_id),
+          ...((proposals as ResponseJobRef[] | null) || []).map((row) => row.job_id),
+        ]);
       }
 
-      if (response.error) {
-        throw new Error(response.error);
-      }
+      const visibleJobs = (response.jobs || []).filter((job: Job) => {
+        if (userRole !== 'pro' || !user?.id) return true;
+        return job.client_id !== user.id && !respondedJobIds.has(job.id);
+      });
 
-      setJobs(response.jobs || []);
-    } catch (error: any) {
+      setJobs(visibleJobs);
+    } catch (error) {
       console.error("Error loading jobs:", error);
       toast({
         title: "Ошибка",
-        description: "Не удалось загрузить заказы",
+        description: error instanceof Error ? error.message : "Не удалось загрузить заказы",
         variant: "destructive"
       });
     } finally {
       setRefreshing(false);
     }
-  };
-
-  const acceptJob = async (jobId: string) => {
-    if (!user) return;
-    
-    try {
-      setAcceptingJob(jobId);
-
-      const { error } = await supabase
-        .from("jobs")
-        .update({ 
-          pro_id: user.id, 
-          status: "accepted" 
-        })
-        .eq("id", jobId)
-        .eq("status", "new"); // Only accept if still new
-
-      if (error) throw error;
-
-      toast({
-        title: "Заказ принят!",
-        description: "Заказ был успешно принят в работу"
-      });
-
-      // Refresh jobs list
-      await loadJobs();
-    } catch (error: any) {
-      console.error("Error accepting job:", error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось принять заказ",
-        variant: "destructive"
-      });
-    } finally {
-      setAcceptingJob(null);
-    }
-  };
+  }, [searchQuery, selectedCategory, toast, user?.id, userRole]);
 
   const handleJobPress = (jobId: string) => {
     navigate(`/job/${jobId}`);
@@ -253,43 +289,43 @@ export default function MobileFeed() {
 
   return (
     <>
-      <Seo 
-        title="Лента заказов — ServiceHub" 
-        description="Доступные заказы для специалистов" 
-        canonical="/feed" 
+      <Seo
+        title="Лента заказов — ServiceHub"
+        description="Заказы для отправки предложений на ServiceHub"
+        canonical="/feed"
       />
-      
+
       <div className="min-h-screen bg-[#E5E7EB]">
-        <MobileHeader 
+        <MobileHeader
           title="Лента заказов"
           showBack={true}
           showNotifications={true}
         />
-        
-        <div 
+
+        <div
           className="pt-20 pb-24 px-4 space-y-6"
           style={{ paddingTop: `${80 + safeAreaInsets.top}px` }}
         >
           {/* Hero Section */}
           <MobileCard className="text-center">
             <h1 className="text-2xl font-bold mb-2">
-              {userRole === "pro" ? "Доступные заказы" : "Поиск специалистов"}
+              {userRole === "pro" ? "Заказы для предложений" : "Лента заказов"}
             </h1>
             <p className="text-muted-foreground mb-4">
-              {userRole === "pro" 
-                ? "Выберите подходящий заказ для работы"
-                : "Найдите лучших специалистов в вашем городе"
+              {userRole === "pro"
+                ? "Показываем только новые заказы, по которым вы ещё не откликались"
+                : "Смотрите новые заказы на платформе"
               }
             </p>
-            
+
             <div className="flex flex-wrap gap-2 justify-center">
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                 <AnimatedIcon icon={Zap} className="text-primary h-3 w-3" />
-                <span className="text-xs font-medium">Мгновенные выплаты</span>
+                <span className="text-xs font-medium">Новые заказы</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 border border-green-200">
                 <AnimatedIcon icon={Shield} className="text-green-500 h-3 w-3" />
-                <span className="text-xs font-medium">Защита эскроу</span>
+                <span className="text-xs font-medium">Отклики и сообщения</span>
               </div>
             </div>
           </MobileCard>
@@ -307,7 +343,7 @@ export default function MobileFeed() {
                   className="pl-10"
                 />
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 <select
@@ -405,7 +441,7 @@ export default function MobileFeed() {
                           </span>
                         </div>
                       )}
-                      
+
                       {job.location_address && (
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-blue-500" />
@@ -414,7 +450,7 @@ export default function MobileFeed() {
                           </span>
                         </div>
                       )}
-                      
+
                       <div className="flex items-center gap-2">
                         <Star className={`h-4 w-4 ${getUrgencyColor(job.urgency)}`} />
                         <span className="text-sm text-muted-foreground">
@@ -429,7 +465,7 @@ export default function MobileFeed() {
                         {job.job_photos.slice(0, 3).map((photo, index) => (
                           <img
                             key={index}
-                            src={`https://adstlhdgegtkvtgklkyx.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
+                            src={`https://tedkllggdmwhxtxwqrzk.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
                             alt="Фото заказа"
                             className="w-16 h-16 object-cover rounded-lg border border-border"
                             onError={(e) => {
@@ -456,8 +492,8 @@ export default function MobileFeed() {
                         </div>
                         <div>
                           <p className="text-sm font-medium">
-                            {job.profiles.full_name || 
-                             (job.profiles.first_name && job.profiles.last_name 
+                            {job.profiles.full_name ||
+                             (job.profiles.first_name && job.profiles.last_name
                                ? `${job.profiles.first_name} ${job.profiles.last_name.charAt(0)}.`
                                : 'Клиент')}
                           </p>
@@ -478,23 +514,18 @@ export default function MobileFeed() {
                       <Eye className="h-4 w-4 mr-2" />
                       Подробнее
                     </Button>
-                    
-                    {userRole === "pro" && job.status === "new" && (
+
+                    {userRole === "pro" && job.status === "new" && job.client_id !== user?.id && (
                       <Button
                         size="sm"
-                        onClick={() => acceptJob(job.id)}
-                        disabled={acceptingJob === job.id}
+                        onClick={() => navigate(`/job/${job.id}/respond`)}
                         className="flex-1"
                       >
-                        {acceptingJob === job.id ? (
-                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                        )}
-                        {acceptingJob === job.id ? 'Принимаем...' : 'Откликнуться'}
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Отправить предложение
                       </Button>
                     )}
-                    
+
                     <Button variant="ghost" size="sm" className="px-3">
                       <Video className="h-4 w-4" />
                     </Button>

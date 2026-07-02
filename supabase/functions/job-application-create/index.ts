@@ -22,13 +22,13 @@ serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error("Missing Supabase environment variables");
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    
+
     // Get auth header from request
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
@@ -47,7 +47,7 @@ serve(async (req) => {
 
     const requestBody = await req.json();
     console.log('Request body received:', JSON.stringify(requestBody, null, 2));
-    
+
     const { jobId, priceCents, etaSlot, note, warrantyDays }: JobApplicationParams = requestBody;
 
     // Detailed validation logging
@@ -57,22 +57,22 @@ serve(async (req) => {
     console.log('- etaSlot:', etaSlot);
     console.log('- note:', note);
     console.log('- warrantyDays:', warrantyDays);
-    
+
     if (!jobId) {
       console.error('Validation failed: Missing jobId');
       throw new Error("Missing job ID");
     }
-    
+
     if (!priceCents) {
       console.error('Validation failed: Missing priceCents');
       throw new Error("Missing price");
     }
-    
+
     if (typeof priceCents !== 'number') {
       console.error('Validation failed: priceCents is not a number, received:', typeof priceCents, priceCents);
       throw new Error("Price must be a number");
     }
-    
+
     if (priceCents <= 0) {
       console.error('Validation failed: priceCents <= 0, received:', priceCents);
       throw new Error("Price must be greater than 0");
@@ -103,6 +103,10 @@ serve(async (req) => {
 
     if (jobError || !job) {
       throw new Error('Job not found or no longer available');
+    }
+
+    if (job.client_id === user.id) {
+      throw new Error('You cannot send a proposal to your own job');
     }
 
     // Check if professional has any services configured first
@@ -200,7 +204,7 @@ serve(async (req) => {
     // Log application creation
     console.log(`Job application created: ${application.id} for job ${jobId} by pro ${user.id}`);
 
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       success: true,
       applicationId: application.id,
       message: 'Application submitted successfully'
@@ -210,7 +214,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Job application error:', error);
-    
+
     // Enhanced error logging
     const errorDetails = {
       message: error.message,
@@ -220,7 +224,7 @@ serve(async (req) => {
       user_id: undefined,
       request_data: undefined
     };
-    
+
     try {
       // Try to get user and request data for better debugging
       const authHeader = req.headers.get("authorization");
@@ -233,22 +237,22 @@ serve(async (req) => {
         const { data: { user } } = await userSupabase.auth.getUser();
         errorDetails.user_id = user?.id;
       }
-      
+
       const body = await req.clone().json().catch(() => null);
       errorDetails.request_data = body;
     } catch (logError) {
       console.error('Error getting additional details for logging:', logError);
     }
-    
+
     console.error('Detailed error information:', JSON.stringify(errorDetails, null, 2));
-    
+
     // Try to log to admin logs system
     try {
       const adminSupabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
       );
-      
+
       await adminSupabase.from('error_logs').insert({
         level: 'error',
         source: 'edge_function_job_application_create',
@@ -265,9 +269,9 @@ serve(async (req) => {
     } catch (logToDbError) {
       console.error('Failed to log error to database:', logToDbError);
     }
-    
-    return new Response(JSON.stringify({ 
-      error: error.message 
+
+    return new Response(JSON.stringify({
+      error: error.message
     }), {
       status: 400,
       headers: { ...corsHeaders, 'content-type': 'application/json' }

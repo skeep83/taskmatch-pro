@@ -41,6 +41,7 @@ const MobileMessages = lazy(() => import("./mobile/pages/MobileMessages"));
 const MobileJobNew = lazy(() => import("./mobile/pages/MobileJobNew"));
 const MobileJobDetail = lazy(() => import("./mobile/pages/MobileJobDetail"));
 const MobileJobRespond = lazy(() => import("./mobile/pages/MobileJobRespond"));
+const MobileTenderDetail = lazy(() => import("./mobile/pages/MobileTenderDetail"));
 const MobileProfileSettings = lazy(() => import("./mobile/pages/MobileProfileSettings"));
 const Kyc = lazy(() => import("./pages/Kyc"));
 const ProSchedule = lazy(() => import("./pages/ProSchedule"));
@@ -79,13 +80,16 @@ import PageTransition from "./components/PageTransition";
 const AppContent = () => {
   const location = useLocation();
   const { isMobile } = useDeviceDetection();
-  
+  const isAuthRoute = location.pathname === "/auth";
+  const isAdminRoute = location.pathname === "/admin" || location.pathname.startsWith("/admin/");
+  const hidePublicShell = isAuthRoute || isAdminRoute;
+
   // Отслеживаем присутствие пользователя на платформе
-  usePresenceTracking();
-  
+  usePresenceTracking(!isAuthRoute);
+
   return (
     <>
-      {!isMobile && <AppNavigation />}
+      {!hidePublicShell && !isMobile && <AppNavigation />}
       <PageTransition>
         <Suspense fallback={
           <div className="min-h-screen bg-gradient-to-br from-background to-background/80 flex items-center justify-center">
@@ -137,7 +141,9 @@ const AppContent = () => {
             <Route path="/portfolio" element={<ProPortfolio />} />
             <Route path="/tenders" element={<TendersList />} />
             <Route path="/tenders/new" element={<TenderNew />} />
-            <Route path="/tenders/:id" element={<TenderDetail />} />
+            <Route path="/tenders/:id" element={
+              isMobile ? <MobileTenderDetail /> : <TenderDetail />
+            } />
             <Route path="/pro/:id" element={<ProPublic />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-canceled" element={<PaymentCanceled />} />
@@ -163,14 +169,20 @@ const AppContent = () => {
           </Routes>
         </Suspense>
       </PageTransition>
-      {!isMobile && <FloatingActionButton />}
-      {!isMobile && <Footer />}
-      {isMobile && <MobileBottomNav />}
+      {!hidePublicShell && !isMobile && <FloatingActionButton />}
+      {!hidePublicShell && !isMobile && <Footer />}
+      {!hidePublicShell && isMobile && <MobileBottomNav />}
     </>
   );
 };
 
 const App = () => {
+  const routerBasename = (() => {
+    const base = (import.meta.env.BASE_URL || '/').trim();
+    if (!base || base === '/') return '/';
+    return base.endsWith('/') ? base.slice(0, -1) : base;
+  })();
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -184,7 +196,7 @@ const App = () => {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter basename={routerBasename === '/' ? undefined : routerBasename}>
           <EnhancedI18nProvider>
             <DatabaseI18nProvider>
               <MobileProvider>

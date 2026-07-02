@@ -1,14 +1,30 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { advancedErrorLogger } from './utils/advancedErrorLogger'
+import React from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import { getAdvancedErrorLogger } from './utils/advancedErrorLogger'
 
-// Initialize advanced error logging
-advancedErrorLogger;
+const pathname = window.location.pathname;
+const routerBase = import.meta.env.BASE_URL || "/";
+const isSubpathDeployment = routerBase !== "/";
+const isAuthOnlyEntry = !isSubpathDeployment && (pathname === "/auth" || pathname.endsWith("/auth"));
 
-createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const loadApp = async () => {
+  const mod = isAuthOnlyEntry ? await import("./AuthEntry") : await import("./App");
+  return mod.default;
+};
+
+loadApp().then((AppComponent) => {
+  createRoot(document.getElementById("root")!).render(
+    <React.StrictMode>
+      <AppComponent />
+    </React.StrictMode>
+  );
+
+  queueMicrotask(() => {
+    try {
+      getAdvancedErrorLogger();
+    } catch (error) {
+      console.warn('Advanced error logger init skipped:', error);
+    }
+  });
+});

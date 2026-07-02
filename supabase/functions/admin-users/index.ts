@@ -33,7 +33,7 @@ serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: userError } = await supabaseService.auth.getUser(token);
-    
+
     if (userError || !user) {
       console.error('Auth error:', userError);
       return new Response(JSON.stringify({ error: "Invalid authentication" }), {
@@ -67,19 +67,19 @@ serve(async (req) => {
     }
 
     const { method } = req;
-    
+
     // Handle list users request
     if (method === "POST") {
       const postData = await req.json();
       console.log('Request data:', postData);
-      
+
       if (postData.action === 'list') {
         return await handleListUsers(supabaseService, postData, user.id);
       }
-      
+
       return await handleUserAction(supabaseService, postData, user.id, req);
     }
-    
+
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -117,10 +117,10 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
 
     const allAuthUsers = authUsersResponse.users || [];
     console.log(`Found ${allAuthUsers.length} auth users`);
-    
+
     if (allAuthUsers.length === 0) {
-      return new Response(JSON.stringify({ 
-        users: [], 
+      return new Response(JSON.stringify({
+        users: [],
         pagination: { page, limit, total: 0 },
         stats: includeStats ? {
           total_users: 0,
@@ -138,7 +138,7 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
     // Get all profiles in one query
     const { data: allProfiles, error: profileError } = await supabase
       .from('profiles')
-      .select('id, full_name, phone, locale, city, created_at, updated_at');
+      .select('id, full_name, phone, locale, city, created_at, updated_at, is_blocked, blocked_at, blocked_reason, blocked_by');
 
     if (profileError) {
       console.error('Error fetching profiles:', profileError);
@@ -175,6 +175,10 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
         phone: profile?.phone || null,
         city: profile?.city || null,
         locale: profile?.locale || 'ru',
+        is_blocked: Boolean(profile?.is_blocked),
+        blocked_at: profile?.blocked_at || null,
+        blocked_reason: profile?.blocked_reason || null,
+        blocked_by: profile?.blocked_by || null,
         user_roles: userRoles,
         kyc_documents: userKyc,
         pro_profiles: [],
@@ -186,7 +190,7 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
     let filteredUsers = enrichedUsers;
 
     if (role) {
-      filteredUsers = filteredUsers.filter(user => 
+      filteredUsers = filteredUsers.filter(user =>
         user.user_roles.some(r => r.role === role)
       );
     }
@@ -207,31 +211,29 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
       try {
         // Calculate real statistics from the data
         const totalUsers = allAuthUsers.length;
-        
+
         // Active users (signed in within last 30 days)
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-        const activeUsers = allAuthUsers.filter(user => 
+        const activeUsers = allAuthUsers.filter(user =>
           user.last_sign_in_at && new Date(user.last_sign_in_at) > thirtyDaysAgo
         ).length;
 
         // Pro users
-        const proUsers = enrichedUsers.filter(user => 
+        const proUsers = enrichedUsers.filter(user =>
           user.user_roles.some(r => r.role === 'pro')
         ).length;
 
         // Pending KYC
-        const pendingKyc = enrichedUsers.filter(user => 
+        const pendingKyc = enrichedUsers.filter(user =>
           user.kyc_documents.some(k => k.status === 'pending')
         ).length;
 
         // Blocked users
-        const blockedUsers = enrichedUsers.filter(user => 
-          user.user_roles.some(r => r.role === 'blocked')
-        ).length;
+        const blockedUsers = enrichedUsers.filter(user => user.is_blocked).length;
 
         // New signups today
         const today = new Date().toDateString();
-        const newSignupsToday = allAuthUsers.filter(user => 
+        const newSignupsToday = allAuthUsers.filter(user =>
           user.created_at && new Date(user.created_at).toDateString() === today
         ).length;
 
@@ -265,8 +267,8 @@ async function handleListUsers(supabase: any, data: any, adminId: string) {
 
     console.log(`Returning ${paginatedUsers.length} users out of ${filteredUsers.length} total`);
 
-    return new Response(JSON.stringify({ 
-      users: paginatedUsers, 
+    return new Response(JSON.stringify({
+      users: paginatedUsers,
       pagination: { page, limit, total: filteredUsers.length },
       total_pages: Math.ceil(filteredUsers.length / limit),
       stats
@@ -301,46 +303,164 @@ async function handleUserAction(supabase: any, data: any, adminId: string, req: 
 
     switch (action) {
       case 'block_user': {
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role: 'blocked' });
-        
-        result = { success: !roleError };
-        error = roleError;
+        const reason = typeof actionData.reason === 'string' ? actionData.reason.trim() : '';
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: userId,
+            is_blocked: true,
+            blocked_at: new Date().toISOString(),
+            blocked_reason: reason || 'Blocked by admin',
+            blocked_by: adminId,
+          }, { onConflict: 'id' });
+
+        result = { success: !profileError };
+        error = profileError;
         break;
       }
 
       case 'unblock_user': {
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', userId)
-          .eq('role', 'blocked');
-        
-        result = { success: !roleError };
-        error = roleError;
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: userId,
+            is_blocked: false,
+            blocked_at: null,
+            blocked_reason: null,
+            blocked_by: null,
+          }, { onConflict: 'id' });
+
+        result = { success: !profileError };
+        error = profileError;
         break;
       }
 
       case 'change_role': {
         const { newRole, removeRole } = actionData;
-        
+
         if (removeRole) {
-          await supabase
+          const { error: removeError } = await supabase
             .from('user_roles')
             .delete()
             .eq('user_id', userId)
             .eq('role', removeRole);
+
+          if (removeError) {
+            error = removeError;
+            break;
+          }
         }
 
         if (newRole) {
-          const { error: roleError } = await supabase
+          const { data: existingRole, error: existingRoleError } = await supabase
             .from('user_roles')
-            .insert({ user_id: userId, role: newRole });
-          error = roleError;
+            .select('id, role')
+            .eq('user_id', userId)
+            .eq('role', newRole)
+            .maybeSingle();
+
+          if (existingRoleError) {
+            error = existingRoleError;
+            break;
+          }
+
+          if (!existingRole) {
+            const { error: roleError } = await supabase
+              .from('user_roles')
+              .insert({ user_id: userId, role: newRole });
+
+            if (roleError) {
+              error = roleError;
+              break;
+            }
+          }
         }
 
-        result = { success: !error };
+        const { data: updatedRoles, error: verifyError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId);
+
+        error = verifyError;
+        result = {
+          success: !verifyError && (!newRole || (updatedRoles || []).some((roleRow: { role: string }) => roleRow.role === newRole)),
+          roles: (updatedRoles || []).map((roleRow: { role: string }) => roleRow.role)
+        };
+        break;
+      }
+
+      case 'create_qa_admin': {
+        const email = typeof actionData.email === 'string' ? actionData.email.trim().toLowerCase() : '';
+        const password = typeof actionData.password === 'string' ? actionData.password : '';
+        const requestedRoles = Array.isArray(actionData.roles) && actionData.roles.length > 0
+          ? actionData.roles
+          : ['client', 'admin'];
+
+        if (!email || !password) {
+          return new Response(JSON.stringify({ error: 'Email and password are required' }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const { data: createdUserResponse, error: createUserError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+        });
+
+        if (createUserError || !createdUserResponse.user) {
+          error = createUserError || new Error('User creation failed');
+          break;
+        }
+
+        const createdUserId = createdUserResponse.user.id;
+        const uniqueRoles = Array.from(new Set(['client', ...requestedRoles]));
+
+        for (const role of uniqueRoles) {
+          const { data: existingRole, error: existingRoleError } = await supabase
+            .from('user_roles')
+            .select('id')
+            .eq('user_id', createdUserId)
+            .eq('role', role)
+            .maybeSingle();
+
+          if (existingRoleError) {
+            error = existingRoleError;
+            break;
+          }
+
+          if (!existingRole) {
+            const { error: roleInsertError } = await supabase
+              .from('user_roles')
+              .insert({ user_id: createdUserId, role });
+
+            if (roleInsertError) {
+              error = roleInsertError;
+              break;
+            }
+          }
+        }
+
+        if (error) {
+          break;
+        }
+
+        const { data: createdRoles, error: createdRolesError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', createdUserId);
+
+        error = createdRolesError;
+        result = {
+          success: !createdRolesError,
+          user: {
+            id: createdUserId,
+            email: createdUserResponse.user.email,
+            email_confirmed_at: createdUserResponse.user.email_confirmed_at,
+          },
+          roles: (createdRoles || []).map((roleRow: { role: string }) => roleRow.role),
+        };
         break;
       }
 
@@ -353,7 +473,8 @@ async function handleUserAction(supabase: any, data: any, adminId: string, req: 
 
     if (error) {
       console.error(`Error in ${action}:`, error);
-      return new Response(JSON.stringify({ error: `Failed to ${action}`, details: error.message }), {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return new Response(JSON.stringify({ error: `Failed to ${action}`, details: errorMessage }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -363,9 +484,10 @@ async function handleUserAction(supabase: any, data: any, adminId: string, req: 
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Error in user action ${action}:`, error);
-    return new Response(JSON.stringify({ error: `Failed to ${action}`, details: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: `Failed to ${action}`, details: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

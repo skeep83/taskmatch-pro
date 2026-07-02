@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Diagnostics: React.FC = () => {
   useEffect(() => {
+    if (!import.meta.env.DEV) return;
+
     (async () => {
       try {
-        const { supabase } = await import("@/integrations/supabase/client");
         if (supabase?.auth && typeof supabase.from === "function") {
           console.info(
             "ServiceHub Diagnostics: Supabase client detected and ready.",

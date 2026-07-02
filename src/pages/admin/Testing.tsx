@@ -14,7 +14,7 @@ export default function AdminTesting() {
       </div>
 
       <Tabs defaultValue="notifications" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
           <TabsTrigger value="notifications">Уведомления</TabsTrigger>
           <TabsTrigger value="errors">Логи ошибок</TabsTrigger>
           <TabsTrigger value="auto-scanner">Автосканер</TabsTrigger>
@@ -26,7 +26,7 @@ export default function AdminTesting() {
             <p className="text-sm text-muted-foreground mb-6">
               Проверьте работу системы уведомлений, звуковых эффектов и real-time обновлений
             </p>
-            
+
             <NotificationTester />
           </div>
         </TabsContent>

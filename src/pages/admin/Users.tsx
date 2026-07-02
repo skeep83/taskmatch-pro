@@ -9,8 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, Search, Users, UserCheck, UserX, Crown, Shield, Eye, Edit, Ban, CheckCircle, XCircle, MapPin, Calendar, Phone, Mail, Briefcase, Star, Clock, DollarSign, AlertTriangle, ExternalLink, Trash2 } from "lucide-react";
+import { Activity, Search, Users, UserCheck, UserX, Crown, Shield, Eye, Edit, Ban, CheckCircle, XCircle, MapPin, Calendar, Phone, Mail, Briefcase, Star, Clock, DollarSign, AlertTriangle, ExternalLink, Trash2, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface User {
@@ -25,6 +26,7 @@ interface User {
   roles: string[];
   kyc_status: "none" | "pending" | "approved" | "rejected";
   is_blocked: boolean;
+  blocked_until?: string | null;
   profile_completion: number;
   pro_data?: ProData;
   pro_upgrade_request?: ProUpgradeRequest;
@@ -73,6 +75,12 @@ interface UserStats {
 }
 
 export default function AdminUsers() {
+  const isLegacyBanned = (bannedUntil?: string | null) => {
+    if (!bannedUntil) return false;
+    const ts = Date.parse(bannedUntil);
+    return Number.isFinite(ts) && ts > Date.now();
+  };
+
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [kycDocuments, setKycDocuments] = useState<KycDocument[]>([]);
@@ -93,6 +101,7 @@ export default function AdminUsers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [actionNote, setActionNote] = useState("");
+  const [actionInFlight, setActionInFlight] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Helper function to generate signed URL for private storage files
@@ -106,7 +115,7 @@ export default function AdminUsers() {
         console.error('Error creating signed URL:', error);
         return null;
       }
-      
+
       return data.signedUrl;
     } catch (error) {
       console.error('Error generating signed URL:', error);
@@ -149,10 +158,8 @@ export default function AdminUsers() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Call admin-users edge function to get users and stats together
-      const { data, error } = await supabase.functions.invoke('admin-users', {
+
+      const data = await adminApi.makeRequest('admin-users', {
         body: {
           action: 'list',
           page: currentPage,
@@ -162,8 +169,6 @@ export default function AdminUsers() {
           include_stats: true
         }
       });
-
-      if (error) throw error;
 
       console.log('Admin users response:', data);
 
@@ -177,10 +182,11 @@ export default function AdminUsers() {
 
         // Extract roles from nested structure
         const roles = user.user_roles?.map((r: any) => r.role) || [];
-        
+
         // Extract KYC status
         const kyc_status = user.kyc_documents?.[0]?.status || 'none';
-        
+        const blockedByState = Boolean(user.is_blocked) || isLegacyBanned(user.banned_until);
+
         // Extract pro data
         const proProfile = user.pro_profiles?.[0];
         const ratingStats = user.pro_rating_stats?.[0];
@@ -196,7 +202,8 @@ export default function AdminUsers() {
           last_sign_in_at: user.last_sign_in_at || user.updated_at,
           roles,
           kyc_status: kyc_status as any,
-          is_blocked: roles.includes('blocked'),
+          is_blocked: blockedByState,
+          blocked_until: user.banned_until || null,
           profile_completion: Math.min(completion, 100),
           pro_data: roles.includes('pro') ? {
             bio: proProfile?.bio,
@@ -214,7 +221,8 @@ export default function AdminUsers() {
       }) || [];
 
       setUsers(users);
-      
+      setSelectedUser(current => current ? users.find(user => user.id === current.id) || current : current);
+
       // Use stats from the API response if available, otherwise calculate locally
       if (data?.stats) {
         console.log('Using API stats:', data.stats);
@@ -243,7 +251,8 @@ export default function AdminUsers() {
       }
 
       setTotalPages(data?.total_pages || Math.ceil(users.length / 20));
-      
+      return users;
+
     } catch (error) {
       console.error("Failed to fetch users:", error);
       toast({
@@ -254,12 +263,13 @@ export default function AdminUsers() {
     } finally {
       setLoading(false);
     }
+
+    return [];
   };
 
   const fetchUserKyc = async (userId: string) => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { data: kycDocs, error } = await supabase
         .from('kyc_documents')
         .select(`
@@ -273,9 +283,9 @@ export default function AdminUsers() {
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
-      
+
       const documents: KycDocument[] = kycDocs?.map(doc => ({
         id: doc.id,
         user_id: doc.user_id,
@@ -286,7 +296,7 @@ export default function AdminUsers() {
         reviewed_at: doc.reviewed_at,
         reviewer_notes: undefined // Could add this field to table
       })) || [];
-      
+
       setKycDocuments(documents);
     } catch (error) {
       console.error("Failed to fetch KYC documents:", error);
@@ -300,16 +310,15 @@ export default function AdminUsers() {
 
   const fetchUserProUpgradeRequests = async (userId: string) => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { data: requests, error } = await supabase
         .from('pro_upgrade_requests')
         .select('*')
         .eq('user_id', userId)
         .order('submitted_at', { ascending: false });
-      
+
       if (error) throw error;
-      
+
       setProUpgradeRequests(requests || []);
     } catch (error) {
       console.error("Failed to fetch pro upgrade requests:", error);
@@ -323,20 +332,19 @@ export default function AdminUsers() {
 
   const approveProUpgradeRequest = async (requestId: string) => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { error } = await supabase.rpc('approve_pro_upgrade_request', {
         _request_id: requestId
       });
-      
+
       if (error) throw error;
-      
+
       // Refresh user data and pro upgrade requests
       if (selectedUser) {
         fetchUserProUpgradeRequests(selectedUser.id);
         fetchUsers();
       }
-      
+
       toast({
         title: "Успешно",
         description: "Заявка на статус специалиста одобрена"
@@ -353,21 +361,20 @@ export default function AdminUsers() {
 
   const rejectProUpgradeRequest = async (requestId: string, reason?: string) => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { error } = await supabase.rpc('reject_pro_upgrade_request', {
         _request_id: requestId,
         _reason: reason || actionNote
       });
-      
+
       if (error) throw error;
-      
+
       // Refresh user data and pro upgrade requests
       if (selectedUser) {
         fetchUserProUpgradeRequests(selectedUser.id);
         fetchUsers();
       }
-      
+
       toast({
         title: "Успешно",
         description: "Заявка на статус специалиста отклонена"
@@ -384,22 +391,21 @@ export default function AdminUsers() {
 
   const deleteProUpgradeRequest = async (requestId: string) => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { error } = await supabase
         .from('pro_upgrade_requests')
         .delete()
         .eq('id', requestId)
         .eq('status', 'pending'); // Only allow deletion of pending requests
-      
+
       if (error) throw error;
-      
+
       // Refresh user data and pro upgrade requests
       if (selectedUser) {
         fetchUserProUpgradeRequests(selectedUser.id);
         fetchUsers();
       }
-      
+
       toast({
         title: "Успешно",
         description: "Заявка на статус специалиста удалена"
@@ -416,22 +422,21 @@ export default function AdminUsers() {
 
   const deleteKycDocument = async (docId: string) => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { error } = await supabase
         .from('kyc_documents')
         .delete()
         .eq('id', docId)
         .eq('status', 'pending'); // Only allow deletion of pending documents
-      
+
       if (error) throw error;
-      
+
       // Refresh user data and KYC documents
       if (selectedUser) {
         fetchUserKyc(selectedUser.id);
         fetchUsers();
       }
-      
+
       toast({
         title: "Успешно",
         description: "KYC документ удален"
@@ -447,82 +452,69 @@ export default function AdminUsers() {
   };
 
   const blockUser = async (userId: string, reason: string) => {
+    const note = reason.trim() || "Блокировка администратором";
+
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // In a real app, you'd have a blocked_users table or a blocked field
-      // For now, we'll just show the UI change
-      setUsers(prev =>
-        prev.map(user =>
-          user.id === userId ? { ...user, is_blocked: true } : user
-        )
-      );
-      
-      // Log admin action
-      console.log(`Admin blocked user ${userId}: ${reason}`);
-      
+      setActionInFlight(`block:${userId}`);
+      await adminApi.blockUser(userId, note);
+      await fetchUsers();
+
       toast({
         title: "Успешно",
-        description: "Пользователь заблокирован"
+        description: "Пользователь заблокирован через backend"
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Ошибка",
-        description: "Не удалось заблокировать пользователя",
+        description: error?.message || "Не удалось заблокировать пользователя",
         variant: "destructive"
       });
+    } finally {
+      setActionInFlight(null);
     }
   };
 
   const unblockUser = async (userId: string, reason: string) => {
+    const note = reason.trim() || "Разблокировка администратором";
+
     try {
-      // await adminApi.unblockUser(userId, reason);
-      setUsers(prev =>
-        prev.map(user =>
-          user.id === userId ? { ...user, is_blocked: false } : user
-        )
-      );
+      setActionInFlight(`unblock:${userId}`);
+      await adminApi.unblockUser(userId, note);
+      await fetchUsers();
+
       toast({
         title: "Успешно",
-        description: "Пользователь разблокирован"
+        description: "Пользователь разблокирован через backend"
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Ошибка",
-        description: "Не удалось разблокировать пользователя",
+        description: error?.message || "Не удалось разблокировать пользователя",
         variant: "destructive"
       });
+    } finally {
+      setActionInFlight(null);
     }
   };
 
   const changeUserRole = async (userId: string, newRole: string, removeRole?: string) => {
     try {
-      // await adminApi.changeUserRole(userId, newRole, removeRole, actionNote);
-      setUsers(prev =>
-        prev.map(user => {
-          if (user.id === userId) {
-            let updatedRoles = [...user.roles];
-            if (removeRole && updatedRoles.includes(removeRole)) {
-              updatedRoles = updatedRoles.filter(r => r !== removeRole);
-            }
-            if (!updatedRoles.includes(newRole)) {
-              updatedRoles.push(newRole);
-            }
-            return { ...user, roles: updatedRoles };
-          }
-          return user;
-        })
-      );
+      setActionInFlight(`role:${userId}:${newRole}`);
+      await adminApi.changeUserRole(userId, newRole, removeRole, actionNote.trim() || undefined);
+      await fetchUsers();
+
       toast({
         title: "Успешно",
-        description: "Роль пользователя изменена"
+        description: "Роль пользователя изменена через backend"
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Ошибка",
-        description: "Не удалось изменить роль",
+        description: error?.message || "Не удалось изменить роль",
         variant: "destructive"
       });
+    } finally {
+      setActionInFlight(null);
     }
   };
 
@@ -548,23 +540,25 @@ export default function AdminUsers() {
   };
 
   const resetKyc = async (userId: string, reason: string) => {
+    const note = reason.trim() || "Сброс KYC администратором";
+
     try {
-      // await adminApi.resetKYC(userId, reason);
-      setUsers(prev =>
-        prev.map(user =>
-          user.id === userId ? { ...user, kyc_status: "none" } : user
-        )
-      );
+      setActionInFlight(`kyc-reset:${userId}`);
+      await adminApi.resetKYC(userId, note);
+      await fetchUsers();
+
       toast({
         title: "Успешно",
-        description: "KYC статус сброшен"
+        description: "KYC переведён обратно в pending через backend"
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Ошибка",
-        description: "Не удалось сбросить KYC",
+        description: error?.message || "Не удалось сбросить KYC",
         variant: "destructive"
       });
+    } finally {
+      setActionInFlight(null);
     }
   };
 
@@ -596,17 +590,17 @@ export default function AdminUsers() {
                          `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.roles.includes(roleFilter);
     const matchesKyc = kycFilter === "all" || user.kyc_status === kycFilter;
-    const matchesStatus = statusFilter === "all" || 
+    const matchesStatus = statusFilter === "all" ||
                          (statusFilter === "active" && !user.is_blocked) ||
                          (statusFilter === "blocked" && user.is_blocked);
-    
+
     return matchesSearch && matchesRole && matchesKyc && matchesStatus;
   });
 
   if (loading) {
     return (
       <section className="max-w-6xl mx-auto card-surface">
-        <Seo title="ServiceHub — Admin Users" description="Управление пользователями и мастерами" canonical="/admin/users" />
+        <Seo title="ServiceHub — Пользователи" description="Управление пользователями и мастерами" canonical="/admin/users" />
         <div className="flex items-center justify-center py-12">
           <Activity className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -615,19 +609,41 @@ export default function AdminUsers() {
   }
 
   return (
-    <section className="max-w-6xl mx-auto space-y-6">
-      <Seo title="ServiceHub — Admin Users" description="Управление пользователями и мастерами" canonical="/admin/users" />
-      
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Управление пользователями</h1>
-          <p className="text-sm text-muted-foreground">Пользователи, профессионалы и KYC верификация</p>
+    <section className="space-y-6">
+      <Seo title="ServiceHub — Пользователи" description="Управление пользователями и мастерами" canonical="/admin/users" />
+
+      <div className="rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border border-white/40">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-primary shadow-sm">
+              <Shield className="h-3.5 w-3.5" />
+              Phase 2 · Admin real-actions
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                Управление пользователями
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+                Реальные административные действия, KYC-модерация и единый операционный обзор пользователей в стиле всего ServiceHub.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant="secondary" className="px-3 py-1 rounded-xl bg-white/70 text-foreground shadow-sm">
+              {filteredUsers.length} в выборке
+            </Badge>
+            <Button variant="outline" size="sm" onClick={() => fetchUsers()} className="rounded-xl bg-white/70" disabled={loading}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Обновить
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -640,7 +656,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Activity className="w-4 h-4" />
@@ -653,7 +669,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
@@ -666,7 +682,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <UserCheck className="w-4 h-4" />
@@ -679,7 +695,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Ban className="w-4 h-4" />
@@ -692,7 +708,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -707,94 +723,96 @@ export default function AdminUsers() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
         <CardHeader>
           <CardTitle>Фильтры и поиск</CardTitle>
+          <CardDescription>Быстрый срез по ролям, KYC и статусу доступа.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Поиск по имени или email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Поиск по имени, email или телефону..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white/70 border-white/60"
+              />
             </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Роль" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все роли</SelectItem>
-                <SelectItem value="client">Клиенты</SelectItem>
-                <SelectItem value="pro">Профи</SelectItem>
-                <SelectItem value="admin">Админы</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={kycFilter} onValueChange={setKycFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="KYC" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все KYC</SelectItem>
-                <SelectItem value="none">Без KYC</SelectItem>
-                <SelectItem value="pending">На проверке</SelectItem>
-                <SelectItem value="approved">Одобрено</SelectItem>
-                <SelectItem value="rejected">Отклонено</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Статус" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все</SelectItem>
-                <SelectItem value="active">Активные</SelectItem>
-                <SelectItem value="blocked">Заблокированные</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 xl:w-auto">
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-full xl:w-[160px] bg-white/70 border-white/60">
+                  <SelectValue placeholder="Роль" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все роли</SelectItem>
+                  <SelectItem value="client">Клиенты</SelectItem>
+                  <SelectItem value="pro">Профи</SelectItem>
+                  <SelectItem value="admin">Админы</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={kycFilter} onValueChange={setKycFilter}>
+                <SelectTrigger className="w-full xl:w-[160px] bg-white/70 border-white/60">
+                  <SelectValue placeholder="KYC" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все KYC</SelectItem>
+                  <SelectItem value="none">Без KYC</SelectItem>
+                  <SelectItem value="pending">На проверке</SelectItem>
+                  <SelectItem value="approved">Одобрено</SelectItem>
+                  <SelectItem value="rejected">Отклонено</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full xl:w-[160px] bg-white/70 border-white/60">
+                  <SelectValue placeholder="Статус" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все</SelectItem>
+                  <SelectItem value="active">Активные</SelectItem>
+                  <SelectItem value="blocked">Заблокированные</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Users Table */}
-      <Card>
+      <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
         <CardHeader>
           <CardTitle>Список пользователей</CardTitle>
           <CardDescription>
-            Все пользователи системы с возможностью управления
+            Все пользователи системы с возможностью управления и реальными backend-действиями.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Пользователь</TableHead>
-                <TableHead>Роли</TableHead>
-                <TableHead>KYC</TableHead>
-                <TableHead>Профиль</TableHead>
-                <TableHead>Статус</TableHead>
-                <TableHead>Последняя активность</TableHead>
-                <TableHead>Действия</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
+          <ScrollArea className="w-full whitespace-nowrap rounded-2xl bg-white/55">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Пользователь</TableHead>
+                  <TableHead>Роли</TableHead>
+                  <TableHead>KYC</TableHead>
+                  <TableHead>Профиль</TableHead>
+                  <TableHead>Статус</TableHead>
+                  <TableHead>Последняя активность</TableHead>
+                  <TableHead className="text-right">Действия</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id} className="hover:bg-muted/30">
                   <TableCell>
                     <div>
                       <div className="font-medium flex items-center gap-2">
-                        {user.first_name && user.last_name 
+                        {user.first_name && user.last_name
                           ? `${user.first_name} ${user.last_name}`
                           : user.email
                         }
                         {user.pro_data && getVerificationIcon(user.pro_data.verification_level)}
                       </div>
-                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                      <div className="text-sm text-muted-foreground truncate max-w-[280px]">{user.email}</div>
                       {user.city && (
                         <div className="text-xs text-muted-foreground flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
@@ -807,8 +825,8 @@ export default function AdminUsers() {
                     <div className="flex gap-1 flex-wrap">
                       {user.roles.map(role => (
                         <Badge key={role} variant="outline" className="text-xs">
-                          {role === 'client' ? 'Клиент' : 
-                           role === 'pro' ? 'Профи' : 
+                          {role === 'client' ? 'Клиент' :
+                           role === 'pro' ? 'Профи' :
                            role === 'admin' ? 'Админ' : role}
                         </Badge>
                       ))}
@@ -824,8 +842,8 @@ export default function AdminUsers() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <div className="w-16 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full" 
+                        <div
+                          className="bg-blue-600 h-2 rounded-full"
                           style={{ width: `${user.profile_completion}%` }}
                         />
                       </div>
@@ -845,7 +863,7 @@ export default function AdminUsers() {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {user.last_sign_in_at 
+                      {user.last_sign_in_at
                         ? new Date(user.last_sign_in_at).toLocaleDateString()
                         : "Никогда"
                       }
@@ -869,18 +887,18 @@ export default function AdminUsers() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[calc(100vw-2rem)]">
                           <DialogHeader>
                             <DialogTitle>Профиль пользователя</DialogTitle>
                             <DialogDescription>
                               Детальная информация и управление пользователем
                             </DialogDescription>
                           </DialogHeader>
-                          
+
                           {selectedUser && (
                             <div className="space-y-6">
                               {/* Basic Info */}
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                   <h4 className="font-medium mb-2">Основная информация</h4>
                                   <div className="space-y-2 text-sm">
@@ -892,7 +910,7 @@ export default function AdminUsers() {
                                     <div><strong>Роли:</strong> {selectedUser.roles.join(", ")}</div>
                                   </div>
                                 </div>
-                                
+
                                 <div>
                                   <h4 className="font-medium mb-2">Статусы</h4>
                                   <div className="space-y-2 text-sm">
@@ -917,7 +935,7 @@ export default function AdminUsers() {
                               {selectedUser.pro_data && (
                                 <div>
                                   <h4 className="font-medium mb-2">Данные профессионала</h4>
-                                  <div className="grid grid-cols-2 gap-4 text-sm">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                     <div>
                                       <div><strong>Био:</strong> {selectedUser.pro_data.bio || "Не указано"}</div>
                                       <div><strong>Почасовая ставка:</strong> ${(selectedUser.pro_data.hourly_rate_cents || 0) / 100}/час</div>
@@ -948,7 +966,7 @@ export default function AdminUsers() {
                                   <h4 className="font-medium mb-2">KYC Документы</h4>
                                   <div className="space-y-2">
                                     {kycDocuments.map((doc) => (
-                                      <div key={doc.id} className="flex items-center justify-between p-2 border rounded">
+                                      <div key={doc.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-2 border rounded">
                                         <div>
                                           <div className="font-medium">{doc.doc_type}</div>
                                           <div className="text-sm text-muted-foreground">
@@ -959,8 +977,8 @@ export default function AdminUsers() {
                                           <Badge className={getKycStatusColor(doc.status)}>
                                             {doc.status}
                                           </Badge>
-                                          <Button 
-                                            size="sm" 
+                                          <Button
+                                            size="sm"
                                             variant="outline"
                                             onClick={() => openKycDocument(doc)}
                                           >
@@ -989,7 +1007,7 @@ export default function AdminUsers() {
                                   <h4 className="font-medium mb-2">Заявки на статус специалиста</h4>
                                   <div className="space-y-2">
                                     {proUpgradeRequests.map((request) => (
-                                      <div key={request.id} className="flex items-center justify-between p-3 border rounded">
+                                      <div key={request.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 border rounded">
                                         <div>
                                           <div className="font-medium">Заявка на статус специалиста</div>
                                           <div className="text-sm text-muted-foreground">
@@ -1067,7 +1085,7 @@ export default function AdminUsers() {
                               {/* Admin Actions */}
                               <div>
                                 <h4 className="font-medium mb-2">Действия администратора</h4>
-                                
+
                                 <div className="mb-3">
                                   <Textarea
                                     placeholder="Причина/комментарий к действию..."
@@ -1082,6 +1100,7 @@ export default function AdminUsers() {
                                     <Button
                                       onClick={() => unblockUser(selectedUser.id, actionNote)}
                                       className="bg-green-600 hover:bg-green-700"
+                                      disabled={actionInFlight === `unblock:${selectedUser.id}`}
                                     >
                                       <UserCheck className="w-4 h-4 mr-1" />
                                       Разблокировать
@@ -1090,6 +1109,7 @@ export default function AdminUsers() {
                                     <Button
                                       variant="destructive"
                                       onClick={() => blockUser(selectedUser.id, actionNote)}
+                                      disabled={actionInFlight === `block:${selectedUser.id}`}
                                     >
                                       <Ban className="w-4 h-4 mr-1" />
                                       Заблокировать
@@ -1101,6 +1121,7 @@ export default function AdminUsers() {
                                     <Button
                                       variant="outline"
                                       onClick={() => changeUserRole(selectedUser.id, "pro")}
+                                      disabled={actionInFlight === `role:${selectedUser.id}:pro`}
                                     >
                                       <Briefcase className="w-4 h-4 mr-1" />
                                       Сделать профи
@@ -1111,6 +1132,7 @@ export default function AdminUsers() {
                                     <Button
                                       variant="outline"
                                       onClick={() => changeUserRole(selectedUser.id, "admin")}
+                                      disabled={actionInFlight === `role:${selectedUser.id}:admin`}
                                     >
                                       <Shield className="w-4 h-4 mr-1" />
                                       Дать админа
@@ -1168,6 +1190,7 @@ export default function AdminUsers() {
                                       <Button
                                         variant="outline"
                                         onClick={() => resetKyc(selectedUser.id, actionNote)}
+                                        disabled={actionInFlight === `kyc-reset:${selectedUser.id}`}
                                       >
                                         <AlertTriangle className="w-4 h-4 mr-1" />
                                         Сбросить KYC
@@ -1185,7 +1208,8 @@ export default function AdminUsers() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => blockUser(user.id, "Административное решение")}
+                          onClick={() => blockUser(user.id, "Блокировка администратором")}
+                          disabled={actionInFlight === `block:${user.id}`}
                         >
                           <Ban className="w-4 h-4" />
                         </Button>
@@ -1193,6 +1217,7 @@ export default function AdminUsers() {
                         <Button
                           size="sm"
                           onClick={() => unblockUser(user.id, "Разблокировка администратором")}
+                          disabled={actionInFlight === `unblock:${user.id}`}
                         >
                           <UserCheck className="w-4 h-4" />
                         </Button>
@@ -1202,7 +1227,8 @@ export default function AdminUsers() {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+            </Table>
+          </ScrollArea>
         </CardContent>
       </Card>
 

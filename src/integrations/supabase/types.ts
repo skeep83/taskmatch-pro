@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -20,7 +20,7 @@ export type Database = {
           admin_user_id: string
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           new_values: Json | null
           old_values: Json | null
           resource_id: string | null
@@ -32,7 +32,7 @@ export type Database = {
           admin_user_id: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           resource_id?: string | null
@@ -44,7 +44,7 @@ export type Database = {
           admin_user_id?: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           resource_id?: string | null
@@ -58,7 +58,7 @@ export type Database = {
           created_at: string
           expires_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           is_active: boolean | null
           session_token: string
           user_agent: string | null
@@ -68,7 +68,7 @@ export type Database = {
           created_at?: string
           expires_at: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           session_token: string
           user_agent?: string | null
@@ -78,7 +78,7 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           session_token?: string
           user_agent?: string | null
@@ -1166,10 +1166,14 @@ export type Database = {
           location_address: string | null
           location_lat: number | null
           location_lng: number | null
+          location_precision: string | null
+          location_public_label: string | null
+          location_source: string | null
           media_urls: string[] | null
           milestones: Json | null
           otp_code: string | null
           pro_id: string | null
+          public_id: string
           scheduled_at: string | null
           start_confirmed: boolean
           status: Database["public"]["Enums"]["job_status"]
@@ -1196,10 +1200,14 @@ export type Database = {
           location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_precision?: string | null
+          location_public_label?: string | null
+          location_source?: string | null
           media_urls?: string[] | null
           milestones?: Json | null
           otp_code?: string | null
           pro_id?: string | null
+          public_id?: string
           scheduled_at?: string | null
           start_confirmed?: boolean
           status?: Database["public"]["Enums"]["job_status"]
@@ -1226,10 +1234,14 @@ export type Database = {
           location_address?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_precision?: string | null
+          location_public_label?: string | null
+          location_source?: string | null
           media_urls?: string[] | null
           milestones?: Json | null
           otp_code?: string | null
           pro_id?: string | null
+          public_id?: string
           scheduled_at?: string | null
           start_confirmed?: boolean
           status?: Database["public"]["Enums"]["job_status"]
@@ -1912,6 +1924,7 @@ export type Database = {
           location_lng: number | null
           pro_id: string
           response_time_minutes: number | null
+          service_mode: string | null
           updated_at: string
         }
         Insert: {
@@ -1926,6 +1939,7 @@ export type Database = {
           location_lng?: number | null
           pro_id: string
           response_time_minutes?: number | null
+          service_mode?: string | null
           updated_at?: string
         }
         Update: {
@@ -1940,6 +1954,7 @@ export type Database = {
           location_lng?: number | null
           pro_id?: string
           response_time_minutes?: number | null
+          service_mode?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1996,6 +2011,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address_line1: string | null
+          address_line2: string | null
+          address_notes: string | null
           avatar_url: string | null
           city: string | null
           country: string | null
@@ -2006,11 +2024,18 @@ export type Database = {
           last_name: string | null
           latitude: number | null
           locale: string | null
+          location_precision: string | null
+          location_public_label: string | null
+          location_source: string | null
           longitude: number | null
           phone: string | null
+          postal_code: string | null
           updated_at: string
         }
         Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          address_notes?: string | null
           avatar_url?: string | null
           city?: string | null
           country?: string | null
@@ -2021,11 +2046,18 @@ export type Database = {
           last_name?: string | null
           latitude?: number | null
           locale?: string | null
+          location_precision?: string | null
+          location_public_label?: string | null
+          location_source?: string | null
           longitude?: number | null
           phone?: string | null
+          postal_code?: string | null
           updated_at?: string
         }
         Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          address_notes?: string | null
           avatar_url?: string | null
           city?: string | null
           country?: string | null
@@ -2036,8 +2068,12 @@ export type Database = {
           last_name?: string | null
           latitude?: number | null
           locale?: string | null
+          location_precision?: string | null
+          location_public_label?: string | null
+          location_source?: string | null
           longitude?: number | null
           phone?: string | null
+          postal_code?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -2627,26 +2663,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_admin_role: {
-        Args: { _user_id: string }
-        Returns: undefined
-      }
+      add_admin_role: { Args: { _user_id: string }; Returns: undefined }
       approve_pro_upgrade_request: {
         Args: { _request_id: string }
         Returns: boolean
       }
-      cleanup_rate_limits: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      clear_all_error_logs: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      clear_expired_otp: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_rate_limits: { Args: never; Returns: undefined }
+      clear_all_error_logs: { Args: never; Returns: Json }
+      clear_expired_otp: { Args: never; Returns: undefined }
       find_nearby_pros: {
         Args: {
           job_category_id: string
@@ -2671,6 +2695,7 @@ export type Database = {
           response_time_minutes: number
         }[]
       }
+      generate_job_public_id: { Args: never; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -2690,10 +2715,20 @@ export type Database = {
         Args: { _biz: string; _user: string }
         Returns: boolean
       }
-      is_super_admin: {
-        Args: { _user_id?: string }
-        Returns: boolean
-      }
+      is_job_locked_state:
+        | {
+            Args: {
+              _job_id: string
+              _pro_id: string
+              _status: Database["public"]["Enums"]["job_status"]
+            }
+            Returns: boolean
+          }
+        | {
+            Args: { _job_id: string; _pro_id: string; _status: string }
+            Returns: boolean
+          }
+      is_super_admin: { Args: { _user_id?: string }; Returns: boolean }
       log_admin_action: {
         Args: {
           p_action: string
@@ -2710,10 +2745,7 @@ export type Database = {
         Args: { details?: Json; event_type: string }
         Returns: undefined
       }
-      make_user_admin: {
-        Args: { _email: string }
-        Returns: undefined
-      }
+      make_user_admin: { Args: { _email: string }; Returns: undefined }
       manage_admin_role: {
         Args: {
           action_type: string

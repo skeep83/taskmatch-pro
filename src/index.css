@@ -1,9 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 @import "./styles/ios.css";
 @import "./styles/android.css";
 @import "./styles/mobile.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Image optimization for better performance */
 .hero-image-container {
@@ -68,25 +69,25 @@ All colors MUST be HSL.
     --brand-2: 199 89% 48%;
     --brand-3: 280 72% 60%;
     --brand-glow: 258 80% 65%;
-    
+
     /* Pure neumorphism shadows - darker for better contrast */
-    --shadow-raised: 
+    --shadow-raised:
       9px 9px 18px rgba(174, 187, 204, 0.5),
       -9px -9px 18px rgba(255, 255, 255, 0.5);
-    
-    --shadow-raised-hover: 
+
+    --shadow-raised-hover:
       14px 14px 28px rgba(174, 187, 204, 0.6),
       -14px -14px 28px rgba(255, 255, 255, 0.6);
-    
-    --shadow-raised-strong: 
+
+    --shadow-raised-strong:
       18px 18px 36px rgba(174, 187, 204, 0.7),
       -18px -18px 36px rgba(255, 255, 255, 0.7);
-    
+
     /* Neumorphic backgrounds - grayish-blue like reference */
     --surface-raised: linear-gradient(145deg, hsl(220, 16%, 95%), hsl(220, 16%, 92%));
     --surface-elevated: linear-gradient(145deg, hsl(220, 16%, 94%), hsl(220, 16%, 91%));
     --background-neomorphic: hsl(220, 16%, 93%);
-    
+
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
@@ -132,20 +133,20 @@ All colors MUST be HSL.
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* Neumorphism shadows for dark mode */
-    --shadow-raised: 
+    --shadow-raised:
       9px 9px 18px rgba(0, 0, 0, 0.4),
       -9px -9px 18px rgba(255, 255, 255, 0.08);
-    
-    --shadow-raised-hover: 
+
+    --shadow-raised-hover:
       14px 14px 28px rgba(0, 0, 0, 0.5),
       -14px -14px 28px rgba(255, 255, 255, 0.1);
-    
-    --shadow-raised-strong: 
+
+    --shadow-raised-strong:
       18px 18px 36px rgba(0, 0, 0, 0.6),
       -18px -18px 36px rgba(255, 255, 255, 0.12);
 
     --background-neomorphic: hsl(220, 16%, 18%);
-    
+
     /* Navigation depth */
     --nav-z-index: 50;
     --fab-z-index: 40;
@@ -180,11 +181,11 @@ All colors MUST be HSL.
   }
   .btn-hero:active {
     transform: translateY(1px);
-    box-shadow: 
+    box-shadow:
       4px 4px 8px rgba(174, 187, 204, 0.4),
       -4px -4px 8px rgba(255, 255, 255, 0.3);
   }
-  
+
   .btn-ghost {
     @apply inline-flex items-center justify-center rounded-2xl px-8 py-4 font-semibold border-0 transition-all duration-300 ease-out;
     background: var(--surface-raised);
@@ -197,51 +198,51 @@ All colors MUST be HSL.
   }
   .btn-ghost:active {
     transform: translateY(1px);
-    box-shadow: 
+    box-shadow:
       4px 4px 8px rgba(174, 187, 204, 0.4),
       -4px -4px 8px rgba(255, 255, 255, 0.3);
   }
-  
+
   /* Pure neumorphic card surfaces */
   .card-surface {
     @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
     background: var(--surface-raised);
     box-shadow: var(--shadow-raised);
   }
-  
+
   .card-surface:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-raised-hover);
   }
-  
+
   .glass-surface {
     @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
     background: var(--surface-elevated);
     box-shadow: var(--shadow-raised);
   }
-  
+
   .glass-surface:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-raised-hover);
   }
-  
+
   .acrylic-surface {
     @apply rounded-3xl border-0 p-8 relative transition-all duration-300 ease-out;
     background: var(--surface-elevated);
     box-shadow: var(--shadow-raised-strong);
   }
-  
+
   .acrylic-surface:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-raised-hover);
   }
-  
+
   .glass-nav {
     @apply border-0 sticky top-0 z-50;
     background: var(--surface-raised);
     box-shadow: var(--shadow-raised);
   }
-  
+
   .text-gradient {
     background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
     -webkit-background-clip: text;
@@ -258,73 +259,73 @@ All colors MUST be HSL.
   .story-link { position: relative; display: inline-block; }
   .story-link::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px; background: hsl(var(--primary)); transform: scaleX(0); transform-origin: bottom right; transition: transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94); }
   .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
-  
+
   /* Navigation specific animations */
   .animate-float-slow {
     animation: float 6s ease-in-out infinite;
   }
-  
+
   .animate-pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
   }
-  
+
   .animate-gradient-shift {
     background-size: 200% 200%;
     animation: gradient-shift 3s ease infinite;
   }
-  
+
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
   }
-  
+
   @keyframes pulse-glow {
     0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
     50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.6), 0 0 40px hsl(var(--primary) / 0.3); }
   }
-  
+
   @keyframes gradient-shift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-  
+
   /* 3D Card Effects */
   .perspective-1000 {
     perspective: 1000px;
   }
-  
+
   .shadow-3xl {
-    box-shadow: 
+    box-shadow:
       0 35px 60px -12px rgba(0, 0, 0, 0.3),
       0 0 0 1px rgba(255, 255, 255, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
-  
+
   .rotate-y-5 {
     transform: rotateY(5deg);
   }
-  
+
   .card-3d {
     transform-style: preserve-3d;
     transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    box-shadow: 
+    box-shadow:
       0 10px 30px -5px rgba(0, 0, 0, 0.15),
       0 25px 60px -15px rgba(0, 0, 0, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
-  
+
   .card-3d:hover {
     transform: translateY(-12px) rotateX(8deg) rotateY(3deg) scale(1.02);
-    box-shadow: 
+    box-shadow:
       0 20px 40px -5px rgba(0, 0, 0, 0.2),
       0 35px 80px -15px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
-  
+
   .gradient-border {
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.1), 
+    background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.1),
       rgba(255, 255, 255, 0.05)
     );
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -334,21 +335,21 @@ All colors MUST be HSL.
   .perspective-1000 {
     perspective: 1000px;
   }
-  
+
   .preserve-3d {
     transform-style: preserve-3d;
   }
-  
+
   .backface-hidden {
     backface-visibility: hidden;
   }
 
-  
+
   .neumorphic-icon {
     background: linear-gradient(145deg, #f0f0f0, #cacaca);
     box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
   }
-  
+
   @keyframes spin-slow {
     from {
       transform: rotate(0deg);
@@ -357,7 +358,7 @@ All colors MUST be HSL.
       transform: rotate(360deg);
     }
   }
-  
+
   @keyframes wiggle {
     0%, 7% { transform: rotateZ(0); }
     15% { transform: rotateZ(-15deg); }
@@ -367,7 +368,7 @@ All colors MUST be HSL.
     35% { transform: rotateZ(-4deg); }
     40%, 100% { transform: rotateZ(0); }
   }
-  
+
   @keyframes heartbeat {
     0% { transform: scale(1); }
     14% { transform: scale(1.1); }
@@ -375,19 +376,19 @@ All colors MUST be HSL.
     42% { transform: scale(1.1); }
     70% { transform: scale(1); }
   }
-  
+
   .animate-spin-slow {
     animation: spin-slow 3s linear infinite;
   }
-  
+
   .animate-wiggle {
     animation: wiggle 2s ease-in-out infinite;
   }
-  
+
   .animate-heartbeat {
     animation: heartbeat 1.5s ease-in-out infinite;
   }
-  
+
   /* Live Visitors Connection Lines */
   @keyframes fadeInLine {
     0% {
@@ -399,7 +400,7 @@ All colors MUST be HSL.
       stroke-dashoffset: 0;
     }
   }
-  
+
   @keyframes dashFlow {
     0% {
       stroke-dashoffset: 0;

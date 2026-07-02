@@ -8,9 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StarRating } from '@/components/ui/star-rating';
 import { User, DollarSign, Clock, Shield } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
+import { submitJobResponse } from '@/lib/jobResponseSubmission';
 
 interface PriceProposalFormProps {
   jobId: string;
@@ -51,6 +51,43 @@ export const PriceProposalForm = ({
     { value: 'custom', label: 'Другое (укажите в примечании)' }
   ];
 
+  const getReadableErrorMessage = (error: unknown) => {
+    const message = error instanceof Error ? error.message.trim() : String(error ?? '').trim();
+
+    if (message.includes('Pro role required')) {
+      return {
+        title: 'Необходима роль специалиста',
+        description: 'Чтобы отправлять ценовые предложения, вам нужно включить роль специалиста в профиле.'
+      };
+    }
+
+    if (message.includes('Unauthorized')) {
+      return {
+        title: 'Требуется вход',
+        description: 'Сначала войдите в аккаунт, затем повторите отправку предложения.'
+      };
+    }
+
+    if (message.includes('Job not found or not available')) {
+      return {
+        title: 'Заказ уже недоступен',
+        description: 'Этот заказ больше не принимает предложения.'
+      };
+    }
+
+    if (message.includes('Failed to create proposal') || message.includes('Failed to update proposal')) {
+      return {
+        title: 'Не удалось сохранить предложение',
+        description: 'Предложение не было сохранено. Попробуйте ещё раз.'
+      };
+    }
+
+    return {
+      title: 'Ошибка',
+      description: message || 'Не удалось отправить предложение'
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -58,7 +95,7 @@ export const PriceProposalForm = ({
     try {
       // Convert price to cents (assuming input is in main currency unit)
       const priceCents = Math.round(parseFloat(formData.price) * 100);
-      
+
       if (!priceCents || priceCents <= 0) {
         toast({
           title: "Ошибка",
@@ -68,21 +105,19 @@ export const PriceProposalForm = ({
         return;
       }
 
-      const { error } = await supabase.functions.invoke('job-price-proposal-create', {
-        body: {
-          jobId,
-          priceCents,
-          etaSlot: formData.etaSlot,
-          note: formData.note,
-          warrantyDays: formData.warrantyDays
-        }
+      const { error } = await submitJobResponse({
+        jobId,
+        priceCents,
+        etaSlot: formData.etaSlot,
+        note: formData.note,
+        warrantyDays: formData.warrantyDays,
       });
 
       if (error) throw error;
 
       toast({
         title: "Предложение отправлено",
-        description: "Заказчик получит уведомление о вашем предложении"
+        description: "Заказчик получит ваше предложение и сможет выбрать исполнителя"
       });
 
       // Reset form
@@ -96,9 +131,10 @@ export const PriceProposalForm = ({
       if (onProposalSubmit) {
         onProposalSubmit();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error submitting price proposal:', error);
-      
+      const errorInfo = error instanceof Error ? error : new Error(String(error ?? 'Unknown error'));
+
       // Enhanced error logging for better debugging
       const errorData = {
         timestamp: new Date().toISOString(),
@@ -110,28 +146,20 @@ export const PriceProposalForm = ({
           warrantyDays: formData.warrantyDays
         },
         error: {
-          message: error.message,
-          name: error.name,
-          stack: error.stack
+          message: errorInfo.message,
+          name: errorInfo.name,
+          stack: errorInfo.stack
         }
       };
-      
+
       console.error('Detailed price proposal error:', errorData);
-      
-      // Special handling for role-related errors
-      if (error.message?.includes('Pro role required')) {
-        toast({
-          title: "Необходима роль специалиста",
-          description: "Чтобы предлагать цены, вам нужно стать специалистом. Перейдите в настройки профиля.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Ошибка",
-          description: error.message || "Не удалось отправить предложение",
-          variant: "destructive"
-        });
-      }
+
+      const readableError = getReadableErrorMessage(error);
+      toast({
+        title: readableError.title,
+        description: readableError.description,
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -155,16 +183,16 @@ export const PriceProposalForm = ({
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <StarRating 
-                  rating={clientRating.average} 
-                  size="lg" 
-                  showValue 
-                  showCount 
+                <StarRating
+                  rating={clientRating.average}
+                  size="lg"
+                  showValue
+                  showCount
                   count={clientRating.count}
                 />
               </div>
               <Badge variant={clientRating.average >= 4.5 ? "default" : "secondary"}>
-                {clientRating.average >= 4.8 ? "Отличный" : 
+                {clientRating.average >= 4.8 ? "Отличный" :
                  clientRating.average >= 4.0 ? "Хороший" : "Средний"} заказчик
               </Badge>
             </div>
@@ -177,14 +205,14 @@ export const PriceProposalForm = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Предложить свою цену
+            Отправить предложение с ценой
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Заказ: {jobTitle}
           </p>
           {(budgetMinCents || budgetMaxCents) && (
             <div className="text-sm text-muted-foreground">
-              Бюджет заказчика: {' '}
+              Бюджет заказа: {' '}
               {budgetMinCents && budgetMaxCents
                 ? `${formatPrice(budgetMinCents)} - ${formatPrice(budgetMaxCents)}`
                 : budgetMinCents
@@ -244,7 +272,7 @@ export const PriceProposalForm = ({
             </div>
 
             <div>
-              <Label htmlFor="note">Примечание</Label>
+              <Label htmlFor="note">Комментарий к предложению</Label>
               <Textarea
                 id="note"
                 placeholder="Дополнительная информация о работе, материалах, особенностях..."
@@ -254,9 +282,9 @@ export const PriceProposalForm = ({
               />
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               disabled={loading}
             >
               {loading ? "Отправляем..." : "Отправить предложение"}

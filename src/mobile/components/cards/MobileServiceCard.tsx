@@ -29,8 +29,8 @@ interface MobileServiceCardProps {
 
 export function MobileServiceCard({ service, onPress, onBook, className }: MobileServiceCardProps) {
   return (
-    <MobileCard 
-      pressable 
+    <MobileCard
+      pressable
       onPress={onPress}
       className={cn("mb-4", className)}
     >
@@ -46,14 +46,14 @@ export function MobileServiceCard({ service, onPress, onBook, className }: Mobil
             </Badge>
           )}
         </div>
-        
+
         {service.verified && (
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className="ml-2 text-xs bg-green-500/10 text-green-700 border-green-500/20"
           >
             <Shield size={12} className="mr-1" />
-            Проверен
+            Профиль
           </Badge>
         )}
       </div>
@@ -67,8 +67,8 @@ export function MobileServiceCard({ service, onPress, onBook, className }: Mobil
       <div className="flex items-center mb-4">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mr-3">
           {service.provider_avatar ? (
-            <img 
-              src={service.provider_avatar} 
+            <img
+              src={service.provider_avatar}
               alt={service.provider_name}
               className="w-full h-full rounded-full object-cover"
             />
@@ -110,9 +110,9 @@ export function MobileServiceCard({ service, onPress, onBook, className }: Mobil
       <div className="flex items-center justify-between">
         {/* Price */}
         <div className="text-primary font-semibold">
-          {service.price_min && service.price_max 
+          {service.price_min && service.price_max
             ? `${service.price_min}-${service.price_max} MDL`
-            : service.price_min 
+            : service.price_min
               ? `от ${service.price_min} MDL`
               : 'Договорная'}
         </div>

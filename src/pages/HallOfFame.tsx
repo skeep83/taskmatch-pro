@@ -8,14 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileTabNavigation } from '@/components/servicehub/MobileTabNavigation';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
-import { 
-  Star, 
-  Trophy, 
-  Award, 
-  Search, 
-  Filter, 
-  MapPin, 
-  Shield, 
+import {
+  Star,
+  Trophy,
+  Award,
+  Search,
+  Filter,
+  MapPin,
+  Shield,
   CheckCircle,
   Eye,
   Heart
@@ -53,7 +53,7 @@ interface Provider {
 export const HallOfFame: React.FC = () => {
   const { isMobile } = useDeviceDetection();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
@@ -95,7 +95,7 @@ export const HallOfFame: React.FC = () => {
   const loadProviders = async () => {
     try {
       setLoading(true);
-      
+
       // Заглушка данных (в реальном проекте загружается из БД)
       const mockData: Provider[] = [
         {
@@ -139,7 +139,7 @@ export const HallOfFame: React.FC = () => {
           category: 'cleaning',
           location: 'Бельцы',
           verificationLevel: 'verified',
-          badges: ['Чистота+', 'Быстрый отклик'],
+          badges: ['Чистота+', 'Отклик'],
           portfolioSamples: [
             {
               id: '1',
@@ -166,13 +166,13 @@ export const HallOfFame: React.FC = () => {
 
   const filteredAndSortedProviders = providers
     .filter(provider => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch = !searchQuery ||
         provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         provider.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
         provider.location.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesCategory = selectedCategory === 'all' || provider.category === selectedCategory;
-      
+
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
@@ -233,10 +233,10 @@ export const HallOfFame: React.FC = () => {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Зал славы
+            Исполнители с отзывами
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400">
-            Лучшие специалисты ServiceHub с проверенными отзывами
+            Сравните профили, отзывы и условия перед созданием заказа
           </p>
         </div>
 
@@ -246,7 +246,7 @@ export const HallOfFame: React.FC = () => {
             <div className="relative">
               <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
-                placeholder="Поиск специалистов..."
+                placeholder="Поиск по профилям..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -289,12 +289,12 @@ export const HallOfFame: React.FC = () => {
         {/* Providers Grid */}
         <div className={cn(
           "grid gap-6 mb-8",
-          viewMode === 'grid' 
-            ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" 
+          viewMode === 'grid'
+            ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
             : "grid-cols-1"
         )}>
           {filteredAndSortedProviders.map(provider => (
-            <div 
+            <div
               key={provider.id}
               className="card-surface group cursor-pointer transition-all duration-300 hover:scale-105"
             >
@@ -411,7 +411,7 @@ export const HallOfFame: React.FC = () => {
           <div className="text-center py-12">
             <Trophy size={48} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-              Специалисты не найдены
+              Профили не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Попробуйте изменить фильтры поиска

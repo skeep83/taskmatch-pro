@@ -1,29 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Seo } from "@/components/Seo";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { 
-  TrendingUp, TrendingDown, Users, Briefcase, DollarSign, 
-  AlertTriangle, Clock, Shield, Star, Activity, ArrowUpRight,
-  ArrowDownRight, RefreshCw, Calendar, MapPin, Target
+import {
+  AlertTriangle,
+  ArrowDownRight,
+  ArrowUpRight,
+  Briefcase,
+  Clock,
+  RefreshCw,
+  Shield,
+  Users,
+  DollarSign,
+  Settings,
 } from "lucide-react";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CategoryDistributionChart } from '@/components/admin/CategoryDistributionChart';
-import { LiveVisitors } from '@/components/admin/LiveVisitors';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { LiveVisitors } from "@/components/admin/LiveVisitors";
+import { adminApi } from "@/lib/adminApi";
+
+type MetricCard = {
+  title: string;
+  value: string;
+  change: number;
+  icon: any;
+  color: string;
+  tone: string;
+  reverseGood?: boolean;
+  helper: string;
+};
+
+const chartTooltipStyle = {
+  backgroundColor: "hsl(var(--background))",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "12px",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+};
 
 export default function AdminDashboard() {
-  const { t } = useEnhancedI18n();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [timeRange, setTimeRange] = useState('7d');
+  const [timeRange, setTimeRange] = useState("7d");
 
   useEffect(() => {
     loadDashboardData();
@@ -32,20 +53,13 @@ export default function AdminDashboard() {
   const loadDashboardData = async () => {
     try {
       setRefreshing(true);
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Call admin analytics function
-      const { data, error } = await supabase.functions.invoke('admin-analytics', {
-        body: { timeRange }
-      });
-
-      if (error) throw error;
+      const data = await adminApi.getAnalytics("dashboard", timeRange);
       setDashboardData(data);
     } catch (error: any) {
       toast({
         title: "Ошибка загрузки данных",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -53,93 +67,19 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <Seo title="ServiceHub — Admin Dashboard" description="Операционные метрики и аналитика" canonical="/admin" />
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="pb-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-8 w-16" />
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-32" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-32" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
   const stats = dashboardData?.stats || {};
   const charts = dashboardData?.charts || {};
-  const alerts = dashboardData?.alerts || [];
+  const alerts = (dashboardData?.alerts || []).slice(0, 3);
 
-  const metricCards = [
+  const primaryMetrics = useMemo<MetricCard[]>(() => [
     {
-      title: "GMV (7д)",
-      value: `$${(stats.gmv_7d || 0).toLocaleString()}`,
-      change: stats.gmv_change || 0,
-      icon: DollarSign,
-      color: "text-green-600"
-    },
-    {
-      title: "MAU",
-      value: (stats.mau || 0).toLocaleString(),
-      change: stats.mau_change || 0,
-      icon: Users,
-      color: "text-blue-600"
-    },
-    {
-      title: "Активные заказы",
+      title: "Заказы в работе",
       value: (stats.active_jobs || 0).toLocaleString(),
       change: stats.jobs_change || 0,
       icon: Briefcase,
-      color: "text-purple-600"
-    },
-    {
-      title: "Конверсия",
-      value: `${(stats.conversion_rate || 0).toFixed(1)}%`,
-      change: stats.conversion_change || 0,
-      icon: Target,
-      color: "text-orange-600"
-    },
-    {
-      title: "Ср. время ответа",
-      value: `${(stats.avg_response_time || 0).toFixed(1)}м`,
-      change: stats.response_time_change || 0,
-      icon: Clock,
-      color: "text-teal-600",
-      reverseGood: true
-    },
-    {
-      title: "NPS",
-      value: (stats.nps || 0).toFixed(1),
-      change: stats.nps_change || 0,
-      icon: Star,
-      color: "text-yellow-600"
+      color: "text-violet-600",
+      tone: "bg-violet-500/10",
+      helper: "Текущая загрузка платформы",
     },
     {
       title: "Активные споры",
@@ -147,488 +87,285 @@ export default function AdminDashboard() {
       change: stats.disputes_change || 0,
       icon: AlertTriangle,
       color: "text-red-600",
-      reverseGood: true
+      tone: "bg-red-500/10",
+      reverseGood: true,
+      helper: "Требуют ручной разбор",
     },
     {
-      title: "Риск-флаги",
+      title: "Флаги риска",
       value: (stats.risk_flags || 0).toLocaleString(),
       change: stats.risk_change || 0,
       icon: Shield,
       color: "text-amber-600",
-      reverseGood: true
-    }
+      tone: "bg-amber-500/10",
+      reverseGood: true,
+      helper: "Сигналы фрода и нарушений",
+    },
+    {
+      title: "Время ответа",
+      value: `${(stats.avg_response_time || 0).toFixed(1)}м`,
+      change: stats.response_time_change || 0,
+      icon: Clock,
+      color: "text-cyan-600",
+      tone: "bg-cyan-500/10",
+      reverseGood: true,
+      helper: "Среднее по активным обращениям",
+    },
+  ], [stats]);
+
+  const secondaryStats = [
+    { label: "GMV за период", value: `$${(stats.gmv_7d || 0).toLocaleString()}` },
+    { label: "Конверсия", value: `${(stats.conversion_rate || 0).toFixed(1)}%` },
+    { label: "MAU", value: (stats.mau || 0).toLocaleString() },
+    { label: "NPS", value: (stats.nps || 0).toFixed(1) },
   ];
 
-  return (
-    <div className="space-y-8">
-      <Seo title="ServiceHub — Admin Dashboard" description="Операционные метрики и аналитика" canonical="/admin" />
-      
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Admin Dashboard
-            </span>
-          </h1>
-          <p className="text-muted-foreground">
-            Операционные метрики и ключевые показатели платформы
-          </p>
+  const healthStats = [
+    { label: "API", value: `${stats.api_response_time || 120}ms` },
+    { label: "Ошибки", value: `${(stats.error_rate || 0.1).toFixed(2)}%` },
+    { label: "Очередь", value: `${stats.queue_health || 98}%` },
+    { label: "Память", value: `${stats.memory_usage || 68}%` },
+  ];
+
+  const quickActions = [
+    { label: "Пользователи", icon: Users, onClick: () => navigate("/admin/users") },
+    { label: "Заказы", icon: Briefcase, onClick: () => navigate("/admin/jobs") },
+    { label: "Финансы", icon: DollarSign, onClick: () => navigate("/admin/finance") },
+    { label: "Настройки", icon: Settings, onClick: () => navigate("/admin/settings") },
+  ];
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Seo title="ServiceHub — Админ-панель" description="Операционный обзор ServiceHub" canonical="/admin" />
+        <div className="card-surface p-6 sm:p-7">
+          <div className="h-7 w-56 rounded-xl bg-slate-200 animate-pulse mb-3" />
+          <div className="h-4 w-72 rounded-xl bg-slate-200 animate-pulse" />
         </div>
-        <div className="flex items-center gap-3">
-          <select 
-            value={timeRange} 
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="px-4 py-2 card-surface border-0 rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="24h">24 часа</option>
-            <option value="7d">7 дней</option>
-            <option value="30d">30 дней</option>
-            <option value="90d">90 дней</option>
-          </select>
-          <button
-            onClick={loadDashboardData}
-            disabled={refreshing}
-            className="btn-ghost px-4 py-2 rounded-xl flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Обновить
-          </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="card-surface p-6 rounded-3xl animate-pulse h-[178px]" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="card-surface h-[360px] rounded-3xl animate-pulse xl:col-span-2" />
+          <div className="card-surface h-[360px] rounded-3xl animate-pulse" />
         </div>
       </div>
+    );
+  }
 
-      {/* Alerts */}
+  return (
+    <div className="space-y-6">
+      <Seo title="ServiceHub — Админ-панель" description="Операционный обзор ServiceHub" canonical="/admin" />
+
+      <section className="card-surface p-6 sm:p-7">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div className="space-y-2 min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gray-500">Операционный обзор</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Главное без лишнего шума</h2>
+            <p className="text-sm text-muted-foreground max-w-2xl">
+              Только ключевые сигналы для ежедневной работы: заказы, споры, риски, SLA и быстрые переходы.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="w-full px-4 py-2 card-surface border-0 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 sm:w-auto"
+            >
+              <option value="24h">24 часа</option>
+              <option value="7d">7 дней</option>
+              <option value="30d">30 дней</option>
+              <option value="90d">90 дней</option>
+            </select>
+            <button
+              onClick={loadDashboardData}
+              disabled={refreshing}
+              className="btn-ghost px-4 py-2 rounded-xl flex items-center justify-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+              Обновить
+            </button>
+          </div>
+        </div>
+      </section>
+
       {alerts.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid gap-4"
-        >
+        <section className="grid gap-3">
           {alerts.map((alert: any, index: number) => (
-            <div key={index} className="card-surface border-l-4 border-l-red-500 p-4">
+            <motion.div
+              key={`${alert.title}-${index}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="card-surface border-l-4 border-l-red-500 p-4"
+            >
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-red-500/10 rounded-lg">
+                <div className="p-2 bg-red-500/10 rounded-lg shrink-0">
                   <AlertTriangle className="h-5 w-5 text-red-600" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-red-900 mb-1">{alert.title}</h3>
-                  <p className="text-sm text-red-700 mb-2">{alert.message}</p>
-                  <Badge variant="destructive" className="text-xs">{alert.severity}</Badge>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-red-900">{alert.title}</h3>
+                    {alert.severity && <Badge variant="destructive" className="text-xs">{alert.severity}</Badge>}
+                  </div>
+                  <p className="text-sm text-red-700">{alert.message}</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </motion.div>
+        </section>
       )}
 
-      {/* Main Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metricCards.map((metric, index) => {
+      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {primaryMetrics.map((metric, index) => {
           const Icon = metric.icon;
-          const isPositive = metric.reverseGood ? metric.change < 0 : metric.change > 0;
-          const isNegative = metric.reverseGood ? metric.change > 0 : metric.change < 0;
-          
+          const improved = metric.reverseGood ? metric.change < 0 : metric.change > 0;
+          const degraded = metric.reverseGood ? metric.change > 0 : metric.change < 0;
+
           return (
             <motion.div
               key={metric.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="group hover-scale h-full"
+              transition={{ delay: index * 0.05 }}
+              className="card-surface p-6 h-full"
             >
-              <div className="card-surface p-6 relative overflow-hidden h-full flex flex-col min-h-[180px]">
-                {/* Icon and Title */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-3 rounded-xl ${metric.color.replace('text-', 'bg-')}/10`}>
-                    <Icon className={`h-6 w-6 ${metric.color}`} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                      {metric.title}
-                    </h3>
-                  </div>
+              <div className="flex items-start justify-between gap-4 mb-5">
+                <div className={`w-12 h-12 rounded-2xl ${metric.tone} flex items-center justify-center shrink-0`}>
+                  <Icon className={`h-6 w-6 ${metric.color}`} />
                 </div>
-
-                {/* Value and Change */}
-                <div className="flex items-end justify-between mb-4 flex-grow">
-                  <div className="text-3xl font-bold">
-                    {metric.value}
+                {metric.change !== 0 && (
+                  <div className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+                    improved
+                      ? "bg-green-500/10 text-green-700"
+                      : degraded
+                      ? "bg-red-500/10 text-red-700"
+                      : "bg-slate-500/10 text-slate-700"
+                  }`}>
+                    {improved ? <ArrowUpRight className="h-3 w-3" /> : degraded ? <ArrowDownRight className="h-3 w-3" /> : null}
+                    {Math.abs(metric.change).toFixed(1)}%
                   </div>
-                  {metric.change !== 0 && (
-                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                      isPositive 
-                        ? 'bg-green-500/10 text-green-600' 
-                        : isNegative 
-                        ? 'bg-red-500/10 text-red-600' 
-                        : 'bg-gray-500/10 text-gray-600'
-                    }`}>
-                      {isPositive ? (
-                        <ArrowUpRight className="h-3 w-3" />
-                      ) : isNegative ? (
-                        <ArrowDownRight className="h-3 w-3" />
-                      ) : null}
-                      {Math.abs(metric.change).toFixed(1)}%
-                    </div>
-                  )}
-                </div>
-
-                {/* Progress bar */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent to-primary/20">
-                  <div 
-                    className={`h-full bg-gradient-to-r ${metric.color.replace('text-', 'from-')} to-primary transition-all duration-1000 ease-out`}
-                    style={{ width: `${Math.min(100, Math.abs(metric.change) * 2)}%` }}
-                  />
-                </div>
-
-                {/* Hover glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                )}
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
+                <div className="text-3xl font-bold text-gray-900">{metric.value}</div>
+                <p className="text-xs text-muted-foreground">{metric.helper}</p>
               </div>
             </motion.div>
           );
         })}
-      </div>
+      </section>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* GMV Trend */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="hover-scale h-full"
-        >
-          <div className="card-surface p-6 h-full flex flex-col">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-green-500/10 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold">GMV Тренд</h3>
-                <p className="text-sm text-muted-foreground">Валовый объем сделок за период</p>
-              </div>
-            </div>
-            <div className="flex-1 min-h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={charts.gmv_trend || []}>
-                  <defs>
-                    <linearGradient id="gmv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="gmv" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
-                    fillOpacity={1} 
-                    fill="url(#gmv)" 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* User Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="hover-scale h-full"
-        >
-          <div className="card-surface p-6 h-full flex flex-col">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-blue-500/10 rounded-lg">
-                <Activity className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Активность пользователей</h3>
-                <p className="text-sm text-muted-foreground">MAU, WAU, DAU динамика</p>
-              </div>
-            </div>
-            <div className="flex-1 min-h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={charts.user_activity || []}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="dau" stroke="#3b82f6" strokeWidth={3} name="DAU" dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="wau" stroke="#8b5cf6" strokeWidth={3} name="WAU" dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="mau" stroke="#10b981" strokeWidth={3} name="MAU" dot={{ r: 4 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Job Categories Distribution */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="hover-scale h-full"
-        >
-          <div className="card-surface p-6 h-full flex flex-col">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-purple-500/10 rounded-lg">
-                <Briefcase className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Распределение по категориям</h3>
-                <p className="text-sm text-muted-foreground">Топ категории услуг</p>
-              </div>
-            </div>
-            <div className="flex-1">
-              <CategoryDistributionChart data={charts.category_distribution || []} />
-            </div>
-          </div>
-        </motion.div>
-
-        {/* System Health */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="hover-scale"
-        >
+      <section className="grid grid-cols-1 xl:grid-cols-3 gap-6 min-w-0">
+        <div className="xl:col-span-2 space-y-6 min-w-0">
           <div className="card-surface p-6 h-full">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-teal-500/10 rounded-lg">
-                <Shield className="h-5 w-5 text-teal-600" />
-              </div>
+            <div className="flex items-start justify-between gap-3 mb-6">
               <div>
-                <h3 className="font-semibold">Здоровье системы</h3>
-                <p className="text-sm text-muted-foreground">Ключевые операционные показатели</p>
+                <h3 className="font-semibold text-gray-900">Динамика заказов</h3>
+                <p className="text-sm text-muted-foreground">Новые заказы по дням за выбранный период</p>
+              </div>
+              <Badge variant="secondary" className="rounded-xl">Операционный сигнал</Badge>
+            </div>
+            <div className="min-h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={charts.orders || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.35} />
+                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Bar dataKey="value" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="card-surface p-6">
+              <div className="flex items-start justify-between gap-3 mb-6">
+                <div>
+                  <h3 className="font-semibold text-gray-900">Финансы и рост</h3>
+                  <p className="text-sm text-muted-foreground">Вторичные показатели, полезные для контекста</p>
+                </div>
+                <Badge variant="outline" className="rounded-xl">Вторично</Badge>
+              </div>
+              <div className="space-y-3">
+                {secondaryStats.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between rounded-2xl bg-white/40 px-4 py-3">
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className="font-semibold text-gray-900">{item.value}</span>
+                  </div>
+                ))}
               </div>
             </div>
-            
-            {/* Horizontal neumorphic indicators */}
-            <div className="grid grid-cols-5 gap-4 h-[300px] content-center">
-              {/* Uptime */}
-              <div className="flex flex-col items-center space-y-3">
-                <div className="text-xs font-medium text-center text-muted-foreground">
-                  Uptime
-                </div>
-                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
-                  <div 
-                    className="w-full bg-gradient-to-t from-green-500 to-emerald-400 rounded-full transition-all duration-1000 ease-out"
-                    style={{ height: '99.9%' }}
-                  />
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-green-400 to-green-600" />
-                </div>
-                <div className="text-xs font-semibold text-green-600">99.9%</div>
-              </div>
 
-              {/* API Response Time */}
-              <div className="flex flex-col items-center space-y-3">
-                <div className="text-xs font-medium text-center text-muted-foreground">
-                  API Time
+            <div className="card-surface p-6">
+              <div className="flex items-start justify-between gap-3 mb-6">
+                <div>
+                  <h3 className="font-semibold text-gray-900">Состояние платформы</h3>
+                  <p className="text-sm text-muted-foreground">Только короткая техсводка без dev-overload</p>
                 </div>
-                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
-                  <div 
-                    className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-full transition-all duration-1000 ease-out"
-                    style={{ height: `${Math.max(0, 100 - (stats.api_response_time || 120) / 5)}%` }}
-                  />
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-blue-400 to-blue-600" />
-                </div>
-                <div className="text-xs font-semibold">{stats.api_response_time || 120}ms</div>
+                <Badge variant="outline" className="rounded-xl">Сервис</Badge>
               </div>
-
-              {/* Error Rate */}
-              <div className="flex flex-col items-center space-y-3">
-                <div className="text-xs font-medium text-center text-muted-foreground">
-                  Errors
-                </div>
-                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
-                  <div 
-                    className="w-full bg-gradient-to-t from-pink-500 to-pink-400 rounded-full transition-all duration-1000 ease-out"
-                    style={{ height: `${Math.max(5, (stats.error_rate || 0.1) * 20)}%` }}
-                  />
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-pink-400 to-pink-600" />
-                </div>
-                <div className="text-xs font-semibold">{(stats.error_rate || 0.1).toFixed(2)}%</div>
-              </div>
-
-              {/* Queue Health */}
-              <div className="flex flex-col items-center space-y-3">
-                <div className="text-xs font-medium text-center text-muted-foreground">
-                  Queue
-                </div>
-                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
-                  <div 
-                    className="w-full bg-gradient-to-t from-teal-500 to-cyan-400 rounded-full transition-all duration-1000 ease-out"
-                    style={{ height: `${stats.queue_health || 98}%` }}
-                  />
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-teal-400 to-cyan-600" />
-                </div>
-                <div className="text-xs font-semibold text-teal-600">{stats.queue_health || 98}%</div>
-              </div>
-
-              {/* Memory Usage */}
-              <div className="flex flex-col items-center space-y-3">
-                <div className="text-xs font-medium text-center text-muted-foreground">
-                  Memory
-                </div>
-                <div className="relative w-8 h-40 bg-gradient-to-b from-white/20 to-black/10 rounded-full shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] flex items-end overflow-hidden">
-                  <div 
-                    className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-full transition-all duration-1000 ease-out"
-                    style={{ height: `${stats.memory_usage || 68}%` }}
-                  />
-                </div>
-                <div className="w-6 h-6 rounded-full bg-gradient-to-b from-white/30 to-white/10 shadow-[2px_2px_4px_rgba(0,0,0,0.2),-2px_-2px_4px_rgba(255,255,255,0.3)] flex items-center justify-center">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-green-400 to-green-600" />
-                </div>
-                <div className="text-xs font-semibold">{stats.memory_usage || 68}%</div>
+              <div className="space-y-3">
+                {healthStats.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between rounded-2xl bg-white/40 px-4 py-3">
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className="font-semibold text-gray-900">{item.value}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
 
-
-      {/* Live Visitors and Quick Actions in one row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Live Visitors Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="hover-scale h-full"
-        >
+        <div className="space-y-6 min-w-0">
           <LiveVisitors />
-        </motion.div>
 
-        {/* Quick Actions with Alert Categories */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="hover-scale h-full"
-        >
-          <div className="card-surface p-6 h-full flex flex-col">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Activity className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Быстрые действия</h3>
-                <p className="text-sm text-muted-foreground">Операции и критические алерты</p>
-              </div>
+          <div className="card-surface p-6">
+            <div className="mb-5">
+              <h3 className="font-semibold text-gray-900">Быстрые действия</h3>
+              <p className="text-sm text-muted-foreground">Частые переходы без декоративного шума и фейковых алертов</p>
             </div>
-            
-            {/* Alert Categories */}
-            <div className="mb-6">
-              <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">Критические алерты</h4>
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                {[
-                  { icon: AlertTriangle, label: "Финансовые риски", count: 3, color: "text-red-600" },
-                  { icon: Shield, label: "Безопасность", count: 1, color: "text-orange-600" },
-                  { icon: Clock, label: "SLA нарушения", count: 7, color: "text-amber-600" },
-                  { icon: Target, label: "Качество услуг", count: 2, color: "text-purple-600" }
-                ].map((alert, index) => {
-                  const Icon = alert.icon;
-                  return (
-                    <div
-                      key={index}
-                      className="p-3 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300 cursor-pointer group"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
-                            <Icon className={`h-3 w-3 ${alert.color}`} />
-                          </div>
-                          <span className="text-xs font-medium text-gray-700">{alert.label}</span>
-                        </div>
-                        <div className="px-2 py-1 rounded-full bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
-                          <span className={`text-xs font-bold ${alert.color}`}>{alert.count}</span>
-                        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
+              {quickActions.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.label}
+                    onClick={item.onClick}
+                    className="w-full rounded-2xl bg-[#E5E7EB] px-4 py-4 text-left shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-white/50 flex items-center justify-center shrink-0">
+                        <Icon className="h-5 w-5 text-gray-700" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">{item.label}</div>
+                        <div className="text-xs text-muted-foreground">Перейти в рабочий раздел</div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">Быстрые действия</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { icon: Users, label: "Пользователи", action: () => window.location.href = "/admin/users" },
-                  { icon: Briefcase, label: "Заказы", action: () => window.location.href = "/admin/jobs" },
-                  { icon: DollarSign, label: "Финансы", action: () => window.location.href = "/admin/finance" },
-                  { icon: Calendar, label: "Настройки", action: () => window.location.href = "/admin/settings" }
-                ].map((item, index) => {
-                  const Icon = item.icon;
-                  return (
-                    <button
-                      key={index}
-                      onClick={item.action}
-                      className="p-4 rounded-xl group flex flex-col items-center gap-2 text-center bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center group-hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all duration-300">
-                        <Icon className="h-4 w-4 text-gray-600" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </motion.div>
         </div>
+      </section>
+
+      <section className="card-surface p-5 sm:p-6">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-900">Что убрано с главного экрана</h3>
+            <p className="text-sm text-muted-foreground">
+              Категории, декоративные тех-индикаторы и hardcoded alert-карточки убраны из первого экрана, чтобы оператор видел только то, что помогает действовать.
+            </p>
+          </div>
+          <Badge variant="secondary" className="rounded-xl w-fit">Clean dashboard pass</Badge>
+        </div>
+      </section>
     </div>
   );
 }

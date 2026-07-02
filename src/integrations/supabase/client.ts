@@ -2,11 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://adstlhdgegtkvtgklkyx.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs";
-
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+export const SUPABASE_URL = "https://tedkllggdmwhxtxwqrzk.supabase.co";
+export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_uZp6qQA4agB_MgDFmbuzUg_Blk4PzhB";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
@@ -15,3 +12,67 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
   }
 });
+
+const FUNCTION_BASE = `${window.location.origin}/marketplace-api/functions`;
+const originalInvoke = supabase.functions.invoke.bind(supabase.functions);
+
+(supabase.functions as any).invoke = async (functionName: string, options: any = {}) => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
+      ...(options.headers || {}),
+    };
+
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+
+    const explicitMethod = String(options.method || '').toUpperCase();
+    const hasBody = options.body !== undefined && options.body !== null;
+    const method = explicitMethod || (hasBody ? 'POST' : 'GET');
+    let url = `${FUNCTION_BASE}/${functionName}`;
+
+    if (method === 'GET' && hasBody && typeof options.body === 'object') {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(options.body)) {
+        if (value === undefined || value === null) continue;
+        if (typeof value === 'object') {
+          params.set(key, JSON.stringify(value));
+        } else {
+          params.set(key, String(value));
+        }
+      }
+      const qs = params.toString();
+      if (qs) url += `?${qs}`;
+    }
+
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: method === 'GET' ? undefined : JSON.stringify(options.body || {}),
+    });
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+
+    if (!response.ok) {
+      const message = data?.error || data?.message || `Function ${functionName} failed with ${response.status}`;
+      const shouldFallbackToDirectInvoke =
+        response.status === 404 ||
+        /unknown function/i.test(message) ||
+        /not found/i.test(message);
+
+      if (shouldFallbackToDirectInvoke) {
+        return await originalInvoke(functionName as any, options);
+      }
+
+      return { data: null, error: { message } };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    return await originalInvoke(functionName as any, options);
+  }
+};

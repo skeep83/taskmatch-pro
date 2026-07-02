@@ -56,11 +56,20 @@ export default function AdminRisk() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedAlert, setSelectedAlert] = useState<RiskAlert | null>(null);
   const { toast } = useToast();
+  const isPreviewOnly = true;
+
+  const showPreviewOnlyToast = (actionLabel: string) => {
+    toast({
+      title: "Режим предпросмотра",
+      description: `${actionLabel} временно недоступно: раздел risk пока работает на mock-данных и не подключён к боевому backend.`,
+      variant: "destructive"
+    });
+  };
 
   const fetchRiskData = async () => {
     try {
       setLoading(true);
-      
+
       // Mock data for risk alerts
       const mockAlerts: RiskAlert[] = [
         {
@@ -81,7 +90,7 @@ export default function AdminRisk() {
         },
         {
           id: "2",
-          user_id: "user2", 
+          user_id: "user2",
           user_name: "Петров П.П.",
           risk_type: "velocity_check",
           severity: "medium",
@@ -174,10 +183,15 @@ export default function AdminRisk() {
   };
 
   const updateAlertStatus = async (alertId: string, status: string) => {
+    if (isPreviewOnly) {
+      showPreviewOnlyToast("Смена статуса risk-alert");
+      return;
+    }
+
     try {
       // await adminApi.updateRiskAlert(alertId, { status });
-      setAlerts(prev => 
-        prev.map(alert => 
+      setAlerts(prev =>
+        prev.map(alert =>
           alert.id === alertId ? { ...alert, status: status as any } : alert
         )
       );
@@ -195,6 +209,11 @@ export default function AdminRisk() {
   };
 
   const blockUser = async (userId: string) => {
+    if (isPreviewOnly) {
+      showPreviewOnlyToast("Блокировка пользователя из risk-panel");
+      return;
+    }
+
     try {
       // await adminApi.blockUser(userId, "Risk management decision");
       toast({
@@ -211,6 +230,11 @@ export default function AdminRisk() {
   };
 
   const toggleRule = async (ruleId: string, enabled: boolean) => {
+    if (isPreviewOnly) {
+      showPreviewOnlyToast(`Переключение правила риска (${enabled ? 'включить' : 'отключить'})`);
+      return;
+    }
+
     try {
       // await adminApi.updateRiskRule(ruleId, { enabled });
       setRules(prev =>
@@ -260,14 +284,14 @@ export default function AdminRisk() {
                          alert.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSeverity = severityFilter === "all" || alert.severity === severityFilter;
     const matchesStatus = statusFilter === "all" || alert.status === statusFilter;
-    
+
     return matchesSearch && matchesSeverity && matchesStatus;
   });
 
   if (loading) {
     return (
       <section className="max-w-6xl mx-auto card-surface">
-        <Seo title="ServiceHub — Admin Risk" description="Риск и фрод" canonical="/admin/risk" />
+        <Seo title="ServiceHub — Риски" description="Риск и фрод" canonical="/admin/risk" />
         <div className="flex items-center justify-center py-12">
           <Activity className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -278,13 +302,30 @@ export default function AdminRisk() {
   return (
     <section className="max-w-6xl mx-auto space-y-6">
       <Seo title="ServiceHub — Admin Risk" description="Риск и фрод" canonical="/admin/risk" />
-      
-      <div className="flex items-center justify-between">
+
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Управление рисками</h1>
-          <p className="text-sm text-muted-foreground">Мониторинг и предотвращение мошенничества</p>
+          <h1 className="text-2xl font-semibold">Risk Management</h1>
+          <p className="text-sm text-muted-foreground">Мониторинг мошенничества и подозрительной активности</p>
         </div>
       </div>
+
+      {isPreviewOnly && (
+        <Card className="border-amber-300 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3 text-amber-900">
+              <AlertTriangle className="w-5 h-5 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-medium">Preview-only раздел</p>
+                <p className="text-sm">
+                  Risk-панель сейчас работает на mock-данных. Просмотр алертов и правил доступен для аудита UI,
+                  но смена статусов, блокировка пользователей и переключение правил намеренно отключены до появления проверенного backend-контракта.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -351,7 +392,7 @@ export default function AdminRisk() {
         </CardHeader>
         <CardContent>
           {/* Filters */}
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -389,10 +430,11 @@ export default function AdminRisk() {
             </Select>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Пользователь</TableHead>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Пользователь</TableHead>
                 <TableHead>Тип угрозы</TableHead>
                 <TableHead>Серьезность</TableHead>
                 <TableHead>Оценка</TableHead>
@@ -463,7 +505,7 @@ export default function AdminRisk() {
                               Подробная информация об угрозе безопасности
                             </DialogDescription>
                           </DialogHeader>
-                          
+
                           {selectedAlert && (
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -480,34 +522,36 @@ export default function AdminRisk() {
                                   <strong>Серьезность:</strong> {selectedAlert.severity}
                                 </div>
                               </div>
-                              
+
                               <div>
                                 <strong>Описание:</strong>
                                 <p className="mt-1 text-sm">{selectedAlert.description}</p>
                               </div>
-                              
+
                               <div>
                                 <strong>Метаданные:</strong>
                                 <pre className="mt-1 p-3 bg-gray-50 text-xs rounded-md overflow-auto">
                                   {JSON.stringify(selectedAlert.metadata, null, 2)}
                                 </pre>
                               </div>
-                              
+
                               <div className="flex gap-2">
                                 <Button
                                   onClick={() => updateAlertStatus(selectedAlert.id, "investigating")}
-                                  disabled={selectedAlert.status === "investigating"}
+                                  disabled={isPreviewOnly || selectedAlert.status === "investigating"}
                                 >
                                   Взять в работу
                                 </Button>
                                 <Button
                                   variant="outline"
+                                  disabled={isPreviewOnly}
                                   onClick={() => updateAlertStatus(selectedAlert.id, "false_positive")}
                                 >
                                   Ложное срабатывание
                                 </Button>
                                 <Button
                                   variant="destructive"
+                                  disabled={isPreviewOnly}
                                   onClick={() => blockUser(selectedAlert.user_id)}
                                 >
                                   <Ban className="w-4 h-4 mr-1" />
@@ -522,6 +566,7 @@ export default function AdminRisk() {
                       {alert.status === "new" && (
                         <Button
                           size="sm"
+                          disabled={isPreviewOnly}
                           onClick={() => updateAlertStatus(alert.id, "investigating")}
                         >
                           Проверить
@@ -532,7 +577,8 @@ export default function AdminRisk() {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
@@ -545,10 +591,11 @@ export default function AdminRisk() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Правило</TableHead>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Правило</TableHead>
                 <TableHead>Описание</TableHead>
                 <TableHead>Действие</TableHead>
                 <TableHead>Приоритет</TableHead>
@@ -576,6 +623,7 @@ export default function AdminRisk() {
                     <Button
                       variant="outline"
                       size="sm"
+                      disabled={isPreviewOnly}
                       onClick={() => toggleRule(rule.id, !rule.enabled)}
                     >
                       {rule.enabled ? "Отключить" : "Включить"}
@@ -585,6 +633,7 @@ export default function AdminRisk() {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </section>

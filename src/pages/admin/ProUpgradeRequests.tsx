@@ -8,11 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Eye, 
+import {
+  Clock,
+  CheckCircle,
+  XCircle,
+  Eye,
   FileText,
   User,
   Calendar,
@@ -32,7 +32,7 @@ const getSignedUrl = async (filePath: string, bucket: string = 'kyc') => {
       console.error('Error creating signed URL:', error);
       return null;
     }
-    
+
     return data.signedUrl;
   } catch (error) {
     console.error('Error generating signed URL:', error);
@@ -97,7 +97,7 @@ export default function ProUpgradeRequests() {
   const loadRequests = async () => {
     try {
       setLoading(true);
-      
+
       let query = supabase
         .from('pro_upgrade_requests')
         .select('*')
@@ -125,10 +125,10 @@ export default function ProUpgradeRequests() {
 
   const handleReview = async (action: 'approve' | 'reject') => {
     if (!reviewModal.request) return;
-    
+
     try {
       setProcessing(reviewModal.request.id);
-      
+
       let result;
       if (action === 'approve') {
         const { data, error } = await supabase.rpc('approve_pro_upgrade_request', {
@@ -147,8 +147,8 @@ export default function ProUpgradeRequests() {
 
       toast({
         title: action === 'approve' ? "Заявка одобрена" : "Заявка отклонена",
-        description: action === 'approve' 
-          ? "Пользователь получил статус специалиста" 
+        description: action === 'approve'
+          ? "Пользователь получил статус специалиста"
           : "Заявка была отклонена"
       });
 
@@ -211,7 +211,7 @@ export default function ProUpgradeRequests() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {[
           { key: 'pending', label: 'Ожидают', count: getFilteredCount('pending') },
           { key: 'approved', label: 'Одобрены', count: getFilteredCount('approved') },
@@ -240,127 +240,129 @@ export default function ProUpgradeRequests() {
               Заявки не найдены
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Пользователь</TableHead>
-                  <TableHead>Контакты</TableHead>
-                  <TableHead>Подано</TableHead>
-                  <TableHead>Статус</TableHead>
-                  <TableHead>Документы</TableHead>
-                  <TableHead>Действия</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {requests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                         <div>
-                           <p className="font-medium">
-                             {`${request.profile_data.first_name || ''} ${request.profile_data.last_name || ''}`.trim() ||
-                              'Не указано'}
-                           </p>
-                           <p className="text-sm text-muted-foreground">
-                             {request.profile_data.city || 'Город не указан'}
-                           </p>
-                         </div>
-                      </div>
-                    </TableCell>
-                    
-                     <TableCell>
-                       <div className="text-sm">
-                         <p>{request.profile_data.phone || 'Телефон не указан'}</p>
-                         {request.profile_data.bio && (
-                           <p className="text-muted-foreground truncate max-w-xs">
-                             {request.profile_data.bio}
-                           </p>
-                         )}
-                       </div>
-                     </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Calendar className="w-3 h-3" />
-                        {formatDistanceToNow(new Date(request.submitted_at), { 
-                          addSuffix: true, 
-                          locale: ru 
-                        })}
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      {getStatusBadge(request.status)}
-                      {request.status === 'rejected' && request.rejection_reason && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {request.rejection_reason}
-                        </p>
-                      )}
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <FileText className="w-3 h-3" />
-                        <span className="text-sm">
-                          {request.kyc_documents.length} док.
-                        </span>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {request.status === 'pending' && (
-                          <>
-                            <Button
-                              size="sm"
-                              onClick={() => openReviewModal(request, 'approve')}
-                              disabled={processing === request.id}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Одобрить
-                            </Button>
-                            
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => openReviewModal(request, 'reject')}
-                              disabled={processing === request.id}
-                            >
-                              <XCircle className="w-3 h-3 mr-1" />
-                              Отклонить
-                            </Button>
-                          </>
-                        )}
-                        
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setReviewModal({
-                              isOpen: true,
-                              request,
-                              action: null
-                            });
-                          }}
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          Просмотр
-                        </Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Пользователь</TableHead>
+                    <TableHead>Контакты</TableHead>
+                    <TableHead>Подано</TableHead>
+                    <TableHead>Статус</TableHead>
+                    <TableHead>Документы</TableHead>
+                    <TableHead>Действия</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {requests.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-muted-foreground" />
+                           <div>
+                             <p className="font-medium">
+                               {`${request.profile_data.first_name || ''} ${request.profile_data.last_name || ''}`.trim() ||
+                                'Не указано'}
+                             </p>
+                             <p className="text-sm text-muted-foreground">
+                               {request.profile_data.city || 'Город не указан'}
+                             </p>
+                           </div>
+                        </div>
+                      </TableCell>
+
+                       <TableCell>
+                         <div className="text-sm">
+                           <p>{request.profile_data.phone || 'Телефон не указан'}</p>
+                           {request.profile_data.bio && (
+                             <p className="text-muted-foreground truncate max-w-xs">
+                               {request.profile_data.bio}
+                             </p>
+                           )}
+                         </div>
+                       </TableCell>
+
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-sm">
+                          <Calendar className="w-3 h-3" />
+                          {formatDistanceToNow(new Date(request.submitted_at), {
+                            addSuffix: true,
+                            locale: ru
+                          })}
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        {getStatusBadge(request.status)}
+                        {request.status === 'rejected' && request.rejection_reason && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {request.rejection_reason}
+                          </p>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <FileText className="w-3 h-3" />
+                          <span className="text-sm">
+                            {request.kyc_documents.length} док.
+                          </span>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="flex gap-2">
+                          {request.status === 'pending' && (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => openReviewModal(request, 'approve')}
+                                disabled={processing === request.id}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Одобрить
+                              </Button>
+
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => openReviewModal(request, 'reject')}
+                                disabled={processing === request.id}
+                              >
+                                <XCircle className="w-3 h-3 mr-1" />
+                                Отклонить
+                              </Button>
+                            </>
+                          )}
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setReviewModal({
+                                isOpen: true,
+                                request,
+                                action: null
+                              });
+                            }}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            Просмотр
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Review Modal */}
-      <Dialog 
-        open={reviewModal.isOpen} 
+      <Dialog
+        open={reviewModal.isOpen}
         onOpenChange={(open) => {
           if (!open) {
             setReviewModal({ isOpen: false, request: null, action: null });
@@ -402,7 +404,7 @@ export default function ProUpgradeRequests() {
                       <strong>Город:</strong> {reviewModal.request.profile_data.city || 'Не указан'}
                     </div>
                   </div>
-                  
+
                   {reviewModal.request.profile_data.bio && (
                     <div className="text-sm">
                       <strong>Описание услуг:</strong>
@@ -506,12 +508,12 @@ export default function ProUpgradeRequests() {
                 >
                   Отмена
                 </Button>
-                
+
                 <Button
                   onClick={() => handleReview(reviewModal.action!)}
                   disabled={processing === reviewModal.request?.id || (reviewModal.action === 'reject' && !rejectionReason.trim())}
-                  className={reviewModal.action === 'approve' 
-                    ? "bg-green-600 hover:bg-green-700" 
+                  className={reviewModal.action === 'approve'
+                    ? "bg-green-600 hover:bg-green-700"
                     : "bg-red-600 hover:bg-red-700"
                   }
                 >

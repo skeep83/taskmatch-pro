@@ -8,10 +8,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { loadProNearbyJobs, type ProNearbyJob } from "@/utils/proNearbyJobs";
 import { RoleGuard } from "@/components/RoleGuard";
 import { ProUpgradeStatusCard } from "@/components/ProUpgradeStatusCard";
-import { 
-  Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare, 
+import {
+  Wallet, Star, UserCog, Calendar, Image as ImageIcon, MessageSquare,
   CreditCard, Briefcase, Clock, ShieldCheck, TrendingUp, Award,
   Settings, Bell, Zap, Video, MapPin, CheckCircle, AlertCircle, XCircle,
   BarChart3, DollarSign
@@ -22,6 +23,55 @@ import proWorkspace from "@/assets/pro-workspace.jpg";
 import jobManagement from "@/assets/job-management.jpg";
 import kycVerification from "@/assets/kyc-verification.jpg";
 
+const getJobStatusText = (job: DashboardJob) => {
+  const isDoneAwaitingConfirmation = job.status === 'done' && !job.end_confirmed;
+  const map: Record<string, string> = {
+    'new': 'Новый',
+    'accepted': 'Принят',
+    'in_progress': 'В работе',
+    'done': isDoneAwaitingConfirmation ? 'Ждёт подтверждения' : 'Выполнен',
+    'cancelled': 'Отменён',
+    'expired': 'Просрочен',
+  };
+  return map[job.status] || job.status;
+};
+
+interface DashboardJob {
+  id: string;
+  title?: string | null;
+  description?: string | null;
+  status: string;
+  end_confirmed?: boolean | null;
+  scheduled_at?: string | null;
+  budget_min_cents?: number | null;
+  budget_max_cents?: number | null;
+  client_id?: string | null;
+  location_address?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  pro_id?: string | null;
+}
+
+interface DashboardTender {
+  id: string;
+  title: string;
+  deadline: string;
+}
+
+interface RealtimeJobPayload {
+  title?: string | null;
+  status?: string | null;
+  pro_id?: string | null;
+}
+
+interface RatingRow {
+  score: number;
+}
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  return error instanceof Error ? error.message : fallback;
+};
+
 const DashboardPro = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
@@ -29,8 +79,9 @@ const DashboardPro = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [nearbyJobs, setNearbyJobs] = useState<any[]>([]);
-  const [myActiveJobs, setMyActiveJobs] = useState<any[]>([]);
+  const [nearbyJobs, setNearbyJobs] = useState<ProNearbyJob[]>([]);
+  const [hasProLocation, setHasProLocation] = useState(false);
+  const [myActiveJobs, setMyActiveJobs] = useState<DashboardJob[]>([]);
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [ratingAvg, setRatingAvg] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number>(0);
@@ -38,12 +89,12 @@ const DashboardPro = () => {
   const [monthlyEarnings, setMonthlyEarnings] = useState<number>(0);
   const [completedJobs, setCompletedJobs] = useState<number>(0);
   const [responseTime, setResponseTime] = useState<string>('< 1 час');
-  const [tenders, setTenders] = useState<any[]>([]);
+  const [tenders, setTenders] = useState<DashboardTender[]>([]);
   const [hasPendingProRequest, setHasPendingProRequest] = useState<boolean>(false);
 
   useEffect(() => {
     initializeDashboard();
-    
+
     // Настройка реального времени для отслеживания изменений KYC документов
     const kycChannel = supabase
       .channel('kyc_documents_pro_dashboard')
@@ -66,46 +117,47 @@ const DashboardPro = () => {
 
     // Настройка реального времени для отслеживания изменений в работах
     const jobsChannel = supabase
-      .channel('jobs_pro_dashboard')
+      .channel(`jobs_pro_dashboard_${userId ?? 'anonymous'}`)
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
           table: 'jobs'
         },
         (payload) => {
-          console.log('DashboardPro: Job updated:', payload);
-          const updatedJob = payload.new as any;
-          const oldJob = payload.old as any;
-          
-          // Если работа была назначена текущему пользователю (статус изменился на accepted и назначен pro_id)
-          if (userId && updatedJob.pro_id === userId && updatedJob.status === 'accepted' && 
+          console.log('DashboardPro: Job changed:', payload);
+
+          if (!userId) {
+            return;
+          }
+
+          const updatedJob = ((payload.new as RealtimeJobPayload | null) ?? {}) as RealtimeJobPayload;
+          const oldJob = ((payload.old as RealtimeJobPayload | null) ?? {}) as RealtimeJobPayload;
+          const isAssignedToCurrentUser = updatedJob.pro_id === userId || oldJob.pro_id === userId;
+          const affectsNearbyJobs = updatedJob.status === 'new' || oldJob.status === 'new' || payload.eventType === 'INSERT' || payload.eventType === 'DELETE';
+
+          if (updatedJob.pro_id === userId && updatedJob.status === 'accepted' &&
               (oldJob.status !== 'accepted' || oldJob.pro_id !== userId)) {
             console.log('DashboardPro: Job assigned to current user, forcing data reload');
-            
-            // Принудительно перезагружаем данные
-            setTimeout(() => {
-              loadActiveJobs(userId);
-              loadNearbyJobs(userId);
-            }, 500);
-            
-            // Показываем уведомление
+
             toast({
               title: "Новая работа назначена!",
               description: `Заказ "${updatedJob.title}" назначен вам на выполнение`,
               duration: 8000
             });
           }
-          
-          // Обновляем активные заказы если это наша работа
-          if (userId && updatedJob.pro_id === userId) {
-            setTimeout(() => loadActiveJobs(userId), 300);
+
+          if (isAssignedToCurrentUser) {
+            setTimeout(() => {
+              loadActiveJobs(userId);
+            }, 300);
           }
-          
-          // Обновляем доступные заказы если статус изменился на 'new'
-          if (updatedJob.status === 'new') {
-            setTimeout(() => loadNearbyJobs(userId), 300);
+
+          if (affectsNearbyJobs || isAssignedToCurrentUser) {
+            setTimeout(() => {
+              loadNearbyJobs(userId);
+            }, 300);
           }
         }
       )
@@ -120,23 +172,23 @@ const DashboardPro = () => {
   const initializeDashboard = async () => {
     try {
       console.log('DashboardPro: Starting initialization...');
-      
+
       const { data: session } = await supabase.auth.getSession();
       const uid = session.session?.user?.id;
-      
+
       if (!uid) {
         console.log('DashboardPro: No user session, redirecting to auth');
         toast({ title: "Требуется вход", description: "Пожалуйста, войдите" });
         navigate("/auth");
         return;
       }
-      
+
       console.log('DashboardPro: User authenticated, setting userId');
       setUserId(uid);
-      
+
       // Ensure user has pro role
       await ensureProRole(uid);
-      
+
       // Load dashboard data
       console.log('DashboardPro: Loading dashboard data...');
       await Promise.all([
@@ -151,18 +203,18 @@ const DashboardPro = () => {
 
       console.log('DashboardPro: Dashboard loaded successfully');
       setLoading(false);
-      
+
       // Дополнительная проверка через 2 секунды на случай пропущенных обновлений
       setTimeout(() => {
         console.log('DashboardPro: Performing delayed check for missed updates');
         loadActiveJobs(uid);
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('DashboardPro: Error during initialization:', error);
-      toast({ 
-        title: "Ошибка загрузки", 
-        description: error.message || "Не удалось загрузить данные", 
-        variant: "destructive" 
+      toast({
+        title: "Ошибка загрузки",
+        description: getErrorMessage(error, "Не удалось загрузить данные"),
+        variant: "destructive"
       });
       setLoading(false);
     }
@@ -175,23 +227,23 @@ const DashboardPro = () => {
         .select("role")
         .eq("user_id", uid)
         .eq("role", "pro");
-        
+
       if (!roles || roles.length === 0) {
         console.log('DashboardPro: Creating pro role for user');
         const { error } = await supabase
           .from("user_roles")
           .insert({ user_id: uid, role: "pro" });
-          
+
         if (error && !error.message.includes('duplicate')) {
           throw error;
         }
-        
-        toast({ 
-          title: "Добро пожаловать!", 
-          description: "Роль специалиста активирована" 
+
+        toast({
+          title: "Добро пожаловать!",
+          description: "Роль специалиста активирована"
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('DashboardPro: Error ensuring pro role:', error);
       // Don't throw - just log and continue
     }
@@ -199,13 +251,9 @@ const DashboardPro = () => {
 
   const loadNearbyJobs = async (uid: string) => {
     try {
-      const { data } = await supabase
-        .from('jobs')
-        .select('id, description, status, scheduled_at, budget_min_cents, budget_max_cents')
-        .eq('status', 'new')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      setNearbyJobs(data || []);
+      const result = await loadProNearbyJobs(uid);
+      setNearbyJobs(result.jobs);
+      setHasProLocation(result.hasProLocation);
     } catch (error) {
       console.error('DashboardPro: Error loading nearby jobs:', error);
     }
@@ -215,17 +263,18 @@ const DashboardPro = () => {
     try {
       console.log('DashboardPro: Loading active jobs for pro_id:', uid);
       console.log('DashboardPro: Looking for specific job: d984322c-a83b-477b-acfa-0ac6e80d03e6');
-      
+
       const { data, error } = await supabase
         .from('jobs')
         .select(`
-          id, 
-          client_id, 
+          id,
+          client_id,
           title,
-          description, 
-          status, 
-          scheduled_at, 
-          budget_min_cents, 
+          description,
+          status,
+          end_confirmed,
+          scheduled_at,
+          budget_min_cents,
           budget_max_cents,
           location_address,
           created_at,
@@ -236,12 +285,12 @@ const DashboardPro = () => {
         .in('status', ['accepted', 'in_progress', 'done'])
         .order('updated_at', { ascending: false })
         .limit(20);
-      
+
       if (error) {
         console.error('DashboardPro: Error loading active jobs:', error);
         return;
       }
-      
+
       const jobs = data || [];
       const targetJob = jobs.find(job => job.id === 'd984322c-a83b-477b-acfa-0ac6e80d03e6');
        console.log('DashboardPro: Loaded active jobs:', {
@@ -252,14 +301,14 @@ const DashboardPro = () => {
         userId: uid,
         timestamp: new Date().toISOString()
       });
-      
+
       // Обновляем состояние
       setMyActiveJobs(jobs);
-      
+
       // Calculate completed jobs count
       const completed = jobs.filter(job => job.status === 'done').length;
       setCompletedJobs(completed);
-      
+
       // Если целевой заказ найден, показываем дополнительное уведомление
       if (targetJob && targetJob.status === 'accepted') {
         console.log('DashboardPro: Target job found and accepted!');
@@ -289,7 +338,7 @@ const DashboardPro = () => {
         .select('score')
         .eq('to_user_id', uid)
         .limit(200);
-      const scores = (ratings || []).map((r: any) => r.score as number);
+      const scores = (ratings || []).map((r: RatingRow) => r.score);
       const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
       setRatingAvg(avg);
       setRatingCount(scores.length);
@@ -306,33 +355,33 @@ const DashboardPro = () => {
         .select('status, doc_type, created_at')
         .eq('user_id', uid)
         .order('created_at', { ascending: false });
-      
+
       if (error) {
         console.error('DashboardPro: Error loading KYC documents:', error);
         setKycStatus('pending');
         return;
       }
-      
+
       console.log('DashboardPro: KYC documents found:', docs);
-      
+
       if (!docs || docs.length === 0) {
         console.log('DashboardPro: No KYC documents found, setting status to pending');
         setKycStatus('pending');
         return;
       }
-      
+
       // Проверяем, есть ли хотя бы один одобренный документ
       const hasApprovedDoc = docs.some(doc => doc.status === 'approved');
       const hasRejectedDoc = docs.some(doc => doc.status === 'rejected');
       const allPending = docs.every(doc => doc.status === 'pending');
-      
+
       let finalStatus = 'pending';
       if (hasApprovedDoc) {
         finalStatus = 'approved';
       } else if (hasRejectedDoc && !allPending) {
-        finalStatus = 'rejected';  
+        finalStatus = 'rejected';
       }
-      
+
       console.log('DashboardPro: Final KYC status:', finalStatus);
       setKycStatus(finalStatus);
     } catch (error) {
@@ -363,7 +412,7 @@ const DashboardPro = () => {
         .eq('user_id', uid)
         .eq('status', 'pending')
         .limit(1);
-      
+
       setHasPendingProRequest(requests && requests.length > 0);
     } catch (error) {
       console.error('DashboardPro: Error checking pro upgrade status:', error);
@@ -385,8 +434,8 @@ const DashboardPro = () => {
   return (
     <RoleGuard requiredRole="pro">
       <main className="min-h-screen">
-        <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Pro dashboard" canonical="/pro/dashboard" />
-      
+        <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Управляйте откликами, заказами и доходами" canonical="/pro/dashboard" />
+
       {/* Header Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
@@ -396,7 +445,7 @@ const DashboardPro = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Управляйте заказами и развивайте бизнес
           </p>
-          
+
           <div className="flex justify-center mt-8">
           </div>
         </div>
@@ -412,43 +461,43 @@ const DashboardPro = () => {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
             <div className="card-surface p-6">
-              <div className="flex items-center justify-between">
+              <Link to="/wallet" className="flex items-center justify-between p-2 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Баланс</p>
                   <p className="text-2xl font-bold">{formatPrice(walletBalance)}</p>
                 </div>
                 <NeumorphicIcon icon={Wallet} size={64} variant="behance" />
-              </div>
+              </Link>
             </div>
-            
+
             <div className="card-surface p-6">
-              <div className="flex items-center justify-between">
+              <Link to="/profile" className="flex items-center justify-between p-2 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Рейтинг</p>
                   <div className="flex items-center gap-2">
-                    <StarRating 
-                      rating={ratingAvg || 0} 
-                      size="sm" 
-                      showValue 
+                    <StarRating
+                      rating={ratingAvg || 0}
+                      size="sm"
+                      showValue
                       showCount={false}
                     />
                     <span className="text-sm text-muted-foreground">({ratingCount})</span>
                   </div>
                 </div>
                 <NeumorphicIcon icon={Star} size={64} variant="behance" />
-              </div>
+              </Link>
             </div>
-            
+
             <div className="card-surface p-6">
-              <div className="flex items-center justify-between">
+              <Link to="/jobs?status=done" className="flex items-center justify-between p-2 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Выполнено</p>
                   <p className="text-2xl font-bold">{completedJobs}</p>
                 </div>
                 <NeumorphicIcon icon={Award} size={64} variant="behance" />
-              </div>
+              </Link>
             </div>
-            
+
             <div className="card-surface p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -462,60 +511,51 @@ const DashboardPro = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/profile/settings" className="flex flex-col items-center gap-2">
+            <Link to="/profile/settings" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                   <UserCog className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Профиль</span>
-              </Link>
-            </button>
-            
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/pro/schedule" className="flex flex-col items-center gap-2">
+            </Link>
+
+            <Link to="/pro/schedule" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                   <Calendar className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Расписание</span>
-              </Link>
-            </button>
-            
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/portfolio" className="flex flex-col items-center gap-2">
+            </Link>
+
+            <Link to="/portfolio" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                   <ImageIcon className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Портфолио</span>
-              </Link>
-            </button>
-            
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/tenders" className="flex flex-col items-center gap-2">
+            </Link>
+
+            <Link to="/tenders" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                   <Briefcase className="h-6 w-6 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">Тендеры</span>
-              </Link>
-            </button>
-            
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
+                <span className="text-sm font-medium text-gray-700">Заказы с дедлайном</span>
+            </Link>
+
+            <button type="button" disabled aria-disabled="true" title="Выплата будет доступна после подключения payout flow" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl opacity-60 cursor-not-allowed">
               <div className="flex flex-col items-center gap-2 w-full">
                 <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                   <CreditCard className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Выплата</span>
+                <span className="text-xs text-muted-foreground">Скоро доступно</span>
               </div>
             </button>
-            
-            
-            <button className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl">
-              <Link to="/kyc" className="flex flex-col items-center gap-2">
+
+
+            <Link to="/kyc" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
                 <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                   <ShieldCheck className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">KYC</span>
-              </Link>
-            </button>
+            </Link>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -525,10 +565,10 @@ const DashboardPro = () => {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
                     <NeumorphicIcon icon={Briefcase} size={48} variant="behance" />
-                    <h2 className="text-2xl font-display font-bold">Доступные заказы</h2>
+                    <h2 className="text-2xl font-display font-bold">Заказы для предложений</h2>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {nearbyJobs.length} заказов поблизости
+                    {nearbyJobs.length} заказов рядом
                   </div>
                 </div>
 
@@ -536,8 +576,12 @@ const DashboardPro = () => {
                   {nearbyJobs.length === 0 && (
                     <div className="text-center py-12">
                       <NeumorphicIcon icon={Briefcase} size={64} variant="behance" className="mb-4 mx-auto" />
-                      <h3 className="text-lg font-semibold mb-2">Нет доступных заказов</h3>
-                      <p className="text-muted-foreground mb-6">Проверьте позже или расширьте радиус поиска</p>
+                      <h3 className="text-lg font-semibold mb-2">Пока нет заказов для отклика</h3>
+                      <p className="text-muted-foreground mb-6">
+                        {hasProLocation
+                          ? 'Проверьте позже или настройте профиль и радиус работы'
+                          : 'Добавьте свою точку в профиле, чтобы видеть расстояние до заказов поблизости'}
+                      </p>
                       <Link to="/profile/settings" className="btn-hero px-8 py-4 rounded-xl font-semibold text-lg">
                         Настроить профиль
                       </Link>
@@ -567,19 +611,28 @@ const DashboardPro = () => {
                                 }
                               </span>
                             </div>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-5 w-5" />
+                              <span>{job.distanceKm !== null ? `${job.distanceKm.toFixed(1)} км` : 'Без дистанции'}</span>
+                            </div>
                           </div>
+                          {job.location_address && (
+                            <div className="text-sm text-muted-foreground mb-3">
+                              {job.location_address}
+                            </div>
+                          )}
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <Link 
+                        <Link
                           to={`/job/${job.id}`}
                           className="btn-ghost px-6 py-3 rounded-xl font-semibold"
                         >
                           Подробнее
                         </Link>
                         <button className="btn-hero px-6 py-3 rounded-xl font-semibold">
-                          Принять заказ
+                          Отправить предложение
                         </button>
                         <button className="btn-ghost px-3 py-3 rounded-xl">
                           <NeumorphicIcon icon={Video} size={20} variant="behance" />
@@ -601,7 +654,10 @@ const DashboardPro = () => {
                   {myActiveJobs.length === 0 && (
                     <div className="text-center py-12">
                       <NeumorphicIcon icon={Clock} size={64} variant="behance" className="mb-4 mx-auto" />
-                      <p className="text-muted-foreground">У вас нет активных заказов</p>
+                      <p className="text-muted-foreground mb-4">У вас нет активных заказов</p>
+                      <Link to="/jobs" className="btn-hero px-6 py-3 rounded-xl font-semibold inline-block">
+                        Найти заказы
+                      </Link>
                     </div>
                   )}
 
@@ -611,7 +667,7 @@ const DashboardPro = () => {
                         <div className="flex-1">
                           <h3 className="font-semibold mb-2">{job.description || 'Заказ'}</h3>
                           <div className="text-sm text-muted-foreground mb-2">
-                            Статус: {job.status === 'accepted' ? 'Принят' : job.status === 'in_progress' ? 'В работе' : 'Выполнен'}
+                            Статус: {getJobStatusText(job)}
                           </div>
                           <div className="text-sm text-muted-foreground">
                             {job.budget_min_cents && job.budget_max_cents
@@ -623,18 +679,18 @@ const DashboardPro = () => {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <Link 
+                        <Link
                           to={`/job/${job.id}`}
                           className="btn-hero px-6 py-3 rounded-xl font-semibold"
                         >
                           Управлять
                         </Link>
-                        <Link 
+                        <Link
                           to={`/messages?user=${job.client_id}&job=${job.id}`}
                           className="btn-ghost px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
                         >
                           <NeumorphicIcon icon={MessageSquare} size={20} variant="behance" />
-                          Чат
+                          Продолжить по заказу
                         </Link>
                       </div>
                     </div>
@@ -658,13 +714,13 @@ const DashboardPro = () => {
                     )}
                   </div>
                   <span className="text-sm font-medium text-foreground">
-                    Статус: {kycStatus === 'approved' ? 'Проверенный специалист' : 
-                             kycStatus === 'rejected' ? 'Документы отклонены' : 
+                    Статус: {kycStatus === 'approved' ? 'Проверенный специалист' :
+                             kycStatus === 'rejected' ? 'Документы отклонены' :
                              'Ожидает проверки'}
                   </span>
                 </div>
-                
-                <button 
+
+                <button
                   onClick={() => userId && loadKycStatus(userId)}
                   className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
                   title="Обновить статус KYC"
@@ -672,17 +728,17 @@ const DashboardPro = () => {
                   <TrendingUp className="h-4 w-4" />
                 </button>
               </div>
-              
-              {/* Tenders */}
+
+              {/* Business tenders */}
               <div className="card-surface p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <NeumorphicIcon icon={TrendingUp} size={48} variant="behance" />
-                  <h3 className="font-bold">Открытые тендеры</h3>
+                  <h3 className="font-bold">Бизнес-тендеры</h3>
                 </div>
-                
+
                 {tenders.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    Нет открытых тендеров
+                    Сейчас нет открытых бизнес-тендеров
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -693,7 +749,7 @@ const DashboardPro = () => {
                           До {new Date(tender.deadline).toLocaleDateString()}
                         </p>
                         <button className="btn-hero px-4 py-2 rounded-lg text-sm font-semibold w-full">
-                          Подать заявку
+                          Откликнуться
                         </button>
                       </div>
                     ))}
@@ -707,7 +763,7 @@ const DashboardPro = () => {
                   <NeumorphicIcon icon={BarChart3} size={48} variant="behance" />
                   <h3 className="font-bold">Активность</h3>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div className="text-sm">
                     <div className="flex justify-between mb-1">
@@ -715,14 +771,14 @@ const DashboardPro = () => {
                       <span className="font-semibold">0</span>
                     </div>
                   </div>
-                  
+
                   <div className="text-sm">
                     <div className="flex justify-between mb-1">
                       <span>Просмотров профиля</span>
                       <span className="font-semibold">12</span>
                     </div>
                   </div>
-                  
+
                   <div className="text-sm">
                     <div className="flex justify-between mb-1">
                       <span>Новых сообщений</span>
@@ -738,13 +794,13 @@ const DashboardPro = () => {
                   <NeumorphicIcon icon={Zap} size={48} variant="behance" />
                   <h3 className="font-bold">Советы</h3>
                 </div>
-                
+
                 <div className="space-y-3 text-sm">
                   <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                    <p className="font-medium mb-1">Быстрые отклики</p>
+                    <p className="font-medium mb-1">Отклики по заказам</p>
                     <p className="text-muted-foreground">Отвечайте на заказы в течение 30 минут для повышения рейтинга</p>
                   </div>
-                  
+
                   <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
                     <p className="font-medium mb-1">Качественные фото</p>
                     <p className="text-muted-foreground">Добавьте фото работ в портфолио для привлечения клиентов</p>

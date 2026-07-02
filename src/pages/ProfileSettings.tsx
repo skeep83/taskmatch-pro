@@ -12,9 +12,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { AvatarUpload } from "@/components/AvatarUpload";
 import { RoleUpgrade } from "@/components/RoleUpgrade";
-import { 
-  User, 
-  ArrowLeft, 
+import {
+  User,
+  ArrowLeft,
   Save,
   Phone,
   MapPin,
@@ -33,6 +33,8 @@ interface Profile {
   country?: string;
   locale?: string;
   avatar_url?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 interface ProProfile {
@@ -57,7 +59,9 @@ export default function ProfileSettings() {
     city: '',
     country: '',
     locale: 'ru',
-    avatar_url: ''
+    avatar_url: '',
+    latitude: null,
+    longitude: null
   });
   const [proProfile, setProProfile] = useState<ProProfile>({
     bio: '',
@@ -78,7 +82,7 @@ export default function ProfileSettings() {
   const checkAuth = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         navigate("/auth");
         return;
@@ -90,10 +94,10 @@ export default function ProfileSettings() {
       await loadProfile(user.id);
     } catch (error: any) {
       console.error('Auth error:', error);
-      toast({ 
-        title: "Ошибка", 
-        description: error.message || "Ошибка аутентификации", 
-        variant: "destructive" 
+      toast({
+        title: "Ошибка",
+        description: error.message || "Ошибка аутентификации",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -122,7 +126,9 @@ export default function ProfileSettings() {
           city: data.city || '',
           country: data.country || '',
           locale: data.locale || 'ru',
-          avatar_url: data.avatar_url || ''
+          avatar_url: data.avatar_url || '',
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null
         });
       }
 
@@ -169,7 +175,7 @@ export default function ProfileSettings() {
         .order('label_ru');
 
       if (error) throw error;
-      
+
       // Transform data to match expected format
       const transformedData = (data || []).map(cat => ({
         id: cat.id,
@@ -177,7 +183,7 @@ export default function ProfileSettings() {
         name: cat.label_ru,
         name_ro: cat.label_ro
       }));
-      
+
       setCategories(transformedData);
       console.log('Loaded categories:', transformedData.length);
     } catch (error: any) {
@@ -226,12 +232,12 @@ export default function ProfileSettings() {
 
   const handleSave = async () => {
     if (!user) return;
-    
+
     setSaving(true);
     try {
       // Update full_name based on first_name and last_name
       const fullName = `${profile.first_name?.trim() || ''} ${profile.last_name?.trim() || ''}`.trim();
-      
+
       // Update basic profile
       const { error: profileError } = await supabase
         .from("profiles")
@@ -243,7 +249,9 @@ export default function ProfileSettings() {
           phone: profile.phone?.trim() || null,
           city: profile.city?.trim() || null,
           country: profile.country?.trim() || null,
-          locale: profile.locale || 'ru'
+          locale: profile.locale || 'ru',
+          latitude: profile.latitude ?? null,
+          longitude: profile.longitude ?? null
         });
 
       if (profileError) throw profileError;
@@ -273,16 +281,16 @@ export default function ProfileSettings() {
     if (!user) return;
 
     // Upsert pro profile
-    const payload: any = { 
-      user_id: user.id, 
-      bio: proProfile.bio, 
-      radius_km: proProfile.radius_km || 10 
+    const payload: any = {
+      user_id: user.id,
+      bio: proProfile.bio,
+      radius_km: proProfile.radius_km || 10
     };
-    
+
     if (proProfile.hourly_rate_cents !== '') {
       payload.hourly_rate_cents = Number(proProfile.hourly_rate_cents);
     }
-    
+
     if (proProfile.fixed_price_cents !== '') {
       payload.fixed_price_cents = Number(proProfile.fixed_price_cents);
     }
@@ -309,7 +317,7 @@ export default function ProfileSettings() {
       const { error } = await supabase
         .from('pro_categories')
         .insert(toAdd);
-      
+
       if (error) throw error;
     }
 
@@ -319,7 +327,7 @@ export default function ProfileSettings() {
         .delete()
         .eq('user_id', user.id)
         .in('category_id', toRemove);
-      
+
       if (error) throw error;
     }
   };
@@ -341,7 +349,7 @@ export default function ProfileSettings() {
   const toggleCategory = (categoryId: string) => {
     console.log('Toggling category:', categoryId, 'Current selected:', selectedCategories);
     setSelectedCategories(prev => {
-      const newSelection = prev.includes(categoryId) 
+      const newSelection = prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId];
       console.log('New selection:', newSelection);
@@ -378,7 +386,7 @@ export default function ProfileSettings() {
               Назад
             </Button>
           </div>
-          
+
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
             Настройки профиля
           </h1>
@@ -412,7 +420,7 @@ export default function ProfileSettings() {
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Основная информация
                 </h2>
-                
+
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -424,7 +432,7 @@ export default function ProfileSettings() {
                         onChange={(e) => updateProfile('first_name', e.target.value)}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="last_name">Фамилия</Label>
                       <Input
@@ -458,7 +466,7 @@ export default function ProfileSettings() {
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Местоположение
                 </h2>
-                
+
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -474,7 +482,7 @@ export default function ProfileSettings() {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="country">Страна</Label>
                       <div className="relative">
@@ -489,6 +497,32 @@ export default function ProfileSettings() {
                       </div>
                     </div>
                   </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="latitude">Широта</Label>
+                      <Input
+                        id="latitude"
+                        type="number"
+                        step="any"
+                        value={profile.latitude ?? ''}
+                        onChange={(e) => updateProfile('latitude', e.target.value === '' ? null : Number(e.target.value))}
+                        placeholder="Например 47.0105"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="longitude">Долгота</Label>
+                      <Input
+                        id="longitude"
+                        type="number"
+                        step="any"
+                        value={profile.longitude ?? ''}
+                        onChange={(e) => updateProfile('longitude', e.target.value === '' ? null : Number(e.target.value))}
+                        placeholder="Например 28.8638"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -498,9 +532,9 @@ export default function ProfileSettings() {
                   <div className="w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                   Статус аккаунта
                 </h2>
-                <RoleUpgrade 
-                  userId={user.id} 
-                  currentRole={userRole} 
+                <RoleUpgrade
+                  userId={user.id}
+                  currentRole={userRole}
                   onRoleUpgraded={handleRoleUpgraded}
                 />
               </div>
@@ -513,7 +547,7 @@ export default function ProfileSettings() {
                     <Briefcase className="w-6 h-6 text-primary" />
                     Настройки специалиста
                   </h2>
-                  
+
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="bio">О себе</Label>
@@ -537,7 +571,7 @@ export default function ProfileSettings() {
                           onChange={(e) => updateProProfile('radius_km', Number(e.target.value))}
                         />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="hourly">Ставка (¢/час)</Label>
                         <Input
@@ -548,7 +582,7 @@ export default function ProfileSettings() {
                           onChange={(e) => updateProProfile('hourly_rate_cents', e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="fixed">Фикс. цена (¢)</Label>
                         <Input
@@ -571,11 +605,11 @@ export default function ProfileSettings() {
                           Выбрано: {selectedCategories.length}
                         </span>
                       </div>
-                      
+
                       <p className="text-sm text-muted-foreground">
                         Выберите категории услуг, которые вы предоставляете. Это поможет клиентам найти вас.
                       </p>
-                      
+
                       {/* Search for categories */}
                       <div className="space-y-3">
                         <Input
@@ -584,7 +618,7 @@ export default function ProfileSettings() {
                           onChange={(e) => setCategorySearch(e.target.value)}
                           className="w-full"
                         />
-                        
+
                         {/* Quick filters */}
                         <div className="flex flex-wrap gap-2">
                           <span className="text-xs text-muted-foreground">Популярные:</span>
@@ -615,12 +649,12 @@ export default function ProfileSettings() {
                       ) : (
                         <>
                           {(() => {
-                            const filteredCategories = categories.filter(category => 
-                              categorySearch === '' || 
+                            const filteredCategories = categories.filter(category =>
+                              categorySearch === '' ||
                               category.name?.toLowerCase().includes(categorySearch.toLowerCase()) ||
                               category.name_ro?.toLowerCase().includes(categorySearch.toLowerCase())
                             );
-                            
+
                             if (filteredCategories.length === 0) {
                               return (
                                 <div className="p-6 border border-dashed border-border rounded-lg text-center">
@@ -636,7 +670,7 @@ export default function ProfileSettings() {
                                 </div>
                               );
                             }
-                            
+
                             return (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto p-4 border rounded-lg bg-muted/20">
                                 {filteredCategories.map((category) => (
@@ -647,7 +681,7 @@ export default function ProfileSettings() {
                                       onCheckedChange={() => toggleCategory(category.id)}
                                       className="data-[state=checked]:bg-primary"
                                     />
-                                    <Label 
+                                    <Label
                                       htmlFor={`category-${category.id}`}
                                       className="text-sm cursor-pointer flex-1 font-medium leading-snug"
                                       title={`${category.name_ro} (${category.key})`} // Show Romanian translation and key on hover
@@ -671,7 +705,7 @@ export default function ProfileSettings() {
                             {selectedCategories.map((catId) => {
                               const category = categories.find(c => c.id === catId);
                               return category ? (
-                                <span 
+                                <span
                                   key={catId}
                                   className="inline-flex items-center px-3 py-1 bg-success/20 text-success text-sm rounded-full border border-success/30 font-medium"
                                   title={category.name_ro}
@@ -697,8 +731,8 @@ export default function ProfileSettings() {
 
               {/* Save Button */}
               <div className="card-surface p-6">
-                <Button 
-                  onClick={handleSave} 
+                <Button
+                  onClick={handleSave}
                   disabled={saving}
                   className="btn-hero w-full text-lg py-3"
                 >
@@ -721,7 +755,7 @@ export default function ProfileSettings() {
                     <span className="text-muted-foreground">Email:</span>
                     <span className="font-medium text-sm">{user?.email}</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between py-3 border-b border-border/50">
                     <span className="text-muted-foreground">ID:</span>
                     <span className="font-medium text-sm font-mono">{user?.id.slice(-8)}</span>

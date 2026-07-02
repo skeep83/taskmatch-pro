@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from '@/integrations/supabase/client';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,11 +13,13 @@ import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { JobStatusProgress } from '@/components/JobStatusProgress';
 
 interface JobApplication {
   id: string;
+  responseSource: 'job_application' | 'job_price_proposal';
+  responseLabel: string;
   price_cents: number;
   eta_slot?: string;
   note?: string;
@@ -61,11 +63,111 @@ interface JobApplicationsListProps {
   onApplicationSelect: () => void;
 }
 
-export function JobApplicationsList({ 
-  jobId, 
-  jobStatus, 
-  selectedProId, 
-  onApplicationSelect 
+interface PortfolioImage {
+  id: string;
+  url: string;
+  title: string;
+  description: string;
+  isMain: boolean;
+}
+
+type JobProgressStatus = 'new' | 'accepted' | 'in_progress' | 'done' | 'cancelled';
+
+const normalizeJobProgressStatus = (status: string): JobProgressStatus => {
+  if (status === 'accepted' || status === 'in_progress' || status === 'done' || status === 'cancelled') {
+    return status;
+  }
+
+  return 'new';
+};
+
+const invokeEdgeFunction = async <T,>(name: string, payload: Record<string, unknown>) => {
+  const initialResult = await supabase.functions.invoke(name, {
+    body: payload,
+  });
+
+  if (!initialResult.error) {
+    return initialResult as { data: T; error: null };
+  }
+
+  const fallbackNeeded = /unknown function/i.test(initialResult.error.message || '')
+    || /non-2xx/i.test(initialResult.error.message || '')
+    || /failed with 404/i.test(initialResult.error.message || '');
+
+  if (!fallbackNeeded) {
+    return initialResult as { data: null; error: Error };
+  }
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    return initialResult as { data: null; error: Error };
+  }
+
+  const tryFetch = async (url: string) => {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await response.text();
+
+    let data: unknown = null;
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { raw: text };
+      }
+    }
+
+    return { response, data };
+  };
+
+  const fallbackUrls = [
+    `${window.location.origin}/marketplace-api/functions/${name}`,
+    `${SUPABASE_URL}/functions/v1/${name}`,
+  ];
+
+  for (const url of fallbackUrls) {
+    try {
+      const { response, data } = await tryFetch(url);
+      if (response.ok) {
+        return { data: data as T, error: null };
+      }
+
+      const message = typeof data === 'object' && data && 'error' in data
+        ? String((data as { error?: unknown }).error)
+        : `Function failed with status ${response.status}`;
+
+      if (response.status !== 404) {
+        return { data: null, error: new Error(message) };
+      }
+    } catch (error) {
+      continue;
+    }
+  }
+
+  return initialResult as { data: null; error: Error };
+};
+
+const invokeJobApplicationSelect = async (applicationId: string, jobId: string) => {
+  return invokeEdgeFunction('job-application-select', { applicationId, jobId });
+};
+
+const fetchJobApplications = async (jobId: string) => {
+  return invokeEdgeFunction<{ applications?: JobApplication[] }>('job-applications-list', { jobId });
+};
+
+export function JobApplicationsList({
+  jobId,
+  jobStatus,
+  selectedProId,
+  onApplicationSelect
 }: JobApplicationsListProps) {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,15 +176,41 @@ export function JobApplicationsList({
   const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
   const [selectedPortfolio, setSelectedPortfolio] = useState<JobApplication | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [allPortfolioImages, setAllPortfolioImages] = useState<any[]>([]);
+  const [allPortfolioImages, setAllPortfolioImages] = useState<PortfolioImage[]>([]);
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const fetchApplications = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const result = await fetchJobApplications(jobId);
+      if (result.error) {
+        throw result.error;
+      }
+
+      const fetchedApplications = result.data?.applications || [];
+      setApplications(fetchedApplications);
+      setCurrentIndex(0);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      toast({
+        title: 'Не удалось загрузить предложения',
+        description: error instanceof Error ? error.message : 'Попробуйте обновить страницу',
+        variant: 'destructive',
+      });
+      setApplications([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [jobId, toast]);
 
   useEffect(() => {
     if (jobId) {
       fetchApplications();
     }
-  }, [jobId]);
+  }, [fetchApplications, jobId]);
 
   // Real-time subscription for job applications
   useEffect(() => {
@@ -100,7 +228,7 @@ export function JobApplicationsList({
         },
         (payload) => {
           console.log('New job application received:', payload);
-          fetchApplications(); // Refresh applications list
+          void fetchApplications();
         }
       )
       .on(
@@ -113,7 +241,7 @@ export function JobApplicationsList({
         },
         (payload) => {
           console.log('New price proposal received:', payload);
-          fetchApplications(); // Refresh applications list
+          void fetchApplications();
         }
       )
       .subscribe();
@@ -121,159 +249,36 @@ export function JobApplicationsList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [jobId]);
+  }, [fetchApplications, jobId]);
 
-  const fetchApplications = async () => {
+  const handleSelectProfessional = async (application: JobApplication) => {
     try {
-      setLoading(true);
-      
-      // Fetch both job applications and price proposals
-      const [applicationsResponse, proposalsResponse] = await Promise.all([
-        supabase
-          .from('job_applications')
-          .select(`
-            *,
-            profiles:pro_id (
-              first_name,
-              last_name,
-              full_name,
-              avatar_url
-            )
-          `)
-          .eq('job_id', jobId)
-          .order('created_at', { ascending: false }),
-        
-        supabase
-          .from('job_price_proposals')
-          .select(`
-            id,
-            job_id,
-            pro_id,
-            price_cents,
-            warranty_days,
-            eta_slot,
-            note,
-            status,
-            created_at,
-            updated_at
-          `)
-          .eq('job_id', jobId)
-          .order('created_at', { ascending: false })
-      ]);
+      setSelecting(application.id);
 
-      if (applicationsResponse.error) {
-        console.error('Error fetching applications:', applicationsResponse.error);
-      }
-      
-      if (proposalsResponse.error) {
-        console.error('Error fetching proposals:', proposalsResponse.error);
-      }
-
-      // Combine and normalize data from both sources
-      const allApplications = [
-        ...(applicationsResponse.data || []),
-        ...(proposalsResponse.data || [])
-      ];
-
-      if (!allApplications || allApplications.length === 0) {
-        setApplications([]);
-        return;
-      }
-
-      // Fetch additional data for each professional
-      const enhancedApplications = await Promise.all(
-        allApplications.map(async (app) => {
-          try {
-            // Fetch profiles data (since proposals don't include it)
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('first_name, last_name, full_name, avatar_url')
-              .eq('id', app.pro_id)
-              .maybeSingle();
-
-            // Fetch pro profile
-            const { data: proProfile } = await supabase
-              .from('pro_profiles')
-              .select('*')
-              .eq('user_id', app.pro_id)
-              .maybeSingle();
-
-            // Fetch ratings
-            const { data: ratings } = await supabase
-              .from('ratings')
-              .select('score')
-              .eq('to_user_id', app.pro_id);
-
-            let rating = null;
-            if (ratings && ratings.length > 0) {
-              const avg_score = ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length;
-              rating = { avg_score, rating_count: ratings.length };
-            }
-
-            // Fetch portfolio
-            const { data: portfolioData } = await supabase
-              .from('portfolio_items')
-              .select(`
-                id,
-                title,
-                image_url,
-                portfolio_media (
-                  id,
-                  file_url,
-                  file_type,
-                  display_order,
-                  file_name
-                )
-              `)
-              .eq('pro_id', app.pro_id)
-              .order('created_at', { ascending: false });
-
-            console.log('📸 Portfolio data for pro:', app.pro_id, portfolioData);
-
-            return {
-              ...app,
-              profiles: profileData,
-              proProfile,
-              rating,
-              portfolio: portfolioData || []
-            };
-          } catch (error) {
-            console.error('Error fetching pro data:', error);
-            return app;
-          }
-        })
-      );
-
-      setApplications(enhancedApplications);
-    } catch (error) {
-      console.error('Error in fetchApplications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSelectProfessional = async (proId: string) => {
-    try {
-      setSelecting(proId);
-      
-      const { error } = await supabase
-        .from('jobs')
-        .update({ pro_id: proId, status: 'accepted' })
-        .eq('id', jobId);
+      const { data, error } = await invokeJobApplicationSelect(application.id, jobId);
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      await fetchApplications();
+      onApplicationSelect();
 
       toast({
-        title: 'Специалист выбран',
-        description: 'Специалист был успешно назначен на заказ'
+        title: 'Исполнитель выбран',
+        description: 'Предложение успешно принято, заказ передан исполнителю'
       });
-      
-      onApplicationSelect();
-    } catch (error: any) {
+
+      if (data?.chatId) {
+        navigate(`/messages/${data.chatId}`);
+        return;
+      }
+      navigate(`/messages?user=${application.pro_id}&job=${jobId}`);
+    } catch (error: unknown) {
       console.error('Error selecting professional:', error);
+      const message = error instanceof Error ? error.message : 'Не удалось выбрать исполнителя';
       toast({
         title: 'Ошибка',
-        description: error.message || 'Не удалось выбрать специалиста',
+        description: message,
         variant: 'destructive'
       });
     } finally {
@@ -283,9 +288,9 @@ export function JobApplicationsList({
 
   const handlePortfolioOpen = (application: JobApplication) => {
     console.log('🖼️ Opening portfolio for:', application.pro_id, application);
-    
+
     // Собираем все изображения из портфолио
-    const images: any[] = [];
+    const images: PortfolioImage[] = [];
     application.portfolio?.forEach(item => {
       // Добавляем основное изображение
       if (item.image_url) {
@@ -297,7 +302,7 @@ export function JobApplicationsList({
           isMain: true
         });
       }
-      
+
       // Добавляем дополнительные изображения
       if (item.portfolio_media) {
         item.portfolio_media
@@ -314,7 +319,7 @@ export function JobApplicationsList({
           });
       }
     });
-    
+
     console.log('🎨 All portfolio images:', images);
     setAllPortfolioImages(images);
     setCurrentImageIndex(0);
@@ -331,9 +336,9 @@ export function JobApplicationsList({
       <Card>
         <CardContent className="text-center py-8">
           <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Пока нет откликов</h3>
+          <h3 className="text-lg font-semibold mb-2">Пока нет предложений</h3>
           <p className="text-muted-foreground">
-            Специалисты скоро увидят ваш заказ и начнут откликаться
+            Специалисты увидят ваш заказ и начнут отправлять предложения
           </p>
         </CardContent>
       </Card>
@@ -347,21 +352,21 @@ export function JobApplicationsList({
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-semibold text-foreground">
-            Специалист назначен
+            Исполнитель выбран
           </h3>
         </div>
-        
+
         {/* Assigned Professional Card */}
         <div className="card-surface p-6">
-          <h4 className="text-lg font-semibold mb-4">Ваш специалист</h4>
+          <h4 className="text-lg font-semibold mb-4">Ваш исполнитель</h4>
           {applications.length > 0 && (
             (() => {
               const assignedApp = applications.find(app => app.pro_id === selectedProId);
-              if (!assignedApp) return <div>Загрузка данных специалиста...</div>;
+              if (!assignedApp) return <div>Загрузка данных исполнителя...</div>;
 
-              const profileName = assignedApp.profiles?.full_name || 
-                (assignedApp.profiles?.first_name && assignedApp.profiles?.last_name 
-                  ? `${assignedApp.profiles.first_name} ${assignedApp.profiles.last_name}` 
+              const profileName = assignedApp.profiles?.full_name ||
+                (assignedApp.profiles?.first_name && assignedApp.profiles?.last_name
+                  ? `${assignedApp.profiles.first_name} ${assignedApp.profiles.last_name}`
                   : 'Специалист');
 
               return (
@@ -371,7 +376,7 @@ export function JobApplicationsList({
                     {/* Decorative gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
                   </div>
-                  
+
                   {/* Avatar positioned to overlap sections - with higher z-index */}
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-16 z-10">
                     <motion.div
@@ -380,8 +385,8 @@ export function JobApplicationsList({
                       className="relative"
                     >
                       <Avatar className="w-32 h-32 ring-4 ring-white shadow-xl">
-                        <AvatarImage 
-                          src={assignedApp.profiles?.avatar_url || ''} 
+                        <AvatarImage
+                          src={assignedApp.profiles?.avatar_url || ''}
                           alt={profileName}
                           className="object-cover"
                         />
@@ -389,7 +394,7 @@ export function JobApplicationsList({
                           {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      
+
                       {/* Status indicator */}
                       <motion.div
                         initial={{ scale: 0 }}
@@ -400,7 +405,7 @@ export function JobApplicationsList({
                       </motion.div>
                     </motion.div>
                   </div>
-                  
+
                   {/* Bottom white section */}
                   <div className="relative bg-white px-6 pt-20 pb-8">
                     {/* Name and title */}
@@ -410,15 +415,15 @@ export function JobApplicationsList({
                         СПЕЦИАЛИСТ
                       </p>
                     </div>
-                    
+
                     {/* Rating */}
                     {assignedApp.rating && (
                       <div className="flex justify-center items-center gap-2 mb-6">
                         <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star 
-                              key={star} 
-                              className={`w-5 h-5 ${star <= assignedApp.rating!.avg_score ? 'text-purple-500 fill-purple-500' : 'text-gray-300'}`} 
+                            <Star
+                              key={star}
+                              className={`w-5 h-5 ${star <= assignedApp.rating!.avg_score ? 'text-purple-500 fill-purple-500' : 'text-gray-300'}`}
                             />
                           ))}
                         </div>
@@ -427,27 +432,27 @@ export function JobApplicationsList({
                         </span>
                       </div>
                     )}
-                    
+
                     {/* Price section */}
                     <div className="text-center mb-6">
                       <div className="text-3xl font-bold text-gray-900">
                         {formatPrice(assignedApp.price_cents)}
                       </div>
                       <div className="text-sm text-gray-500">
-                        Цена работы
+                        Предложенная цена
                       </div>
                     </div>
-                    
+
                     {/* Action buttons */}
                     <div className="space-y-3">
-                      <Link 
-                        to={`/messages?job_id=${jobId}&pro_id=${selectedProId}`}
+                      <Link
+                        to={`/messages?user=${selectedProId}&job=${jobId}`}
                         className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
                       >
                         <MessageSquare className="w-4 h-4 mr-2" />
                         Чат
                       </Link>
-                      <Link 
+                      <Link
                         to={`/pro/${selectedProId}`}
                         className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 font-medium py-2 rounded-lg transition-all duration-200 flex items-center justify-center"
                       >
@@ -461,19 +466,19 @@ export function JobApplicationsList({
             })()
           )}
         </div>
-        
+
         {/* Job Status Progress */}
         <div className="card-surface p-6">
-          <JobStatusProgress 
-            status={jobStatus as any}
+          <JobStatusProgress
+            status={normalizeJobProgressStatus(jobStatus)}
             startConfirmed={false}
             endConfirmed={false}
           />
         </div>
-        
+
         {/* Tips for working with professional */}
         <div className="card-surface p-6">
-          <h4 className="text-lg font-semibold mb-4">Советы по работе со специалистом</h4>
+          <h4 className="text-lg font-semibold mb-4">Советы по работе с исполнителем</h4>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
@@ -510,25 +515,25 @@ export function JobApplicationsList({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold text-foreground">
-          Отклики ({applications.length})
+          Предложения ({applications.length})
         </h3>
         {/* Debug info */}
         <div className="text-sm text-muted-foreground">
           Текущая карточка: {currentIndex + 1} / {applications.length}
         </div>
       </div>
-      
+
       {/* Card Deck Container */}
       <div className="relative w-full max-w-lg mx-auto h-[700px] border border-dashed border-muted-foreground/20 rounded-lg overflow-visible">
         <AnimatePresence mode="wait">
           {applications.map((application, index) => {
             const isSelected = selectedProId === application.pro_id;
             const canSelect = jobStatus === 'new' && !selectedProId;
-            
+
             // Формируем имя специалиста
-            const profileName = application.profiles?.full_name || 
-              (application.profiles?.first_name && application.profiles?.last_name 
-                ? `${application.profiles.first_name} ${application.profiles.last_name}` 
+            const profileName = application.profiles?.full_name ||
+              (application.profiles?.first_name && application.profiles?.last_name
+                ? `${application.profiles.first_name} ${application.profiles.last_name}`
                 : 'Специалист');
 
             // Only show current card
@@ -540,8 +545,8 @@ export function JobApplicationsList({
                 initial={{ opacity: 0, x: 100, rotateY: 15 }}
                 animate={{ opacity: 1, x: 0, rotateY: 0 }}
                 exit={{ opacity: 0, x: -100, rotateY: -15 }}
-                transition={{ 
-                  duration: 0.4, 
+                transition={{
+                  duration: 0.4,
                   ease: [0.4, 0, 0.2, 1]
                 }}
                 className="absolute inset-0 perspective-1000"
@@ -553,7 +558,7 @@ export function JobApplicationsList({
                     {/* Decorative gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-white/20" />
                   </div>
-                  
+
                   {/* Avatar positioned to overlap sections - with higher z-index */}
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-16 z-10">
                     <motion.div
@@ -562,8 +567,8 @@ export function JobApplicationsList({
                       className="relative"
                     >
                       <Avatar className="w-32 h-32 ring-4 ring-white shadow-xl">
-                        <AvatarImage 
-                          src={application.profiles?.avatar_url || ''} 
+                        <AvatarImage
+                          src={application.profiles?.avatar_url || ''}
                           alt={profileName}
                           className="object-cover"
                         />
@@ -571,7 +576,7 @@ export function JobApplicationsList({
                           {profileName.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      
+
                       {/* Status indicator */}
                       {isSelected && (
                         <motion.div
@@ -584,18 +589,21 @@ export function JobApplicationsList({
                       )}
                     </motion.div>
                   </div>
-                  
+
                    {/* Bottom white section */}
                    <div className="relative bg-white px-6 pt-20 pb-8">
                     {/* Name and title */}
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
-                      <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
-                        СПЕЦИАЛИСТ
-                      </p>
+                      <div className="flex items-center justify-center gap-2">
+                        <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">
+                          СПЕЦИАЛИСТ
+                        </p>
+                        <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+                          {application.responseLabel}
+                        </Badge>
+                      </div>
                     </div>
-                    
-                    {/* Professional info instead of social icons */}
                     <div className="space-y-4 mb-6">
                       {/* Experience/Bio */}
                       <div className="text-center">
@@ -603,7 +611,7 @@ export function JobApplicationsList({
                           {application.proProfile?.bio || 'Опытный специалист готов выполнить вашу задачу качественно и в срок'}
                         </p>
                       </div>
-                      
+
                       {/* Hourly rate if available */}
                       {application.proProfile?.hourly_rate_cents && (
                         <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
@@ -611,7 +619,7 @@ export function JobApplicationsList({
                           <span>Почасовая ставка: {formatPrice(application.proProfile.hourly_rate_cents)}/час</span>
                         </div>
                       )}
-                      
+
                       {/* Coverage radius */}
                       {application.proProfile?.radius_km && (
                         <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
@@ -619,7 +627,7 @@ export function JobApplicationsList({
                           <span>Радиус работы: {application.proProfile.radius_km} км</span>
                         </div>
                       )}
-                      
+
                       {/* Response time if available */}
                       {application.eta_slot && (
                         <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
@@ -628,7 +636,7 @@ export function JobApplicationsList({
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Price section */}
                     {application.price_cents && (
                       <div className="text-center mb-6">
@@ -636,19 +644,19 @@ export function JobApplicationsList({
                           {formatPrice(application.price_cents)}
                         </div>
                         <div className="text-sm text-gray-500">
-                          Цена работы
+                          Предложенная цена
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Rating */}
                     {application.rating && (
                       <div className="flex justify-center items-center gap-2 mb-6">
                         <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star 
-                              key={star} 
-                              className={`w-5 h-5 ${star <= application.rating!.avg_score ? 'text-purple-500 fill-purple-500' : 'text-gray-300'}`} 
+                            <Star
+                              key={star}
+                              className={`w-5 h-5 ${star <= application.rating!.avg_score ? 'text-purple-500 fill-purple-500' : 'text-gray-300'}`}
                             />
                           ))}
                         </div>
@@ -657,7 +665,7 @@ export function JobApplicationsList({
                         </span>
                       </div>
                     )}
-                    
+
                      {/* Portfolio and Action buttons */}
                      <div className="space-y-3">
                        {/* Portfolio button */}
@@ -669,18 +677,18 @@ export function JobApplicationsList({
                           <Eye className="w-4 h-4 mr-2" />
                           Портфолио
                         </Button>
-                       
+
                        {/* Action button */}
                        {canSelect && (
                          <Button
-                           onClick={() => handleSelectProfessional(application.pro_id)}
-                           disabled={selecting === application.pro_id}
+                           onClick={() => handleSelectProfessional(application)}
+                           disabled={selecting === application.id}
                            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                          >
-                           {selecting === application.pro_id ? 'Выбираем...' : 'Выбрать специалиста'}
+                           {selecting === application.id ? 'Принимаем предложение...' : 'Принять предложение'}
                          </Button>
                        )}
-                       
+
                        {isSelected && (
                          <div className="w-full bg-green-100 text-green-800 font-semibold py-3 rounded-xl text-center">
                            ✓ Выбран
@@ -707,7 +715,7 @@ export function JobApplicationsList({
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          
+
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-muted-foreground">
               {currentIndex + 1} из {applications.length}
@@ -718,15 +726,15 @@ export function JobApplicationsList({
                   key={index}
                   onClick={() => setCurrentIndex(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                    index === currentIndex 
-                      ? 'bg-primary scale-125' 
+                    index === currentIndex
+                      ? 'bg-primary scale-125'
                       : 'bg-muted hover:bg-muted-foreground/30'
                   }`}
                 />
               ))}
             </div>
           </div>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -745,8 +753,8 @@ export function JobApplicationsList({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage 
-                  src={selectedPortfolio?.profiles?.avatar_url || ''} 
+                <AvatarImage
+                  src={selectedPortfolio?.profiles?.avatar_url || ''}
                   alt={selectedPortfolio?.profiles?.full_name || 'Специалист'}
                 />
                 <AvatarFallback>
@@ -761,13 +769,13 @@ export function JobApplicationsList({
               </div>
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="mt-6">
             {allPortfolioImages.length > 0 ? (
               <div className="space-y-6">
                 {/* Main Image Display */}
                 <div className="relative">
-                  <motion.div 
+                  <motion.div
                     key={currentImageIndex}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -781,7 +789,7 @@ export function JobApplicationsList({
                       height={500}
                       className="w-full h-full object-cover"
                     />
-                    
+
                     {/* Image info overlay */}
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
                       <div className="text-white">
@@ -811,7 +819,7 @@ export function JobApplicationsList({
                         >
                           <ChevronLeft className="w-6 h-6" />
                         </Button>
-                        
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -850,8 +858,8 @@ export function JobApplicationsList({
                         key={image.id}
                         onClick={() => setCurrentImageIndex(index)}
                         className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                          index === currentImageIndex 
-                            ? 'border-primary shadow-lg scale-105' 
+                          index === currentImageIndex
+                            ? 'border-primary shadow-lg scale-105'
                             : 'border-transparent hover:border-muted-foreground/50'
                         }`}
                         whileHover={{ scale: index === currentImageIndex ? 1.05 : 1.02 }}
@@ -898,7 +906,7 @@ export function JobApplicationsList({
               </div>
             )}
           </div>
-          
+
           {/* Portfolio stats */}
           {selectedPortfolio && (
             <div className="mt-6 pt-6 border-t border-gray-200">

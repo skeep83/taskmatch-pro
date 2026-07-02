@@ -66,7 +66,7 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
       case 'premium':
         return <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">Премиум</Badge>;
       case 'verified':
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">Проверен</Badge>;
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-200">Профиль</Badge>;
       default:
         return null;
     }
@@ -76,7 +76,7 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 60000);
-    
+
     if (minutes < 60) return `${minutes} мин назад`;
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours} ч назад`;
@@ -94,25 +94,28 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
       {/* Header - Провайдер */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <Avatar 
-            className="h-12 w-12 cursor-pointer" 
+          <Avatar
+            className="h-12 w-12 cursor-pointer"
             onClick={() => onViewProfile?.(response.provider.id)}
           >
             <AvatarImage src={response.provider.avatar} />
             <AvatarFallback>{response.provider.name.charAt(0)}</AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3
                 className="font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:text-primary transition-colors"
                 onClick={() => onViewProfile?.(response.provider.id)}
               >
                 {response.provider.name}
               </h3>
               {getVerificationBadge(response.provider.verificationLevel)}
+              {response.status === 'pending' && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">На рассмотрении</Badge>}
+              {response.status === 'selected' && <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">Выбран</Badge>}
+              {response.status === 'declined' && <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 text-xs">Отклонён</Badge>}
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-1">
                 <Star size={14} className="text-yellow-500 fill-current" />
@@ -146,7 +149,7 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
             <div className="text-xs text-gray-500">Время работы</div>
           </div>
         )}
-        
+
         <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <Shield size={16} className="mx-auto mb-1 text-gray-600 dark:text-gray-400" />
           <div className="text-sm font-medium">{response.warranty} дн</div>
@@ -193,14 +196,14 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
       {/* Действия */}
       <div className="flex gap-2">
         {isOwner && response.status === 'pending' && (
-          <Button 
+          <Button
             onClick={() => onSelect?.(response.id)}
             className="flex-1"
           >
             Выбрать исполнителя
           </Button>
         )}
-        
+
         {response.status === 'selected' && (
           <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200 px-4 py-2">
             Выбран
@@ -213,8 +216,8 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
           </Badge>
         )}
 
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
           onClick={() => onMessage?.(response.provider.id)}
           className="gap-1"

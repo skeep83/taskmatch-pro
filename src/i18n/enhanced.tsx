@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import './config'; // Initialize i18n
+import i18n from './config'; // Initialize i18n
 import { translationDetector, createMonitoredTranslation, runGlobalTranslationChecks } from './detector';
 
 export type SupportedLanguage = 'ru' | 'ro';
@@ -27,23 +27,23 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     const initializeI18n = async () => {
       try {
-        // Динамически импортируем config для инициализации i18n
-        const i18n = (await import('./config')).default;
-        
-        // Ждем полной инициализации
+        // Используем уже импортированный config для инициализации i18n
         if (i18n.isInitialized) {
-          console.log('i18n already initialized, language:', i18n.language);
           setI18nInstance(i18n);
           setCurrentLanguage(i18n.language as SupportedLanguage);
           setIsInitialized(true);
         } else {
-          console.log('waiting for i18n initialization');
+          if (import.meta.env.DEV) {
+            console.log('waiting for i18n initialization');
+          }
           const onInitialized = () => {
-            console.log('i18n initialized, language:', i18n.language);
+            if (import.meta.env.DEV) {
+              console.log('i18n initialized, language:', i18n.language);
+            }
             setI18nInstance(i18n);
             setCurrentLanguage(i18n.language as SupportedLanguage);
             setIsInitialized(true);
-            
+
             // Запускаем глобальные проверки переводов
             if (import.meta.env.DEV) {
               setTimeout(() => runGlobalTranslationChecks(), 1000);
@@ -55,7 +55,9 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         // Listen for language changes
         const onLanguageChanged = (lng: string) => {
-          console.log('Language changed event received:', lng);
+          if (import.meta.env.DEV) {
+            console.log('Language changed event received:', lng);
+          }
           setCurrentLanguage(lng as SupportedLanguage);
         };
         i18n.on('languageChanged', onLanguageChanged);
@@ -69,7 +71,7 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setIsInitialized(true);
       }
     };
-    
+
     initializeI18n();
   }, []);
 
@@ -77,13 +79,13 @@ export const EnhancedI18nProvider: React.FC<{ children: React.ReactNode }> = ({ 
   return <I18nProviderWrapper i18nInstance={i18nInstance} isReady={isInitialized} currentLanguage={currentLanguage}>{children}</I18nProviderWrapper>;
 };
 
-const I18nProviderWrapper: React.FC<{ 
-  i18nInstance: any; 
+const I18nProviderWrapper: React.FC<{
+  i18nInstance: any;
   isReady: boolean;
   currentLanguage: SupportedLanguage;
-  children: React.ReactNode 
+  children: React.ReactNode
 }> = ({ i18nInstance, isReady, currentLanguage, children }) => {
-  
+
   // Create a safe wrapper for translation that doesn't break when i18n isn't ready
   const safeT = (key: string, options?: any) => {
     if (!i18nInstance || !isReady) {
@@ -107,18 +109,18 @@ const I18nProviderWrapper: React.FC<{
         'nav.schedule': 'Расписание',
         'nav.new_order': 'Новый заказ',
         'nav.new_order_description': 'Создайте заказ за 3 минуты',
-        'nav.catalog_specialists': 'Каталог специалистов',
-        'nav.catalog_specialists_description': 'Найти проверенных профессионалов',
+        'nav.catalog_specialists': 'Найти исполнителя',
+        'nav.catalog_specialists_description': 'Каталог исполнителей',
         'nav.job_feed': 'Лента заказов',
-        'nav.job_feed_description': 'Активные предложения работы',
+        'nav.job_feed_description': 'Новые заказы для отклика',
         'nav.tenders': 'Тендеры',
-        'nav.tenders_description': 'Корпоративные конкурсы',
+        'nav.tenders_description': 'Заказы с дедлайном',
         'nav.login_account': 'Войти в аккаунт',
-        'catalog.description': 'Поиск специалистов по категориям'
+        'catalog.description': 'Поиск исполнителей по категориям'
       };
-      
+
       const result = basicTranslations[key] || key;
-      
+
       // Логируем использование fallback переводов
       if (import.meta.env.DEV && basicTranslations[key]) {
         translationDetector.logIssue({
@@ -127,13 +129,13 @@ const I18nProviderWrapper: React.FC<{
           context: 'Using basic translation - i18n not ready'
         });
       }
-      
+
       return result;
     }
-    
+
     try {
       const result = i18nInstance.t(key, options);
-      
+
       // Создаем мониторируемую версию перевода
       const monitoredT = createMonitoredTranslation((k, opts) => i18nInstance.t(k, opts));
       return monitoredT(key, options);
@@ -144,16 +146,22 @@ const I18nProviderWrapper: React.FC<{
   };
 
   const handleChangeLanguage = async (lng: SupportedLanguage) => {
-    console.log('Changing language to:', lng);
+    if (import.meta.env.DEV) {
+      console.log('Changing language to:', lng);
+    }
     if (i18nInstance) {
       try {
         await i18nInstance.changeLanguage(lng);
-        console.log('Language changed successfully to:', lng);
+        if (import.meta.env.DEV) {
+          console.log('Language changed successfully to:', lng);
+        }
       } catch (error) {
         console.error('Failed to change language:', error);
       }
     } else {
-      console.warn('i18n instance not available, cannot change language');
+      if (import.meta.env.DEV) {
+        console.warn('i18n instance not available, cannot change language');
+      }
     }
   };
 
@@ -190,10 +198,10 @@ const I18nProviderWrapper: React.FC<{
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     const now = new Date();
     const diffInHours = (now.getTime() - dateObj.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
-      return (i18nInstance?.language === 'ro') 
+      return (i18nInstance?.language === 'ro')
         ? `acum ${diffInMinutes} ${diffInMinutes === 1 ? 'minut' : 'minute'}`
         : `${diffInMinutes} ${diffInMinutes === 1 ? 'минуту' : diffInMinutes < 5 ? 'минуты' : 'минут'} назад`;
     } else if (diffInHours < 24) {

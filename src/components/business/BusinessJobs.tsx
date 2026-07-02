@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -36,11 +36,7 @@ export function BusinessJobs() {
   const [jobs, setJobs] = useState<BusinessJob[]>([]);
   const [businessId, setBusinessId] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadBusinessJobs();
-  }, []);
-
-  const loadBusinessJobs = async () => {
+  const loadBusinessJobs = useCallback(async () => {
     setLoading(true);
     try {
       const { data: session } = await supabase.auth.getSession();
@@ -92,7 +88,54 @@ export function BusinessJobs() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    void loadBusinessJobs();
+  }, [loadBusinessJobs]);
+
+  useEffect(() => {
+    if (!businessId) return;
+
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        void loadBusinessJobs();
+      }
+    };
+
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+
+    const businessJobsChannel = supabase
+      .channel(`business-jobs-${businessId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'business_jobs',
+        filter: `business_id=eq.${businessId}`,
+      }, () => {
+        void loadBusinessJobs();
+      })
+      .subscribe();
+
+    const jobsChannel = supabase
+      .channel(`business-linked-jobs-${businessId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'jobs',
+      }, () => {
+        void loadBusinessJobs();
+      })
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      void supabase.removeChannel(businessJobsChannel);
+      void supabase.removeChannel(jobsChannel);
+    };
+  }, [businessId, loadBusinessJobs]);
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
@@ -102,7 +145,7 @@ export function BusinessJobs() {
       'done': { label: 'Выполнен', variant: 'default' as const },
       'cancelled': { label: 'Отменен', variant: 'destructive' as const }
     };
-    
+
     const getStatusIcon = (status: string) => {
       switch (status) {
         case 'new': return <AlertCircle className="h-3 w-3 flex-shrink-0" />;
@@ -113,7 +156,7 @@ export function BusinessJobs() {
         default: return <Clock className="h-3 w-3 flex-shrink-0" />;
       }
     };
-    
+
     const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const };
     return (
       <Badge variant={statusInfo.variant} className="flex items-center gap-1">
@@ -155,7 +198,7 @@ export function BusinessJobs() {
           Создать заказ
         </button>
       </div>
-      
+
       {jobs.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
@@ -182,14 +225,14 @@ export function BusinessJobs() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-black text-lg mb-2">{job.title}</h3>
                       <p className="text-gray-600 text-sm line-clamp-2 mb-3">{job.description}</p>
-                      
+
                       {job.location_address && (
                         <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                           <MapPin className="h-4 w-4" />
                           {job.location_address}
                         </div>
                       )}
-                      
+
                       <div className="flex items-center gap-4">
                         <div className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-lg px-3 py-1 text-sm text-black">
                           {job.categories?.label_ru || "Не указано"}
@@ -197,7 +240,7 @@ export function BusinessJobs() {
                         {getStatusBadge(job.status)}
                       </div>
                     </div>
-                    
+
                     <div className="text-right">
                       <div className="flex items-center gap-1 text-black font-semibold mb-2">
                         <DollarSign className="h-4 w-4" />
@@ -209,7 +252,7 @@ export function BusinessJobs() {
                       </div>
                       <div className="flex items-center gap-1 text-sm text-gray-500">
                         <Calendar className="h-3 w-3" />
-                        {job.scheduled_at ? 
+                        {job.scheduled_at ?
                           new Date(job.scheduled_at).toLocaleDateString() :
                           new Date(job.created_at).toLocaleDateString()
                         }

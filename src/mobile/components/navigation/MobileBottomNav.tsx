@@ -1,55 +1,103 @@
 import { default as React, useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Search, MessageCircle, User, Briefcase, Plus } from 'lucide-react';
+import { Home, Search, MessageCircle, User, Plus, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobile } from '@/mobile/providers/MobileProvider';
 import { motion } from 'framer-motion';
+import { supabase } from "@/integrations/supabase/client";
 
 interface NavItem {
-  icon: React.ComponentType<any>;
+  icon: LucideIcon;
   label: string;
   path: string;
   color?: string;
+  matchPrefix?: boolean;
 }
 
-const navItems: NavItem[] = [
-  { icon: Home, label: 'Главная', path: '/' },
-  { icon: Search, label: 'Поиск', path: '/catalog' },
-  { icon: Plus, label: 'Создать', path: '/job/new', color: 'text-primary' },
-  { icon: MessageCircle, label: 'Сообщения', path: '/messages' },
-  { icon: User, label: 'Профиль', path: '/dashboard/client' },
+// Базовые пункты меню без профиля (профиль будет динамическим)
+const baseNavItems: Omit<NavItem, 'path'>[] = [
+  { icon: Home, label: 'Главная', matchPrefix: false },
+  { icon: Search, label: 'Поиск', matchPrefix: false },
+  { icon: Plus, label: 'Создать', color: 'text-primary', matchPrefix: true },
+  { icon: MessageCircle, label: 'Сообщения', matchPrefix: true },
 ];
 
 export function MobileBottomNav() {
   const location = useLocation();
-  const { bottomNavHeight, safeAreaInsets, isKeyboardOpen } = useMobile();
+  const { isKeyboardOpen } = useMobile();
   const [unreadCount, setUnreadCount] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+
+  // Загружаем роли пользователя
+  useEffect(() => {
+    const loadRoles = async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        const uid = session.session?.user?.id;
+        if (!uid) {
+          setUserRoles([]);
+          return;
+        }
+        setUserId(uid);
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', uid);
+        setUserRoles(roles?.map(r => r.role) || []);
+      } catch (error) {
+        console.error('Error loading user roles:', error);
+        setUserRoles([]);
+      }
+    };
+    loadRoles();
+  }, []);
+
+  // Определяем путь для профиля в зависимости от ролей
+  const getDashboardPath = (): string => {
+    if (userRoles.includes('pro')) return '/dashboard/pro';
+    if (userRoles.includes('business')) return '/dashboard/business';
+    // Если ролей нет или только client, то /dashboard/client
+    return '/dashboard/client';
+  };
+
+  const profilePath = getDashboardPath();
+
+  // Собираем полный список навигационных пунктов с динамическим профилем
+  const navItems: NavItem[] = [
+    ...baseNavItems.map(item => ({
+      ...item,
+      path: item.label === 'Главная' ? '/' :
+            item.label === 'Поиск' ? '/catalog' :
+            item.label === 'Создать' ? '/job/new' :
+            item.label === 'Сообщения' ? '/messages' : '/'
+    })),
+    { icon: User, label: 'Профиль', path: profilePath, matchPrefix: true }
+  ];
 
   // Загружаем количество непрочитанных сообщений
   useEffect(() => {
     const loadUnreadCount = async () => {
       try {
-        const { supabase } = await import('@/integrations/supabase/client');
         const { data: session } = await supabase.auth.getSession();
         const uid = session.session?.user?.id;
-        
+
         if (!uid) {
           setUnreadCount(0);
           return;
         }
-        
+
         setUserId(uid);
-        
+
         // Получаем количество непрочитанных сообщений
         const { data: unreadMessages } = await supabase
           .from('chat_messages')
           .select('id, chat_id')
           .eq('is_read', false)
           .neq('sender_id', uid);
-        
+
         setUnreadCount(unreadMessages?.length || 0);
-        
+
         // Подписываемся на новые сообщения
         const channel = supabase
           .channel('unread-messages-counter')
@@ -60,8 +108,7 @@ export function MobileBottomNav() {
               schema: 'public',
               table: 'chat_messages'
             },
-            (payload: any) => {
-              // Увеличиваем счетчик если сообщение не от нас
+            (payload) => {
               if (payload.new.sender_id !== uid) {
                 setUnreadCount(prev => prev + 1);
               }
@@ -74,21 +121,20 @@ export function MobileBottomNav() {
               schema: 'public',
               table: 'chat_messages'
             },
-            (payload: any) => {
-              // Уменьшаем счетчик если сообщение прочитано
+            (payload) => {
               if (payload.new.is_read && !payload.old.is_read && payload.new.sender_id !== uid) {
                 setUnreadCount(prev => Math.max(0, prev - 1));
               }
             }
           )
           .subscribe();
-        
+
         return () => supabase.removeChannel(channel);
       } catch (error) {
         console.error('Error loading unread count:', error);
       }
     };
-    
+
     loadUnreadCount();
   }, []);
 
@@ -97,21 +143,18 @@ export function MobileBottomNav() {
     if (location.pathname.startsWith('/messages') && userId) {
       const markMessagesAsRead = async () => {
         try {
-          const { supabase } = await import('@/integrations/supabase/client');
-          
-          // Помечаем все сообщения как прочитанные
           await supabase
             .from('chat_messages')
             .update({ is_read: true })
             .eq('is_read', false)
             .neq('sender_id', userId);
-          
+
           setUnreadCount(0);
         } catch (error) {
           console.error('Error marking messages as read:', error);
         }
       };
-      
+
       markMessagesAsRead();
     }
   }, [location.pathname, userId]);
@@ -129,17 +172,33 @@ export function MobileBottomNav() {
         "fixed bottom-0 left-0 right-0 z-50",
         "bg-[#E5E7EB]"
       )}
-      style={{ 
-        paddingBottom: `env(safe-area-inset-bottom)`
+      style={{
+        paddingBottom: `env(safe-area-inset-bottom)`,
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)',
+        willChange: 'transform'
       }}
     >
-      {/* Компактное neumorphic меню */}
       <div className="px-2 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
         <nav className="flex items-center justify-around h-14">
           {navItems.map((item, index) => {
-            const isActive = location.pathname === item.path;
+            // Определяем активность: для точных совпадений или по префиксу
+            let isActive = false;
+            if (item.label === 'Главная') {
+              isActive = location.pathname === '/';
+            } else if (item.label === 'Поиск') {
+              isActive = location.pathname === '/catalog';
+            } else if (item.matchPrefix) {
+              isActive = location.pathname.startsWith(item.path);
+            } else {
+              isActive = location.pathname === item.path;
+            }
+            // Для профиля используем startsWith, так как могут быть вложенные
+            if (item.label === 'Профиль') {
+              isActive = location.pathname.startsWith('/dashboard');
+            }
             const Icon = item.icon;
-            
+
             return (
               <NavLink
                 key={item.path}
@@ -152,7 +211,6 @@ export function MobileBottomNav() {
                   isActive && "shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800"
                 )}
               >
-                {/* Active indicator */}
                 {isActive && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -161,8 +219,7 @@ export function MobileBottomNav() {
                     style={{ backgroundColor: "#22D3EE" }}
                   />
                 )}
-                
-                {/* Special styling for create button */}
+
                 {item.label === 'Создать' ? (
                   <motion.div
                     whileTap={{ scale: 0.9 }}
@@ -180,9 +237,9 @@ export function MobileBottomNav() {
                     whileTap={{ scale: 0.9 }}
                     className="flex flex-col items-center justify-center relative z-10"
                   >
-                    <Icon 
-                      size={18} 
-                      className="mb-1 transition-all duration-300" 
+                    <Icon
+                      size={18}
+                      className="mb-1 transition-all duration-300"
                     />
                   </motion.div>
                 )}
@@ -194,7 +251,6 @@ export function MobileBottomNav() {
                   {item.label}
                 </span>
 
-                {/* Notification badge for unread messages */}
                 {item.label === 'Сообщения' && unreadCount > 0 && (
                   <motion.div
                     initial={{ scale: 0 }}

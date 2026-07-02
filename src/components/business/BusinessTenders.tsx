@@ -32,7 +32,7 @@ export const BusinessTenders = () => {
   const loadBusinessTenders = async () => {
     try {
       setLoading(true);
-      
+
       // Get current user session
       const { data: session } = await supabase.auth.getSession();
       if (!session.session?.user) {
@@ -79,7 +79,7 @@ export const BusinessTenders = () => {
             .from('bids')
             .select('*', { count: 'exact', head: true })
             .eq('tender_id', tender.id);
-          
+
           return {
             ...tender,
             bid_count: count || 0
@@ -90,10 +90,10 @@ export const BusinessTenders = () => {
       setTenders(tendersWithBids);
     } catch (error: any) {
       console.error('Error loading tenders:', error);
-      toast({ 
-        title: 'Ошибка', 
-        description: 'Не удалось загрузить тендеры', 
-        variant: 'destructive' 
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось загрузить тендеры',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -166,7 +166,7 @@ export const BusinessTenders = () => {
           </div>
           <h3 className="text-xl font-semibold text-black mb-2">Нет тендеров</h3>
           <p className="text-gray-600 mb-6">
-            У вас пока нет созданных тендеров. Создайте первый тендер для получения предложений от специалистов.
+            У вас пока нет созданных тендеров. Создайте первый тендер для получения откликов исполнителей.
           </p>
           <button
             onClick={() => navigate('/tenders/new')}
@@ -186,21 +186,21 @@ export const BusinessTenders = () => {
                   <div className="flex-1">
                     <h4 className="font-semibold text-black text-lg mb-2">{tender.title}</h4>
                     <p className="text-gray-600 text-sm line-clamp-2 mb-3">{tender.description}</p>
-                    
+
                     <div className="flex items-center gap-4 mb-3">
                       {getStatusBadge(tender.status)}
                       <div className="flex items-center gap-1 text-sm text-gray-500">
                         <Users className="h-4 w-4" />
-                        {tender.bid_count} заявок
+                        {tender.bid_count} откликов
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span>Срок подачи: {formatDate(tender.deadline)}</span>
                       <span>Создан: {formatDate(tender.created_at)}</span>
                     </div>
                   </div>
-                  
+
                   <div className="text-right ml-6">
                     <div className="flex items-center gap-1 text-black font-semibold mb-3">
                       <DollarSign className="h-4 w-4" />

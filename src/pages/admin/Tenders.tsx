@@ -46,6 +46,15 @@ export default function AdminTenders() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
+  const isPreviewOnly = true;
+
+  const showPreviewOnlyToast = (actionLabel: string) => {
+    toast({
+      title: "Режим предпросмотра",
+      description: `${actionLabel} временно недоступно: раздел тендеров пока работает на mock-данных и не подключён к боевому backend.`,
+      variant: "destructive"
+    });
+  };
 
   const fetchTenders = async () => {
     try {
@@ -56,10 +65,10 @@ export default function AdminTenders() {
         search: searchTerm || undefined,
         status: statusFilter !== "all" ? statusFilter : undefined,
       };
-      
+
       // Note: This would be a real API call in production
       // const data = await adminApi.getTenders(params);
-      
+
       // Mock data for now
       const mockTenders: Tender[] = [
         {
@@ -74,7 +83,7 @@ export default function AdminTenders() {
           category: "Сантехника"
         },
         {
-          id: "2", 
+          id: "2",
           title: "Электромонтажные работы",
           client_name: "Стройком ЛТД",
           status: "completed",
@@ -87,7 +96,7 @@ export default function AdminTenders() {
           winner_name: "Иванов И.И."
         }
       ];
-      
+
       setTenders(mockTenders);
       setTotalPages(1);
     } catch (error) {
@@ -131,7 +140,7 @@ export default function AdminTenders() {
     } catch (error) {
       console.error("Failed to fetch bids:", error);
       toast({
-        title: "Ошибка", 
+        title: "Ошибка",
         description: "Не удалось загрузить заявки",
         variant: "destructive"
       });
@@ -139,6 +148,11 @@ export default function AdminTenders() {
   };
 
   const selectWinner = async (tenderId: string, bidId: string) => {
+    if (isPreviewOnly) {
+      showPreviewOnlyToast("Выбор победителя тендера");
+      return;
+    }
+
     try {
       // await adminApi.selectTenderWinner(tenderId, bidId);
       toast({
@@ -156,6 +170,11 @@ export default function AdminTenders() {
   };
 
   const cancelTender = async (tenderId: string) => {
+    if (isPreviewOnly) {
+      showPreviewOnlyToast("Отмена тендера");
+      return;
+    }
+
     try {
       // await adminApi.cancelTender(tenderId);
       toast({
@@ -199,7 +218,7 @@ export default function AdminTenders() {
   if (loading) {
     return (
       <section className="max-w-6xl mx-auto card-surface">
-        <Seo title="ServiceHub — Admin Tenders" description="Управление тендерами" canonical="/admin/tenders" />
+        <Seo title="ServiceHub — Тендеры" description="Управление тендерами" canonical="/admin/tenders" />
         <div className="flex items-center justify-center py-12">
           <Activity className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -209,14 +228,31 @@ export default function AdminTenders() {
 
   return (
     <section className="max-w-6xl mx-auto space-y-6">
-      <Seo title="ServiceHub — Admin Tenders" description="Управление тендерами" canonical="/admin/tenders" />
-      
-      <div className="flex items-center justify-between">
+      <Seo title="ServiceHub — Тендеры" description="Управление тендерами" canonical="/admin/tenders" />
+
+      <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Управление тендерами</h1>
           <p className="text-sm text-muted-foreground">Мониторинг и управление тендерными процедурами</p>
         </div>
       </div>
+
+      {isPreviewOnly && (
+        <Card className="border-amber-300 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3 text-amber-900">
+              <AlertCircle className="w-5 h-5 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-medium">Preview-only раздел</p>
+                <p className="text-sm">
+                  Тендеры в этой админ-странице сейчас показываются из mock-данных. Просмотр структуры доступен,
+                  но выбор победителя и отмена тендера намеренно отключены до подключения боевого backend.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -279,7 +315,7 @@ export default function AdminTenders() {
           <CardTitle>Фильтры и поиск</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -316,8 +352,9 @@ export default function AdminTenders() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
               <TableRow>
                 <TableHead>Тендер</TableHead>
                 <TableHead>Клиент</TableHead>
@@ -366,8 +403,8 @@ export default function AdminTenders() {
                     <div className="flex items-center gap-2">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => {
                               setSelectedTender(tender);
@@ -384,7 +421,7 @@ export default function AdminTenders() {
                               Заявки участников тендера
                             </DialogDescription>
                           </DialogHeader>
-                          
+
                           {selectedTender && (
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -415,9 +452,10 @@ export default function AdminTenders() {
 
                               <div>
                                 <h4 className="font-medium mb-3">Заявки участников</h4>
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
+                                <div className="overflow-x-auto">
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
                                       <TableHead>Специалист</TableHead>
                                       <TableHead>Цена</TableHead>
                                       <TableHead>Гарантия</TableHead>
@@ -454,6 +492,7 @@ export default function AdminTenders() {
                                           {selectedTender?.status === "active" && !selectedTender.winner_id && (
                                             <Button
                                               size="sm"
+                                              disabled={isPreviewOnly}
                                               onClick={() => selectWinner(selectedTender.id, bid.id)}
                                             >
                                               <Award className="w-4 h-4 mr-1" />
@@ -464,7 +503,8 @@ export default function AdminTenders() {
                                       </TableRow>
                                     ))}
                                   </TableBody>
-                                </Table>
+                                  </Table>
+                                </div>
                               </div>
                             </div>
                           )}
@@ -475,6 +515,7 @@ export default function AdminTenders() {
                         <Button
                           variant="outline"
                           size="sm"
+                          disabled={isPreviewOnly}
                           onClick={() => cancelTender(tender.id)}
                         >
                           <AlertCircle className="w-4 h-4" />
@@ -485,7 +526,8 @@ export default function AdminTenders() {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </section>

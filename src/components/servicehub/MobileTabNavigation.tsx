@@ -22,7 +22,7 @@ export const MobileTabNavigation: React.FC = () => {
     { icon: Search, label: 'Поиск', path: '/jobs/search' },
     { icon: PlusCircle, label: 'Создать', path: '/job/new' },
     { icon: MessageCircle, label: 'Чат', path: '/messages', badge: 3 },
-    { icon: Star, label: 'Зал славы', path: '/hall-of-fame' },
+    { icon: Star, label: 'Отзывы', path: '/hall-of-fame' },
     { icon: User, label: 'Профиль', path: '/profile' }
   ];
 
@@ -31,9 +31,9 @@ export const MobileTabNavigation: React.FC = () => {
       <div className="safe-area-inset-bottom">
         <nav className="flex items-center justify-around py-2 px-1">
           {tabs.map((tab) => {
-            const isActive = location.pathname === tab.path || 
+            const isActive = location.pathname === tab.path ||
               (tab.path !== '/' && location.pathname.startsWith(tab.path));
-            
+
             return (
               <Link
                 key={tab.path}
@@ -41,14 +41,14 @@ export const MobileTabNavigation: React.FC = () => {
                 className={cn(
                   "flex flex-col items-center justify-center px-3 py-2 min-w-[60px] rounded-xl transition-all duration-200",
                   "touch-manipulation active:scale-95",
-                  isActive 
-                    ? "bg-primary/10 text-primary" 
+                  isActive
+                    ? "bg-primary/10 text-primary"
                     : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 )}
               >
                 <div className="relative">
-                  <tab.icon 
-                    size={24} 
+                  <tab.icon
+                    size={24}
                     className={cn(
                       "transition-transform duration-200",
                       isActive && "scale-110"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Seo } from "@/components/Seo";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -10,15 +10,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { motion } from "framer-motion";
-import { 
-  MapPin, 
-  Clock, 
-  Euro, 
-  Filter, 
-  Search, 
-  Video, 
-  Star, 
-  Shield, 
+import { supabase } from "@/integrations/supabase/client";
+import {
+  MapPin,
+  Clock,
+  Euro,
+  Filter,
+  Search,
+  Video,
+  Star,
+  Shield,
   Zap,
   Briefcase,
   User,
@@ -30,125 +31,200 @@ import {
   PlayCircle
 } from "lucide-react";
 
+interface Category {
+  id: string;
+  key: string;
+  label_ru?: string | null;
+}
+
+interface Job {
+  id: string;
+  title?: string | null;
+  description?: string | null;
+  status: string;
+  created_at: string;
+  scheduled_at?: string | null;
+  location_address?: string | null;
+  urgency?: string | null;
+  client_id: string;
+  category_id: string;
+  budget_min_cents?: number | null;
+  budget_max_cents?: number | null;
+  category?: Category;
+}
+
 export default function Feed() {
-  const { t } = useEnhancedI18n();
+
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
   const navigate = useNavigate();
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState("client");
   const [activeTab, setActiveTab] = useState("all");
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id;
-      
-      // Load user role
+      let nextUserRole = userRole;
+
       if (uid) {
-        const { data: roles } = await (supabase as any).from("user_roles").select("role").eq("user_id", uid);
-        if (roles?.[0]?.role === "pro") setUserRole("pro");
-        else if (roles?.[0]?.role === "business") setUserRole("business");
+        const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+        if (roles?.some((role) => role.role === "pro")) nextUserRole = "pro";
+        else if (roles?.some((role) => role.role === "business")) nextUserRole = "business";
+        else nextUserRole = "client";
+        setUserRole(nextUserRole);
       }
-      
-      // Load available jobs first
-      let query = (supabase as any)
+
+      let query = supabase
         .from("jobs")
         .select("*")
         .eq("status", "new")
         .order("created_at", { ascending: false })
         .limit(20);
-        
+
+      if (uid) {
+        query = query.neq("client_id", uid);
+      }
+
       if (selectedCategory) query = query.eq("category_id", selectedCategory);
-      
+
       const { data: jobsData, error: jobsError } = await query;
       if (jobsError) throw jobsError;
-      
-      // Load categories separately
-      const { data: categoriesData, error: categoriesError } = await (supabase as any)
+
+      const { data: categoriesData, error: categoriesError } = await supabase
         .from("categories")
         .select("*")
         .order("label_ru");
-      
+
       if (categoriesError) {
         console.warn("Categories loading error:", categoriesError);
       }
-      
-      // Merge category info with jobs
-      const jobsWithCategories = (jobsData || []).map((job: any) => {
-        const category = (categoriesData || []).find((cat: any) => cat.id === job.category_id);
+
+      let respondedJobIds = new Set<string>();
+
+      if (uid && nextUserRole === "pro") {
+        const [{ data: applications }, { data: proposals }] = await Promise.all([
+          supabase.from("job_applications").select("job_id").eq("pro_id", uid),
+          supabase.from("job_price_proposals").select("job_id").eq("pro_id", uid),
+        ]);
+
+        respondedJobIds = new Set([
+          ...(applications || []).map((item) => item.job_id),
+          ...(proposals || []).map((item) => item.job_id),
+        ]);
+      }
+
+      const jobsWithCategories = (jobsData || []).map((job) => {
+        const category = (categoriesData || []).find((cat) => cat.id === job.category_id);
         return {
           ...job,
-          category: category
+          category,
         };
       });
-      
-      setJobs(jobsWithCategories);
+
+      const visibleJobs = jobsWithCategories.filter((job) => {
+        if (nextUserRole !== "pro") return true;
+        return !respondedJobIds.has(job.id);
+      });
+
+      setJobs(visibleJobs);
       setCategories(categoriesData || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      toast({ title: "Ошибка загрузки", variant: "destructive" });
+      toast({
+        title: "Ошибка загрузки",
+        description: error instanceof Error ? error.message : undefined,
+        variant: "destructive"
+      });
     }
-  };
+  }, [selectedCategory, toast, userRole]);
 
-  useEffect(() => { loadJobs(); }, [selectedCategory]);
+  useEffect(() => { void loadJobs(); }, [loadJobs]);
 
-  const acceptJob = async (jobId: string) => {
-    try {
-      setLoading(true);
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data: s } = await supabase.auth.getSession();
-      const uid = s.session?.user?.id;
-      if (!uid) { navigate("/auth"); return; }
-      
-      const { error } = await (supabase as any)
-        .from("jobs")
-        .update({ pro_id: uid, status: "accepted" })
-        .eq("id", jobId);
-        
-      if (error) throw error;
-      toast({ title: "Заказ принят" });
-      loadJobs();
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: "Ошибка", description: e?.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        void loadJobs();
+      }
+    };
 
-  const filteredJobs = jobs.filter(job => 
-    searchQuery === "" || 
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+
+    const jobsChannel = supabase
+      .channel('desktop-feed-jobs')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'jobs',
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    const applicationsChannel = supabase
+      .channel('desktop-feed-applications')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'job_applications',
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    const proposalsChannel = supabase
+      .channel('desktop-feed-proposals')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'job_price_proposals',
+      }, () => {
+        void loadJobs();
+      })
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      void supabase.removeChannel(jobsChannel);
+      void supabase.removeChannel(applicationsChannel);
+      void supabase.removeChannel(proposalsChannel);
+    };
+  }, [loadJobs]);
+
+  const filteredJobs = jobs.filter(job =>
+    searchQuery === "" ||
     job.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     job.category?.label_ru?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <main className="min-h-screen">
-      <Seo title="ServiceHub — Лента заказов" description="Доступные заказы для специалистов" canonical="/feed" />
-      
+      <Seo title="ServiceHub — Лента заказов" description="Заказы для отправки предложений на ServiceHub" canonical="/feed" />
+
       {/* Header Section */}
       <section className="container mx-auto py-24 px-6">
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-            {userRole === "pro" ? "Лента заказов" : "Доступные заказы"}
+            {userRole === "pro" ? "Заказы для предложений" : "Лента заказов"}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {userRole === "pro" ? "Найдите подходящие заказы и начните зарабатывать" : "Просматривайте доступные услуги"}
+            {userRole === "pro" ? "Показываем только новые заказы, по которым вы ещё не откликались" : "Смотрите новые заказы на платформе"}
           </p>
           <div className="flex flex-wrap gap-4 justify-center mt-8">
             <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               <AnimatedIcon icon={Zap} className="text-primary" />
-              <span className="text-sm font-medium">Мгновенные выплаты</span>
+              <span className="text-sm font-medium">Новые заказы</span>
             </div>
             <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               <AnimatedIcon icon={Shield} className="text-green-500" />
-              <span className="text-sm font-medium">Защита эскроу</span>
+              <span className="text-sm font-medium">Отклики и сообщения</span>
             </div>
           </div>
         </div>
@@ -259,7 +335,7 @@ export default function Feed() {
                       </div>
                       <CardTitle className="text-lg line-clamp-2">{job.description}</CardTitle>
                     </CardHeader>
-                    
+
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         {job.budget_min_cents && (
@@ -289,14 +365,13 @@ export default function Feed() {
                       {userRole === "pro" && (
                         <div className="flex gap-2 pt-4 border-t">
                           <Button
-                            onClick={() => acceptJob(job.id)}
-                            disabled={loading}
+                            onClick={() => navigate(`/job/${job.id}/respond`)}
                             className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black border-none flex-1"
                           >
-                            {loading ? "Загрузка..." : "Принять заказ"}
+                            Отправить предложение
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="icon"
                             className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black border-none"
                           >
@@ -304,7 +379,7 @@ export default function Feed() {
                           </Button>
                         </div>
                       )}
-                      
+
                       <div className="text-xs text-muted-foreground pt-3 border-t">
                         Создан {new Date(job.created_at).toLocaleString()}
                       </div>

@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useSoundSettings } from '@/hooks/useSoundSettings';
 import { notificationSounds } from '@/utils/notificationSounds';
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,7 +52,7 @@ function MobileMessages() {
   const { bottomNavHeight, safeAreaInsets } = useMobile();
   const { toast } = useToast();
   const { shouldPlaySound, settings } = useSoundSettings();
-  
+
   const [userId, setUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -95,27 +96,26 @@ function MobileMessages() {
 
   const loadChats = async () => {
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
       const { data: session } = await supabase.auth.getSession();
       const uid = session.session?.user?.id;
-      
+
       if (!uid) {
         toast({ title: 'Требуется авторизация', variant: 'destructive' });
         navigate('/auth');
         return;
       }
-      
+
       setUserId(uid);
-      
+
       const { data: chatsData } = await supabase
         .from('chats')
         .select('id, job_id, client_id, professional_id, last_message_at, created_at')
         .or(`client_id.eq.${uid},professional_id.eq.${uid}`)
         .order('last_message_at', { ascending: false })
         .limit(50);
-      
-      setChats(chatsData || []);
-      
+
+      setChats((chatsData || []).filter(chat => chat.client_id !== chat.professional_id));
+
       // Load profiles
       if (chatsData && chatsData.length > 0) {
         const userIds = new Set<string>([uid]);
@@ -123,12 +123,12 @@ function MobileMessages() {
           if (chat.client_id !== uid) userIds.add(chat.client_id);
           if (chat.professional_id !== uid) userIds.add(chat.professional_id);
         });
-        
+
         const { data: profilesData } = await supabase
           .from('profiles')
           .select('id, full_name, first_name, last_name, avatar_url')
           .in('id', Array.from(userIds));
-        
+
         const profilesMap: Record<string, Profile> = {};
         (profilesData || []).forEach((profile: Profile) => {
           profilesMap[profile.id] = profile;
@@ -136,23 +136,22 @@ function MobileMessages() {
         setProfiles(profilesMap);
       }
     } catch (error) {
-      console.error('Error loading chats:', error);
+      ;
       toast({ title: 'Ошибка загрузки чатов', variant: 'destructive' });
     }
   };
 
   const loadMessages = async () => {
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
       const { data } = await supabase
         .from('chat_messages')
         .select('id, sender_id, content, created_at, is_read')
         .eq('chat_id', id)
         .order('created_at', { ascending: true })
         .limit(500);
-      
+
       setMessages(data || []);
-      
+
       // Помечаем сообщения как прочитанные если они не наши
       if (userId && data) {
         const unreadMessages = data.filter(msg => !msg.is_read && msg.sender_id !== userId);
@@ -163,14 +162,14 @@ function MobileMessages() {
             .in('id', unreadMessages.map(msg => msg.id));
         }
       }
-      
+
       // Setup realtime subscription
       const channel = supabase.channel('schema-db-changes')
-        .on('postgres_changes', { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'chat_messages', 
-          filter: `chat_id=eq.${id}` 
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `chat_id=eq.${id}`
         }, (payload: any) => {
           // Проверяем, есть ли уже это сообщение в списке (предотвращение дублирования)
           setMessages(prev => {
@@ -178,27 +177,26 @@ function MobileMessages() {
             if (exists) return prev;
             return [...prev, payload.new];
           });
-          
+
           // Воспроизводим звук получения сообщения если это не наше сообщение
           if (payload.new.sender_id !== userId && shouldPlaySound('message')) {
             notificationSounds.playNotification('message');
           }
         })
         .subscribe();
-      
+
       return () => supabase.removeChannel(channel);
     } catch (error) {
-      console.error('Error loading messages:', error);
+      ;
     }
   };
 
   const setupPresence = async () => {
     if (!id || !userId) return;
-    
+
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      const room = supabase.channel(`presence:chat:${id}`, { 
-        config: { presence: { key: userId } } 
+      const room = supabase.channel(`presence:chat:${id}`, {
+        config: { presence: { key: userId } }
       });
       roomRef.current = room;
 
@@ -219,11 +217,11 @@ function MobileMessages() {
         .on('presence', { event: 'leave' }, updateState)
         .subscribe(async (status: string) => {
           if (status === 'SUBSCRIBED') {
-            await room.track({ 
-              user_id: userId, 
-              chat_id: id, 
-              online_at: new Date().toISOString(), 
-              typing: false 
+            await room.track({
+              user_id: userId,
+              chat_id: id,
+              online_at: new Date().toISOString(),
+              typing: false
             });
           }
         });
@@ -236,11 +234,11 @@ function MobileMessages() {
   const updateTypingStatus = async (typing: boolean) => {
     if (roomRef.current && userId) {
       try {
-        await roomRef.current.track({ 
-          user_id: userId, 
-          chat_id: id, 
-          online_at: new Date().toISOString(), 
-          typing 
+        await roomRef.current.track({
+          user_id: userId,
+          chat_id: id,
+          online_at: new Date().toISOString(),
+          typing
         });
       } catch (error) {
         console.error('Error updating typing status:', error);
@@ -251,18 +249,18 @@ function MobileMessages() {
   // Обработка изменения текста с typing indicator
   const handleTextChange = async (newText: string) => {
     setText(newText);
-    
+
     // Отправляем typing status только если текст не пустой и мы не печатаем уже
     if (newText.trim() && !isTyping) {
       setIsTyping(true);
       await updateTypingStatus(true);
     }
-    
+
     // Очищаем предыдущий таймер
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
+
     // Устанавливаем новый таймер для отключения typing
     typingTimeoutRef.current = setTimeout(async () => {
       setIsTyping(false);
@@ -272,7 +270,7 @@ function MobileMessages() {
 
   const sendMessage = async () => {
     if (!text.trim() || !userId || !id) return;
-    
+
     // Останавливаем typing статус перед отправкой
     if (isTyping) {
       setIsTyping(false);
@@ -281,32 +279,31 @@ function MobileMessages() {
         clearTimeout(typingTimeoutRef.current);
       }
     }
-    
+
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      
+
       const { data: newMessage, error } = await supabase
         .from('chat_messages')
-        .insert({ 
-          chat_id: id, 
-          sender_id: userId, 
-          message_type: 'text', 
-          content: text 
+        .insert({
+          chat_id: id,
+          sender_id: userId,
+          message_type: 'text',
+          content: text
         })
         .select()
         .single();
-      
+
       if (error) throw error;
-      
+
       // Update chat timestamp
       await supabase
         .from('chats')
         .update({ last_message_at: new Date().toISOString() })
         .eq('id', id);
-      
+
       setText('');
       // НЕ добавляем сообщение локально - оно придет через реал-тайм подписку
-      
+
       // Воспроизводим звук отправки сообщения
       if (shouldPlaySound('message')) {
         notificationSounds.playNotification('message');
@@ -319,17 +316,16 @@ function MobileMessages() {
 
   const deleteChat = async (chatId: string) => {
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      
+
       await supabase.from('chat_messages').delete().eq('chat_id', chatId);
       await supabase.from('chats').delete().eq('id', chatId);
-      
+
       setChats(prev => prev.filter(c => c.id !== chatId));
-      
+
       if (String(id) === String(chatId)) {
         navigate('/messages');
       }
-      
+
       toast({ title: 'Чат удален' });
     } catch (error) {
       console.error('Error deleting chat:', error);
@@ -350,17 +346,17 @@ function MobileMessages() {
     // Chat list view
     return (
       <div className="min-h-screen bg-[#E5E7EB]">
-        <MobileHeader 
+        <MobileHeader
           title="Сообщения"
           showBack={false}
           showNotifications
         />
-        
-        <div 
+
+        <div
           className="px-4 pt-4"
-          style={{ 
+          style={{
             paddingTop: 72 + safeAreaInsets.top + 16,
-            paddingBottom: bottomNavHeight + safeAreaInsets.bottom + 16 
+            paddingBottom: bottomNavHeight + safeAreaInsets.bottom + 16
           }}
         >
           {chats.length === 0 ? (
@@ -374,11 +370,11 @@ function MobileMessages() {
               {chats.map((chat, index) => {
                 const otherUserId = chat.client_id === userId ? chat.professional_id : chat.client_id;
                 const otherProfile = profiles[otherUserId];
-                const displayName = otherProfile?.full_name || 
-                                  (otherProfile?.first_name && otherProfile?.last_name ? 
-                                     `${otherProfile.first_name} ${otherProfile.last_name}` : 
+                const displayName = otherProfile?.full_name ||
+                                  (otherProfile?.first_name && otherProfile?.last_name ?
+                                     `${otherProfile.first_name} ${otherProfile.last_name}` :
                                      'Пользователь');
-                
+
                 const initials = displayName
                   .split(' ')
                   .filter(n => n.length > 0)
@@ -401,15 +397,15 @@ function MobileMessages() {
                     >
                       <div className="flex items-center gap-3">
                         <Avatar className="w-12 h-12 flex-shrink-0">
-                          <AvatarImage 
-                            src={otherProfile?.avatar_url || ''} 
+                          <AvatarImage
+                            src={otherProfile?.avatar_url || ''}
                             alt={displayName}
                           />
                           <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-semibold">
                             {initials || 'У'}
                           </AvatarFallback>
                         </Avatar>
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-gray-800 truncate">
                             {displayName}
@@ -427,7 +423,7 @@ function MobileMessages() {
                             })}
                           </div>
                         </div>
-                        
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -463,19 +459,19 @@ function MobileMessages() {
   }
 
   // Chat detail view
-  const otherUserId = selectedChat ? 
-    (selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id) : 
+  const otherUserId = selectedChat ?
+    (selectedChat.client_id === userId ? selectedChat.professional_id : selectedChat.client_id) :
     null;
   const otherProfile = otherUserId ? profiles[otherUserId] : null;
-  const displayName = otherProfile?.full_name || 
-                     (otherProfile?.first_name && otherProfile?.last_name ? 
-                        `${otherProfile.first_name} ${otherProfile.last_name}` : 
+  const displayName = otherProfile?.full_name ||
+                     (otherProfile?.first_name && otherProfile?.last_name ?
+                        `${otherProfile.first_name} ${otherProfile.last_name}` :
                         'Пользователь');
 
   return (
     <div className="min-h-screen bg-[#E5E7EB] flex flex-col">
       {/* Custom header for chat */}
-      <div 
+      <div
         className="fixed top-0 left-0 right-0 z-50 bg-[#E5E7EB]"
         style={{ paddingTop: `env(safe-area-inset-top)` }}
       >
@@ -488,14 +484,14 @@ function MobileMessages() {
               >
                 <ArrowLeft size={16} />
               </Button>
-              
+
               <Avatar className="w-10 h-10">
                 <AvatarImage src={otherProfile?.avatar_url || ''} alt={displayName} />
                 <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-semibold text-sm">
                   {displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
-              
+
               <div>
                 <div className="font-semibold text-gray-800">{displayName}</div>
                 <div className="text-xs text-gray-600 flex items-center gap-1">
@@ -519,18 +515,18 @@ function MobileMessages() {
       </div>
 
       {/* Messages */}
-      <div 
+      <div
         className="flex-1 px-4 pt-4 pb-4 overflow-y-auto space-y-4"
-        style={{ 
+        style={{
           paddingTop: 72 + safeAreaInsets.top + 16,
-          paddingBottom: 80 + safeAreaInsets.bottom 
+          paddingBottom: 80 + safeAreaInsets.bottom
         }}
       >
         {messages.map((message) => {
           const senderProfile = profiles[message.sender_id];
-          const senderName = senderProfile?.full_name || 
-                           (senderProfile?.first_name && senderProfile?.last_name ? 
-                              `${senderProfile.first_name} ${senderProfile.last_name}` : 
+          const senderName = senderProfile?.full_name ||
+                           (senderProfile?.first_name && senderProfile?.last_name ?
+                              `${senderProfile.first_name} ${senderProfile.last_name}` :
                               'Пользователь');
           const isOwn = message.sender_id === userId;
 
@@ -542,9 +538,9 @@ function MobileMessages() {
               className={`flex gap-3 ${isOwn ? 'justify-end' : 'justify-start'}`}
             >
               {!isOwn && (
-                <div 
+                <div
                   className="w-8 h-8 rounded-full p-0.5 flex-shrink-0 mt-1"
-                  style={{ 
+                  style={{
                     background: 'var(--surface-raised)',
                     boxShadow: 'var(--shadow-raised)'
                   }}
@@ -557,12 +553,12 @@ function MobileMessages() {
                   </Avatar>
                 </div>
               )}
-              
+
               <div className={`max-w-[75%] ${isOwn ? 'order-2' : ''}`}>
-                <div 
+                <div
                   className={`p-4 rounded-2xl ${
-                    isOwn 
-                      ? 'text-white rounded-br-md ml-auto' 
+                    isOwn
+                      ? 'text-white rounded-br-md ml-auto'
                       : 'text-gray-800 rounded-bl-md'
                   }`}
                   style={isOwn ? {
@@ -584,11 +580,11 @@ function MobileMessages() {
                   </div>
                 </div>
               </div>
-              
+
               {isOwn && (
-                <div 
+                <div
                   className="w-8 h-8 rounded-full p-0.5 flex-shrink-0 mt-1 order-3"
-                  style={{ 
+                  style={{
                     background: 'var(--surface-raised)',
                     boxShadow: 'var(--shadow-raised)'
                   }}
@@ -608,18 +604,18 @@ function MobileMessages() {
       </div>
 
       {/* Message input */}
-      <div 
+      <div
         className="fixed bottom-16 left-0 right-0 px-4 py-4 z-40"
-        style={{ 
+        style={{
           paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
           background: 'linear-gradient(145deg, #E8ECF0, #D6DCE5)',
           boxShadow: '0 -8px 25px rgba(0,0,0,0.15)'
         }}
       >
         <div className="flex gap-3 items-end">
-          <div 
+          <div
             className="flex-1 bg-white rounded-2xl p-1"
-            style={{ 
+            style={{
               boxShadow: 'inset 8px 8px 16px #D1D5DB, inset -8px -8px 16px #FFFFFF'
             }}
           >
@@ -641,12 +637,12 @@ function MobileMessages() {
             onClick={sendMessage}
             disabled={!text.trim()}
             className="w-12 h-12 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200"
-            style={{ 
-              background: text.trim() 
-                ? 'linear-gradient(135deg, #7C3AED, #A855F7)' 
+            style={{
+              background: text.trim()
+                ? 'linear-gradient(135deg, #7C3AED, #A855F7)'
                 : 'linear-gradient(145deg, #E8ECF0, #D6DCE5)',
-              boxShadow: text.trim() 
-                ? '8px 8px 16px #BCBDC1, -8px -8px 16px #FFFFFF' 
+              boxShadow: text.trim()
+                ? '8px 8px 16px #BCBDC1, -8px -8px 16px #FFFFFF'
                 : 'inset 6px 6px 12px #D1D5DB, inset -6px -6px 12px #FFFFFF',
               color: text.trim() ? 'white' : '#7C3AED'
             }}

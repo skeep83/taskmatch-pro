@@ -35,8 +35,8 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
   };
 
   return (
-    <MobileCard 
-      pressable 
+    <MobileCard
+      pressable
       onPress={onPress}
       className={cn("mb-4", className)}
     >
@@ -53,11 +53,11 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
               </Badge>
             )}
             {job.urgency && (
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className={cn("text-xs", urgencyColors[job.urgency])}
               >
-                {job.urgency === 'high' ? 'Срочно' : 
+                {job.urgency === 'high' ? 'Срочно' :
                  job.urgency === 'medium' ? 'Средне' : 'Обычно'}
               </Badge>
             )}
@@ -77,7 +77,7 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
             {job.job_photos.slice(0, 3).map((photo, index) => (
               <div key={index} className="w-8 h-8 rounded border-2 border-white overflow-hidden shadow-sm">
                 <img
-                  src={`https://adstlhdgegtkvtgklkyx.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
+                  src={`https://tedkllggdmwhxtxwqrzk.supabase.co/storage/v1/object/public/evidence/${photo.file_url}`}
                   alt={`Фото ${index + 1}`}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -101,7 +101,7 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
             <span className="truncate max-w-[140px]">{job.location}</span>
           </div>
         )}
-        
+
         <div className="flex items-center">
           <Clock size={14} className="mr-1.5" />
           <span>{new Date(job.created_at).toLocaleDateString('ru')}</span>
@@ -112,9 +112,9 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
       <div className="flex items-center font-semibold text-primary">
         <DollarSign size={16} className="mr-1.5" />
         <span>
-          {job.budget_min && job.budget_max 
+          {job.budget_min && job.budget_max
             ? `${job.budget_min}-${job.budget_max} MDL`
-            : job.budget_min 
+            : job.budget_min
               ? `от ${job.budget_min} MDL`
               : 'Договорная'}
         </span>
@@ -144,13 +144,41 @@ export function MobileJobCard({ job, onPress, className }: MobileJobCardProps) {
       {/* Status */}
       {job.status && (
         <div className="pt-3 border-t border-border/30">
-          <Badge 
-            variant={job.status === 'active' ? 'default' : 'secondary'}
+          <Badge
+            variant={(() => {
+              const statusMap: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+                'Published': 'default',
+                'Assigned': 'secondary',
+                'InProgress': 'secondary',
+                'Submitted': 'secondary',
+                'Completed': 'outline',
+                'Cancelled': 'destructive',
+                'active': 'default',
+                'completed': 'outline',
+                'in_progress': 'secondary',
+                'pending': 'secondary',
+                'cancelled': 'destructive',
+              };
+              return statusMap[job.status] || 'secondary';
+            })()}
             className="text-xs"
           >
-            {job.status === 'active' ? 'Активен' : 
-             job.status === 'completed' ? 'Завершен' : 
-             job.status === 'in_progress' ? 'В работе' : job.status}
+            {(() => {
+              const labelMap: Record<string, string> = {
+                'Published': 'Опубликован',
+                'Assigned': 'Назначен',
+                'InProgress': 'В работе',
+                'Submitted': 'На проверке',
+                'Completed': 'Завершен',
+                'Cancelled': 'Отменен',
+                'active': 'Активен',
+                'completed': 'Завершен',
+                'in_progress': 'В работе',
+                'pending': 'В ожидании',
+                'cancelled': 'Отменен',
+              };
+              return labelMap[job.status] || job.status;
+            })()}
           </Badge>
         </div>
       )}

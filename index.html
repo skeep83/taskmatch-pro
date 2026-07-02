@@ -6,7 +6,7 @@
     <title>ServiceHub — маркетплейс услуг</title>
     <meta name="description" content="ServiceHub: быстрый подбор проверенных специалистов, эскроу-платежи, тендеры, чаты, мгновенные выплаты." />
     <meta name="author" content="ServiceHub" />
-    
+
     <!-- Cache control and performance hints -->
     <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable" />
     <meta name="format-detection" content="telephone=no" />
@@ -17,28 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preload" href="/assets/hero-dashboard.jpg" as="image" fetchpriority="high">
-    <link rel="modulepreload" href="/src/main.tsx">
-    <link rel="modulepreload" href="/src/App.tsx">
-    <link rel="modulepreload" href="/src/integrations/supabase/client.ts">
-    
-    <!-- Additional resource hints for better caching -->
-    <link rel="preload" href="/assets/index.js" as="script" crossorigin>
-    <link rel="preload" href="/assets/index.css" as="style">
-    
-    <!-- Early hints for critical resources -->
-    <script>
-      // Early connection establishment for faster resource loading
-      if ('connection' in navigator && navigator.connection && navigator.connection.downlink > 1) {
-        // Only for fast connections to avoid waste on slow networks
-        const linkElem = document.createElement('link');
-        linkElem.rel = 'preload';
-        linkElem.as = 'script';
-        linkElem.href = '/assets/index.js';
-        document.head.appendChild(linkElem);
-      }
-    </script>
-    
+
     <!-- Critical CSS inline for immediate render -->
     <style>
       /* Critical base styles to prevent layout shift */
@@ -46,7 +25,7 @@
       html { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
       body { margin: 0; padding: 0; background: #ffffff; color: #0f172a; }
       #root { min-height: 100vh; }
-      
+
       /* Critical above-the-fold styles */
       .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
       .grid { display: grid; gap: 2rem; grid-template-columns: 1fr; }
@@ -98,19 +77,19 @@
       .absolute { position: absolute; }
       .inset-0 { top: 0px; right: 0px; bottom: 0px; left: 0px; }
       .z-10 { z-index: 10; }
-      
+
       /* Loading skeleton styles */
-      .skeleton { 
+      .skeleton {
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
         background-size: 200% 100%;
         animation: loading 1.5s infinite;
       }
-      
+
       @keyframes loading {
         0% { background-position: 200% 0; }
         100% { background-position: -200% 0; }
       }
-      
+
       /* Initial loading screen */
       .initial-loader {
         position: fixed;
@@ -125,7 +104,7 @@
         justify-content: center;
         flex-direction: column;
       }
-      
+
       .loader-spinner {
         width: 40px;
         height: 40px;
@@ -134,22 +113,22 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
-      
+
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
-      
+
       /* Dark mode support */
       @media (prefers-color-scheme: dark) {
         body { background: #0f172a; color: #f1f5f9; }
         .initial-loader { background: #0f172a; }
-        .skeleton { 
+        .skeleton {
           background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
           background-size: 200% 100%;
         }
       }
-      
+
       /* Responsive grid */
       @media (min-width: 768px) {
         .grid { grid-template-columns: 1fr 1fr; }
@@ -157,12 +136,12 @@
         .md\:block { display: block; }
         .md\:hidden { display: none; }
       }
-      
+
       /* Prevent flash of unstyled content */
       .font-display { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
       .font-sans { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
     </style>
-    
+
     <!-- Load Google Fonts with better non-blocking strategy -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,30 +164,7 @@
       }
     </script>
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
-    
-    <!-- Defer all non-critical CSS completely -->
-    <script>
-      // Load main CSS after initial render
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = '/assets/index.css';
-          document.head.appendChild(link);
-        });
-      } else {
-        setTimeout(() => {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = '/assets/index.css';
-          document.head.appendChild(link);
-        }, 50);
-      }
-    </script>
-    <noscript><link rel="stylesheet" href="/assets/index.css"></noscript>
-    
-    <!-- Resource hints for faster loading -->
-    <link rel="prefetch" href="/assets/index.js">
+
     <link rel="canonical" href="https://taskmatch-pro.lovable.app/" />
 
     <meta property="og:title" content="ServiceHub — маркетплейс услуг" />
@@ -228,9 +184,9 @@
       <div style="margin-top: 1rem; font-size: 1.125rem; font-weight: 600; color: #2563eb;">ServiceHub</div>
       <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #64748b;">Загрузка...</div>
     </div>
-    
+
     <div id="root"></div>
-    
+
     <script>
       // Hide initial loader when React app starts
       document.addEventListener('DOMContentLoaded', function() {

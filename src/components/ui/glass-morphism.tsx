@@ -36,8 +36,8 @@ export const GlassMorphism = React.forwardRef<HTMLDivElement, GlassMorphismProps
         {...props}
       >
         {/* Shimmer effect */}
-        <div className="absolute inset-0 -top-40 -bottom-40 bg-gradient-to-r from-transparent via-white/5 to-transparent rotate-12 animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none" />
-        
+        <div className="absolute inset-0 -top-40 -bottom-40 hidden bg-gradient-to-r from-transparent via-white/5 to-transparent rotate-12 animate-[shimmer_3s_ease-in-out_infinite] pointer-events-none lg:block" />
+
         {/* Content */}
         <div className="relative z-10">
           {children}

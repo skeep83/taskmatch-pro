@@ -8,13 +8,30 @@ import { Badge } from '@/components/ui/badge';
 import { useMobile } from '@/mobile/providers/MobileProvider';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { useNotifications } from '@/hooks/useNotifications';
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardOption {
   value: string;
   label: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   description: string;
   available: boolean;
+}
+
+interface ChatMessageInsertPayload {
+  new: {
+    sender_id?: string;
+  };
+}
+
+interface ChatMessageUpdatePayload {
+  new: {
+    is_read?: boolean;
+    sender_id?: string;
+  };
+  old: {
+    is_read?: boolean;
+  };
 }
 
 interface MobileHeaderProps {
@@ -62,26 +79,25 @@ export function MobileHeader({
   React.useEffect(() => {
     const loadUnreadMessagesCount = async () => {
       try {
-        const { supabase } = await import('@/integrations/supabase/client');
         const { data: session } = await supabase.auth.getSession();
         const uid = session.session?.user?.id;
-        
+
         if (!uid) {
           setUnreadMessagesCount(0);
           return;
         }
-        
+
         setUserId(uid);
-        
+
         // Получаем количество непрочитанных сообщений
         const { data: unreadMessages } = await supabase
           .from('chat_messages')
           .select('id, chat_id')
           .eq('is_read', false)
           .neq('sender_id', uid);
-        
+
         setUnreadMessagesCount(unreadMessages?.length || 0);
-        
+
         // Подписываемся на новые сообщения
         const channel = supabase
           .channel('header-unread-messages-counter')
@@ -92,7 +108,7 @@ export function MobileHeader({
               schema: 'public',
               table: 'chat_messages'
             },
-            (payload: any) => {
+            (payload: ChatMessageInsertPayload) => {
               // Увеличиваем счетчик если сообщение не от нас
               if (payload.new.sender_id !== uid) {
                 setUnreadMessagesCount(prev => prev + 1);
@@ -106,7 +122,7 @@ export function MobileHeader({
               schema: 'public',
               table: 'chat_messages'
             },
-            (payload: any) => {
+            (payload: ChatMessageUpdatePayload) => {
               // Уменьшаем счетчик если сообщение прочитано
               if (payload.new.is_read && !payload.old.is_read && payload.new.sender_id !== uid) {
                 setUnreadMessagesCount(prev => Math.max(0, prev - 1));
@@ -114,13 +130,13 @@ export function MobileHeader({
             }
           )
           .subscribe();
-        
+
         return () => supabase.removeChannel(channel);
       } catch (error) {
         console.error('Error loading unread messages count:', error);
       }
     };
-    
+
     loadUnreadMessagesCount();
   }, []);
 
@@ -129,21 +145,20 @@ export function MobileHeader({
     if (location.pathname.startsWith('/messages') && userId) {
       const markMessagesAsRead = async () => {
         try {
-          const { supabase } = await import('@/integrations/supabase/client');
-          
+
           // Помечаем все сообщения как прочитанные
           await supabase
             .from('chat_messages')
             .update({ is_read: true })
             .eq('is_read', false)
             .neq('sender_id', userId);
-          
+
           setUnreadMessagesCount(0);
         } catch (error) {
           console.error('Error marking messages as read:', error);
         }
       };
-      
+
       markMessagesAsRead();
     }
   }, [location.pathname, userId]);
@@ -151,7 +166,6 @@ export function MobileHeader({
   // Функция логаута
   const handleLogout = async () => {
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
       await supabase.auth.signOut();
       navigate('/auth');
     } catch (error) {
@@ -204,7 +218,7 @@ export function MobileHeader({
                 <ArrowLeft size={16} />
               </motion.button>
             )}
-            
+
             {title && (
               <h1 className="text-base font-semibold truncate">
                 {title}
@@ -228,12 +242,12 @@ export function MobileHeader({
                   className="flex items-center gap-2 px-3 py-1.5 bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
                   whileTap={{ scale: 0.95 }}
                 >
-                  {getCurrentDashboardOption()?.icon && 
+                  {getCurrentDashboardOption()?.icon &&
                     React.createElement(getCurrentDashboardOption()!.icon, { className: "h-4 w-4 text-primary" })
                   }
                   <ChevronDown className={`h-4 w-4 transition-transform ${selectorOpen ? 'rotate-180' : ''}`} />
                 </motion.button>
-                
+
                 {/* Dropdown Menu */}
                 {selectorOpen && (
                   <motion.div
@@ -276,7 +290,7 @@ export function MobileHeader({
                 <Search size={16} />
               </motion.button>
             )}
-            
+
             {showNotifications && (
               <div className="relative">
                 <motion.button
@@ -306,7 +320,7 @@ export function MobileHeader({
                     <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                   )}
                 </motion.button>
-                
+
                 {/* Notification Panel */}
                 {notificationOpen && (
                   <motion.div
@@ -322,7 +336,7 @@ export function MobileHeader({
                 )}
               </div>
             )}
-            
+
             {showMenu && (
               <motion.button
                 onClick={() => {
@@ -335,7 +349,7 @@ export function MobileHeader({
                 <MoreHorizontal size={16} />
               </motion.button>
             )}
-            
+
             {showLogout && (
               <motion.button
                 onClick={handleLogout}
@@ -347,11 +361,11 @@ export function MobileHeader({
             )}
           </div>
         </header>
-        
+
         {/* Overlay to close dropdowns */}
         {(selectorOpen || notificationOpen) && (
-          <div 
-            className="fixed inset-0 z-40" 
+          <div
+            className="fixed inset-0 z-40"
             onClick={() => {
               setSelectorOpen(false);
               setNotificationOpen(false);

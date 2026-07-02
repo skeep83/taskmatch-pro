@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { 
-  Wrench, Zap, Sparkles, Paintbrush, 
-  Car, Trees, Monitor, Package 
+import {
+  Wrench, Zap, Sparkles, Paintbrush,
+  Car, Trees, Monitor, Package
 } from "lucide-react";
 
 interface CategoryData {
@@ -37,7 +37,7 @@ const segmentColors = [
 
 export function CategoryDistributionChart({ data }: CategoryDistributionChartProps) {
   const total = data.reduce((sum, item) => sum + item.value, 0);
-  
+
   if (total === 0) {
     return (
       <div className="flex items-center justify-center h-[300px] text-muted-foreground">
@@ -70,11 +70,11 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
     const end = polarToCartesian(0, 0, outerRadius, startAngle);
     const innerStart = polarToCartesian(0, 0, innerRadius, endAngle);
     const innerEnd = polarToCartesian(0, 0, innerRadius, startAngle);
-    
+
     const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-    
+
     return [
-      "M", start.x, start.y, 
+      "M", start.x, start.y,
       "A", outerRadius, outerRadius, 0, largeArcFlag, 0, end.x, end.y,
       "L", innerEnd.x, innerEnd.y,
       "A", innerRadius, innerRadius, 0, largeArcFlag, 1, innerStart.x, innerStart.y,
@@ -94,7 +94,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
     <div className="relative w-full h-[300px] flex items-center justify-center">
       {/* Central donut chart */}
       <div className="relative">
-        <svg width="600" height="600" viewBox="-300 -300 600 600" className="drop-shadow-lg">
+        <svg viewBox="-300 -300 600 600" className="h-[240px] w-[240px] drop-shadow-lg sm:h-[600px] sm:w-[600px]">
           {/* Background circle */}
           <circle
             cx="0"
@@ -105,7 +105,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
             strokeWidth="1"
             opacity="0.1"
           />
-          
+
           {/* Donut segments */}
           {segments.map((segment, index) => (
             <motion.path
@@ -121,7 +121,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
               }}
             />
           ))}
-          
+
           {/* Center circle */}
           <circle
             cx="0"
@@ -132,7 +132,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
             strokeWidth="1"
             className="drop-shadow-sm"
           />
-          
+
           {/* Center text */}
           <text
             x="0"
@@ -158,7 +158,7 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
         const IconComponent = categoryIcons[segment.name] || Package;
         const positions = [
           { top: '10%', left: '10%' }, // Top-left
-          { top: '10%', right: '10%' }, // Top-right  
+          { top: '10%', right: '10%' }, // Top-right
           { bottom: '10%', left: '10%' }, // Bottom-left
           { bottom: '10%', right: '10%' }, // Bottom-right
         ];
@@ -172,12 +172,12 @@ export function CategoryDistributionChart({ data }: CategoryDistributionChartPro
             className="absolute flex flex-col items-center gap-2 p-3 rounded-xl card-surface min-w-[100px]"
             style={positions[index]}
           >
-            <div 
+            <div
               className="p-2 rounded-lg shadow-sm"
               style={{ backgroundColor: `${segment.color}20` }}
             >
-              <IconComponent 
-                className="h-4 w-4" 
+              <IconComponent
+                className="h-4 w-4"
                 style={{ color: segment.color }}
               />
             </div>

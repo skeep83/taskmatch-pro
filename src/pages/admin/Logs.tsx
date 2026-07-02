@@ -145,14 +145,14 @@ function AdminLogs() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Мониторинг ошибок</h1>
           <p className="text-muted-foreground">
             Продвинутая система сбора и анализа ошибок платформы
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={fetchLogs} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Обновить
@@ -222,8 +222,8 @@ function AdminLogs() {
                 className="pl-10"
               />
             </div>
-            <select 
-              value={filters.level} 
+            <select
+              value={filters.level}
               onChange={(e) => handleFilterChange('level', e.target.value)}
               className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
@@ -233,8 +233,8 @@ function AdminLogs() {
               <option value="warning">Предупреждения</option>
               <option value="info">Информация</option>
             </select>
-            <select 
-              value={filters.source} 
+            <select
+              value={filters.source}
               onChange={(e) => handleFilterChange('source', e.target.value)}
               className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
@@ -246,8 +246,8 @@ function AdminLogs() {
               <option value="auth">Auth</option>
               <option value="notification">Notification</option>
             </select>
-            <select 
-              value={filters.resolved} 
+            <select
+              value={filters.resolved}
               onChange={(e) => handleFilterChange('resolved', e.target.value)}
               className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
@@ -255,8 +255,8 @@ function AdminLogs() {
               <option value="false">Не решено</option>
               <option value="true">Решено</option>
             </select>
-            <select 
-              value={filters.timeRange} 
+            <select
+              value={filters.timeRange}
               onChange={(e) => handleFilterChange('timeRange', e.target.value)}
               className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
@@ -294,7 +294,7 @@ function AdminLogs() {
             const isExpanded = expandedLog === log.id;
             const LogIcon = getLogIcon(log.level);
             const iconColor = getLogIconColor(log.level);
-            
+
             return (
               <Card key={log.id} className={`transition-all ${log.level === 'critical' ? 'border-red-200 bg-red-50/50' : ''}`}>
                 <CardContent className="p-4">
@@ -323,7 +323,7 @@ function AdminLogs() {
                             Пользователь: {log.user_id}
                           </p>
                         )}
-                        
+
                         {isExpanded && (
                           <div className="mt-4 space-y-3 pt-3 border-t">
                             <div>
@@ -332,7 +332,7 @@ function AdminLogs() {
                                 {format(new Date(log.timestamp), 'dd.MM.yyyy HH:mm:ss')}
                               </p>
                             </div>
-                            
+
                             {log.metadata && (
                               <div>
                                 <h4 className="text-sm font-medium mb-1">Метаданные:</h4>
@@ -341,7 +341,7 @@ function AdminLogs() {
                                 </pre>
                               </div>
                             )}
-                            
+
                             {log.stack_trace && (
                               <div>
                                 <h4 className="text-sm font-medium mb-1">Stack Trace:</h4>
@@ -354,7 +354,7 @@ function AdminLogs() {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
@@ -385,8 +385,8 @@ function AdminLogs() {
       {/* Pagination */}
       {logs.length === 50 && (
         <div className="flex justify-center">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => setPage(prev => prev + 1)}
             disabled={loading}
           >

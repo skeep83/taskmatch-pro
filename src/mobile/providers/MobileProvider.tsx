@@ -36,7 +36,7 @@ export function MobileProvider({ children }: MobileProviderProps) {
     const handleResize = () => {
       const currentHeight = window.innerHeight;
       setViewportHeight(currentHeight);
-      
+
       // Detect keyboard open on mobile (significant height reduction)
       if (deviceInfo.isMobile) {
         const heightDiff = deviceInfo.screenHeight - currentHeight;
@@ -53,7 +53,7 @@ export function MobileProvider({ children }: MobileProviderProps) {
     };
 
     window.addEventListener('resize', handleResize);
-    
+
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleVisualViewportChange);
     }
@@ -71,7 +71,7 @@ export function MobileProvider({ children }: MobileProviderProps) {
     bottomNavHeight: 60, // Уменьшенная высота
     safeAreaInsets: {
       top: deviceInfo.isIOS ? 44 : 24,
-      bottom: deviceInfo.isIOS ? 34 : 0,
+      bottom: 0,
       left: 0,
       right: 0,
     },

@@ -5,17 +5,46 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: '/',
   server: {
     host: "::",
     port: 8080,
   },
   build: {
     sourcemap: true,
+    modulePreload: true,
     rollupOptions: {
       external: [],
       output: {
-        // Completely disable manual chunks to prevent React splitting
-        manualChunks: undefined,
+        hoistTransitiveImports: false,
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+
+          if (
+            id.includes("/react/") ||
+            id.includes("/react-dom/") ||
+            id.includes("/scheduler/") ||
+            id.includes("/react-is/") ||
+            id.includes("/use-sync-external-store/")
+          ) {
+            return "vendor-react";
+          }
+
+          if (id.includes("@supabase/supabase-js")) return "vendor-supabase";
+          if (id.includes("react-i18next") || id.includes("/i18next/")) return "vendor-i18n";
+          if (id.includes("framer-motion")) return "vendor-motion";
+          if (
+            id.includes("@radix-ui/") ||
+            id.includes("embla-carousel-react") ||
+            id.includes("vaul") ||
+            id.includes("cmdk") ||
+            id.includes("/clsx/") ||
+            id.includes("/tailwind-merge/") ||
+            id.includes("/class-variance-authority/")
+          ) {
+            return "vendor-ui";
+          }
+        },
       },
     },
   },
@@ -33,8 +62,8 @@ export default defineConfig(({ mode }) => ({
     },
     // Aggressive deduplication
     dedupe: [
-      "react", 
-      "react-dom", 
+      "react",
+      "react-dom",
       "react-is",
       "react/jsx-runtime",
       "react/jsx-dev-runtime",
@@ -42,10 +71,10 @@ export default defineConfig(({ mode }) => ({
     ],
   },
   optimizeDeps: {
-    // Include all React-related dependencies 
+    // Include all React-related dependencies
     include: [
-      "react", 
-      "react-dom", 
+      "react",
+      "react-dom",
       "react/jsx-runtime",
       "react-is",
       "@radix-ui/react-tooltip",

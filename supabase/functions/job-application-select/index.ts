@@ -19,13 +19,13 @@ serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error("Missing Supabase environment variables");
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    
+
     // Get auth header from request
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
@@ -108,18 +108,43 @@ serve(async (req) => {
       throw new Error('Application not found');
     }
 
+    if (application.pro_id === user.id) {
+      throw new Error('You cannot accept your own proposal');
+    }
+
     // Start transaction: Update job status and assign professional
+    const nowIso = new Date().toISOString();
     const { error: updateError } = await supabase
       .from('jobs')
       .update({
         status: 'accepted',
+        status_new: 'Assigned',
         pro_id: application.pro_id,
-        updated_at: new Date().toISOString()
+        updated_at: nowIso
       })
       .eq('id', jobId);
 
     if (updateError) {
       throw updateError;
+    }
+
+    const { error: transitionError } = await supabase
+      .from('job_status_transitions')
+      .insert({
+        job_id: jobId,
+        from_status: job.status_new || job.status || 'new',
+        to_status: 'Assigned',
+        triggered_by: user.id,
+        reason: 'client_selected_professional',
+        metadata: {
+          application_id: applicationId,
+          selected_pro_id: application.pro_id,
+          price_cents: application.price_cents,
+        },
+      });
+
+    if (transitionError) {
+      console.warn('Job transition log creation failed:', transitionError);
     }
 
     // Create escrow for the job
@@ -140,7 +165,7 @@ serve(async (req) => {
 
     // Send notification to selected professional using notifications-send function
     const proName = `${application.profiles?.first_name || ''} ${application.profiles?.last_name || ''}`.trim() || 'Специалист';
-    
+
     try {
       const { error: notifyError } = await supabase.functions.invoke('notifications-send', {
         body: {
@@ -215,22 +240,55 @@ serve(async (req) => {
       }
     }
 
+    // Ensure there is an active chat for this job pair
+    let chatId: string | null = null;
+
+    const { data: existingChat } = await supabase
+      .from('chats')
+      .select('id')
+      .eq('job_id', jobId)
+      .eq('client_id', user.id)
+      .eq('professional_id', application.pro_id)
+      .maybeSingle();
+
+    if (existingChat?.id) {
+      chatId = existingChat.id;
+    } else {
+      const { data: newChat, error: chatError } = await supabase
+        .from('chats')
+        .insert({
+          job_id: jobId,
+          client_id: user.id,
+          professional_id: application.pro_id,
+          status: 'active'
+        })
+        .select('id')
+        .single();
+
+      if (chatError) {
+        console.warn('Chat creation failed during application selection:', chatError);
+      } else {
+        chatId = newChat?.id ?? null;
+      }
+    }
+
     console.log(`Job ${jobId} assigned to professional ${application.pro_id} via application ${applicationId}`);
 
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       success: true,
       message: 'Professional selected successfully',
       jobId: jobId,
       proId: application.pro_id,
-      priceCents: application.price_cents
+      priceCents: application.price_cents,
+      chatId
     }), {
       headers: { ...corsHeaders, 'content-type': 'application/json' }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Job application selection error:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message 
+    return new Response(JSON.stringify({
+      error: error.message
     }), {
       status: 400,
       headers: { ...corsHeaders, 'content-type': 'application/json' }

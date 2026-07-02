@@ -10,8 +10,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { 
-  Search, Briefcase, Clock, CheckCircle, AlertTriangle, 
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Search, Briefcase, Clock, CheckCircle, AlertTriangle,
   Eye, Edit, Ban, MapPin, DollarSign, Calendar,
   Filter, Download, RefreshCw, TrendingUp, Users
 } from "lucide-react";
@@ -20,7 +21,21 @@ export default function AdminJobs() {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Array<{
+    id: string;
+    public_id: string;
+    title: string | null;
+    description: string | null;
+    status: string;
+    created_at: string;
+    scheduled_at: string | null;
+    budget_min_cents: number | null;
+    budget_max_cents: number | null;
+    location_address: string | null;
+    client_id: string;
+    pro_id: string | null;
+    category_id: string;
+  }>>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -30,12 +45,11 @@ export default function AdminJobs() {
 
   const loadJobs = async () => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { data: jobsData, error } = await supabase
         .from('jobs')
         .select(`
-          id, title, description, status, created_at, scheduled_at,
+          id, public_id, title, description, status, created_at, scheduled_at,
           budget_min_cents, budget_max_cents, location_address,
           client_id, pro_id, category_id
         `)
@@ -67,16 +81,16 @@ export default function AdminJobs() {
   const getStatusBadge = (status: string) => {
     const variants = {
       new: "secondary",
-      accepted: "default", 
+      accepted: "default",
       in_progress: "default",
       done: "default",
       cancelled: "destructive"
     };
-    
+
     const labels = {
       new: "Новый",
       accepted: "Принят",
-      in_progress: "В работе", 
+      in_progress: "В работе",
       done: "Выполнен",
       cancelled: "Отменен"
     };
@@ -92,11 +106,22 @@ export default function AdminJobs() {
   const newJobs = jobs.filter(j => j.status === 'new').length;
   const activeJobs = jobs.filter(j => ['accepted', 'in_progress'].includes(j.status)).length;
   const completedJobs = jobs.filter(j => j.status === 'done').length;
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredJobs = jobs.filter((job) => {
+    const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
+    const matchesSearch = !normalizedSearch ||
+      job.public_id.toLowerCase().includes(normalizedSearch) ||
+      job.id.toLowerCase().includes(normalizedSearch) ||
+      (job.title || '').toLowerCase().includes(normalizedSearch) ||
+      (job.description || '').toLowerCase().includes(normalizedSearch);
+
+    return matchesStatus && matchesSearch;
+  });
 
   return (
     <div className="space-y-6">
       <Seo title="ServiceHub — Управление заказами" description="Админ-панель управления заказами" canonical="/admin/jobs" />
-      
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -160,15 +185,40 @@ export default function AdminJobs() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Заказы ({jobs.length})</CardTitle>
+          <CardTitle>Заказы ({filteredJobs.length})</CardTitle>
           <CardDescription>
-            Управление всеми заказами платформы
+            Ищите по номеру заявки `JOB-000123`, UUID или названию заказа
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 flex flex-col gap-3 md:flex-row">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Поиск по № заявки, UUID, названию или описанию"
+                className="pl-9"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-[220px]">
+                <SelectValue placeholder="Все статусы" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все статусы</SelectItem>
+                <SelectItem value="new">Новый</SelectItem>
+                <SelectItem value="accepted">Принят</SelectItem>
+                <SelectItem value="in_progress">В работе</SelectItem>
+                <SelectItem value="done">Выполнен</SelectItem>
+                <SelectItem value="cancelled">Отменён</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>№ заявки</TableHead>
                 <TableHead>Заказ</TableHead>
                 <TableHead>Статус</TableHead>
                 <TableHead>Бюджет</TableHead>
@@ -177,8 +227,12 @@ export default function AdminJobs() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {jobs.slice(0, 20).map((job) => (
+              {filteredJobs.slice(0, 20).map((job) => (
                 <TableRow key={job.id}>
+                  <TableCell>
+                    <div className="font-mono text-xs font-semibold text-primary">{job.public_id}</div>
+                    <div className="max-w-[180px] truncate text-[11px] text-muted-foreground">{job.id}</div>
+                  </TableCell>
                   <TableCell>
                     <div>
                       <div className="font-medium line-clamp-1">

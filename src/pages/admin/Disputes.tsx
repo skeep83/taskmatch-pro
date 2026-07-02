@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { 
+import { supabase } from "@/integrations/supabase/client";
+import {
   AlertTriangle, Clock, CheckCircle, Eye,
   Scale, Gavel, RefreshCw, TrendingDown
 } from "lucide-react";
@@ -24,8 +25,7 @@ export default function AdminDisputes() {
 
   const loadDisputes = async () => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { data: disputesData, error } = await supabase
         .from('dispute_cases')
         .select('id, job_id, claimant, status, created_at, updated_at')
@@ -61,7 +61,7 @@ export default function AdminDisputes() {
       resolved: "default",
       closed: "outline"
     };
-    
+
     const labels = {
       open: "Открыт",
       in_review: "На рассмотрении",
@@ -83,7 +83,7 @@ export default function AdminDisputes() {
   return (
     <div className="space-y-6">
       <Seo title="ServiceHub — Управление спорами" description="Админ-панель управления спорами" canonical="/admin/disputes" />
-      
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">

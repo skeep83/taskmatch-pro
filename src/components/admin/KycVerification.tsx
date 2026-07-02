@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  User, 
-  FileText, 
-  Camera, 
-  CheckCircle, 
+import {
+  User,
+  FileText,
+  Camera,
+  CheckCircle,
   XCircle,
   Clock,
   Eye,
@@ -83,7 +83,7 @@ export const AdminKycVerification = () => {
 
   useEffect(() => {
     loadSubmissions();
-    
+
     // Настройка реального времени для отслеживания изменений в KYC документах
     const kycChannel = supabase
       .channel('kyc_documents_changes')
@@ -109,11 +109,24 @@ export const AdminKycVerification = () => {
   const loadSubmissions = async () => {
     try {
       setLoading(true);
-      
-      // Use edge function to get submissions with user data
-      const { data, error } = await supabase.functions.invoke('admin-kyc-submissions');
 
-      if (error) throw error;
+      const session = await supabase.auth.getSession();
+      const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-kyc-submissions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.data.session?.access_token}`,
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+        },
+        body: '{}'
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to load KYC submissions (${response.status})`);
+      }
+
+      const data = await response.json();
       setSubmissions(data.submissions || []);
     } catch (error) {
       console.error('Error loading submissions:', error);
@@ -130,17 +143,29 @@ export const AdminKycVerification = () => {
   const moderateDocument = async (userId: string, status: 'approved' | 'rejected', notes: string = '') => {
     try {
       setProcessing(true);
-      
-      const { data, error } = await supabase.functions.invoke('admin-kyc', {
-        body: {
+
+      const session = await supabase.auth.getSession();
+      const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-kyc`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.data.session?.access_token}`,
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({
           action: 'moderate',
           userId,
           status,
           notes
-        }
+        })
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to moderate KYC (${response.status})`);
+      }
+
+      await response.json();
 
       toast({
         title: status === 'approved' ? "Документы одобрены" : "Документы отклонены",
@@ -149,7 +174,7 @@ export const AdminKycVerification = () => {
 
       // Принудительно обновляем данные после успешной модерации
       await loadSubmissions();
-      
+
       // Обновляем выбранную заявку если она есть
       if (selectedSubmission) {
         // Перезагружаем данные и находим обновленную заявку
@@ -176,7 +201,7 @@ export const AdminKycVerification = () => {
   const approveSubmission = async (submissionId: string) => {
     try {
       setProcessing(true);
-      
+
       const { error } = await supabase.rpc('approve_pro_upgrade_request', {
         _request_id: submissionId
       });
@@ -204,7 +229,7 @@ export const AdminKycVerification = () => {
   const rejectSubmission = async (submissionId: string, reason: string) => {
     try {
       setProcessing(true);
-      
+
       const { error } = await supabase.rpc('reject_pro_upgrade_request', {
         _request_id: submissionId,
         _reason: reason
@@ -232,13 +257,13 @@ export const AdminKycVerification = () => {
   };
 
   const filteredSubmissions = submissions.filter(submission => {
-    const matchesSearch = 
+    const matchesSearch =
       submission.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       submission.user?.profiles?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       submission.user?.profiles?.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === "all" || submission.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -278,7 +303,7 @@ export const AdminKycVerification = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold">Верификация KYC</h2>
           <p className="text-muted-foreground">Управление заявками на верификацию пользователей</p>
@@ -294,7 +319,7 @@ export const AdminKycVerification = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -342,11 +367,11 @@ export const AdminKycVerification = () => {
                     }`}
                     onClick={() => setSelectedSubmission(submission)}
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
                       <div className="flex items-center gap-3">
                         {submission.user?.profiles?.avatar_url ? (
-                          <img 
-                            src={submission.user.profiles.avatar_url} 
+                          <img
+                            src={submission.user.profiles.avatar_url}
                             alt="Avatar"
                             className="w-10 h-10 rounded-full object-cover"
                           />
@@ -364,8 +389,8 @@ export const AdminKycVerification = () => {
                       </div>
                       {getStatusBadge(submission.status)}
                     </div>
-                    
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {formatDistanceToNow(new Date(submission.submitted_at), { addSuffix: true, locale: ru })}
@@ -406,7 +431,7 @@ export const AdminKycVerification = () => {
                       <User className="w-4 h-4" />
                       Информация о пользователе
                     </h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground">Email:</span>
                         <p className="font-medium">{selectedSubmission.user?.email}</p>
@@ -433,7 +458,7 @@ export const AdminKycVerification = () => {
                         <FileText className="w-4 h-4" />
                         Личные данные
                       </h4>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">Имя:</span>
                           <p className="font-medium">{selectedSubmission.profile_data.firstName}</p>
@@ -469,7 +494,7 @@ export const AdminKycVerification = () => {
                     {selectedSubmission.kyc_documents && selectedSubmission.kyc_documents.length > 0 ? (
                       <div className="space-y-3">
                         {selectedSubmission.kyc_documents.map((doc: KycDocument) => (
-                          <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div key={doc.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 border rounded-lg">
                             <div className="flex items-center gap-3">
                               {doc.doc_type === 'selfie' ? (
                                 <Camera className="w-4 h-4" />
@@ -478,7 +503,7 @@ export const AdminKycVerification = () => {
                               )}
                               <div>
                                 <p className="text-sm font-medium">
-                                  {doc.doc_type === 'id_card' ? 'Документ удостоверения личности' : 
+                                  {doc.doc_type === 'id_card' ? 'Документ удостоверения личности' :
                                    doc.doc_type === 'selfie' ? 'Селфи' : doc.doc_type}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
@@ -488,9 +513,9 @@ export const AdminKycVerification = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               {getDocumentStatusBadge(doc.status)}
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => {
                                   setDocumentViewer({
                                     isOpen: true,
@@ -514,8 +539,8 @@ export const AdminKycVerification = () => {
                   {/* Action Buttons */}
                   {selectedSubmission.status === 'pending' && (
                     <div className="space-y-4">
-                      <div className="flex gap-3">
-                        <Button 
+                      <div className="flex flex-col gap-3 sm:flex-row">
+                        <Button
                           onClick={() => approveSubmission(selectedSubmission.id)}
                           disabled={processing}
                           className="flex-1"
@@ -524,7 +549,7 @@ export const AdminKycVerification = () => {
                           {processing ? "Обработка..." : "Одобрить заявку"}
                         </Button>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <Label htmlFor="rejection-reason">Причина отклонения (опционально):</Label>
                         <Textarea
@@ -534,7 +559,7 @@ export const AdminKycVerification = () => {
                           onChange={(e) => setRejectionReason(e.target.value)}
                           rows={3}
                         />
-                        <Button 
+                        <Button
                           variant="destructive"
                           onClick={() => rejectSubmission(selectedSubmission.id, rejectionReason)}
                           disabled={processing}

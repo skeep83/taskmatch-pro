@@ -2,20 +2,22 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
-export const usePresenceTracking = () => {
+export const usePresenceTracking = (enabled: boolean = true) => {
   const location = useLocation();
   const channelRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    if (!enabled) return;
+
     const trackPresence = async () => {
       try {
         // Получаем данные пользователя
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         let userType = 'unregistered';
         let profile = null;
-        
+
         if (user) {
 
           // Получаем дополнительную информацию о пользователе
@@ -55,18 +57,21 @@ export const usePresenceTracking = () => {
         }
 
         const presenceData = {
-          user_id: user.id,
-          username: profile?.full_name || 
+          user_id: user?.id || null,
+          username: user ? (
+                   profile?.full_name ||
                    `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() ||
                    user.email?.split('@')[0] ||
-                   'Пользователь',
-          avatar_url: profile?.avatar_url,
+                   'Пользователь'
+          ) : `Guest_${Date.now()}`,
+          avatar_url: profile?.avatar_url || null,
           page: location.pathname,
           joined_at: new Date().toISOString(),
           last_seen: new Date().toISOString(),
           user_agent: navigator.userAgent,
           location: getPageTitle(location.pathname),
-          user_type: userType
+          user_type: userType,
+          is_authenticated: !!user
         };
 
         // Отправляем данные о присутствии
@@ -105,6 +110,8 @@ export const usePresenceTracking = () => {
 
   // Cleanup при размонтировании компонента
   useEffect(() => {
+    if (!enabled) return;
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -114,10 +121,12 @@ export const usePresenceTracking = () => {
         channelRef.current = null;
       }
     };
-  }, []);
+  }, [enabled]);
 
   // Обработчик ухода со страницы
   useEffect(() => {
+    if (!enabled) return;
+
     const handleBeforeUnload = () => {
       if (channelRef.current) {
         channelRef.current.untrack();
@@ -133,10 +142,10 @@ export const usePresenceTracking = () => {
       } else {
         // Пользователь вернулся на вкладку
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         let userType = 'unregistered';
         let profile = null;
-        
+
         if (user && channelRef.current) {
           const { data: profileData } = await supabase
             .from('profiles')
@@ -162,7 +171,7 @@ export const usePresenceTracking = () => {
           const presenceData = {
             user_id: user?.id || null,
             username: user ? (
-              profile?.full_name || 
+              profile?.full_name ||
               `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() ||
               user.email?.split('@')[0] ||
               'Пользователь'

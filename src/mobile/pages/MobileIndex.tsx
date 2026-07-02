@@ -1,34 +1,76 @@
 import { default as React, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, MapPin, Zap, Shield, Star, TrendingUp } from 'lucide-react';
+import { Search, MapPin, Zap, Shield, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MobileHeader } from '../components/navigation/MobileHeader';
 import { MobileCard } from '../components/ui/MobileCard';
 import { useMobile } from '../providers/MobileProvider';
+import { supabase } from '@/integrations/supabase/client';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 import heroImage from '@/assets/services-hero.jpg';
 
-const categories = [
-  { id: '1', name: 'Сантехника', icon: '🔧', color: 'from-blue-500 to-blue-600' },
-  { id: '2', name: 'Электрика', icon: '⚡', color: 'from-yellow-500 to-yellow-600' },
-  { id: '3', name: 'Уборка', icon: '🧹', color: 'from-green-500 to-green-600' },
-  { id: '4', name: 'Ремонт', icon: '🔨', color: 'from-orange-500 to-orange-600' },
-  { id: '5', name: 'Доставка', icon: '🚚', color: 'from-purple-500 to-purple-600' },
-  { id: '6', name: 'Красота', icon: '💄', color: 'from-pink-500 to-pink-600' },
-];
+type HomeCategory = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+};
+
+const ACTIVE_JOB_STATUSES = ['new', 'accepted', 'in_progress', 'done'];
 
 const features = [
-  { icon: Zap, title: 'Быстро', description: 'Специалисты откликаются за минуты' },
-  { icon: Shield, title: 'Безопасно', description: 'Проверенные мастера с гарантией' },
-  { icon: Star, title: 'Качественно', description: 'Высокие рейтинги и отзывы клиентов' },
+  { icon: Zap, title: 'Предложения', description: 'Получайте предложения по задаче без долгого поиска' },
+  { icon: Shield, title: 'Безопасно', description: 'Профили исполнителей и понятные условия заказа' },
+  { icon: Star, title: 'Прозрачно', description: 'Сравнивайте рейтинг, отзывы и профиль исполнителя' },
 ];
 
 function MobileIndex() {
   const navigate = useNavigate();
   const { safeAreaInsets, bottomNavHeight } = useMobile();
   const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState<HomeCategory[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const [{ data: categoriesData, error: categoriesError }, { data: jobsData, error: jobsError }] = await Promise.all([
+        supabase.from('categories').select('id,label_ru,key').order('label_ru'),
+        supabase.from('jobs').select('category_id,status').in('status', ACTIVE_JOB_STATUSES).limit(1000),
+      ]);
+
+      if (categoriesError) {
+        console.error('Failed to load home categories:', categoriesError);
+        return;
+      }
+      if (jobsError) {
+        console.error('Failed to load home category popularity:', jobsError);
+      }
+
+      const counts = new Map<string, number>();
+      (jobsData || []).forEach((job: any) => {
+        if (!job.category_id) return;
+        counts.set(job.category_id, (counts.get(job.category_id) || 0) + 1);
+      });
+
+      const next = (categoriesData || [])
+        .map((category: any) => ({
+          id: category.id,
+          name: category.label_ru || category.key,
+          icon: getCategoryIcon(category.label_ru, category.key),
+          color: 'from-slate-500 to-slate-600',
+          popularity: counts.get(category.id) || 0,
+        }))
+        .sort((a, b) => {
+          if (b.popularity !== a.popularity) return b.popularity - a.popularity;
+          return a.name.localeCompare(b.name, 'ru');
+        })
+        .slice(0, 6)
+        .map(({ popularity, ...category }) => category);
+
+      setCategories(next);
+    })();
+  }, []);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -39,14 +81,14 @@ function MobileIndex() {
   };
 
   const handleCategoryPress = (categoryId: string) => {
-    navigate(`/catalog?category=${categoryId}`);
+    navigate(`/catalog?category_id=${categoryId}`);
   };
 
   return (
     <div className="min-h-screen bg-[#E5E7EB]">
-      <MobileHeader 
-        showNotifications 
-        showSearch 
+      <MobileHeader
+        showNotifications
+        showSearch
         showLogout
       />
 
@@ -65,17 +107,17 @@ function MobileIndex() {
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-2xl font-bold mb-2 leading-tight text-gray-800"
           >
-            Найдите идеального
-            <span className="text-primary block">специалиста</span>
+            Найдите
+            <span className="text-primary block">исполнителя</span>
           </motion.h1>
-          
+
           <motion.p
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-gray-600 mb-6"
           >
-            Тысячи проверенных мастеров готовы помочь
+            Создайте заказ и получите предложения от исполнителей
           </motion.p>
 
           {/* Search bar */}
@@ -116,38 +158,6 @@ function MobileIndex() {
         </MobileCard>
       </motion.div>
 
-      {/* Categories с neumorphic дизайном */}
-      <div className="px-4 mb-6">
-        <motion.h2
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-lg font-semibold mb-4 text-gray-800"
-        >
-          Популярные категории
-        </motion.h2>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {categories.map((category, index) => (
-            <motion.div
-              key={category.id}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6 + index * 0.1, duration: 0.6 }}
-            >
-              <MobileCard
-                pressable
-                onPress={() => handleCategoryPress(category.id)}
-                className="p-4 h-20 flex flex-col justify-center items-center text-center"
-              >
-                <div className="text-2xl mb-1">{category.icon}</div>
-                <h3 className="font-medium text-sm text-gray-700">{category.name}</h3>
-              </MobileCard>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
       {/* Features с neumorphic дизайном */}
       <div className="px-4 mb-6">
         <motion.h2
@@ -158,7 +168,7 @@ function MobileIndex() {
         >
           Почему выбирают нас
         </motion.h2>
-        
+
         <div className="space-y-3">
           {features.map((feature, index) => (
             <motion.div
@@ -183,7 +193,39 @@ function MobileIndex() {
         </div>
       </div>
 
-      {/* CTA Section с neumorphic дизайном */}
+      {/* Categories с neumorphic дизайном */}
+      <div className="px-4 mb-6">
+        <motion.h2
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="text-lg font-semibold mb-4 text-gray-800"
+        >
+          Популярные категории
+        </motion.h2>
+
+        <div className="grid grid-cols-2 gap-3">
+          {categories.map((category, index) => (
+            <motion.div
+              key={category.id}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 + index * 0.1, duration: 0.6 }}
+            >
+              <MobileCard
+                pressable
+                onPress={() => handleCategoryPress(category.id)}
+                className="p-4 h-20 flex flex-col justify-center items-center text-center"
+              >
+                <div className="text-2xl mb-1">{category.icon}</div>
+                <h3 className="font-medium text-sm text-gray-700">{category.name}</h3>
+              </MobileCard>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA Section - объединенный */}
       <div className="px-4 mb-6">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -191,18 +233,22 @@ function MobileIndex() {
           transition={{ delay: 1.2, duration: 0.6 }}
         >
           <MobileCard className="p-6 text-center">
-            <div className="p-3 bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl w-fit mx-auto mb-4">
-              <TrendingUp className="text-primary" size={24} />
-            </div>
-            <h3 className="text-lg font-semibold mb-2 text-gray-800">Станьте специалистом</h3>
+            <h3 className="text-lg font-semibold mb-2 text-gray-800">Присоединяйтесь к платформе</h3>
             <p className="text-gray-600 mb-4 text-sm">
-              Присоединяйтесь к тысячам мастеров и начните зарабатывать уже сегодня
+              Выберите свою роль и начните зарабатывать или находить исполнителей
             </p>
-            <Button asChild className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
-              <Link to="/auth?type=register&role=pro">
-                Начать зарабатывать
-              </Link>
-            </Button>
+            <div className="space-y-3">
+              <Button asChild className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
+                <Link to="/auth?type=register&role=pro">
+                  Стать исполнителем
+                </Link>
+              </Button>
+              <Button asChild className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
+                <Link to="/tenders">
+                  Для бизнеса
+                </Link>
+              </Button>
+            </div>
           </MobileCard>
         </motion.div>
       </div>

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Lock, Mail, User, Shield, Eye, EyeOff } from "lucide-react";
 import authBg from "@/assets/auth-bg.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const { t } = useEnhancedI18n();
@@ -17,13 +18,20 @@ const Auth = () => {
   const { toast } = useToast();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
+  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState<string | null>(null);
+  const [emailValue, setEmailValue] = useState("");
+  const [passwordValue, setPasswordValue] = useState("");
+  const [roleValue, setRoleValue] = useState<"client" | "pro" | "business">("client");
+
+  const redirectAfterAuth = (path: string) => {
+    window.location.replace(path);
+  };
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const email = String(fd.get("email") || "").trim();
-    const password = String(fd.get("password") || "");
-    const desiredRole = (String(fd.get("role") || "client") as "client" | "pro" | "business");
+    const email = emailValue.trim();
+    const password = passwordValue;
+    const desiredRole = roleValue;
 
     if (!email || !password) {
       toast({ title: "Проверьте поля", description: "Введите email и пароль", variant: "destructive" });
@@ -32,7 +40,6 @@ const Auth = () => {
 
     setLoading(true);
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
       if (!supabase?.auth) throw new Error("Supabase client is unavailable. Please ensure integration is active.");
       if (mode === "signin") {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -43,7 +50,7 @@ const Auth = () => {
           if (pendingRole) {
             try {
               // Ensure role exists
-              const { data: roles } = await supabase.from("user_roles").select("role");
+              const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
               const hasRole = (roles || []).some((r: any) => r.role === pendingRole);
               if (!hasRole) {
                 await supabase.from("user_roles").insert({ user_id: data.user.id, role: pendingRole });
@@ -54,43 +61,72 @@ const Auth = () => {
               localStorage.removeItem("desired_role");
             }
           }
-          // Redirect by role priority: pro -> business -> client
-          const { data: roles2 } = await supabase.from("user_roles").select("role");
+          // Redirect by role priority: admin -> pro -> business -> client
+          const { data: roles2 } = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
           const roleList = (roles2 || []).map((r: any) => r.role);
           toast({ title: "Успешный вход", description: `Добро пожаловать, ${email}` });
-          if (roleList.includes("pro")) navigate("/dashboard/pro", { replace: true });
-          else if (roleList.includes("business")) navigate("/dashboard/business", { replace: true });
-          else navigate("/dashboard/client", { replace: true });
+          if (roleList.some((role: string) => ['admin', 'superadmin', 'ops', 'kyc', 'finance', 'dispute_manager', 'content', 'risk', 'city_manager', 'tender'].includes(role))) redirectAfterAuth("/admin");
+          else if (roleList.includes("pro")) redirectAfterAuth("/dashboard/pro");
+          else if (roleList.includes("business")) redirectAfterAuth("/dashboard/business");
+          else redirectAfterAuth("/dashboard/client");
         }
       } else {
-        const redirectUrl = `${window.location.origin}/`;
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: redirectUrl },
+        const { data: signupData, error: signupError } = await supabase.functions.invoke('public-signup', {
+          body: {
+            email,
+            password,
+            role: desiredRole,
+          },
         });
-        if (error) throw error;
-        if (data.session?.user?.id) {
-          // Email confirmation disabled: attach role immediately
-          await supabase.from("user_roles").insert({ user_id: data.session.user.id, role: desiredRole });
-          toast({ title: "Аккаунт создан", description: "Роль назначена. Добро пожаловать!" });
-          if (desiredRole === "pro") navigate("/dashboard/pro", { replace: true });
-          else if (desiredRole === "business") navigate("/dashboard/business", { replace: true });
-          else navigate("/dashboard/client", { replace: true });
+
+        if (signupError) throw signupError;
+
+        if (signupData?.session?.access_token && signupData?.session?.refresh_token) {
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: signupData.session.access_token,
+            refresh_token: signupData.session.refresh_token,
+          });
+          if (sessionError) throw sessionError;
+
+          localStorage.removeItem("desired_role");
+          setPendingConfirmationEmail(null);
+          toast({ title: "Аккаунт создан", description: "Добро пожаловать!" });
+          if (desiredRole === "pro") redirectAfterAuth("/dashboard/pro");
+          else if (desiredRole === "business") redirectAfterAuth("/dashboard/business");
+          else redirectAfterAuth("/dashboard/client");
         } else {
-          // Most setups require email confirmation
-          localStorage.setItem("desired_role", desiredRole);
-          toast({ title: "Аккаунт создан", description: "Проверьте почту для подтверждения" });
-          navigate("/", { replace: true });
+          const redirectUrl = `${window.location.origin}/`;
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: redirectUrl },
+          });
+          if (error) throw error;
+          if (data.session?.user?.id) {
+            await supabase.from("user_roles").insert({ user_id: data.session.user.id, role: desiredRole });
+            toast({ title: "Аккаунт создан", description: "Роль назначена. Добро пожаловать!" });
+            if (desiredRole === "pro") redirectAfterAuth("/dashboard/pro");
+            else if (desiredRole === "business") redirectAfterAuth("/dashboard/business");
+            else redirectAfterAuth("/dashboard/client");
+          } else {
+            localStorage.setItem("desired_role", desiredRole);
+            setPendingConfirmationEmail(email);
+            setMode("signin");
+            setPasswordValue("");
+            toast({
+              title: "Аккаунт создан",
+              description: "Подтвердите email по письму и затем войдите в аккаунт",
+            });
+          }
         }
       }
     } catch (err: any) {
       console.error(err);
-      
+
       // Better error handling for authentication
       let errorMessage = err?.message || "Не удалось выполнить действие";
       let errorTitle = "Ошибка";
-      
+
       if (err?.message?.includes("Invalid login credentials")) {
         errorTitle = "Неверные данные";
         errorMessage = "Проверьте правильность email и пароля";
@@ -103,15 +139,36 @@ const Auth = () => {
       } else if (err?.message?.includes("Password should be at least")) {
         errorTitle = "Слабый пароль";
         errorMessage = "Пароль должен содержать минимум 6 символов";
+      } else if (err?.message?.includes("email rate limit exceeded") || err?.code === "over_email_send_rate_limit") {
+        errorTitle = "Лимит писем исчерпан";
+        errorMessage = "Регистрация временно упёрлась в лимит отправки писем. Попробуйте ещё раз чуть позже.";
       }
-      
-      toast({ 
-        title: errorTitle, 
-        description: errorMessage, 
-        variant: "destructive" 
+
+      toast({
+        title: errorTitle,
+        description: errorMessage,
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resendConfirmation = async () => {
+    if (!pendingConfirmationEmail) return;
+
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: pendingConfirmationEmail,
+        options: { emailRedirectTo: redirectUrl },
+      });
+      if (error) throw error;
+      toast({ title: 'Письмо отправлено повторно', description: `Проверьте почту: ${pendingConfirmationEmail}` });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: 'Не удалось отправить письмо', description: err?.message || 'Попробуйте ещё раз позже', variant: 'destructive' });
     }
   };
 
@@ -120,23 +177,23 @@ const Auth = () => {
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${authBg})` }}
       />
       <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/95" />
-      
+
       <Seo title={`${t('app.name')} — Auth`} description="Sign in or create an account" canonical="/auth" />
-      
+
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-lg mx-auto">
           <GlassMorphism intensity="strong" variant="bordered" className="p-8 animate-fade-in">
             {/* Header */}
             <div className="text-center mb-8">
               <div className="mb-6">
-                <AnimatedIcon 
-                  icon={mode === 'signin' ? Lock : Shield} 
-                  size={48} 
+                <AnimatedIcon
+                  icon={mode === 'signin' ? Lock : Shield}
+                  size={48}
                   className="text-primary animate-pulse-glow"
                 />
               </div>
@@ -144,27 +201,40 @@ const Auth = () => {
                 {mode === 'signin' ? 'Добро пожаловать!' : 'Создать аккаунт'}
               </h1>
               <p className="text-muted-foreground">
-                {mode === 'signin' 
-                  ? 'Войдите в свой аккаунт ServiceHub' 
+                {mode === 'signin'
+                  ? 'Войдите в свой аккаунт ServiceHub'
                   : 'Присоединяйтесь к ServiceHub сегодня'
                 }
               </p>
             </div>
 
-            <form className="space-y-6" onSubmit={onSubmit}>
+            <form key={`${mode}-${pendingConfirmationEmail ?? 'none'}`} className="space-y-6" onSubmit={onSubmit}>
+              {pendingConfirmationEmail && mode === 'signin' && (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm space-y-3">
+                  <div className="font-medium text-foreground">Аккаунт создан. Подтвердите email</div>
+                  <div className="text-muted-foreground break-all">{pendingConfirmationEmail}</div>
+                  <div className="text-muted-foreground">После подтверждения вернитесь сюда и войдите в аккаунт.</div>
+                  <Button type="button" variant="outline" className="w-full" onClick={resendConfirmation}>
+                    Отправить письмо ещё раз
+                  </Button>
+                </div>
+              )}
+
               {/* Email Field */}
               <div className="space-y-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <Label htmlFor="email" className="flex items-center gap-2 font-medium">
                   <AnimatedIcon icon={Mail} size={16} />
                   Email адрес
                 </Label>
-                <Input 
-                  id="email" 
-                  name="email" 
-                  type="email" 
-                  placeholder="your@email.com" 
-                  autoComplete="email" 
-                  required 
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  autoComplete="email"
+                  value={emailValue}
+                  onChange={(e) => setEmailValue(e.target.value)}
+                  required
                   className="h-12 px-4 text-lg border-2 border-border/50 focus:border-primary/50 transition-all"
                 />
               </div>
@@ -176,13 +246,15 @@ const Auth = () => {
                   Пароль
                 </Label>
                 <div className="relative">
-                  <Input 
-                    id="password" 
-                    name="password" 
+                  <Input
+                    id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••" 
-                    autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} 
-                    required 
+                    placeholder="••••••••"
+                    autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                    value={passwordValue}
+                    onChange={(e) => setPasswordValue(e.target.value)}
+                    required
                     className="h-12 px-4 pr-12 text-lg border-2 border-border/50 focus:border-primary/50 transition-all"
                   />
                   <button
@@ -202,43 +274,48 @@ const Auth = () => {
                     <AnimatedIcon icon={User} size={16} />
                     Тип аккаунта
                   </Label>
-                  <select 
-                    id="role" 
-                    name="role" 
-                    defaultValue="client" 
+                  <select
+                    id="role"
+                    name="role"
+                    value={roleValue}
+                    onChange={(e) => setRoleValue(e.target.value as "client" | "pro" | "business")}
                     className="w-full h-12 rounded-xl border-2 border-border/50 bg-background/80 px-4 text-lg focus:border-primary/50 transition-all"
                   >
-                    <option value="client">Клиент — заказываю услуги</option>
-                    <option value="pro">Специалист — выполняю заказы</option>
-                    <option value="business">Бизнес — корпоративный аккаунт</option>
+                    <option value="client">{t("auth.account_client")}</option>
+                    <option value="pro">{t("auth.account_pro")}</option>
+                    <option value="business">{t("auth.account_business")}</option>
                   </select>
                 </div>
               )}
 
               {/* Submit Buttons */}
               <div className="flex flex-col gap-4 pt-4 animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <Button 
-                  type="submit" 
-                  disabled={loading} 
+                <Button
+                  type="submit"
+                  disabled={loading}
                   className="h-12 text-lg btn-hero w-full"
                 >
                   {loading ? (
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Подождите…
+                      {t("auth.wait")}
                     </div>
                   ) : (
-                    mode === 'signin' ? 'Войти в аккаунт' : 'Создать аккаунт'
+                    mode === 'signin' ? t("auth.sign_in_btn") : t("auth.sign_up_btn")
                   )}
                 </Button>
-                
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setMode(mode === 'signin' ? 'signup' : 'signin');
+                    setPendingConfirmationEmail(null);
+                    setPasswordValue('');
+                  }}
                   className="h-12 text-lg"
                 >
-                  {mode === 'signin' ? 'Нет аккаунта? Создать' : 'Уже есть аккаунт? Войти'}
+                  {mode === 'signin' ? t("auth.toggle_sign_in") : t("auth.toggle_sign_up")}
                 </Button>
               </div>
             </form>

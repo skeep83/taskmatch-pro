@@ -4,22 +4,31 @@ import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { MobileCard } from "@/mobile/components/ui/MobileCard";
-import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, ArrowLeft } from "lucide-react";
+import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, ArrowLeft, Loader2, Navigation, Search } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { geocodeAddress, getCurrentResolvedLocation, type ResolvedLocation } from "@/lib/geolocation";
+import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
+
+const MAX_MEDIA_FILES = 8;
+const LAST_CREATED_JOB_STORAGE_KEY = "taskmatch:lastCreatedJob";
 
 const MobileJobNew = () => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState<Array<{ id: string; name: string; name_ro?: string; icon?: string }>>([]);
+  const [categories, setCategories] = useState<Array<{ id: string; name: string; name_ro?: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [locationQuery, setLocationQuery] = useState("");
+  const [resolvedLocation, setResolvedLocation] = useState<ResolvedLocation | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const { supabase } = await import("@/integrations/supabase/client");
         const { data, error } = await supabase
           .from("categories")
           .select("id,key,label_ru,label_ro")
@@ -28,10 +37,9 @@ const MobileJobNew = () => {
         const mappedData = data?.map(cat => ({
           id: cat.id,
           name: cat.label_ru || cat.key,
-          name_ro: cat.label_ro,
-          icon: cat.key
+          name_ro: cat.label_ro
         })) || [];
-        setCategories(mappedData);
+        setCategories(dedupeCategoriesByDisplayName(mappedData));
       } catch (e) {
         console.error(e);
       }
@@ -42,6 +50,44 @@ const MobileJobNew = () => {
   const params = new URLSearchParams(location.search);
   const presetCategory = params.get("category_id") || "";
   const presetProId = params.get("pro_id") || "";
+
+  const applyResolvedLocation = (location: ResolvedLocation) => {
+    setResolvedLocation(location);
+    setLocationQuery(location.address);
+    setLocationError(null);
+  };
+
+  const handleUseCurrentLocation = async () => {
+    try {
+      setLocationLoading(true);
+      setLocationError(null);
+      const location = await getCurrentResolvedLocation();
+      applyResolvedLocation(location);
+      toast({ title: 'Местоположение определено', description: location.publicLabel || 'Nearby-поиск теперь будет точнее' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Не удалось определить местоположение';
+      setLocationError(message);
+      toast({ title: 'Ошибка геолокации', description: message, variant: 'destructive' });
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  const handleResolveAddress = async () => {
+    try {
+      setLocationLoading(true);
+      setLocationError(null);
+      const location = await geocodeAddress(locationQuery);
+      applyResolvedLocation(location);
+      toast({ title: 'Адрес подтверждён', description: location.publicLabel || 'Локация сохранена для nearby-подбора' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Не удалось распознать адрес';
+      setLocationError(message);
+      toast({ title: 'Не удалось определить адрес', description: message, variant: 'destructive' });
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -58,9 +104,17 @@ const MobileJobNew = () => {
       toast({ title: t("auth.error.fields"), description: t("job.new.error.required"), variant: "destructive" });
       return;
     }
+
+    if (!resolvedLocation) {
+      toast({
+        title: 'Нужна геолокация',
+        description: 'Укажите адрес или используйте текущее местоположение, чтобы найти ближайших специалистов.',
+        variant: 'destructive'
+      });
+      return;
+    }
     setLoading(true);
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const userId = s.session?.user?.id;
       if (!userId) {
@@ -77,23 +131,44 @@ const MobileJobNew = () => {
         .maybeSingle();
 
       const scheduled_at = date && time ? new Date(`${date}T${time}:00Z`).toISOString() : null;
+      const persistedLocationSource = resolvedLocation.source === 'ip_geolocate'
+        ? 'address_geocode'
+        : resolvedLocation.source;
       const insertPayload: any = {
         client_id: userId,
         category_id,
         title: description.substring(0, 100),
         description,
+        status: 'new',
         budget_min_cents: isFinite(budget_min) ? Math.round(budget_min * 100) : null,
         budget_max_cents: isFinite(budget_max) ? Math.round(budget_max * 100) : null,
         scheduled_at,
-        urgency
+        urgency,
+        location_lat: resolvedLocation.latitude,
+        location_lng: resolvedLocation.longitude,
+        location_address: resolvedLocation.address,
+        location_precision: resolvedLocation.precision,
+        location_source: persistedLocationSource,
+        location_public_label: resolvedLocation.publicLabel,
       };
-      
+
       if (presetProId) insertPayload.pro_id = presetProId;
-      
+
       const { data: created, error } = await supabase
         .from("jobs")
         .insert(insertPayload)
-        .select('id')
+        .select(`
+          id,
+          public_id,
+          client_id,
+          title,
+          status,
+          budget_min_cents,
+          budget_max_cents,
+          created_at,
+          scheduled_at,
+          urgency
+        `)
         .single();
       if (error) throw error;
 
@@ -137,8 +212,14 @@ const MobileJobNew = () => {
         // Continue even if matching fails
       }
 
-      toast({ title: "Заказ создан", description: "Мы нашли специалистов в вашем районе и отправили им уведомления" });
-      navigate("/dashboard/client", { replace: true });
+      try {
+        window.sessionStorage.setItem(LAST_CREATED_JOB_STORAGE_KEY, JSON.stringify(created));
+      } catch (storageError) {
+        console.warn('Failed to persist just-created job locally:', storageError);
+      }
+
+      toast({ title: t("job.new.success.created"), description: t("job.new.success.specialists_notified") });
+      navigate("/dashboard/client?tab=jobs&refresh=1", { replace: true });
     } catch (err: any) {
       console.error(err);
       toast({ title: "Ошибка", description: err?.message || "Не удалось создать заказ", variant: "destructive" });
@@ -149,7 +230,7 @@ const MobileJobNew = () => {
 
   const categoryOptions = useMemo(() => categories.map(c => (
     <option key={c.id} value={c.id}>
-      {c.icon && `${c.icon} `}{c.name}
+      {c.name}
     </option>
   )), [categories]);
 
@@ -167,14 +248,59 @@ const MobileJobNew = () => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    const files = Array.from(e.dataTransfer.files);
-    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+    addFiles(Array.from(e.dataTransfer.files));
+  };
+
+  const addFiles = (incomingFiles: File[]) => {
+    if (!incomingFiles.length) return;
+
+    let skippedCount = 0;
+
+    setUploadedFiles(prev => {
+      const availableSlots = Math.max(0, MAX_MEDIA_FILES - prev.length);
+      const filesToAdd = incomingFiles.slice(0, availableSlots);
+      skippedCount = incomingFiles.length - filesToAdd.length;
+      return [...prev, ...filesToAdd];
+    });
+
+    if (skippedCount > 0) {
+      toast({
+        title: 'Лимит файлов достигнут',
+        description: `Можно прикрепить не более ${MAX_MEDIA_FILES} фото/видео к одному заказу.`,
+      });
+    }
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+    addFiles(Array.from(e.target.files || []));
+    e.target.value = '';
   };
+
+  const openMediaPicker = (accept: string, capture?: 'environment') => {
+    if (uploadedFiles.length >= MAX_MEDIA_FILES) {
+      toast({
+        title: 'Лимит файлов достигнут',
+        description: `Удалите лишние вложения, чтобы добавить новые. Максимум: ${MAX_MEDIA_FILES}.`,
+      });
+      return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept;
+    input.multiple = true;
+    if (capture) {
+      input.capture = capture;
+    }
+    input.onchange = (event) => {
+      addFiles(Array.from((event.target as HTMLInputElement).files || []));
+      input.value = '';
+    };
+    input.click();
+  };
+
+  const remainingSlots = Math.max(0, MAX_MEDIA_FILES - uploadedFiles.length);
+  const mediaLimitReached = remainingSlots === 0;
 
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
@@ -183,7 +309,7 @@ const MobileJobNew = () => {
   return (
     <div className="min-h-screen bg-[#E5E7EB] pb-safe">
       <Seo title={`${t('app.name')} — Создать заказ`} description="Создать заказ" canonical="/job/new" />
-      
+
       {/* Mobile Header */}
       <div className="sticky top-0 z-50 bg-[#E5E7EB] px-4 py-3 border-b border-[#D1D5DB]">
         <div className="flex items-center justify-between">
@@ -193,7 +319,7 @@ const MobileJobNew = () => {
           >
             <ArrowLeft className="w-5 h-5 text-[#374151]" />
           </button>
-          <h1 className="text-lg font-semibold text-[#374151]">Создать заказ</h1>
+          <h1 className="text-lg font-semibold text-[#374151]">{t("job.new.title")}</h1>
           <div className="w-9 h-9" /> {/* Spacer */}
         </div>
       </div>
@@ -204,18 +330,18 @@ const MobileJobNew = () => {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
               <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
-              Детали услуги
+              {t("job.new.service_details")}
             </h2>
-            
+
             <div>
-              <label className="block text-sm font-medium mb-2 text-[#374151]">Категория услуги</label>
-              <select 
-                name="category_id" 
+              <label className="block text-sm font-medium mb-2 text-[#374151]">{t("job.new.category")}</label>
+              <select
+                name="category_id"
                 defaultValue={presetCategory}
-                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50" 
+                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
                 required
               >
-                <option value="" disabled>Выберите категорию</option>
+                <option value="" disabled>{t("job.new.select_category")}</option>
                 {categoryOptions}
               </select>
             </div>
@@ -230,16 +356,16 @@ const MobileJobNew = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-[#374151]">Описание задачи</label>
-              <textarea 
+              <label className="block text-sm font-medium mb-2 text-[#374151]">{t("job.new.description")}</label>
+              <textarea
                 name="description"
-                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50 resize-none" 
+                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50 resize-none"
                 rows={4}
-                placeholder="Детально опишите задачу..."
+                placeholder={t("job.new.description_placeholder")}
                 required
               />
               <p className="text-xs text-[#6B7280] mt-2">
-                Чем подробнее описание, тем точнее будут предложения
+                {t("job.new.description_help")}
               </p>
             </div>
           </div>
@@ -250,53 +376,116 @@ const MobileJobNew = () => {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
               <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
-              Бюджет и расписание
+              {t("job.new.budget_schedule")}
             </h2>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-[#374151]">
                   <Euro className="w-4 h-4 text-green-500" />
                   Бюджет от
                 </label>
-                <input 
-                  name="budget_min" 
-                  type="number" 
+                <input
+                  name="budget_min"
+                  type="number"
                   className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
                   placeholder="1000"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2 text-[#374151]">до</label>
-                <input 
-                  name="budget_max" 
-                  type="number" 
+                <input
+                  name="budget_max"
+                  type="number"
                   className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
                   placeholder="5000"
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium mb-2 flex items-center gap-2 text-[#374151]">
                   <Clock className="w-4 h-4 text-blue-500" />
                   Дата
                 </label>
-                <input 
-                  name="date" 
-                  type="date" 
+                <input
+                  name="date"
+                  type="date"
                   className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2 text-[#374151]">Время</label>
-                <input 
-                  name="time" 
-                  type="time" 
+                <input
+                  name="time"
+                  type="time"
                   className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
                 />
               </div>
+            </div>
+          </div>
+        </MobileCard>
+
+        {/* Location Section */}
+        <MobileCard>
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
+              <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              Геолокация заказа
+            </h2>
+
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-[#374151]">Адрес или район</label>
+              <div className="flex gap-2">
+                <input
+                  value={locationQuery}
+                  onChange={(e) => {
+                    setLocationQuery(e.target.value);
+                    setLocationError(null);
+                  }}
+                  placeholder="Кишинёв, район, улица..."
+                  className="flex-1 bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                />
+                <button
+                  type="button"
+                  onClick={handleResolveAddress}
+                  disabled={locationLoading || !locationQuery.trim()}
+                  className="px-3 py-3 bg-primary text-white rounded-xl font-semibold disabled:opacity-60 inline-flex items-center gap-1"
+                >
+                  {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleUseCurrentLocation}
+                disabled={locationLoading}
+                className="w-full px-4 py-3 bg-[#E5E7EB] text-[#374151] rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] inline-flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4 text-primary" />}
+                Использовать моё местоположение
+              </button>
+
+              {resolvedLocation ? (
+                <div className="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700 space-y-1">
+                  <div className="flex items-center gap-2 font-medium"><CheckCircle className="w-4 h-4" /> Локация готова</div>
+                  <div>{resolvedLocation.publicLabel || resolvedLocation.address}</div>
+                  <div className="text-xs text-green-800/80">{resolvedLocation.latitude.toFixed(5)}, {resolvedLocation.longitude.toFixed(5)}</div>
+                  <div className="text-xs text-green-800/80">
+                    Источник: {resolvedLocation.source === 'device_gps' ? 'Геолокация устройства' : resolvedLocation.source === 'ip_geolocate' ? 'Примерная локация по IP (HTTP fallback)' : 'Ручной адрес'}
+                  </div>
+                  {resolvedLocation.source === 'ip_geolocate' && (
+                    <div className="text-xs text-amber-700">Точность приблизительная — лучше уточнить адрес вручную.</div>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-xl bg-amber-50 px-4 py-3 text-xs text-[#6B7280]">
+                  Без геолокации платформа не сможет приоритетно показать заказ специалистам рядом.
+                </div>
+              )}
+
+              {locationError && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{locationError}</div>}
             </div>
           </div>
         </MobileCard>
@@ -305,45 +494,27 @@ const MobileJobNew = () => {
         <MobileCard>
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-[#374151] flex items-center gap-2">
-              <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
-              Фотографии задачи
+              <span className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
+              {t("job.new.photos")}
             </h2>
-            
+
             {/* Quick Camera Actions */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.capture = 'environment';
-                  input.onchange = (e) => {
-                    const files = Array.from((e.target as HTMLInputElement).files || []);
-                    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
-                  };
-                  input.click();
-                }}
-                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all"
+                onClick={() => openMediaPicker('image/*', 'environment')}
+                disabled={mediaLimitReached}
+                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all disabled:opacity-50"
               >
                 <Camera className="w-4 h-4 text-primary mb-1" />
                 <span className="text-xs text-[#374151] font-medium">Камера</span>
               </button>
-              
+
               <button
                 type="button"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'video/*';
-                  input.capture = 'environment';
-                  input.onchange = (e) => {
-                    const files = Array.from((e.target as HTMLInputElement).files || []);
-                    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
-                  };
-                  input.click();
-                }}
-                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all"
+                onClick={() => openMediaPicker('video/*', 'environment')}
+                disabled={mediaLimitReached}
+                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all disabled:opacity-50"
               >
                 <div className="w-4 h-4 text-primary mb-1 flex items-center justify-center">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
@@ -352,8 +523,13 @@ const MobileJobNew = () => {
                 </div>
                 <span className="text-xs text-[#374151] font-medium">Видео</span>
               </button>
+
+              <label htmlFor="mobile-photo-upload" className={`flex flex-col items-center justify-center p-2 bg-primary text-white rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all ${mediaLimitReached ? 'opacity-50 pointer-events-none' : 'cursor-pointer active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.12)]'}`}>
+                <Upload className="w-4 h-4 mb-1" />
+                <span className="text-xs font-medium">Файлы</span>
+              </label>
             </div>
-            
+
             {/* File Upload Area */}
             <div
               className={`border-2 border-dashed rounded-lg p-3 text-center transition-all ${
@@ -366,7 +542,7 @@ const MobileJobNew = () => {
             >
               <Upload className="w-5 h-5 text-primary mx-auto mb-1" />
               <p className="text-xs text-[#6B7280] mb-2">
-                Или выберите файлы
+                Или выберите до {MAX_MEDIA_FILES} фото/видео из галереи
               </p>
               <input
                 type="file"
@@ -377,16 +553,19 @@ const MobileJobNew = () => {
                 id="mobile-photo-upload"
                 name="photos"
               />
-              <label htmlFor="mobile-photo-upload" className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] inline-flex items-center gap-1 cursor-pointer active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]">
+              <label htmlFor="mobile-photo-upload" className={`bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] inline-flex items-center gap-1 ${mediaLimitReached ? 'opacity-50 pointer-events-none' : 'cursor-pointer active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]'}`}>
                 <Upload className="w-3 h-3" />
                 Выбрать
               </label>
+              <p className="mt-2 text-[11px] text-[#6B7280]">
+                Осталось мест: {remainingSlots}/{MAX_MEDIA_FILES}
+              </p>
             </div>
 
             {/* Uploaded Files Preview */}
             {uploadedFiles.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs text-[#6B7280]">Загружено: {uploadedFiles.length}/8</p>
+                <p className="text-xs text-[#6B7280]">Загружено: {uploadedFiles.length}/{MAX_MEDIA_FILES}</p>
                 <div className="grid grid-cols-4 gap-2">
                   {uploadedFiles.map((file, index) => (
                     <div key={index} className="relative group bg-[#E5E7EB] rounded-lg p-1 shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB]">
@@ -436,7 +615,7 @@ const MobileJobNew = () => {
             disabled={loading}
             className="px-6 py-3 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] disabled:opacity-50"
           >
-            {loading ? 'Создаем...' : 'Создать заказ'}
+            {loading ? t("job.new.creating") : t("job.new.create")}
           </button>
         </div>
       </form>

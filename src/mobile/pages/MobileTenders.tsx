@@ -11,6 +11,7 @@ import { MobileCard } from "@/mobile/components/ui/MobileCard";
 import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
 import { Button } from "@/components/ui/button";
 import { Clock, Euro, Users, Eye, Gavel, Trophy, Timer, RefreshCw, Grid, List, Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const MobileTenders = () => {
   const { t } = useEnhancedI18n();
@@ -26,18 +27,17 @@ const MobileTenders = () => {
     (async () => {
       try {
         setLoading(true);
-        const { supabase } = await import("@/integrations/supabase/client");
         const { data, error } = await (supabase as any)
           .from('tenders')
           .select(`
-            id, title, description, status, created_at, window_to, budget_max_cents,
+            id, title, description, status, created_at, deadline, budget_max_cents,
             bids(id, price_cents, created_at),
             categories(label_ru, key)
           `)
           .eq('status','open')
           .order('created_at', { ascending: false })
           .limit(50);
-          
+
         if (error) throw error;
         setItems(data || []);
       } catch (error) {
@@ -53,38 +53,38 @@ const MobileTenders = () => {
     const now = new Date();
     const end = new Date(windowTo);
     const diff = end.getTime() - now.getTime();
-    
+
     if (diff <= 0) return "Завершен";
-    
+
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (hours > 24) {
       const days = Math.floor(hours / 24);
       return `${days}д ${hours % 24}ч`;
     }
-    
+
     return `${hours}ч ${minutes}м`;
   };
 
   const tabItems = [
     { id: "active", label: "Активные", icon: Gavel },
     { id: "completed", label: "Завершенные", icon: Trophy },
-    { id: "my-bids", label: "Мои заявки", icon: Users },
+    { id: "my-bids", label: "Мои предложения", icon: Users },
     { id: "stats", label: "Статистика", icon: Euro }
   ];
 
   return (
     <div className="min-h-screen bg-[#E5E7EB]">
-      <Seo title={`${t('app.name')} — Тендеры`} description="Открытые тендеры с аукционной системой" canonical="/tenders" />
-      
-      <MobileHeader 
-        title="Тендеры"
+      <Seo title={`${t('app.name')} — Бизнес-тендеры`} description="Тендеры для компаний и крупных закупок" canonical="/tenders" />
+
+      <MobileHeader
+        title="Бизнес-тендеры"
         showBack={true}
         showNotifications={true}
       />
-      
-      <div 
+
+      <div
         className="pt-20 pb-24 px-4 space-y-6"
         style={{ paddingTop: `${80 + safeAreaInsets.top}px` }}
       >
@@ -94,10 +94,10 @@ const MobileTenders = () => {
             <Gavel className="h-8 w-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold mb-2">
-            Открытые тендеры
+            Бизнес-тендеры
           </h1>
           <p className="text-muted-foreground text-sm">
-            Участвуйте в аукционах Vickrey и выигрывайте проекты
+            Отдельный контур для компаний и крупных закупок
           </p>
         </MobileCard>
 
@@ -121,7 +121,7 @@ const MobileTenders = () => {
                 <div className="text-2xl font-bold text-primary">
                   {items.reduce((sum, tender) => sum + (tender.bids?.length || 0), 0)}
                 </div>
-                <div className="text-xs text-muted-foreground">Заявок</div>
+                <div className="text-xs text-muted-foreground">Откликов</div>
               </div>
               <div className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                 <Users className="w-5 h-5 text-primary" />
@@ -138,8 +138,8 @@ const MobileTenders = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex items-center justify-center p-4 rounded-xl transition-all duration-300 w-full aspect-square ${
-                  activeTab === tab.id 
-                    ? "bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary" 
+                  activeTab === tab.id
+                    ? "bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary"
                     : "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-muted-foreground hover:text-primary hover:shadow-[1px_1px_2px_#D1D5DB,-1px_-1px_2px_#F9FAFB]"
                 }`}
               >
@@ -161,13 +161,13 @@ const MobileTenders = () => {
           <>
             {/* View Toggle */}
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-bold">Активные тендеры</h2>
+              <h2 className="text-lg font-bold">Активные бизнес-тендеры</h2>
               <div className="flex gap-1 p-1 rounded-lg bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
                 <button
                   onClick={() => setViewMode("list")}
                   className={`p-2 rounded-md transition-all duration-300 ${
-                    viewMode === "list" 
-                      ? "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-primary" 
+                    viewMode === "list"
+                      ? "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-primary"
                       : "text-muted-foreground"
                   }`}
                 >
@@ -176,8 +176,8 @@ const MobileTenders = () => {
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-md transition-all duration-300 ${
-                    viewMode === "grid" 
-                      ? "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-primary" 
+                    viewMode === "grid"
+                      ? "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-primary"
                       : "text-muted-foreground"
                   }`}
                 >
@@ -192,7 +192,7 @@ const MobileTenders = () => {
                 <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                   <RefreshCw className="h-6 w-6 animate-spin text-primary" />
                 </div>
-                <p className="text-muted-foreground">Загружаем тендеры...</p>
+                <p className="text-muted-foreground">Загружаем бизнес-заказы...</p>
               </MobileCard>
             ) : (
               <div className={viewMode === "grid" ? "grid grid-cols-1 gap-4" : "space-y-4"}>
@@ -201,12 +201,12 @@ const MobileTenders = () => {
                     <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
                       <Trophy className="h-8 w-8 text-muted-foreground" />
                     </div>
-                    <h3 className="font-semibold mb-2">Нет открытых тендеров</h3>
-                    <p className="text-muted-foreground text-sm">Новые тендеры появятся в ближайшее время</p>
+                    <h3 className="font-semibold mb-2">Нет открытых бизнес-тендеров</h3>
+                    <p className="text-muted-foreground text-sm">Когда появятся новые корпоративные закупки, они будут здесь</p>
                   </MobileCard>
                 ) : (
                   items.map((tender, index) => (
-                    <motion.div 
+                    <motion.div
                       key={tender.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -217,8 +217,8 @@ const MobileTenders = () => {
                           {/* Header */}
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <Badge 
-                                variant="outline" 
+                              <Badge
+                                variant="outline"
                                 className="mb-2 bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] border-0 text-primary text-xs"
                               >
                                 {tender.categories?.label_ru || "Тендер"}
@@ -227,19 +227,19 @@ const MobileTenders = () => {
                                 {tender.title || `Тендер #${String(tender.id).slice(0, 8)}`}
                               </h3>
                             </div>
-                            <Badge 
-                              variant="default" 
+                            <Badge
+                              variant="default"
                               className="bg-green-500/20 text-green-700 border-0 text-xs"
                             >
                               Открыт
                             </Badge>
                           </div>
-                          
+
                           {/* Description */}
                           <p className="text-muted-foreground text-sm line-clamp-2">
                             {tender.description}
                           </p>
-                          
+
                           {/* Stats Row */}
                           <div className="grid grid-cols-3 gap-3 text-xs">
                             {tender.budget_max_cents && (
@@ -252,23 +252,23 @@ const MobileTenders = () => {
                                 </span>
                               </div>
                             )}
-                            
+
                             <div className="flex items-center gap-2">
                               <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
                                 <Users className="w-3 h-3 text-blue-500" />
                               </div>
                               <span className="font-medium">
-                                {tender.bids?.length || 0} заявок
+                                {tender.bids?.length || 0} откликов
                               </span>
                             </div>
-                            
-                            {tender.window_to && (
+
+                            {tender.deadline && (
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
                                   <Timer className="w-3 h-3 text-orange-500" />
                                 </div>
                                 <span className="font-medium">
-                                  {getTimeRemaining(tender.window_to)}
+                                  {getTimeRemaining(tender.deadline)}
                                 </span>
                               </div>
                             )}
@@ -280,17 +280,17 @@ const MobileTenders = () => {
                               {new Date(tender.created_at).toLocaleDateString()}
                             </div>
                             <div className="flex gap-2">
-                              <Link 
-                                to={`/tenders/${tender.id}`} 
+                              <Link
+                                to={`/tenders/${tender.id}`}
                                 className="w-8 h-8 rounded-lg bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] hover:shadow-[1px_1px_2px_#D1D5DB,-1px_-1px_2px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
                               >
                                 <Eye className="w-3 h-3" />
                               </Link>
-                              <Link 
-                                to={`/tenders/${tender.id}`} 
+                              <Link
+                                to={`/tenders/${tender.id}`}
                                 className="px-3 py-1.5 rounded-lg bg-primary shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] hover:shadow-[1px_1px_2px_#D1D5DB,-1px_-1px_2px_#F9FAFB] transition-all duration-300 text-white text-xs font-medium"
                               >
-                                Подать заявку
+                                Откликнуться
                               </Link>
                             </div>
                           </div>
@@ -313,20 +313,20 @@ const MobileTenders = () => {
               {activeTab === "stats" && <Euro className="h-8 w-8 text-muted-foreground" />}
             </div>
             <h3 className="font-semibold mb-2">
-              {activeTab === "completed" && "Завершенные тендеры"}
-              {activeTab === "my-bids" && "Мои заявки"}
+              {activeTab === "completed" && "Завершенные бизнес-тендеры"}
+              {activeTab === "my-bids" && "Мои предложения"}
               {activeTab === "stats" && "Статистика"}
             </h3>
             <p className="text-muted-foreground text-sm">
-              {activeTab === "completed" && "Здесь будут отображаться завершенные тендеры"}
-              {activeTab === "my-bids" && "Здесь будут отображаться ваши заявки на тендеры"}
-              {activeTab === "stats" && "Здесь будет отображаться статистика по тендерам"}
+              {activeTab === "completed" && "Здесь будут отображаться завершённые бизнес-тендеры"}
+              {activeTab === "my-bids" && "Здесь будут отображаться ваши отклики на бизнес-тендеры"}
+              {activeTab === "stats" && "Здесь будет отображаться статистика по бизнес-тендерам"}
             </p>
           </MobileCard>
         )}
 
         {/* Floating Action Button */}
-        <Link 
+        <Link
           to="/tenders/new"
           className="fixed bottom-20 right-4 w-14 h-14 rounded-2xl bg-primary shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-white z-10"
           style={{ bottom: `${80 + safeAreaInsets.bottom}px` }}

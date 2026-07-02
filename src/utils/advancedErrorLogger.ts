@@ -1,4 +1,11 @@
-import { supabase } from '@/integrations/supabase/client';
+let supabaseClientPromise: Promise<any> | null = null;
+
+const getSupabaseClient = async () => {
+  if (!supabaseClientPromise) {
+    supabaseClientPromise = import('@/integrations/supabase/client').then((mod) => mod.supabase);
+  }
+  return supabaseClientPromise;
+};
 
 export interface ErrorContext {
   url: string;
@@ -249,8 +256,8 @@ class AdvancedErrorLogger {
 
     console.error = (...args) => {
       originalError.apply(console, args);
-      
-      const message = args.map(arg => 
+
+      const message = args.map(arg =>
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
       ).join(' ');
 
@@ -271,12 +278,12 @@ class AdvancedErrorLogger {
     };
 
     console.warn = (...args) => {
-      const message = args.map(arg => 
+      const message = args.map(arg =>
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
       ).join(' ');
 
       // Don't log our own logging warnings to avoid spam
-      if (message.includes('Failed to log advanced error') || 
+      if (message.includes('Failed to log advanced error') ||
           message.includes('PerformanceObserver not supported') ||
           message.includes('Performance observation not supported')) {
         // Only call original warn in development
@@ -307,7 +314,7 @@ class AdvancedErrorLogger {
       try {
         const response = await originalFetch(...args);
         const endTime = performance.now();
-        
+
         // Log slow requests
         if (endTime - startTime > 5000) {
           this.logAdvancedError({
@@ -376,7 +383,7 @@ class AdvancedErrorLogger {
     XMLHttpRequest.prototype.send = function(...args) {
       if (this._errorLogger) {
         this._errorLogger.startTime = performance.now();
-        
+
         this.addEventListener('error', () => {
           AdvancedErrorLogger.getInstance().logAdvancedError({
             level: 'error',
@@ -397,7 +404,7 @@ class AdvancedErrorLogger {
         this.addEventListener('load', () => {
           const endTime = performance.now();
           const duration = endTime - this._errorLogger.startTime;
-          
+
           if (this.status >= 400) {
             AdvancedErrorLogger.getInstance().logAdvancedError({
               level: this.status >= 500 ? 'error' : 'warning',
@@ -417,7 +424,7 @@ class AdvancedErrorLogger {
           }
         });
       }
-      
+
       return originalXHRSend.call(this, ...args);
     };
   }
@@ -508,11 +515,11 @@ class AdvancedErrorLogger {
 
   private getPerformanceMetrics(): PerformanceMetrics {
     const metrics: PerformanceMetrics = {};
-    
+
     if ('memory' in performance) {
       metrics.memoryUsage = (performance as any).memory;
     }
-    
+
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
       metrics.connectionType = connection.effectiveType;
@@ -528,7 +535,7 @@ class AdvancedErrorLogger {
 
   private getNetworkInfo(): NetworkInfo {
     const info: NetworkInfo = {};
-    
+
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
       info.effectiveType = connection.effectiveType;
@@ -536,7 +543,7 @@ class AdvancedErrorLogger {
       info.rtt = connection.rtt;
       info.saveData = connection.saveData;
     }
-    
+
     return info;
   }
 
@@ -547,9 +554,9 @@ class AdvancedErrorLogger {
       timestamp: Date.now(),
       data
     };
-    
+
     this.userActions.push(action);
-    
+
     // Keep only last 50 actions
     if (this.userActions.length > 50) {
       this.userActions = this.userActions.slice(-50);
@@ -577,14 +584,15 @@ class AdvancedErrorLogger {
     try {
       // Generate fingerprint for deduplication
       error.fingerprint = this.generateFingerprint(error);
-      
+
       // Check for duplicates
       const count = this.duplicateFilter.get(error.fingerprint) || 0;
       if (count > 5) return; // Skip if we've seen this error too many times
-      
+
       this.duplicateFilter.set(error.fingerprint, count + 1);
-      
-      // Add user context
+
+      // Add user context lazily to avoid pulling Supabase into the startup path
+      const supabase = await getSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         error.context.userId = user.id;
@@ -592,10 +600,10 @@ class AdvancedErrorLogger {
 
       // Add to queue
       this.errorQueue.push(error);
-      
+
       // Process queue
       this.processErrorQueue();
-      
+
     } catch (e) {
       // Silently ignore logging errors to prevent infinite loops
       // Only log to console in development
@@ -607,12 +615,13 @@ class AdvancedErrorLogger {
 
   private async processErrorQueue() {
     if (this.isProcessingQueue || this.errorQueue.length === 0) return;
-    
+
     this.isProcessingQueue = true;
-    
+
     try {
       const errors = this.errorQueue.splice(0, 10); // Process up to 10 errors at once
-      
+      const supabase = await getSupabaseClient();
+
       for (const error of errors) {
         await supabase.functions.invoke('admin-logs', {
           body: {
@@ -639,7 +648,7 @@ class AdvancedErrorLogger {
       }
     } finally {
       this.isProcessingQueue = false;
-      
+
       // Process remaining errors if any
       if (this.errorQueue.length > 0) {
         setTimeout(() => this.processErrorQueue(), 1000);
@@ -718,21 +727,29 @@ class AdvancedErrorLogger {
   }
 }
 
-// Export singleton instance
-export const advancedErrorLogger = AdvancedErrorLogger.getInstance();
+// Lazy singleton access to avoid bootstrap side effects during module import
+export const getAdvancedErrorLogger = () => AdvancedErrorLogger.getInstance();
+
+export const advancedErrorLogger = new Proxy({} as AdvancedErrorLogger, {
+  get(_target, prop) {
+    const instance = getAdvancedErrorLogger();
+    const value = (instance as any)[prop];
+    return typeof value === 'function' ? value.bind(instance) : value;
+  },
+});
 
 // Export convenience functions
-export const logAdvancedError = (error: Partial<AdvancedErrorEntry>) => 
-  advancedErrorLogger.logAdvancedError(error as AdvancedErrorEntry);
+export const logAdvancedError = (error: Partial<AdvancedErrorEntry>) =>
+  getAdvancedErrorLogger().logAdvancedError(error as AdvancedErrorEntry);
 
-export const logPaymentError = (provider: string, operation: string, error: any, metadata?: any) => 
-  advancedErrorLogger.logPaymentError(provider, operation, error, metadata);
+export const logPaymentError = (provider: string, operation: string, error: any, metadata?: any) =>
+  getAdvancedErrorLogger().logPaymentError(provider, operation, error, metadata);
 
-export const logAuthError = (operation: string, error: any, metadata?: any) => 
-  advancedErrorLogger.logAuthError(operation, error, metadata);
+export const logAuthError = (operation: string, error: any, metadata?: any) =>
+  getAdvancedErrorLogger().logAuthError(operation, error, metadata);
 
-export const logSupabaseError = (operation: string, error: any, metadata?: any) => 
-  advancedErrorLogger.logSupabaseError(operation, error, metadata);
+export const logSupabaseError = (operation: string, error: any, metadata?: any) =>
+  getAdvancedErrorLogger().logSupabaseError(operation, error, metadata);
 
-export const logSecurityEvent = (eventType: string, details: any) => 
-  advancedErrorLogger.logSecurityEvent(eventType, details);
+export const logSecurityEvent = (eventType: string, details: any) =>
+  getAdvancedErrorLogger().logSecurityEvent(eventType, details);

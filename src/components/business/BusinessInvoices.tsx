@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,7 @@ export function BusinessInvoices() {
   const [invoices, setInvoices] = useState<BusinessInvoice[]>([]);
   const [businessId, setBusinessId] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadBusinessInvoices();
-  }, []);
-
-  const loadBusinessInvoices = async () => {
+  const loadBusinessInvoices = useCallback(async () => {
     setLoading(true);
     try {
       const { data: session } = await supabase.auth.getSession();
@@ -64,7 +60,42 @@ export function BusinessInvoices() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    void loadBusinessInvoices();
+  }, [loadBusinessInvoices]);
+
+  useEffect(() => {
+    if (!businessId) return;
+
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        void loadBusinessInvoices();
+      }
+    };
+
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+
+    const invoicesChannel = supabase
+      .channel(`business-invoices-${businessId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'biz_invoices',
+        filter: `business_id=eq.${businessId}`,
+      }, () => {
+        void loadBusinessInvoices();
+      })
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      void supabase.removeChannel(invoicesChannel);
+    };
+  }, [businessId, loadBusinessInvoices]);
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
@@ -73,7 +104,7 @@ export function BusinessInvoices() {
       'paid': { label: 'Оплачен', variant: 'default' as const },
       'overdue': { label: 'Просрочен', variant: 'destructive' as const }
     };
-    
+
     const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const };
     return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
   };
@@ -162,7 +193,7 @@ export function BusinessInvoices() {
           Создать инвойс
         </button>
       </div>
-      
+
       {invoices.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
@@ -191,11 +222,11 @@ export function BusinessInvoices() {
                       </span>
                       {getStatusBadge(invoice.status)}
                     </div>
-                    
+
                     <div className="flex items-center gap-6 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        Срок: {invoice.due_date ? 
+                        Срок: {invoice.due_date ?
                           new Date(invoice.due_date).toLocaleDateString() :
                           "Не указан"
                         }
@@ -205,7 +236,7 @@ export function BusinessInvoices() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="text-right">
                     <div className="flex items-center gap-1 text-xl font-bold text-black mb-3">
                       <DollarSign className="h-5 w-5" />
@@ -213,7 +244,7 @@ export function BusinessInvoices() {
                     </div>
                     <button
                       className={`p-2 rounded-lg transition-all duration-300 ${
-                        invoice.pdf_url 
+                        invoice.pdf_url
                           ? 'bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]'
                           : 'bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] opacity-50'
                       }`}

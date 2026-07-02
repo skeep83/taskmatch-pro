@@ -12,11 +12,12 @@ import { createChatNotification, markChatNotificationsAsRead } from "@/utils/cha
 import { notificationSounds } from "@/utils/notificationSounds";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
 import { cn } from "@/lib/utils";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import { supabase } from "@/integrations/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
@@ -54,7 +55,6 @@ const Messages = () => {
 
   useEffect(() => {
     (async () => {
-      const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const uid = s.session?.user?.id || null;
       if (!uid) {
@@ -63,15 +63,15 @@ const Messages = () => {
         return;
       }
       setUserId(uid);
-      console.log('🔍 Loading chats for user:', uid);
+      ;
       const { data } = await (supabase as any)
         .from("chats")
         .select("id, job_id, tender_id, client_id, professional_id, last_message_at, created_at")
         .or(`client_id.eq.${uid},professional_id.eq.${uid}`)
         .order("last_message_at", { ascending: false })
         .limit(50);
-      console.log('📋 Loaded chats:', data);
-      setChats(data || []);
+      ;
+      setChats((data || []).filter(chat => chat.client_id !== chat.professional_id));
 
       // Load profiles for chat participants
       if (data && data.length > 0) {
@@ -87,9 +87,9 @@ const Messages = () => {
             .from("profiles")
             .select("id, full_name, first_name, last_name, avatar_url")
             .in("id", Array.from(userIds));
-          
-          console.log('👥 Loaded profiles:', { profilesData, profilesError, userIds: Array.from(userIds) });
-          
+
+          ;
+
           const profilesMap: Record<string, any> = {};
           (profilesData || []).forEach((profile: any) => {
             profilesMap[profile.id] = profile;
@@ -101,12 +101,22 @@ const Messages = () => {
       // Handle URL parameters for creating/opening chats
       const userParam = searchParams.get('user');
       const jobParam = searchParams.get('job');
-      
-      console.log('🔗 URL params:', { userParam, jobParam, currentUserId: uid });
-      
+
+      ;
+
+      if (userParam && userParam === uid) {
+        toast({
+          title: "Недоступно",
+          description: "Нельзя создать чат с самим собой",
+          variant: "destructive"
+        });
+        navigate('/messages', { replace: true });
+        return;
+      }
+
       if (userParam && !id) {
         // Find or create chat with specific user
-        const existingChat = data?.find((chat: any) => 
+        const existingChat = data?.find((chat: any) =>
           (chat.client_id === userParam && chat.professional_id === uid) ||
           (chat.professional_id === userParam && chat.client_id === uid) ||
           (chat.job_id === jobParam && (
@@ -114,40 +124,40 @@ const Messages = () => {
             (chat.professional_id === uid && chat.client_id === userParam)
           ))
         );
-        
-        console.log('🔍 Looking for existing chat. Found:', existingChat);
-        
+
+        ;
+
         if (existingChat) {
-          console.log('✅ Found existing chat, navigating to:', existingChat.id);
+          ;
           navigate(`/messages/${existingChat.id}`, { replace: true });
         } else if (jobParam) {
           // Get job data to determine who is client and who is professional
-          console.log('🏗️ Creating new chat for job:', jobParam);
+          ;
           const { data: jobData } = await (supabase as any)
             .from("jobs")
             .select("client_id, pro_id")
             .eq("id", jobParam)
             .single();
-          
-          console.log('📋 Job data:', jobData);
-          
+
+          ;
+
           if (jobData) {
             let clientId, professionalId;
-            
-            console.log('🔍 Determining roles. Current user:', uid, 'Target user:', userParam);
-            console.log('📋 Job client_id:', jobData.client_id, 'Job pro_id:', jobData.pro_id);
-            
+
+            ;
+            ;
+
             // Current user is client, target user is professional
             if (jobData.client_id === uid && jobData.pro_id === userParam) {
               clientId = uid;
               professionalId = userParam;
-              console.log('✅ Current user is client, target is professional');
+              ;
             }
             // Current user is professional, target user is client
             else if (jobData.pro_id === uid && jobData.client_id === userParam) {
               clientId = userParam;
               professionalId = uid;
-              console.log('✅ Current user is professional, target is client');
+              ;
             }
             // Fallback: determine from user roles
             else {
@@ -156,15 +166,15 @@ const Messages = () => {
                 .from("user_roles")
                 .select("role")
                 .eq("user_id", uid);
-              
+
               const { data: targetUserRoles } = await (supabase as any)
                 .from("user_roles")
                 .select("role")
                 .eq("user_id", userParam);
-              
+
               const currentRoles = (currentUserRoles || []).map((r: any) => r.role);
               const targetRoles = (targetUserRoles || []).map((r: any) => r.role);
-              
+
               // If current user has client role and target has pro role
               if (currentRoles.includes('client') && targetRoles.includes('pro')) {
                 clientId = uid;
@@ -181,13 +191,13 @@ const Messages = () => {
                 professionalId = userParam;
               }
             }
-            
-            console.log('🎯 Final role assignment:', { clientId, professionalId });
-            
+
+            ;
+
             if (clientId && professionalId) {
               await createChatForJob(clientId, professionalId, jobParam);
             } else {
-              console.error('❌ Could not determine client and professional roles');
+              ;
             }
           }
         } else {
@@ -196,17 +206,17 @@ const Messages = () => {
             .from("user_roles")
             .select("role")
             .eq("user_id", uid);
-          
+
           const { data: targetUserRoles } = await (supabase as any)
             .from("user_roles")
             .select("role")
             .eq("user_id", userParam);
-          
+
           const currentRoles = (currentUserRoles || []).map((r: any) => r.role);
           const targetRoles = (targetUserRoles || []).map((r: any) => r.role);
-          
+
           let clientId, professionalId;
-          
+
           if (currentRoles.includes('client') && targetRoles.includes('pro')) {
             clientId = uid;
             professionalId = userParam;
@@ -218,7 +228,7 @@ const Messages = () => {
             clientId = uid;
             professionalId = userParam;
           }
-          
+
           await createChatForJob(clientId, professionalId, null);
         }
       }
@@ -227,20 +237,54 @@ const Messages = () => {
 
   const createChatForJob = async (clientId: string, professionalId: string, jobId: string | null) => {
     try {
-      console.log('💬 Creating chat with params:', { clientId, professionalId, jobId });
-      
+      ;
+
       // Validate required parameters
       if (!clientId || !professionalId) {
-        console.error('❌ Missing required parameters:', { clientId, professionalId, jobId });
-        toast({ 
-          title: "Ошибка", 
-          description: "Недостаточно данных для создания чата", 
-          variant: "destructive" 
+        ;
+        toast({
+          title: "Ошибка",
+          description: "Недостаточно данных для создания чата",
+          variant: "destructive"
         });
         return;
       }
-      
-      const { supabase } = await import("@/integrations/supabase/client");
+
+      if (clientId === professionalId) {
+        toast({
+          title: "Недоступно",
+          description: "Нельзя создать чат с самим собой",
+          variant: "destructive"
+        });
+        navigate('/messages', { replace: true });
+        return;
+      }
+
+
+      let existingChatQuery = (supabase as any)
+        .from("chats")
+        .select("id")
+        .eq("client_id", clientId)
+        .eq("professional_id", professionalId)
+        .limit(1);
+
+      if (jobId) {
+        existingChatQuery = existingChatQuery.eq("job_id", jobId);
+      } else {
+        existingChatQuery = existingChatQuery.is("job_id", null);
+      }
+
+      const { data: existingChats, error: existingChatError } = await existingChatQuery;
+      if (existingChatError) {
+        ;
+      }
+
+      const existingChat = existingChats?.[0];
+      if (existingChat?.id) {
+        navigate(`/messages/${existingChat.id}`, { replace: true });
+        return;
+      }
+
       const { data: newChat, error } = await (supabase as any)
         .from("chats")
         .insert({
@@ -251,59 +295,58 @@ const Messages = () => {
         })
         .select()
         .single();
-      
-      console.log('💬 Chat creation result:', { newChat, error });
-      
+
+      ;
+
       if (error) throw error;
       if (newChat) {
-        console.log('✅ Successfully created chat, navigating to:', newChat.id);
+        ;
         navigate(`/messages/${newChat.id}`, { replace: true });
       } else {
-        console.error('❌ No chat created but no error');
+        ;
       }
     } catch (error) {
-      console.error('Error creating chat:', error);
+      ;
       toast({ title: "Ошибка", description: "Не удалось создать чат", variant: "destructive" });
     }
   };
 
   const deleteChat = async (chatId: string) => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       // Delete chat messages first
       await (supabase as any)
         .from("chat_messages")
         .delete()
         .eq("chat_id", chatId);
-      
+
       // Delete the chat
       const { error } = await (supabase as any)
         .from("chats")
         .delete()
         .eq("id", chatId);
-      
+
       if (error) throw error;
-      
+
       // Update local state
       setChats(prev => prev.filter(c => c.id !== chatId));
-      
+
       // Navigate away if current chat was deleted
       if (String(id) === String(chatId)) {
         navigate("/messages");
       }
-      
-      toast({ 
-        title: "Чат удален", 
-        description: "Чат и все сообщения были удалены" 
+
+      toast({
+        title: "Чат удален",
+        description: "Чат и все сообщения были удалены"
       });
-      
+
     } catch (error) {
-      console.error('Error deleting chat:', error);
-      toast({ 
-        title: "Ошибка", 
-        description: "Не удалось удалить чат", 
-        variant: "destructive" 
+      ;
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить чат",
+        variant: "destructive"
       });
     }
   };
@@ -325,7 +368,6 @@ const Messages = () => {
   useEffect(() => {
     (async () => {
       if (!id) { setMessages([]); return; }
-      const { supabase } = await import("@/integrations/supabase/client");
       const { data } = await (supabase as any)
         .from("chat_messages")
         .select("id, sender_id, content, file_url, created_at, is_read")
@@ -341,7 +383,7 @@ const Messages = () => {
           .from("profiles")
           .select("id, full_name, first_name, last_name, avatar_url")
           .in("id", Array.from(senderIds));
-        
+
         if (messageProfiles) {
           setProfiles(prev => {
             const updated = { ...prev };
@@ -357,8 +399,8 @@ const Messages = () => {
       const channel = (supabase as any).channel('schema-db-changes')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${id}` }, async (payload: any) => {
           const newMessage = payload.new;
-          setMessages((prev) => [...prev, newMessage]);
-          
+          setMessages((prev) => prev.some((message) => message.id === newMessage.id) ? prev : [...prev, newMessage]);
+
           // Load sender profile if not already loaded
           if (!profiles[newMessage.sender_id]) {
             const { data: senderProfile } = await (supabase as any)
@@ -366,21 +408,21 @@ const Messages = () => {
               .select("id, full_name, first_name, last_name, avatar_url")
               .eq("id", newMessage.sender_id)
               .single();
-            
+
             if (senderProfile) {
               setProfiles(prev => ({ ...prev, [senderProfile.id]: senderProfile }));
             }
           }
-          
+
           // Play sound and show notification if message is from another user
           if (newMessage.sender_id !== userId && settings.enabled && settings.messageSound) {
             try {
               await notificationSounds.playNotification('message');
             } catch (error) {
-              console.warn('Could not play notification sound:', error);
+              ;
             }
           }
-          
+
           // Mark chat notifications as read when user is viewing the chat
           if (document.visibilityState === 'visible') {
             await markChatNotificationsAsRead(id);
@@ -396,7 +438,6 @@ const Messages = () => {
   useEffect(() => {
     (async () => {
       if (!id || !userId) return;
-      const { supabase } = await import("@/integrations/supabase/client");
       const room = (supabase as any).channel(`presence:chat:${id}`, { config: { presence: { key: userId } } });
       roomRef.current = room;
 
@@ -427,59 +468,60 @@ const Messages = () => {
 
   const send = async () => {
     if (!text.trim() || !userId || !id) return;
-    
+
     const currentSelectedChat = chats.find(c => String(c.id) === String(id));
     if (!currentSelectedChat) {
-      console.error('❌ Selected chat not found');
+      ;
       toast({ title: "Ошибка", description: "Чат не найден", variant: "destructive" });
       return;
     }
-    
+
+    if (currentSelectedChat.client_id === currentSelectedChat.professional_id) {
+      toast({ title: "Недоступно", description: "Нельзя отправить сообщение самому себе", variant: "destructive" });
+      return;
+    }
+
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      console.log('📤 Sending message:', { chatId: id, senderId: userId, content: text });
-      
+
+      ;
+
       // Send message
       const { data: newMessage, error } = await (supabase as any)
         .from("chat_messages")
         .insert({ chat_id: id, sender_id: userId, message_type: 'text', content: text })
         .select()
         .single();
-      
+
       if (error) throw error;
-      
-      console.log('✅ Message sent successfully:', newMessage);
-      
-      // Immediately update local state for instant UI feedback
-      setMessages(prev => [...prev, newMessage]);
-      
+
+      ;
+
       // Update chat timestamp
       await (supabase as any).from('chats').update({ last_message_at: new Date().toISOString() }).eq('id', id);
-      
+
       // Clear input field
       setText("");
-      
+
       // Send notification to other participant
       if (newMessage && currentSelectedChat) {
         const receiverId = currentSelectedChat.client_id === userId ? currentSelectedChat.professional_id : currentSelectedChat.client_id;
         const senderProfile = profiles[userId] || { full_name: 'Пользователь' };
         const senderName = senderProfile.full_name || senderProfile.first_name || 'Пользователь';
         const messagePreview = text.length > 50 ? text.substring(0, 50) + '...' : text;
-        
-        console.log('📬 Sending notification to:', receiverId);
+
+        ;
         await createChatNotification(receiverId, senderName, messagePreview, id, newMessage.id, userId);
       }
-      
+
     } catch (error) {
-      console.error('Error sending message:', error);
+      ;
       toast({ title: "Ошибка", description: "Не удалось отправить сообщение", variant: "destructive" });
     }
   };
 
   const selectedChat = useMemo(() => {
     const chat = chats.find(c => String(c.id) === String(selectedChatId));
-    console.log('🔍 Selected chat:', { selectedChatId, chat, chatsLength: chats.length });
+    ;
     return chat;
   }, [chats, selectedChatId]);
 
@@ -508,7 +550,7 @@ const Messages = () => {
   return (
     <div className="min-h-screen" style={{ background: 'var(--background-neomorphic)' }}>
       <Seo title={`${t('app.name')} — ${t('messages.title', 'Сообщения')}`} description="Chat messages" canonical="/messages" />
-      
+
       <div className="flex h-screen">{/* Основной контейнер с neumorphic фоном */}
         {/* Chat List Sidebar */}
         <div className={cn(
@@ -518,9 +560,9 @@ const Messages = () => {
           <div className="p-4 border-b flex items-center justify-between">
             <h1 className="text-lg font-semibold">{t('messages.title', 'Сообщения')}</h1>
             {selectedChatId && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => navigate('/messages')}
                 className="lg:hidden"
               >
@@ -528,7 +570,7 @@ const Messages = () => {
               </Button>
             )}
           </div>
-          
+
           <div className="p-4">
             <div className="relative">
               <input
@@ -552,7 +594,7 @@ const Messages = () => {
                 {chats.map((chat) => {
                   const otherId = chat.client_id === userId ? chat.professional_id : chat.client_id;
                   const otherProfile = profiles[otherId];
-                  
+
                   return (
                     <div
                       key={chat.id}
@@ -567,7 +609,7 @@ const Messages = () => {
                           <AvatarImage src={otherProfile?.avatar_url} />
                           <AvatarFallback>{renderProfileInitials(otherProfile)}</AvatarFallback>
                         </Avatar>
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
                             <h3 className="font-medium truncate">
@@ -592,7 +634,7 @@ const Messages = () => {
                               </DropdownMenu>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-1 mt-1">
                             <span className="text-xs text-muted-foreground">
                               {chat.last_message_at ? new Date(chat.last_message_at).toLocaleDateString() : ''}
@@ -615,28 +657,23 @@ const Messages = () => {
         )}>
           {selectedChatId ? (
             <>
-              {/* Debug info - всегда показываем */}
-              <div className="p-2 bg-yellow-100 text-xs border-b">
-                Debug: selectedChatId={selectedChatId}, userId={userId}, selectedChat={selectedChat?.id}, 
-                chatsCount={chats.length}, canSend={!!(selectedChatId && userId && selectedChat)}
-              </div>
               {/* Chat Header */}
               <div className="p-4 border-b bg-muted/30">
                 <div className="flex items-center gap-3">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => navigate('/messages')}
                     className="lg:hidden"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
-                  
+
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={otherUser?.avatar_url} />
                     <AvatarFallback>{renderProfileInitials(otherUser)}</AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1">
                     <h2 className="font-semibold">{renderProfileName(otherUser)}</h2>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -646,7 +683,7 @@ const Messages = () => {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm">
                       <Phone className="h-4 w-4" />
@@ -668,7 +705,7 @@ const Messages = () => {
                   messages.map((message) => {
                     const isOwn = message.sender_id === userId;
                     const senderProfile = profiles[message.sender_id];
-                    
+
                     return (
                       <div
                         key={message.id}
@@ -685,7 +722,7 @@ const Messages = () => {
                             </AvatarFallback>
                           </Avatar>
                         )}
-                        
+
                         <div
                           className={cn(
                             "max-w-[70%] px-3 py-2 rounded-lg",
@@ -713,7 +750,7 @@ const Messages = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         {isOwn && (
                           <Avatar className="h-6 w-6 mt-1">
                             <AvatarImage src={profiles[userId]?.avatar_url} />
@@ -747,8 +784,8 @@ const Messages = () => {
                         }, 100);
                       }}
                     />
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={!text.trim()}
                       className="min-h-[44px] min-w-[44px]"
                     >
@@ -773,50 +810,6 @@ const Messages = () => {
               </div>
             </div>
           )}
-        </div>
-        
-        {/* ПОЛЕ ВВОДА ВСЕГДА ВИДИМО - ГЛОБАЛЬНОЕ */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 z-50"
-             style={{ 
-               background: 'var(--background-neomorphic)',
-               boxShadow: '0 -10px 30px rgba(174, 187, 204, 0.3)'
-             }}>
-          <div className="max-w-4xl mx-auto">
-            <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-3">
-              <div 
-                className="flex-1 relative"
-                style={{ 
-                  background: 'var(--surface-raised)',
-                  boxShadow: 'inset 8px 8px 16px rgba(174, 187, 204, 0.4), inset -8px -8px 16px rgba(255, 255, 255, 0.8)',
-                  borderRadius: '20px',
-                  padding: '2px'
-                }}
-              >
-                <input
-                  type="text"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Введите сообщение здесь..."
-                  className="w-full px-4 py-3 bg-transparent rounded-[18px] focus:outline-none text-base placeholder:text-gray-500"
-                  style={{ fontSize: '16px' }}
-                />
-              </div>
-              <motion.button 
-                type="submit" 
-                disabled={!text.trim()}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 rounded-2xl disabled:opacity-50 flex items-center justify-center transition-all duration-200"
-                style={{ 
-                  background: text.trim() ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--brand-3)))' : 'var(--surface-raised)',
-                  boxShadow: 'var(--shadow-raised)',
-                  color: text.trim() ? 'white' : 'hsl(var(--primary))'
-                }}
-              >
-                <Send className="h-5 w-5" />
-              </motion.button>
-            </form>
-          </div>
         </div>
       </div>
 

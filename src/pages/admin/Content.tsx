@@ -109,6 +109,15 @@ export default function AdminContent() {
   const [selectedNamespace, setSelectedNamespace] = useState<string>("all");
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
+  const moderationPreviewOnly = true;
+
+  const showModerationPreviewOnlyToast = (actionLabel: string) => {
+    toast({
+      title: "Модерация пока в preview-only",
+      description: `${actionLabel} временно отключено: moderation/reports в этом разделе ещё не подключены к боевому backend.`,
+      variant: "destructive"
+    });
+  };
 
   const fetchLanguagesData = async () => {
     try {
@@ -141,7 +150,7 @@ export default function AdminContent() {
   const fetchContentData = async () => {
     try {
       setLoading(true);
-      
+
       // Mock content items data
       const mockContent: ContentItem[] = [
         {
@@ -205,7 +214,7 @@ export default function AdminContent() {
         },
         {
           id: "2",
-          content_id: "2", 
+          content_id: "2",
           reporter_id: "user6",
           reporter_name: "Федоров Ф.Ф.",
           reason: "inappropriate",
@@ -226,7 +235,7 @@ export default function AdminContent() {
       setContentItems(mockContent);
       setReports(mockReports);
       setStats(mockStats);
-      
+
       await fetchLanguagesData();
     } catch (error) {
       console.error("Failed to fetch content data:", error);
@@ -241,15 +250,13 @@ export default function AdminContent() {
   };
 
   const moderateContent = async (contentId: string, action: "approve" | "reject", note?: string) => {
+    if (moderationPreviewOnly) {
+      showModerationPreviewOnlyToast(action === "approve" ? "Одобрение контента" : "Отклонение контента");
+      return;
+    }
+
     try {
       // await adminApi.moderateContent(contentId, action, note);
-      setContentItems(prev =>
-        prev.map(item =>
-          item.id === contentId 
-            ? { ...item, status: action === "approve" ? "approved" : "rejected" }
-            : item
-        )
-      );
       toast({
         title: "Успешно",
         description: `Контент ${action === "approve" ? "одобрен" : "отклонен"}`
@@ -264,15 +271,13 @@ export default function AdminContent() {
   };
 
   const resolveReport = async (reportId: string, action: "dismiss" | "accept") => {
+    if (moderationPreviewOnly) {
+      showModerationPreviewOnlyToast(action === "dismiss" ? "Отклонение репорта" : "Принятие репорта");
+      return;
+    }
+
     try {
       // await adminApi.resolveReport(reportId, action);
-      setReports(prev =>
-        prev.map(report =>
-          report.id === reportId
-            ? { ...report, status: "resolved" }
-            : report
-        )
-      );
       toast({
         title: "Успешно",
         description: `Жалоба ${action === "accept" ? "принята" : "отклонена"}`
@@ -306,7 +311,7 @@ export default function AdminContent() {
           .eq('id', selectedLanguage.id);
 
         if (error) throw error;
-        
+
         toast({
           title: "Успешно",
           description: "Язык обновлен"
@@ -324,12 +329,12 @@ export default function AdminContent() {
           }]);
 
         if (error) throw error;
-        
+
         toast({
           title: "Успешно",
           description: "Язык добавлен"
         });
-        
+
         setNewLanguage({
           code: "",
           name: "",
@@ -338,7 +343,7 @@ export default function AdminContent() {
           is_active: true
         });
       }
-      
+
       await fetchLanguagesData();
       setSelectedLanguage(null);
     } catch (error: any) {
@@ -358,12 +363,12 @@ export default function AdminContent() {
         .eq('id', languageId);
 
       if (error) throw error;
-      
+
       toast({
         title: "Успешно",
         description: "Язык удален"
       });
-      
+
       await fetchLanguagesData();
     } catch (error: any) {
       toast({
@@ -387,7 +392,7 @@ export default function AdminContent() {
           .eq('id', selectedTranslation.id);
 
         if (error) throw error;
-        
+
         toast({
           title: "Успешно",
           description: "Перевод обновлен"
@@ -399,12 +404,12 @@ export default function AdminContent() {
           .insert([newTranslation]);
 
         if (error) throw error;
-        
+
         toast({
           title: "Успешно",
           description: "Перевод добавлен"
         });
-        
+
         setNewTranslation({
           language_code: "",
           translation_key: "",
@@ -413,7 +418,7 @@ export default function AdminContent() {
           context: ""
         });
       }
-      
+
       await fetchLanguagesData();
       setSelectedTranslation(null);
     } catch (error: any) {
@@ -433,12 +438,12 @@ export default function AdminContent() {
         .eq('id', translationId);
 
       if (error) throw error;
-      
+
       toast({
         title: "Успешно",
         description: "Перевод удален"
       });
-      
+
       await fetchLanguagesData();
     } catch (error: any) {
       toast({
@@ -457,12 +462,12 @@ export default function AdminContent() {
         .eq('id', languageId);
 
       if (error) throw error;
-      
+
       toast({
         title: "Успешно",
         description: `Язык ${isActive ? 'активирован' : 'деактивирован'}`
       });
-      
+
       await fetchLanguagesData();
     } catch (error: any) {
       toast({
@@ -502,7 +507,7 @@ export default function AdminContent() {
                          (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesType = typeFilter === "all" || item.type === typeFilter;
     const matchesStatus = statusFilter === "all" || item.status === statusFilter;
-    
+
     return matchesSearch && matchesType && matchesStatus;
   });
 
@@ -510,7 +515,7 @@ export default function AdminContent() {
     const matchesSearch = translation.translation_key.toLowerCase().includes(translationSearchTerm.toLowerCase()) ||
                          translation.translation_value.toLowerCase().includes(translationSearchTerm.toLowerCase());
     const matchesNamespace = selectedNamespace === "all" || translation.namespace === selectedNamespace;
-    
+
     return matchesSearch && matchesNamespace;
   });
 
@@ -530,16 +535,33 @@ export default function AdminContent() {
   return (
     <section className="max-w-6xl mx-auto space-y-6">
       <Seo title="ServiceHub — Admin Content & Languages" description="Модерация контента и управление языками" canonical="/admin/content" />
-      
+
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Контент и локализация</h1>
-          <p className="text-sm text-muted-foreground">Модерация контента и управление многоязычностью платформы</p>
+          <h1 className="text-2xl font-semibold">Content Management</h1>
+          <p className="text-sm text-muted-foreground">Модерация контента и управление локализациями</p>
         </div>
       </div>
 
+      {moderationPreviewOnly && (
+        <Card className="border-amber-300 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3 text-amber-900">
+              <AlertTriangle className="w-5 h-5 mt-0.5" />
+              <div className="space-y-1">
+                <p className="font-medium">Смешанный truth-режим</p>
+                <p className="text-sm">
+                  Языки и переводы в этом разделе подключены к реальной базе. Контент-модерация и обработка репортов пока остаются preview-only,
+                  поэтому approve/reject/dismiss/accept действия намеренно отключены до подключения боевого moderation backend.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Tabs defaultValue="content" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
           <TabsTrigger value="content" className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4" />
             Модерация контента
@@ -658,10 +680,11 @@ export default function AdminContent() {
                 </Select>
               </div>
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Тип</TableHead>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Тип</TableHead>
                     <TableHead>Автор</TableHead>
                     <TableHead>Контент</TableHead>
                     <TableHead>Статус</TableHead>
@@ -748,7 +771,7 @@ export default function AdminContent() {
                                   Проверка и принятие решения по контенту
                                 </DialogDescription>
                               </DialogHeader>
-                              
+
                               {selectedItem && (
                                 <div className="space-y-4">
                                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -765,21 +788,21 @@ export default function AdminContent() {
                                       <strong>Жалоб:</strong> {selectedItem.reports_count}
                                     </div>
                                   </div>
-                                  
+
                                   {selectedItem.title && (
                                     <div>
                                       <strong>Заголовок:</strong>
                                       <p className="mt-1">{selectedItem.title}</p>
                                     </div>
                                   )}
-                                  
+
                                   <div>
                                     <strong>Содержимое:</strong>
                                     <div className="mt-1 p-3 bg-gray-50 rounded-md">
                                       {selectedItem.content}
                                     </div>
                                   </div>
-                                  
+
                                   {selectedItem.images && selectedItem.images.length > 0 && (
                                     <div>
                                       <strong>Изображения:</strong>
@@ -792,7 +815,7 @@ export default function AdminContent() {
                                       </div>
                                     </div>
                                   )}
-                                  
+
                                   {selectedReports.length > 0 && (
                                     <div>
                                       <strong>Жалобы:</strong>
@@ -811,12 +834,14 @@ export default function AdminContent() {
                                                 <Button
                                                   size="sm"
                                                   variant="outline"
+                                                  disabled={moderationPreviewOnly}
                                                   onClick={() => resolveReport(report.id, "dismiss")}
                                                 >
                                                   Отклонить
                                                 </Button>
                                                 <Button
                                                   size="sm"
+                                                  disabled={moderationPreviewOnly}
                                                   onClick={() => resolveReport(report.id, "accept")}
                                                 >
                                                   Принять
@@ -828,7 +853,7 @@ export default function AdminContent() {
                                       </div>
                                     </div>
                                   )}
-                                  
+
                                   <div>
                                     <strong>Заметка модератора:</strong>
                                     <Textarea
@@ -838,12 +863,13 @@ export default function AdminContent() {
                                       className="mt-1"
                                     />
                                   </div>
-                                  
+
                                   {selectedItem.status === "pending" || selectedItem.status === "flagged" ? (
                                     <div className="flex gap-2">
                                       <Button
                                         onClick={() => moderateContent(selectedItem.id, "approve", moderationNote)}
                                         className="flex-1"
+                                        disabled={moderationPreviewOnly}
                                       >
                                         <CheckCircle className="w-4 h-4 mr-1" />
                                         Одобрить
@@ -852,6 +878,7 @@ export default function AdminContent() {
                                         variant="destructive"
                                         onClick={() => moderateContent(selectedItem.id, "reject", moderationNote)}
                                         className="flex-1"
+                                        disabled={moderationPreviewOnly}
                                       >
                                         <XCircle className="w-4 h-4 mr-1" />
                                         Отклонить
@@ -871,6 +898,7 @@ export default function AdminContent() {
                             <div className="flex gap-1">
                               <Button
                                 size="sm"
+                                disabled={moderationPreviewOnly}
                                 onClick={() => moderateContent(item.id, "approve")}
                               >
                                 <CheckCircle className="w-4 h-4" />
@@ -878,6 +906,7 @@ export default function AdminContent() {
                               <Button
                                 size="sm"
                                 variant="destructive"
+                                disabled={moderationPreviewOnly}
                                 onClick={() => moderateContent(item.id, "reject")}
                               >
                                 <XCircle className="w-4 h-4" />
@@ -890,6 +919,7 @@ export default function AdminContent() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1066,7 +1096,7 @@ export default function AdminContent() {
                               )}
                             </DialogContent>
                           </Dialog>
-                          
+
                           {!language.is_default && (
                             <Button
                               variant="outline"
@@ -1092,7 +1122,7 @@ export default function AdminContent() {
             <TranslationMigration />
             <TranslationTester />
           </div>
-          
+
           {/* Translations Management */}
           <Card>
             <CardHeader>
@@ -1275,7 +1305,7 @@ export default function AdminContent() {
                                 )}
                               </DialogContent>
                             </Dialog>
-                            
+
                             <Button
                               variant="outline"
                               size="sm"

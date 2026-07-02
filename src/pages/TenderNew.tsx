@@ -9,6 +9,8 @@ import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, Gavel, A
 import { useCurrency } from "@/hooks/useCurrency";
 import { RoleGuard } from "@/components/RoleGuard";
 import tenderImage from "@/assets/tenders-auction.jpg";
+import { supabase } from "@/integrations/supabase/client";
+import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
 
 const TenderNew = () => {
   const { t } = useEnhancedI18n();
@@ -16,7 +18,7 @@ const TenderNew = () => {
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
 
-  const [categories, setCategories] = useState<Array<{ id: string; name: string; name_ro?: string; icon?: string }>>([]);
+  const [categories, setCategories] = useState<Array<{ id: string; name: string; name_ro?: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [businessAccount, setBusinessAccount] = useState<any>(null);
   const [businessAccountLoading, setBusinessAccountLoading] = useState(true);
@@ -26,7 +28,6 @@ const TenderNew = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { supabase } = await import("@/integrations/supabase/client");
         const { data, error } = await supabase
           .from("categories")
           .select("id,key,label_ru,label_ro")
@@ -35,10 +36,9 @@ const TenderNew = () => {
         const mappedData = data?.map(cat => ({
           id: cat.id,
           name: cat.label_ru || cat.key,
-          name_ro: cat.label_ro,
-          icon: cat.key
+          name_ro: cat.label_ro
         })) || [];
-        setCategories(mappedData);
+        setCategories(dedupeCategoriesByDisplayName(mappedData));
       } catch (e) {
         console.error(e);
       }
@@ -49,9 +49,8 @@ const TenderNew = () => {
   useEffect(() => {
     const loadBusinessAccount = async () => {
       try {
-        const { supabase } = await import("@/integrations/supabase/client");
         const { data: session } = await supabase.auth.getSession();
-        
+
         if (!session.session?.user) {
           navigate('/auth');
           return;
@@ -66,10 +65,10 @@ const TenderNew = () => {
 
         if (error) {
           console.error('Error checking business account:', error);
-          toast({ 
-            title: 'Ошибка', 
-            description: 'Не удалось проверить бизнес-аккаунт', 
-            variant: 'destructive' 
+          toast({
+            title: 'Ошибка',
+            description: 'Не удалось проверить бизнес-аккаунт',
+            variant: 'destructive'
           });
           return;
         }
@@ -77,10 +76,10 @@ const TenderNew = () => {
         setBusinessAccount(businessData);
       } catch (error: any) {
         console.error('Error loading business account:', error);
-        toast({ 
-          title: 'Ошибка', 
-          description: 'Не удалось загрузить бизнес-аккаунт', 
-          variant: 'destructive' 
+        toast({
+          title: 'Ошибка',
+          description: 'Не удалось загрузить бизнес-аккаунт',
+          variant: 'destructive'
         });
       } finally {
         setBusinessAccountLoading(false);
@@ -104,34 +103,33 @@ const TenderNew = () => {
       toast({ title: 'Ошибка', description: 'Введите название тендера', variant: 'destructive' });
       return;
     }
-    
+
     if (!description.trim()) {
       toast({ title: 'Ошибка', description: 'Введите описание тендера', variant: 'destructive' });
       return;
     }
-    
+
     if (!budget_max) {
       toast({ title: 'Ошибка', description: 'Укажите максимальный бюджет', variant: 'destructive' });
       return;
     }
-    
+
     if (!date || !time) {
       toast({ title: 'Ошибка', description: 'Укажите срок подачи заявок', variant: 'destructive' });
       return;
     }
 
     if (!businessAccount) {
-      toast({ 
-        title: 'Ошибка', 
-        description: 'У вас нет бизнес-аккаунта. Только бизнес-аккаунты могут создавать тендеры.', 
-        variant: 'destructive' 
+      toast({
+        title: 'Ошибка',
+        description: 'У вас нет бизнес-аккаунта. Только бизнес-аккаунты могут создавать тендеры.',
+        variant: 'destructive'
       });
       return;
     }
 
     setLoading(true);
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
       const { data: s } = await supabase.auth.getSession();
       const userId = s.session?.user?.id;
       if (!userId) {
@@ -141,7 +139,7 @@ const TenderNew = () => {
       }
 
       const deadline = new Date(`${date}T${time}:00Z`).toISOString();
-      
+
       const { data: created, error } = await supabase
         .from('tenders')
         .insert({
@@ -159,6 +157,9 @@ const TenderNew = () => {
 
       if (error) throw error;
 
+      let uploadedPhotos = 0;
+      let failedPhotos = 0;
+
       // Upload photos to private bucket and link to tender (similar to jobs)
       if (created?.id && uploadedFiles.length) {
         const bucket = (supabase as any).storage.from('evidence');
@@ -169,14 +170,23 @@ const TenderNew = () => {
             const path = `tender/${created.id}/${Date.now()}-${i}.${ext}`;
             const { error: upErr } = await bucket.upload(path, file, { upsert: true, contentType: file.type || 'image/jpeg' });
             if (upErr) throw upErr;
+            uploadedPhotos += 1;
             // You may want to create a tender_photos table similar to job_photos
           } catch (e) {
+            failedPhotos += 1;
             console.warn('photo upload failed', e);
           }
         }
       }
 
-      toast({ title: 'Успех', description: 'Тендер создан успешно. Специалисты смогут подавать заявки до указанного срока.' });
+      toast({
+        title: failedPhotos > 0 ? 'Тендер создан частично' : 'Успех',
+        description: failedPhotos > 0
+          ? `Тендер создан, но ${failedPhotos} из ${uploadedFiles.length} фото не загрузил${failedPhotos === 1 ? 'ось' : failedPhotos < 5 ? 'ись' : 'ось'}. Проверьте вложения на странице тендера.`
+          : uploadedPhotos > 0
+            ? `Тендер создан успешно. Загружено фото: ${uploadedPhotos}. Исполнители смогут откликаться до указанного срока.`
+            : 'Тендер создан успешно. Исполнители смогут откликаться до указанного срока.'
+      });
       navigate(`/tenders/${created.id}`, { replace: true });
     } catch (err: any) {
       console.error(err);
@@ -188,7 +198,7 @@ const TenderNew = () => {
 
   const categoryOptions = useMemo(() => categories.map(c => (
     <option key={c.id} value={c.id}>
-      {c.icon && `${c.icon} `}{c.name}
+      {c.name}
     </option>
   )), [categories]);
 
@@ -233,8 +243,8 @@ const TenderNew = () => {
   return (
     <RoleGuard requiredRole="business">
       <main className="min-h-screen bg-[#E5E7EB]">
-        <Seo title={`${t('app.name')} — Создать тендер`} description="Создайте тендер для получения предложений от специалистов" canonical="/tenders/new" />
-        
+        <Seo title={`${t('app.name')} — Создать тендер`} description="Создайте тендер для получения откликов от исполнителей" canonical="/tenders/new" />
+
         {/* Hero Section */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0">
@@ -247,7 +257,7 @@ const TenderNew = () => {
                 Создать тендер
               </h1>
               <p className="text-xl text-white/90 mb-8">
-                Получите предложения от лучших специалистов
+                Получите отклики от исполнителей
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
@@ -280,7 +290,7 @@ const TenderNew = () => {
                     <p className="text-muted-foreground mb-4">
                       Для создания тендеров необходим бизнес-аккаунт. Тендеры доступны только для корпоративных клиентов.
                     </p>
-                    <button 
+                    <button
                       onClick={() => navigate('/dashboard/business')}
                       className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0 px-6 py-3 rounded-xl font-semibold transition-all"
                     >
@@ -300,14 +310,14 @@ const TenderNew = () => {
               Детали тендера
             </h2>
             <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
-              Опишите проект подробно для получения качественных предложений
+              Опишите проект подробно для получения откликов
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
             {/* Navigation */}
             <div className="flex items-center gap-4 mb-8">
-              <button 
+              <button
                 onClick={() => navigate('/dashboard/business?tab=tenders')}
                 className="gap-2 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0 px-6 py-3 rounded-xl font-semibold transition-all flex items-center"
               >
@@ -318,7 +328,7 @@ const TenderNew = () => {
 
             <div className="bg-[#E5E7EB] rounded-3xl p-8 shadow-[12px_12px_24px_#D1D5DB,-12px_-12px_24px_#F9FAFB]">
               <form className="space-y-8" onSubmit={onSubmit}>
-                
+
                 {businessAccount && (
                   <div className="p-4 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
                     <p className="text-sm text-muted-foreground">
@@ -333,13 +343,13 @@ const TenderNew = () => {
                     <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">1</span>
                     Информация о тендере
                   </h2>
-                  
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                       <label className="block text-sm font-medium mb-3 text-[#374151]">Категория услуги</label>
-                      <select 
-                        name="category_id" 
-                        className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]" 
+                      <select
+                        name="category_id"
+                        className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                       >
                         <option value="">Выберите категорию</option>
                         {categoryOptions}
@@ -351,9 +361,9 @@ const TenderNew = () => {
                         <Euro className="w-4 h-4 text-green-500" />
                         Максимальный бюджет *
                       </label>
-                      <input 
-                        name="budget_max" 
-                        type="number" 
+                      <input
+                        name="budget_max"
+                        type="number"
                         min="1"
                         className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                         placeholder="5000"
@@ -364,9 +374,9 @@ const TenderNew = () => {
 
                   <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <label className="block text-sm font-medium mb-3 text-[#374151]">Название тендера *</label>
-                    <input 
+                    <input
                       name="title"
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]" 
+                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                       placeholder="Например: Ремонт офисного помещения"
                       maxLength={200}
                       required
@@ -375,16 +385,16 @@ const TenderNew = () => {
 
                   <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <label className="block text-sm font-medium mb-3 text-[#374151]">Описание проекта *</label>
-                    <textarea 
+                    <textarea
                       name="description"
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]" 
+                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                       rows={4}
                       placeholder="Подробно опишите проект, требования к материалам, сроки выполнения, критерии оценки..."
                       maxLength={1000}
                       required
                     />
                     <p className="text-xs text-[#6B7280] mt-2">
-                      Подробное описание поможет специалистам подготовить точные предложения
+                      Подробное описание поможет исполнителям подготовить отклики
                     </p>
                   </div>
                 </div>
@@ -395,7 +405,7 @@ const TenderNew = () => {
                     <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">2</span>
                     Срок подачи заявок
                   </h2>
-                  
+
                   <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -403,9 +413,9 @@ const TenderNew = () => {
                           <Clock className="w-4 h-4 text-blue-500" />
                           Дата окончания *
                         </label>
-                        <input 
-                          name="date" 
-                          type="date" 
+                        <input
+                          name="date"
+                          type="date"
                           className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                           min={new Date().toISOString().split('T')[0]}
                           required
@@ -413,9 +423,9 @@ const TenderNew = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-3 text-[#374151]">Время *</label>
-                        <input 
-                          name="time" 
-                          type="time" 
+                        <input
+                          name="time"
+                          type="time"
                           className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
                           required
                         />
@@ -433,7 +443,7 @@ const TenderNew = () => {
                     <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">3</span>
                     Дополнительные материалы
                   </h2>
-                  
+
                   <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
                     <div
                       className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${

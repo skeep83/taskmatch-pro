@@ -5,47 +5,78 @@ class AdminAPI {
   private readonly CACHE_TTL = 30000; // 30 seconds cache
   private readonly REQUEST_TIMEOUT = 10000; // 10 seconds timeout
 
+  private async fetchProxy(functionName: string, options: any = {}) {
+    const { data: { session } } = await supabase.auth.getSession();
+    const explicitMethod = String(options.method || '').toUpperCase();
+    const hasBody = options.body !== undefined && options.body !== null;
+    const method = explicitMethod || (hasBody ? 'POST' : 'GET');
+    let url = `${window.location.origin}/marketplace-api/functions/${functionName}`;
+
+    if (method === 'GET' && hasBody && typeof options.body === 'object') {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(options.body)) {
+        if (value === undefined || value === null) continue;
+        if (typeof value === 'object') {
+          params.set(key, JSON.stringify(value));
+        } else {
+          params.set(key, String(value));
+        }
+      }
+      const qs = params.toString();
+      if (qs) url += `?${qs}`;
+    }
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        ...(options.headers || {}),
+      },
+      body: method === 'GET' ? undefined : JSON.stringify(options.body || {}),
+    });
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+
+    if (!response.ok) {
+      const message = data?.error || data?.message || `Function ${functionName} failed with ${response.status}`;
+      throw new Error(message);
+    }
+
+    return data;
+  }
+
   public async makeRequest(functionName: string, options: any = {}) {
-    // Create cache key
     const cacheKey = `${functionName}_${JSON.stringify(options.body || {})}`;
-    
-    // Check cache first (only for GET-like operations)
+
     if (!options.body?.action || ['list', 'detail', 'stats'].includes(options.body?.action)) {
       const cached = this.requestCache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < cached.ttl) {
-        console.log(`Cache hit for ${functionName}`);
+        if (import.meta.env.DEV) {
+          console.log(`Cache hit for ${functionName}`);
+        }
         return cached.data;
       }
     }
 
-    // Create timeout promise
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error(`Request timeout: ${functionName}`)), this.REQUEST_TIMEOUT);
     });
 
     try {
-      const requestPromise = supabase.functions.invoke(functionName, {
-        body: options.body || {},
-        headers: options.headers || {}
-      });
+      const data = await Promise.race([this.fetchProxy(functionName, options), timeoutPromise]) as any;
 
-      const { data, error } = await Promise.race([requestPromise, timeoutPromise]) as any;
-
-      if (error) {
-        console.error(`AdminAPI Error (${functionName}):`, error);
-        throw new Error(error.message || `Failed to call ${functionName}`);
-      }
-
-      // Cache successful responses
       if (!options.body?.action || ['list', 'detail', 'stats'].includes(options.body?.action)) {
         this.requestCache.set(cacheKey, {
           data,
           timestamp: Date.now(),
           ttl: this.CACHE_TTL
         });
-        
-        // Clean old cache entries
         this.cleanCache();
+      } else {
+        this.invalidateCache(functionName);
       }
 
       return data;
@@ -53,6 +84,7 @@ class AdminAPI {
       if (err instanceof Error && err.message.includes('timeout')) {
         console.error(`Request timeout for ${functionName}`);
       }
+      console.error(`AdminAPI Error (${functionName}):`, err);
       throw err;
     }
   }
@@ -61,6 +93,19 @@ class AdminAPI {
     const now = Date.now();
     for (const [key, value] of this.requestCache.entries()) {
       if (now - value.timestamp > value.ttl) {
+        this.requestCache.delete(key);
+      }
+    }
+  }
+
+  private invalidateCache(functionName?: string) {
+    if (!functionName) {
+      this.requestCache.clear();
+      return;
+    }
+
+    for (const key of this.requestCache.keys()) {
+      if (key.startsWith(`${functionName}_`)) {
         this.requestCache.delete(key);
       }
     }
@@ -221,10 +266,12 @@ class AdminAPI {
 
   // Analytics
   async getAnalytics(metric: string = 'dashboard', period: string = '7d') {
-    const searchParams = new URLSearchParams({ metric, period });
-
     return this.makeRequest('admin-analytics', {
-      body: { params: Object.fromEntries(searchParams) }
+      body: {
+        metric,
+        period,
+        timeRange: period
+      }
     });
   }
 
@@ -274,16 +321,16 @@ class AdminAPI {
   }
 
   // Error Logs Management
-  async getLogs(params?: { 
-    page?: number; 
-    limit?: number; 
-    level?: string; 
-    source?: string; 
-    search?: string; 
-    resolved?: string; 
-    timeRange?: string; 
+  async getLogs(params?: {
+    page?: number;
+    limit?: number;
+    level?: string;
+    source?: string;
+    search?: string;
+    resolved?: string;
+    timeRange?: string;
   }) {
-    const searchParams = new URLSearchParams({
+    const query = new URLSearchParams({
       action: 'list',
       ...(params?.page && { page: String(params.page) }),
       ...(params?.limit && { limit: String(params.limit) }),
@@ -294,55 +341,62 @@ class AdminAPI {
       ...(params?.timeRange && { timeRange: params.timeRange })
     });
 
-    // For Supabase functions with GET method, we need to construct the full URL with query params
-    const functionUrl = `https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/admin-logs?${searchParams.toString()}`;
-    
-    console.log('AdminAPI.getLogs: Making request to:', functionUrl);
-    
     const session = await supabase.auth.getSession();
-    console.log('AdminAPI.getLogs: Session data:', session.data.session ? 'Present' : 'Missing');
-    
-    const response = await fetch(functionUrl, {
+    const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-logs?${query.toString()}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.data.session?.access_token}`,
         'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs'
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
       }
     });
-
-    console.log('AdminAPI.getLogs: Response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AdminAPI.getLogs: Error response:', response.status, errorText);
-      throw new Error(`Failed to call admin-logs: ${response.status} ${errorText}`);
+      console.error('AdminAPI Error (admin-logs list):', response.status, errorText);
+      throw new Error(errorText || `Failed to fetch admin logs (${response.status})`);
     }
 
-    const result = await response.json();
-    console.log('AdminAPI.getLogs: Success, logs count:', result.logs?.length || 0);
-    return result;
+    return response.json();
   }
 
-  async markLogAsResolved(logId: string) {
-    const { data, error } = await supabase.functions.invoke('admin-logs', {
-      method: 'POST',
-      body: { 
-        action: 'resolve', 
-        log_id: logId 
+  async getLogTrends(timeRange: string = '7d') {
+    const query = new URLSearchParams({
+      action: 'trends',
+      timeRange
+    });
+
+    const session = await supabase.auth.getSession();
+    const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-logs?${query.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${session.data.session?.access_token}`,
+        'Content-Type': 'application/json',
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
       }
     });
 
-    if (error) {
-      console.error('AdminAPI Error (admin-logs resolve):', error);
-      throw new Error(error.message || 'Failed to resolve log');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AdminAPI Error (admin-logs trends):', response.status, errorText);
+      throw new Error(errorText || `Failed to fetch admin log trends (${response.status})`);
     }
 
-    return data;
+    return response.json();
+  }
+
+  async markLogAsResolved(logId: string) {
+    return this.makeRequest('admin-logs', {
+      method: 'POST',
+      body: {
+        action: 'resolve',
+        log_id: logId
+      }
+    });
   }
 
   async exportLogs(filters?: any) {
-    const searchParams = new URLSearchParams({
+    const query = new URLSearchParams({
       action: 'export',
       ...(filters?.level && filters.level !== 'all' && { level: filters.level }),
       ...(filters?.source && filters.source !== 'all' && { source: filters.source }),
@@ -351,25 +405,25 @@ class AdminAPI {
       ...(filters?.timeRange && { timeRange: filters.timeRange })
     });
 
-    const functionUrl = `https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/admin-logs?${searchParams.toString()}`;
-    
-    const response = await fetch(functionUrl, {
+    const session = await supabase.auth.getSession();
+    const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-logs?${query.toString()}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        'Authorization': `Bearer ${session.data.session?.access_token}`,
         'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs'
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
       }
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AdminAPI Error (admin-logs export):', response.status, errorText);
-      throw new Error(`Failed to export logs: ${response.status} ${errorText}`);
+      throw new Error(errorText || `Failed to export logs (${response.status})`);
     }
 
-    return await response.text(); // CSV data
+    return await response.text();
   }
+
 
   async createLog(log: {
     level: 'critical' | 'error' | 'warning' | 'info';
@@ -379,32 +433,18 @@ class AdminAPI {
     metadata?: any;
     stack_trace?: string;
   }) {
-    const { data, error } = await supabase.functions.invoke('admin-logs', {
+    return this.makeRequest('admin-logs', {
       method: 'POST',
       body: { action: 'create', ...log }
     });
-
-    if (error) {
-      console.error('AdminAPI Error (admin-logs create):', error);
-      throw new Error(error.message || 'Failed to create log');
-    }
-
-    return data;
   }
 
   async clearAllLogs() {
-    const { data, error } = await supabase.functions.invoke('admin-logs', {
+    return this.makeRequest('admin-logs', {
       body: {
         action: 'clear_all'
       }
     });
-
-    if (error) {
-      console.error('AdminAPI Error (clear logs):', error);
-      throw new Error(error.message || 'Failed to clear logs');
-    }
-
-    return data;
   }
 }
 

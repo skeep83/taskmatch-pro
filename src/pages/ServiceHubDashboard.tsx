@@ -1,4 +1,4 @@
-import { default as React, useState, useEffect } from 'react';
+import { default as React, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -11,12 +11,12 @@ import { JobResponseCard } from '@/components/servicehub/JobResponseCard';
 import { MobileTabNavigation } from '@/components/servicehub/MobileTabNavigation';
 import { useToast } from '@/hooks/use-toast';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
-import { 
-  PlusCircle, 
-  Search, 
-  Filter, 
-  Star, 
-  MessageCircle, 
+import {
+  PlusCircle,
+  Search,
+  Filter,
+  Star,
+  MessageCircle,
   Eye,
   Clock,
   TrendingUp,
@@ -25,6 +25,8 @@ import {
 
 interface Job {
   id: string;
+  client_id?: string;
+  pro_id?: string;
   title: string;
   description: string;
   status_new: JobStatusNew;
@@ -65,7 +67,7 @@ const ServiceHubDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isMobile } = useDeviceDetection();
-  
+
   const [userRole, setUserRole] = useState<'client' | 'provider' | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
@@ -81,10 +83,10 @@ const ServiceHubDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    void loadDashboardData();
+  }, [loadDashboardData]);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -114,8 +116,9 @@ const ServiceHubDashboard: React.FC = () => {
       if (role === 'client') {
         jobsQuery = jobsQuery.eq('client_id', user.id);
       } else {
-        // Для провайдера показываем доступные задачи и назначенные ему
-        jobsQuery = jobsQuery.or(`status_new.eq.Published,pro_id.eq.${user.id}`);
+        // Для провайдера показываем доступные задачи и назначенные ему,
+        // но исключаем собственные заказы пользователя из pro-поверхностей
+        jobsQuery = jobsQuery.or(`status_new.eq.Published,pro_id.eq.${user.id}`).neq('client_id', user.id);
       }
 
       const { data: jobsData } = await jobsQuery.order('created_at', { ascending: false });
@@ -135,7 +138,7 @@ const ServiceHubDashboard: React.FC = () => {
 
         // Считаем статистику
         const totalJobs = formattedJobs.length;
-        const activeJobs = formattedJobs.filter(j => 
+        const activeJobs = formattedJobs.filter(j =>
           ['Published', 'Assigned', 'InProgress', 'Submitted'].includes(j.status_new)
         ).length;
         const completedJobs = formattedJobs.filter(j => j.status_new === 'Completed').length;
@@ -159,7 +162,7 @@ const ServiceHubDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate, toast]);
 
   const filterJobs = (status?: string) => {
     if (!status || status === 'all') return jobs;
@@ -219,16 +222,16 @@ const ServiceHubDashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {userRole === 'client' ? 'Мои заказы' : 'Доступные заказы'}
+              {userRole === 'client' ? 'Мои заказы' : 'Заказы для предложений'}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {userRole === 'client' 
+              {userRole === 'client'
                 ? 'Управляйте своими заказами и отслеживайте прогресс'
-                : 'Найдите подходящие заказы и откликнитесь на них'
+                : 'Найдите заказы и отправляйте отклики'
               }
             </p>
           </div>
-          
+
           <Button onClick={() => navigate('/job/new')} className="gap-2">
             <PlusCircle size={20} />
             {isMobile ? 'Создать' : 'Создать заказ'}
@@ -299,7 +302,7 @@ const ServiceHubDashboard: React.FC = () => {
                   <TabsTrigger value="Submitted">На проверке</TabsTrigger>
                   <TabsTrigger value="Completed">Готовые</TabsTrigger>
                 </TabsList>
-                
+
                 <Button variant="outline" size="sm" className="gap-2">
                   <Filter size={16} />
                   Фильтры
@@ -308,8 +311,8 @@ const ServiceHubDashboard: React.FC = () => {
 
               <TabsContent value={activeTab} className="space-y-4">
                 {filterJobs(activeTab === 'all' ? undefined : activeTab).map(job => (
-                  <Card 
-                    key={job.id} 
+                  <Card
+                    key={job.id}
                     className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-md ${
                       selectedJobId === job.id ? 'ring-2 ring-primary/20 border-primary/30' : ''
                     }`}
@@ -326,7 +329,7 @@ const ServiceHubDashboard: React.FC = () => {
                             <Badge variant="destructive" className="text-xs">Срочно</Badge>
                           )}
                         </div>
-                        
+
                         <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">
                           {job.description}
                         </p>
@@ -344,7 +347,7 @@ const ServiceHubDashboard: React.FC = () => {
                             {Math.floor(job.budget_min_cents / 100)}-{Math.floor(job.budget_max_cents / 100)} MDL
                           </div>
                         )}
-                        
+
                         {job.responses_count > 0 && (
                           <div className="flex items-center gap-1 text-sm text-primary mt-1">
                             <MessageCircle size={14} />
@@ -372,8 +375,8 @@ const ServiceHubDashboard: React.FC = () => {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -387,7 +390,7 @@ const ServiceHubDashboard: React.FC = () => {
 
                       {userRole === 'client' && job.status_new === 'Submitted' && (
                         <>
-                          <Button 
+                          <Button
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -396,8 +399,8 @@ const ServiceHubDashboard: React.FC = () => {
                           >
                             Принять работу
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -410,14 +413,14 @@ const ServiceHubDashboard: React.FC = () => {
                       )}
 
                       {userRole === 'provider' && job.status_new === 'Published' && (
-                        <Button 
+                        <Button
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/job/${job.id}/respond`);
                           }}
                         >
-                          Откликнуться
+                          Отправить предложение
                         </Button>
                       )}
                     </div>
@@ -431,7 +434,7 @@ const ServiceHubDashboard: React.FC = () => {
                       Заказы не найдены
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400">
-                      {userRole === 'client' 
+                      {userRole === 'client'
                         ? 'У вас пока нет заказов в этой категории'
                         : 'Нет подходящих заказов в этой категории'
                       }
@@ -446,7 +449,7 @@ const ServiceHubDashboard: React.FC = () => {
           <div>
             {selectedJob ? (
               <div className="space-y-6">
-                <JobProgressTracker 
+                <JobProgressTracker
                   currentStatus={selectedJob.status_new}
                   showAcceptanceDeadline={selectedJob.status_new === 'Submitted'}
                   acceptanceDeadline={selectedJob.acceptance_deadline ? new Date(selectedJob.acceptance_deadline) : undefined}
@@ -454,7 +457,7 @@ const ServiceHubDashboard: React.FC = () => {
 
                 {selectedJob.assigned_provider && (
                   <Card className="p-6">
-                    <h3 className="font-semibold mb-4">Назначенный исполнитель</h3>
+                    <h3 className="font-semibold mb-4">Выбранный исполнитель</h3>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
                       <div>

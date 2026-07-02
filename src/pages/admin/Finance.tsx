@@ -7,9 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { 
+import { supabase } from "@/integrations/supabase/client";
+import {
   DollarSign, TrendingUp, Wallet, CreditCard,
-  Eye, Check, X, AlertTriangle, Clock, 
+  Eye, Check, X, AlertTriangle, Clock,
   RefreshCw
 } from "lucide-react";
 
@@ -26,8 +27,7 @@ export default function AdminFinance() {
 
   const loadFinanceData = async () => {
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       const { data: escrowData, error: escrowError } = await supabase
         .from('escrows')
         .select('id, job_id, amount_cents, status, created_at, updated_at')
@@ -62,7 +62,7 @@ export default function AdminFinance() {
       released: "default",
       refunded: "destructive"
     };
-    
+
     const labels = {
       held: "Удерживается",
       released: "Освобожден",
@@ -82,7 +82,7 @@ export default function AdminFinance() {
   return (
     <div className="space-y-6">
       <Seo title="ServiceHub — Управление финансами" description="Админ-панель управления финансами" canonical="/admin/finance" />
-      
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -97,6 +97,21 @@ export default function AdminFinance() {
           Обновить
         </Button>
       </div>
+
+      <Card className="border-amber-300 bg-amber-50/80">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-700 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-medium text-amber-900">Read-only финансовый раздел</p>
+              <p className="text-sm text-amber-800">
+                Данные эскроу загружаются из live backend, но действия просмотра/подтверждения/отклонения ещё не подключены.
+                До подключения backend-операций action-кнопки намеренно отключены.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
@@ -133,57 +148,59 @@ export default function AdminFinance() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Сумма</TableHead>
-                <TableHead>Статус</TableHead>
-                <TableHead>Создан</TableHead>
-                <TableHead>Действия</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {escrows.map((escrow) => (
-                <TableRow key={escrow.id}>
-                  <TableCell className="font-mono text-sm">
-                    {escrow.id.slice(0, 8)}...
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">
-                        {(escrow.amount_cents / 100).toLocaleString()}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getEscrowStatusBadge(escrow.status)}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(escrow.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {escrow.status === 'held' && (
-                        <>
-                          <Button variant="ghost" size="sm">
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Сумма</TableHead>
+                  <TableHead>Статус</TableHead>
+                  <TableHead>Создан</TableHead>
+                  <TableHead>Действия</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {escrows.map((escrow) => (
+                  <TableRow key={escrow.id}>
+                    <TableCell className="font-mono text-sm">
+                      {escrow.id.slice(0, 8)}...
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">
+                          {(escrow.amount_cents / 100).toLocaleString()}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {getEscrowStatusBadge(escrow.status)}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(escrow.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" disabled title="Действие ещё не подключено к backend">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {escrow.status === 'held' && (
+                          <>
+                            <Button variant="ghost" size="sm" disabled title="Действие ещё не подключено к backend">
+                              <Check className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" disabled title="Действие ещё не подключено к backend">
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

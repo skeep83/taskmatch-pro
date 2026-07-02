@@ -39,7 +39,7 @@ export const LiveVisitorsContainer = () => {
   ];
 
   return (
-    <div className="card-surface p-6">
+    <div className="card-surface p-6 overflow-hidden">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-cyan-500/10 rounded-lg">
           <Eye className="h-5 w-5 text-cyan-600" />
@@ -51,11 +51,11 @@ export const LiveVisitorsContainer = () => {
           </p>
         </div>
       </div>
-      
-      <div className="relative flex items-center gap-24 h-[420px] ml-8 -mt-20">
+
+      <div className="relative flex flex-col items-center gap-6 xl:flex-row xl:items-center xl:justify-between xl:gap-8">
         {/* Анимированные линии соединения */}
-        <svg 
-          className="absolute inset-0 w-full h-full pointer-events-none" 
+        <svg
+          className="absolute inset-0 hidden h-full w-full pointer-events-none xl:block"
           style={{ zIndex: 3 }}
         >
           <defs>
@@ -68,13 +68,13 @@ export const LiveVisitorsContainer = () => {
               <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
             </linearGradient>
           </defs>
-          
+
           {userTypeInfo.map((_, index) => {
             const startX = 170; // Позиция центрального шара
             const startY = 210; // Центр по вертикали
             const endX = 360; // Начало карточек (еще больше увеличено)
             const endY = 80 + (index * 85); // Позиция каждой карточки
-            
+
             return (
               <g key={index}>
                 {/* Основная линия */}
@@ -84,13 +84,13 @@ export const LiveVisitorsContainer = () => {
                   strokeWidth="2"
                   fill="none"
                   className="animate-fade-in"
-                  style={{ 
+                  style={{
                     animationDelay: `${index * 0.2}s`,
                     strokeDasharray: '5,5',
                     animation: `fadeInLine 1s ease-out ${index * 0.2}s forwards, dashFlow 3s linear infinite`
                   }}
                 />
-                
+
                 {/* Светящаяся точка на конце */}
                 <circle
                   cx={endX}
@@ -98,7 +98,7 @@ export const LiveVisitorsContainer = () => {
                   r="3"
                   fill="hsl(var(--primary))"
                   className="animate-pulse"
-                  style={{ 
+                  style={{
                     animationDelay: `${index * 0.2 + 0.5}s`,
                     filter: 'drop-shadow(0 0 6px hsl(var(--primary)))'
                   }}
@@ -107,16 +107,16 @@ export const LiveVisitorsContainer = () => {
             );
           })}
         </svg>
-        
+
         {/* Большой шар слева */}
         <div className="flex-shrink-0 relative" style={{ zIndex: 2 }}>
           <CentralStatsCircle userStats={userStats} />
         </div>
-        
+
         {/* Категории справа в стиле навигации */}
-        <div className="w-96 space-y-3 relative" style={{ zIndex: 2 }}>
+        <div className="relative w-full max-w-full space-y-3 xl:max-w-[320px]" style={{ zIndex: 2 }}>
           {userTypeInfo.map((userType, index) => (
-            <UserTypeCard 
+            <UserTypeCard
               key={userType.type}
               userType={userType}
               index={index}

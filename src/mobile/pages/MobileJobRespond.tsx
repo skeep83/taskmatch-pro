@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Euro, Clock, FileText, Shield } from 'lucide-react';
 import { MobileCard } from '../components/ui/MobileCard';
@@ -8,14 +8,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { submitJobResponse } from '@/lib/jobResponseSubmission';
 
 export default function MobileJobRespond() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [loading, setLoading] = useState(false);
   const [jobTitle, setJobTitle] = useState('');
+  const [jobClientId, setJobClientId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     price: '',
     eta: '',
@@ -23,26 +25,39 @@ export default function MobileJobRespond() {
     notes: ''
   });
 
-  useEffect(() => {
-    if (id) {
-      fetchJobTitle(id);
-    }
-  }, [id]);
-
-  const fetchJobTitle = async (jobId: string) => {
+  const fetchJobTitle = useCallback(async (jobId: string) => {
     try {
+      const { data: authData } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from('jobs')
-        .select('title')
+        .select('title, client_id')
         .eq('id', jobId)
         .single();
 
       if (error) throw error;
+
+      if (authData.user && data.client_id === authData.user.id) {
+        toast({
+          title: "Недоступно",
+          description: "Нельзя откликаться на собственный заказ",
+          variant: "destructive"
+        });
+        navigate(`/job/${jobId}`);
+        return;
+      }
+
       setJobTitle(data.title);
+      setJobClientId(data.client_id);
     } catch (error) {
       console.error('Error fetching job title:', error);
     }
-  };
+  }, [navigate, toast]);
+
+  useEffect(() => {
+    if (id) {
+      void fetchJobTitle(id);
+    }
+  }, [fetchJobTitle, id]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -53,10 +68,10 @@ export default function MobileJobRespond() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Enhanced validation with detailed logging
     console.log('MobileJobRespond submission - formData:', formData);
-    
+
     if (!formData.price) {
       console.error('Validation failed: empty price field');
       toast({
@@ -68,16 +83,16 @@ export default function MobileJobRespond() {
     }
 
     const price = parseFloat(formData.price);
-    console.log('Price validation:', { 
-      original: formData.price, 
-      converted: price, 
-      valid: !isNaN(price) && price > 0 
+    console.log('Price validation:', {
+      original: formData.price,
+      converted: price,
+      valid: !isNaN(price) && price > 0
     });
-    
+
     if (isNaN(price) || price <= 0) {
       console.error('Validation failed: invalid price number', { price: formData.price, converted: price });
       toast({
-        title: "Ошибка", 
+        title: "Ошибка",
         description: "Пожалуйста, укажите корректную цену",
         variant: "destructive"
       });
@@ -95,27 +110,31 @@ export default function MobileJobRespond() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('job-application-create', {
-        body: {
-          jobId: id,
-          priceCents, // Convert to cents
-          etaSlot: formData.eta,
-          warrantyDays: parseInt(formData.warranty),
-          note: formData.notes
-        }
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData.user && jobClientId && authData.user.id === jobClientId) {
+        throw new Error('You cannot send a proposal to your own job');
+      }
+
+      const { error } = await submitJobResponse({
+        jobId: id!,
+        priceCents,
+        etaSlot: formData.eta,
+        warrantyDays: parseInt(formData.warranty, 10),
+        note: formData.notes,
       });
 
       if (error) throw error;
 
       toast({
-        title: "Отклик отправлен!",
-        description: "Ваш отклик успешно отправлен заказчику"
+        title: "Предложение отправлено!",
+        description: "Ваше предложение успешно отправлено заказчику"
       });
 
       navigate(`/job/${id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error submitting response:', error);
-      
+      const errorInfo = error instanceof Error ? error : new Error(String(error ?? 'Unknown error'));
+
       // Enhanced error logging for better debugging
       const errorData = {
         timestamp: new Date().toISOString(),
@@ -127,37 +146,55 @@ export default function MobileJobRespond() {
           warranty: parseInt(formData.warranty)
         },
         error: {
-          message: error.message,
-          name: error.name,
-          stack: error.stack
+          message: errorInfo.message,
+          name: errorInfo.name,
+          stack: errorInfo.stack
         }
       };
-      
+
       console.error('Detailed mobile job response error:', errorData);
-      
+
       // Special handling for role-related errors
-      if (error.message?.includes('Only professionals can apply to jobs')) {
+      if (errorInfo.message.includes('Only professionals can apply to jobs')) {
         toast({
           title: "Необходима роль специалиста",
-          description: "Чтобы откликаться на заказы, вам нужно стать специалистом. Перейдите в настройки профиля.",
+          description: "Чтобы отправлять предложения на заказы, вам нужно включить роль специалиста в профиле.",
           variant: "destructive"
         });
-      } else if (error.message?.includes('You do not offer services in this category')) {
+      } else if (errorInfo.message.includes('You cannot send a proposal to your own job')) {
         toast({
-          title: "Услуга недоступна",
-          description: "Вы не предоставляете услуги в этой категории. Добавьте её в своём профиле специалиста.",
+          title: "Это ваш собственный заказ",
+          description: "Нельзя откликаться на собственный заказ от имени специалиста.",
           variant: "destructive"
         });
-      } else if (error.message?.includes('You have already applied to this job')) {
+      } else if (errorInfo.message.includes('You need to configure your services first')) {
         toast({
-          title: "Уже откликнулись",
-          description: "Вы уже подали заявку на этот заказ.",
+          title: "Сначала настройте услуги",
+          description: "Добавьте в профиле хотя бы одну услугу, чтобы откликаться на заказы.",
+          variant: "destructive"
+        });
+      } else if (errorInfo.message.includes('You do not offer services in')) {
+        toast({
+          title: "Категория не подключена",
+          description: "У вас не подключена эта категория услуг. Добавьте её в профиле специалиста.",
+          variant: "destructive"
+        });
+      } else if (errorInfo.message.includes('You have already applied to this job')) {
+        toast({
+          title: "Предложение уже отправлено",
+          description: "Вы уже отправили предложение на этот заказ.",
+          variant: "destructive"
+        });
+      } else if (errorInfo.message.includes('Job not found or no longer available')) {
+        toast({
+          title: "Заказ уже недоступен",
+          description: "Заказ был закрыт, удалён или уже недоступен для новых откликов.",
           variant: "destructive"
         });
       } else {
         toast({
           title: "Ошибка",
-          description: error.message || "Не удалось отправить отклик",
+          description: errorInfo.message || "Не удалось отправить предложение",
           variant: "destructive"
         });
       }
@@ -177,7 +214,7 @@ export default function MobileJobRespond() {
           >
             <ArrowLeft className="w-5 h-5 text-[#374151]" />
           </button>
-          <h1 className="text-lg font-semibold text-[#374151]">Отклик на заказ</h1>
+          <h1 className="text-lg font-semibold text-[#374151]">Отправить предложение</h1>
           <div className="w-9 h-9" />
         </div>
       </div>
@@ -289,7 +326,7 @@ export default function MobileJobRespond() {
             disabled={loading}
             className="w-full h-12 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] disabled:opacity-50"
           >
-            {loading ? 'Отправка...' : 'Отправить отклик'}
+            {loading ? 'Отправка...' : 'Отправить предложение'}
           </Button>
         </div>
       </form>

@@ -74,7 +74,7 @@ export default function AdminSettings() {
         .select('value')
         .eq('key', 'platform_logo')
         .maybeSingle();
-      
+
       if (logoData?.value) {
         setLogo({ logoUrl: logoData.value as string });
       } else {
@@ -96,7 +96,7 @@ export default function AdminSettings() {
         .select('id, code, name_en, symbol, is_active')
         .eq('is_active', true)
         .order('code');
-      
+
       setCurrencies(currencyData || []);
 
       // Load platform settings
@@ -167,7 +167,7 @@ export default function AdminSettings() {
           .from('platform_settings')
           .upsert(update, { onConflict: 'key' });
       }
-      
+
       toast({
         title: "Настройки сохранены",
         description: "Все изменения успешно применены",
@@ -196,7 +196,7 @@ export default function AdminSettings() {
 
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
-        title: "Ошибка", 
+        title: "Ошибка",
         description: "Размер файла не должен превышать 5MB",
         variant: "destructive"
       });
@@ -207,9 +207,9 @@ export default function AdminSettings() {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `logo-${Date.now()}.${fileExt}`;
-      
+
       console.log('Uploading logo:', fileName, 'File size:', file.size);
-      
+
       // Upload to portfolio bucket (which is public)
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('portfolio')
@@ -246,7 +246,7 @@ export default function AdminSettings() {
       }
 
       setLogo({ logoUrl });
-      
+
       toast({
         title: "Логотип загружен",
         description: "Новый логотип успешно сохранен",
@@ -298,18 +298,18 @@ export default function AdminSettings() {
             Управление конфигурацией системы
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={loadSettings}>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <Button variant="outline" onClick={loadSettings} className="w-full sm:w-auto">
             Сбросить
           </Button>
-          <Button onClick={saveSettings} disabled={saving}>
+          <Button onClick={saveSettings} disabled={saving} className="w-full sm:w-auto">
             {saving ? "Сохранение..." : "Сохранить"}
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="platform" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid h-auto w-full grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-5">
           <TabsTrigger value="platform">Платформа</TabsTrigger>
           <TabsTrigger value="branding">Брендинг</TabsTrigger>
           <TabsTrigger value="finance">Финансы</TabsTrigger>
@@ -337,7 +337,7 @@ export default function AdminSettings() {
                   onChange={(e) => updateSetting('platformName', e.target.value)}
                 />
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="allowGuestBooking"
@@ -369,9 +369,9 @@ export default function AdminSettings() {
                 <div className="flex items-center gap-4">
                   {logo.logoUrl ? (
                     <div className="flex items-center gap-4">
-                      <img 
-                        src={logo.logoUrl} 
-                        alt="Platform Logo" 
+                      <img
+                        src={logo.logoUrl}
+                        alt="Platform Logo"
                         className="h-16 w-16 object-contain border border-border rounded-lg p-2"
                       />
                       <div className="text-sm text-muted-foreground">
@@ -384,7 +384,7 @@ export default function AdminSettings() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Input
                     id="logo-upload"
@@ -421,7 +421,7 @@ export default function AdminSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="commissionRate">Комиссия платформы (%)</Label>
                   <Input
@@ -434,7 +434,7 @@ export default function AdminSettings() {
                     onChange={(e) => updateSetting('commissionRate', parseFloat(e.target.value) || 0)}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="instantPayoutFee">Комиссия мгновенных выплат (%)</Label>
                   <Input
@@ -449,7 +449,7 @@ export default function AdminSettings() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="minJobAmount">Минимальная сумма заказа ($)</Label>
                   <Input
@@ -460,7 +460,7 @@ export default function AdminSettings() {
                     onChange={(e) => updateSetting('minJobAmount', parseInt(e.target.value) || 0)}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="maxJobAmount">Максимальная сумма заказа ($)</Label>
                   <Input
@@ -471,7 +471,7 @@ export default function AdminSettings() {
                     onChange={(e) => updateSetting('maxJobAmount', parseInt(e.target.value) || 0)}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="maxInstantPayout">Лимит мгновенных выплат ($)</Label>
                   <Input
@@ -500,7 +500,7 @@ export default function AdminSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="defaultCurrency">Валюта по умолчанию</Label>
                   <Select
@@ -519,17 +519,17 @@ export default function AdminSettings() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label>Доступные валюты</Label>
-                  <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-32 overflow-y-auto">
                     {currencies.map((currency) => (
                       <div key={currency.code} className="flex items-center space-x-2">
                         <Switch
                           id={currency.code}
                           checked={settings.supportedCurrencies.includes(currency.code)}
                           onCheckedChange={(checked) => {
-                            const updated = checked 
+                            const updated = checked
                               ? [...settings.supportedCurrencies, currency.code]
                               : settings.supportedCurrencies.filter(c => c !== currency.code);
                             updateSetting('supportedCurrencies', updated);
@@ -544,7 +544,7 @@ export default function AdminSettings() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="autoCurrencyDetection"
@@ -567,10 +567,10 @@ export default function AdminSettings() {
                   </Label>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  <strong>Примечание:</strong> Для управления курсами валют и добавления новых валют 
+                  <strong>Примечание:</strong> Для управления курсами валют и добавления новых валют
                   используйте раздел "Валюты" в главном меню админ-панели.
                 </p>
               </div>
@@ -601,7 +601,7 @@ export default function AdminSettings() {
                   onChange={(e) => updateSetting('sessionTimeout', parseInt(e.target.value) || 30)}
                 />
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Switch
                   id="enableTwoFA"

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  User, Camera, MapPin, Phone, Mail, Globe, 
+import {
+  User, Camera, MapPin, Phone, Mail, Globe,
   Briefcase, Clock, DollarSign, Save, CheckCircle2,
   ArrowLeft, Wrench, Plus, X, Settings, Bell, Calendar
 } from 'lucide-react';
@@ -23,6 +23,7 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { AvatarUpload } from '@/components/AvatarUpload';
 import { MobileAvatarUpload } from '../components/ui/MobileAvatarUpload';
 import { NeumorphicIcon } from '@/components/ui/neumorphic-icon';
+import { geocodeAddress, getCurrentResolvedLocation, type LocationPrecision, type LocationSource } from '@/lib/geolocation';
 
 interface Profile {
   first_name: string;
@@ -33,6 +34,15 @@ interface Profile {
   country: string;
   locale: string;
   avatar_url: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  address_line1: string;
+  address_line2: string;
+  postal_code: string;
+  address_notes: string;
+  location_public_label: string;
+  location_precision: LocationPrecision | '';
+  location_source: LocationSource | '';
 }
 
 interface ProProfile {
@@ -63,7 +73,16 @@ export default function MobileProfileSettings() {
     city: '',
     country: 'RO',
     locale: 'ru',
-    avatar_url: ''
+    avatar_url: '',
+    latitude: null,
+    longitude: null,
+    address_line1: '',
+    address_line2: '',
+    postal_code: '',
+    address_notes: '',
+    location_public_label: '',
+    location_precision: '',
+    location_source: ''
   });
 
   const [proProfile, setProProfile] = useState<ProProfile>({
@@ -76,7 +95,7 @@ export default function MobileProfileSettings() {
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [availability, setAvailability] = useState<any[]>([]);
-  
+
   const [notifications, setNotifications] = useState({
     newJobs: true,
     sms: false,
@@ -114,7 +133,16 @@ export default function MobileProfileSettings() {
           city: profileData.city || '',
           country: profileData.country || 'RO',
           locale: profileData.locale || 'ru',
-          avatar_url: profileData.avatar_url || ''
+          avatar_url: profileData.avatar_url || '',
+          latitude: profileData.latitude ?? null,
+          longitude: profileData.longitude ?? null,
+          address_line1: profileData.address_line1 || '',
+          address_line2: profileData.address_line2 || '',
+          postal_code: profileData.postal_code || '',
+          address_notes: profileData.address_notes || '',
+          location_public_label: profileData.location_public_label || '',
+          location_precision: profileData.location_precision || '',
+          location_source: profileData.location_source || ''
         });
       }
 
@@ -126,18 +154,18 @@ export default function MobileProfileSettings() {
         .single();
 
       let currentRole = roleData?.role || 'client';
-      
+
       // Also check pro_profiles table for pro status
       const { data: proData } = await supabase
         .from('pro_profiles')
         .select('user_id')
         .eq('user_id', user.id)
         .single();
-      
+
       if (proData && currentRole === 'client') {
         currentRole = 'pro';
       }
-      
+
       console.log('MobileProfileSettings - Current role:', currentRole, 'Role data:', roleData, 'Pro data:', proData);
       setUserRole(currentRole);
 
@@ -202,12 +230,12 @@ export default function MobileProfileSettings() {
 
   const handleSave = async () => {
     if (!user) return;
-    
+
     setSaving(true);
     try {
       // Update full_name based on first_name and last_name
       const fullName = `${profile.first_name?.trim() || ''} ${profile.last_name?.trim() || ''}`.trim();
-      
+
       // Update basic profile
       const { error: profileError } = await supabase
         .from("profiles")
@@ -220,7 +248,16 @@ export default function MobileProfileSettings() {
           city: profile.city?.trim() || null,
           country: profile.country?.trim() || null,
           locale: profile.locale || 'ru',
-          avatar_url: profile.avatar_url || null
+          avatar_url: profile.avatar_url || null,
+          latitude: profile.latitude ?? null,
+          longitude: profile.longitude ?? null,
+          address_line1: profile.address_line1?.trim() || null,
+          address_line2: profile.address_line2?.trim() || null,
+          postal_code: profile.postal_code?.trim() || null,
+          address_notes: profile.address_notes?.trim() || null,
+          location_public_label: profile.location_public_label?.trim() || null,
+          location_precision: profile.location_precision || null,
+          location_source: profile.location_source || null
         });
 
       if (profileError) throw profileError;
@@ -251,16 +288,16 @@ export default function MobileProfileSettings() {
     if (!user) return;
 
     // Upsert pro profile
-    const payload: any = { 
-      user_id: user.id, 
-      bio: proProfile.bio, 
-      radius_km: proProfile.radius_km || 10 
+    const payload: any = {
+      user_id: user.id,
+      bio: proProfile.bio,
+      radius_km: proProfile.radius_km || 10
     };
-    
+
     if (proProfile.hourly_rate_cents !== '') {
       payload.hourly_rate_cents = Number(proProfile.hourly_rate_cents);
     }
-    
+
     if (proProfile.fixed_price_cents !== '') {
       payload.fixed_price_cents = Number(proProfile.fixed_price_cents);
     }
@@ -290,7 +327,7 @@ export default function MobileProfileSettings() {
       const { error } = await supabase
         .from('pro_categories')
         .insert(toAdd);
-      
+
       if (error) {
         console.error('Error adding categories:', error);
         throw error;
@@ -305,7 +342,7 @@ export default function MobileProfileSettings() {
         .delete()
         .eq('user_id', user.id)
         .in('category_id', toRemove);
-      
+
       if (error) {
         console.error('Error removing categories:', error);
         throw error;
@@ -341,7 +378,62 @@ export default function MobileProfileSettings() {
     }
   };
 
-  const updateProfile = (field: keyof Profile, value: string) => {
+  const handleUseCurrentLocation = async () => {
+    try {
+      const resolved = await getCurrentResolvedLocation();
+      setProfile(prev => ({
+        ...prev,
+        latitude: resolved.latitude,
+        longitude: resolved.longitude,
+        address_line1: resolved.address,
+        city: resolved.publicLabel || prev.city,
+        location_public_label: resolved.publicLabel,
+        location_precision: resolved.precision,
+        location_source: resolved.source,
+      }));
+      toast({
+        title: 'Локация определена',
+        description: resolved.publicLabel || 'Базовый адрес профиля обновлён',
+      });
+    } catch (error) {
+      toast({
+        title: 'Не удалось определить локацию',
+        description: error instanceof Error ? error.message : 'Попробуйте указать адрес вручную',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleResolveAddress = async () => {
+    try {
+      const query = [profile.address_line1, profile.address_line2, profile.city, profile.country, profile.postal_code]
+        .filter(Boolean)
+        .join(', ');
+      const resolved = await geocodeAddress(query);
+      setProfile(prev => ({
+        ...prev,
+        latitude: resolved.latitude,
+        longitude: resolved.longitude,
+        address_line1: prev.address_line1 || resolved.address,
+        city: prev.city || resolved.publicLabel,
+        location_public_label: resolved.publicLabel,
+        location_precision: resolved.precision,
+        location_source: resolved.source,
+      }));
+      toast({
+        title: 'Адрес подтверждён',
+        description: resolved.publicLabel || 'Координаты профиля обновлены',
+      });
+    } catch (error) {
+      toast({
+        title: 'Адрес не распознан',
+        description: error instanceof Error ? error.message : 'Уточните адрес и попробуйте ещё раз',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const updateProfile = (field: keyof Profile, value: Profile[keyof Profile]) => {
     setProfile(prev => ({
       ...prev,
       [field]: value
@@ -358,7 +450,7 @@ export default function MobileProfileSettings() {
   const toggleCategory = (categoryId: string) => {
     console.log('Mobile - Toggling category:', categoryId, 'Current selected:', selectedCategories);
     setSelectedCategories(prev => {
-      const newSelection = prev.includes(categoryId) 
+      const newSelection = prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId];
       console.log('Mobile - New selection:', newSelection);
@@ -399,12 +491,12 @@ export default function MobileProfileSettings() {
 
   return (
     <div className="min-h-screen bg-[#E5E7EB]">
-      <MobileHeader 
+      <MobileHeader
         title="Настройки профиля"
         showBack={true}
       />
-      
-      <div 
+
+      <div
         className="pt-20 pb-24 px-4 space-y-6"
         style={{ paddingTop: `${80 + safeAreaInsets.top}px` }}
       >
@@ -480,18 +572,58 @@ export default function MobileProfileSettings() {
             <MobileCard>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
-                Местоположение
+                Базовый адрес клиента
               </h3>
               <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button type="button" variant="outline" onClick={handleUseCurrentLocation}>
+                    Определить геолокацию
+                  </Button>
+                  <Button type="button" variant="outline" onClick={handleResolveAddress}>
+                    Подтвердить адрес
+                  </Button>
+                </div>
                 <div>
-                  <Label htmlFor="city">Город</Label>
+                  <Label htmlFor="addressLine1">Адрес</Label>
                   <Input
-                    id="city"
-                    value={profile.city}
-                    onChange={(e) => updateProfile('city', e.target.value)}
-                    placeholder="Введите город"
+                    id="addressLine1"
+                    value={profile.address_line1}
+                    onChange={(e) => updateProfile('address_line1', e.target.value)}
+                    placeholder="Улица, дом"
                     className="mt-1"
                   />
+                </div>
+                <div>
+                  <Label htmlFor="addressLine2">Квартира / подъезд / этаж</Label>
+                  <Input
+                    id="addressLine2"
+                    value={profile.address_line2}
+                    onChange={(e) => updateProfile('address_line2', e.target.value)}
+                    placeholder="Дополнительные детали адреса"
+                    className="mt-1"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="city">Город</Label>
+                    <Input
+                      id="city"
+                      value={profile.city}
+                      onChange={(e) => updateProfile('city', e.target.value)}
+                      placeholder="Город"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="postalCode">Индекс</Label>
+                    <Input
+                      id="postalCode"
+                      value={profile.postal_code}
+                      onChange={(e) => updateProfile('postal_code', e.target.value)}
+                      placeholder="Почтовый индекс"
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="country">Страна</Label>
@@ -499,9 +631,59 @@ export default function MobileProfileSettings() {
                     id="country"
                     value={profile.country}
                     onChange={(e) => updateProfile('country', e.target.value)}
-                    placeholder="Введите страну"
+                    placeholder="Страна"
                     className="mt-1"
                   />
+                </div>
+                <div>
+                  <Label htmlFor="publicLabel">Публичная зона для специалистов</Label>
+                  <Input
+                    id="publicLabel"
+                    value={profile.location_public_label}
+                    onChange={(e) => updateProfile('location_public_label', e.target.value)}
+                    placeholder="Например: Центр, Кишинёв"
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    До принятия заказа специалистам лучше показывать район/город, а не точный адрес.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="addressNotes">Комментарий для доступа</Label>
+                  <Textarea
+                    id="addressNotes"
+                    value={profile.address_notes}
+                    onChange={(e) => updateProfile('address_notes', e.target.value)}
+                    placeholder="Домофон, ориентир, парковка, особенности входа"
+                    className="mt-1"
+                    rows={3}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="latitude">Широта</Label>
+                    <Input
+                      id="latitude"
+                      type="number"
+                      step="any"
+                      value={profile.latitude ?? ''}
+                      onChange={(e) => updateProfile('latitude', e.target.value === '' ? null : Number(e.target.value))}
+                      placeholder="47.0105"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="longitude">Долгота</Label>
+                    <Input
+                      id="longitude"
+                      type="number"
+                      step="any"
+                      value={profile.longitude ?? ''}
+                      onChange={(e) => updateProfile('longitude', e.target.value === '' ? null : Number(e.target.value))}
+                      placeholder="28.8638"
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
               </div>
             </MobileCard>
@@ -620,7 +802,7 @@ export default function MobileProfileSettings() {
                 <p className="text-gray-600 text-sm">
                   Выберите категории, в которых вы предоставляете услуги:
                 </p>
-                
+
                 <MobileCategorySelector
                   categories={categories}
                   selectedCategories={selectedCategories}
@@ -629,7 +811,7 @@ export default function MobileProfileSettings() {
                   maxSelection={20}
                   disabled={categories.length === 0}
                 />
-                
+
                 {categories.length === 0 && (
                   <div className="p-6 text-center text-gray-500 bg-[#E5E7EB] rounded-2xl shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
                     <Wrench className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -653,7 +835,7 @@ export default function MobileProfileSettings() {
               <p className="text-sm text-muted-foreground mb-4">
                 Укажите дни и время, когда вы доступны для выполнения заказов
               </p>
-              
+
               <div className="space-y-4">
                 {[
                   { id: 1, name: 'Понедельник', short: 'Пн' },
@@ -666,7 +848,7 @@ export default function MobileProfileSettings() {
                 ].map((day) => {
                   const schedule = availability.find(a => a.weekday === day.id);
                   const isActive = !!schedule;
-                  
+
                   return (
                     <div key={day.id} className="p-4 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
                       <div className="flex items-center justify-between mb-3">
@@ -691,7 +873,7 @@ export default function MobileProfileSettings() {
                           }}
                         />
                       </div>
-                      
+
                       {isActive && (
                         <div className="grid grid-cols-2 gap-3">
                           <div>
@@ -700,9 +882,9 @@ export default function MobileProfileSettings() {
                               type="time"
                               value={schedule?.start_time || '09:00'}
                               onChange={(e) => {
-                                setAvailability(prev => 
-                                  prev.map(a => 
-                                    a.weekday === day.id 
+                                setAvailability(prev =>
+                                  prev.map(a =>
+                                    a.weekday === day.id
                                       ? { ...a, start_time: e.target.value }
                                       : a
                                   )
@@ -717,9 +899,9 @@ export default function MobileProfileSettings() {
                               type="time"
                               value={schedule?.end_time || '18:00'}
                               onChange={(e) => {
-                                setAvailability(prev => 
-                                  prev.map(a => 
-                                    a.weekday === day.id 
+                                setAvailability(prev =>
+                                  prev.map(a =>
+                                    a.weekday === day.id
                                       ? { ...a, end_time: e.target.value }
                                       : a
                                   )
@@ -734,7 +916,7 @@ export default function MobileProfileSettings() {
                   );
                 })}
               </div>
-              
+
               <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
                 <div className="flex items-start gap-2">
                   <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
@@ -761,7 +943,7 @@ export default function MobileProfileSettings() {
               <p className="text-sm text-muted-foreground mb-4">
                 Управляйте способами получения уведомлений
               </p>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -770,12 +952,12 @@ export default function MobileProfileSettings() {
                   </div>
                   <Switch
                     checked={notifications.newJobs}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotifications(prev => ({ ...prev, newJobs: checked }))
                     }
                   />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="text-sm font-medium">SMS уведомления</label>
@@ -783,7 +965,7 @@ export default function MobileProfileSettings() {
                   </div>
                   <Switch
                     checked={notifications.sms}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotifications(prev => ({ ...prev, sms: checked }))
                     }
                   />
@@ -796,7 +978,7 @@ export default function MobileProfileSettings() {
                   </div>
                   <Switch
                     checked={notifications.email}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotifications(prev => ({ ...prev, email: checked }))
                     }
                   />
@@ -809,7 +991,7 @@ export default function MobileProfileSettings() {
                   </div>
                   <Switch
                     checked={notifications.push}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setNotifications(prev => ({ ...prev, push: checked }))
                     }
                   />

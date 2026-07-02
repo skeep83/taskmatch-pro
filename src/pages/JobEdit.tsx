@@ -6,10 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { AnimatedIcon } from '@/components/ui/animated-icon';
-import { ArrowLeft, Save, Camera, Upload, X } from 'lucide-react';
+import { ArrowLeft, Save, Camera, Upload, Video, X } from 'lucide-react';
+import {
+  appendJobChangeRequest,
+  buildMaterialUpdateEntry,
+  canClientEditJob,
+  getMaterialJobChanges,
+  inferMediaKind,
+  isVideoFile,
+} from '@/utils/jobLifecycle';
 
 interface Job {
   id: string;
+  client_id: string;
   title: string;
   description: string;
   category_id: string;
@@ -18,6 +27,9 @@ interface Job {
   location_address?: string;
   scheduled_at?: string;
   urgency: string;
+  status: string;
+  pro_id?: string | null;
+  change_requests?: unknown;
 }
 
 interface JobPhoto {
@@ -39,6 +51,8 @@ const JobEdit = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [existingPhotos, setExistingPhotos] = useState<JobPhoto[]>([]);
   const [deletedPhotoIds, setDeletedPhotoIds] = useState<string[]>([]);
+  const [responseCount, setResponseCount] = useState(0);
+  const [hasPayment, setHasPayment] = useState(false);
 
   useEffect(() => {
     if (jobId) {
@@ -57,18 +71,37 @@ const JobEdit = () => {
         .single();
 
       if (error) throw error;
-      
-      // Check if job can be edited (no payment and is owner)
+
+      // Check if job can be edited under Variant C rules
       const { data: escrow } = await supabase
         .from('escrows')
         .select('id')
         .eq('job_id', jobId)
         .maybeSingle();
 
-      if (escrow) {
+      const hasEscrow = Boolean(escrow);
+      setHasPayment(hasEscrow);
+
+      const {
+        count: applicationCount,
+      } = await supabase
+        .from('job_applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('job_id', jobId);
+
+      const {
+        count: proposalCount,
+      } = await supabase
+        .from('job_price_proposals')
+        .select('*', { count: 'exact', head: true })
+        .eq('job_id', jobId);
+
+      setResponseCount((applicationCount || 0) + (proposalCount || 0));
+
+      if (!canClientEditJob({ job: data, isOwner: true, hasPayment: hasEscrow })) {
         toast({
           title: 'Редактирование невозможно',
-          description: 'Заказ нельзя редактировать после оплаты депозита',
+          description: 'После выбора исполнителя или создания депозита заказ больше нельзя редактировать',
           variant: 'destructive'
         });
         navigate(`/job/${jobId}`);
@@ -124,7 +157,7 @@ const JobEdit = () => {
 
     try {
       const formData = new FormData(e.currentTarget);
-      
+
       const updateData: any = {
         title: formData.get('title'),
         description: formData.get('description'),
@@ -141,9 +174,27 @@ const JobEdit = () => {
 
       if (budgetMin) updateData.budget_min_cents = parseInt(budgetMin as string) * 100;
       if (budgetMax) updateData.budget_max_cents = parseInt(budgetMax as string) * 100;
-      
+
       if (date && time) {
         updateData.scheduled_at = new Date(`${date}T${time}`).toISOString();
+      }
+
+      if (!job) {
+        throw new Error('Заказ не загружен');
+      }
+
+      const materialChanges = getMaterialJobChanges(job, updateData);
+      const hasMaterialChanges = materialChanges.length > 0;
+
+      if (responseCount > 0 && hasMaterialChanges) {
+        updateData.change_requests = appendJobChangeRequest(
+          job.change_requests,
+          buildMaterialUpdateEntry({
+            triggeredBy: job.client_id,
+            responseCount,
+            changes: materialChanges,
+          }),
+        );
       }
 
       const { error } = await supabase
@@ -156,13 +207,13 @@ const JobEdit = () => {
       // Delete removed photos from storage and database
       if (deletedPhotoIds.length > 0) {
         console.log('Deleting photos:', deletedPhotoIds);
-        
+
         // First get the file paths of photos to delete
         const { data: photosToDelete } = await supabase
           .from('job_photos')
           .select('file_url')
           .in('id', deletedPhotoIds);
-        
+
         // Delete from storage
         if (photosToDelete && photosToDelete.length > 0) {
           const bucket = supabase.storage.from('evidence');
@@ -179,13 +230,13 @@ const JobEdit = () => {
             }
           }
         }
-        
+
         // Delete from database
         const { error: dbDelErr } = await supabase
           .from('job_photos')
           .delete()
           .in('id', deletedPhotoIds);
-          
+
         if (dbDelErr) {
           console.error('Database delete error:', dbDelErr);
         } else {
@@ -193,9 +244,9 @@ const JobEdit = () => {
         }
       }
 
-      // Upload new photos
+      // Upload new media
       if (uploadedFiles.length > 0) {
-        console.log('Starting photo upload, files count:', uploadedFiles.length);
+        console.log('Starting media upload, files count:', uploadedFiles.length);
         const bucket = supabase.storage.from('evidence');
         for (let i = 0; i < Math.min(uploadedFiles.length, 8); i++) {
           const file = uploadedFiles[i];
@@ -204,17 +255,17 @@ const JobEdit = () => {
             const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
             const path = `job/${jobId}/${Date.now()}-${i}.${ext}`;
             console.log('Upload path:', path);
-            
-            const { error: upErr, data: uploadData } = await bucket.upload(path, file, { 
-              upsert: true, 
-              contentType: file.type || 'image/jpeg' 
+
+            const { error: upErr, data: uploadData } = await bucket.upload(path, file, {
+              upsert: true,
+              contentType: file.type || 'image/jpeg'
             });
             if (upErr) {
               console.error('Upload error:', upErr);
               throw upErr;
             }
             console.log('Upload successful:', uploadData);
-            
+
             const { error: insErr, data: insertData } = await supabase
               .from('job_photos')
               .insert({ job_id: jobId, file_url: path })
@@ -225,8 +276,35 @@ const JobEdit = () => {
             }
             console.log('Insert successful:', insertData);
           } catch (e) {
-            console.error('Photo upload failed', e);
+            console.error('Media upload failed', e);
           }
+        }
+      }
+
+      if (responseCount > 0 && hasMaterialChanges) {
+        const [{ data: applications }, { data: proposals }] = await Promise.all([
+          supabase.from('job_applications').select('pro_id').eq('job_id', jobId),
+          supabase.from('job_price_proposals').select('pro_id').eq('job_id', jobId),
+        ]);
+
+        const proIds = [...new Set([...(applications || []), ...(proposals || [])].map((item) => item.pro_id).filter(Boolean))];
+
+        for (const proId of proIds) {
+          await supabase.functions.invoke('notifications-send', {
+            body: {
+              user_id: proId,
+              type: 'job_materially_updated',
+              title: 'Условия заказа изменились',
+              title_ro: 'Condițiile comenzii s-au schimbat',
+              message: `Клиент обновил важные детали заказа "${updateData.title || job.title}". Проверьте описание, бюджет, адрес и вложения.`,
+              message_ro: `Clientul a actualizat detalii importante pentru comanda "${updateData.title || job.title}". Verificați descrierea, bugetul, adresa și fișierele.`,
+              data: {
+                job_id: jobId,
+                changes: materialChanges.map((change) => change.field),
+              },
+              channels: ['push'],
+            },
+          });
         }
       }
 
@@ -234,7 +312,7 @@ const JobEdit = () => {
       console.log('Refreshing photos after upload...');
       await fetchJobPhotos();
       console.log('Photos refreshed, current count:', existingPhotos.length);
-      
+
       // Clear uploaded files from state
       setUploadedFiles([]);
       setDeletedPhotoIds([]);
@@ -266,17 +344,21 @@ const JobEdit = () => {
     }
   };
 
+  const appendFiles = (files: File[]) => {
+    setUploadedFiles(prev => [...prev, ...files.slice(0, Math.max(0, 8 - prev.length))]);
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    const files = Array.from(e.dataTransfer.files);
-    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+    appendFiles(Array.from(e.dataTransfer.files));
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files.slice(0, 8 - prev.length)]);
+    appendFiles(files);
+    e.target.value = '';
   };
 
   const removeNewFile = (index: number) => {
@@ -322,6 +404,12 @@ const JobEdit = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {responseCount > 0 && (
+                  <div className="md:col-span-2 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+                    По этому заказу уже есть отклики. Если вы измените важные условия, система сохранит это в истории и уведомит откликнувшихся исполнителей.
+                  </div>
+                )}
+
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium mb-2">Заголовок</label>
                   <input
@@ -430,22 +518,32 @@ const JobEdit = () => {
                 </div>
               </div>
 
-              {/* Photos Section */}
+              {/* Media Section */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-3">Фотографии</label>
-                
-                {/* Existing Photos */}
+                <label className="block text-sm font-medium mb-3">Фото и видео</label>
+
+                {/* Existing Media */}
                 {existingPhotos.length > 0 && (
                   <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Текущие фотографии:</h4>
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">Текущие вложения:</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {existingPhotos.map((photo) => (
                         <div key={photo.id} className="relative group">
-                          <img
-                            src={getPhotoUrl(photo.file_url)}
-                            alt="Job photo"
-                            className="w-full h-20 object-cover rounded-lg"
-                          />
+                          {inferMediaKind(photo.file_url) === 'video' ? (
+                            <video
+                              src={getPhotoUrl(photo.file_url)}
+                              className="w-full h-20 object-cover rounded-lg bg-black"
+                              controls
+                              muted
+                              playsInline
+                            />
+                          ) : (
+                            <img
+                              src={getPhotoUrl(photo.file_url)}
+                              alt="Job media"
+                              className="w-full h-20 object-cover rounded-lg"
+                            />
+                          )}
                           <button
                             type="button"
                             onClick={() => removeExistingPhoto(photo.id)}
@@ -459,7 +557,7 @@ const JobEdit = () => {
                   </div>
                 )}
 
-                {/* Upload New Photos */}
+                {/* Upload New Media */}
                 <div
                   className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${
                     dragActive ? 'border-primary bg-primary/5' : 'border-gray-300'
@@ -471,37 +569,82 @@ const JobEdit = () => {
                 >
                   <AnimatedIcon icon={Camera} className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-600 mb-2">
-                    Перетащите фото сюда или выберите файлы
+                    Перетащите фото или видео сюда или выберите файлы
                   </p>
+
+                  <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleFileInput}
+                      className="hidden"
+                      id="photo-capture-edit"
+                    />
+                    <label
+                      htmlFor="photo-capture-edit"
+                      className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer inline-flex items-center gap-2"
+                    >
+                      <Camera className="w-4 h-4" />
+                      Сделать фото
+                    </label>
+
+                    <input
+                      type="file"
+                      accept="video/*"
+                      capture="environment"
+                      onChange={handleFileInput}
+                      className="hidden"
+                      id="video-capture-edit"
+                    />
+                    <label
+                      htmlFor="video-capture-edit"
+                      className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer inline-flex items-center gap-2"
+                    >
+                      <Video className="w-4 h-4" />
+                      Снять видео
+                    </label>
+                  </div>
+
                   <input
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="image/*,video/*"
                     onChange={handleFileInput}
                     className="hidden"
                     id="photo-upload-edit"
                   />
-                  <label 
-                    htmlFor="photo-upload-edit" 
+                  <label
+                    htmlFor="photo-upload-edit"
                     className="bg-primary text-white hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer inline-flex items-center gap-2"
                   >
                     <Upload className="w-4 h-4" />
-                    Добавить фото
+                    Выбрать файлы
                   </label>
                 </div>
 
-                {/* New Photos Preview */}
+                {/* New Media Preview */}
                 {uploadedFiles.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Новые фотографии:</h4>
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">Новые вложения:</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map((file, index) => (
                         <div key={index} className="relative group">
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Upload ${index + 1}`}
-                            className="w-full h-20 object-cover rounded-lg"
-                          />
+                          {isVideoFile(file) ? (
+                            <video
+                              src={URL.createObjectURL(file)}
+                              className="w-full h-20 object-cover rounded-lg bg-black"
+                              controls
+                              muted
+                              playsInline
+                            />
+                          ) : (
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-20 object-cover rounded-lg"
+                            />
+                          )}
                           <button
                             type="button"
                             onClick={() => removeNewFile(index)}
@@ -521,9 +664,9 @@ const JobEdit = () => {
                   <Save className="w-4 h-4 mr-2" />
                   {saving ? 'Сохранение...' : 'Сохранить изменения'}
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => navigate(`/job/${jobId}`)}
                 >
                   Отмена

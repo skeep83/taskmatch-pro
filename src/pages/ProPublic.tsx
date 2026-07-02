@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import { OptimizedImage } from "@/components/media/OptimizedImage";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProPublic = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,25 +25,24 @@ const ProPublic = () => {
   useEffect(() => {
     (async () => {
       if (!id) return;
-      const { supabase } = await import("@/integrations/supabase/client");
-      
+
       // Загружаем профиль пользователя (имя, фамилию, аватар)
       const { data: userProf } = await supabase
         .from("profiles").select("first_name,last_name,full_name,avatar_url")
         .eq("id", id).maybeSingle();
-      
+
       if (userProf) {
         setUserProfile(userProf);
       }
-      
+
       // Загружаем профессиональный профиль
       const { data: prof } = await supabase
         .from("pro_profiles").select("user_id,bio,radius_km,hourly_rate_cents,fixed_price_cents")
         .eq("user_id", id).maybeSingle();
-      
-      if (!prof) { 
-        navigate('/catalog'); 
-        return; 
+
+      if (!prof) {
+        navigate('/catalog');
+        return;
       }
       setProfile(prof);
 
@@ -90,21 +90,21 @@ const ProPublic = () => {
     })();
   }, [id, navigate]);
 
-  
+
   // Компонент карусели для портфолио
   const PortfolioCarousel = ({ item }: { item: any }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalIndex, setModalIndex] = useState(0);
-    
+
     // Собираем все изображения (основное + медиа)
     const allMedia = [
       ...(item.portfolio_media || []).sort((a: any, b: any) => a.display_order - b.display_order),
       ...(item.image_url ? [{ file_url: item.image_url, file_type: 'image/jpeg' }] : [])
     ];
-    
+
     if (allMedia.length === 0) return null;
-    
+
     if (allMedia.length === 1) {
       return (
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -154,7 +154,7 @@ const ProPublic = () => {
     return (
       <>
         <div className="relative w-full h-40 rounded-md overflow-hidden group">
-          <div 
+          <div
             className="w-full h-full cursor-zoom-in"
             onClick={() => openModal(currentIndex)}
           >
@@ -165,7 +165,7 @@ const ProPublic = () => {
               bucket="portfolio"
             />
           </div>
-          
+
           {/* Navigation Arrows */}
           <Button
             variant="ghost"
@@ -178,7 +178,7 @@ const ProPublic = () => {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -223,7 +223,7 @@ const ProPublic = () => {
                 className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
                 bucket="portfolio"
               />
-              
+
               {/* Modal Navigation */}
               {allMedia.length > 1 && (
                 <>
@@ -235,7 +235,7 @@ const ProPublic = () => {
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </Button>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -272,14 +272,14 @@ const ProPublic = () => {
   };
 
   const catLabels = useMemo(() => categories.map((c:any)=> c.name || c.name_ro).join(', '), [categories]);
-  
+
   // Формируем отображаемое имя
-  const displayName = userProfile?.full_name || 
-    (userProfile?.first_name && userProfile?.last_name 
-      ? `${userProfile.first_name} ${userProfile.last_name}` 
+  const displayName = userProfile?.full_name ||
+    (userProfile?.first_name && userProfile?.last_name
+      ? `${userProfile.first_name} ${userProfile.last_name}`
       : null) || `Специалист #${String(id).slice(0,8)}`;
-  
-  const initials = userProfile?.full_name 
+
+  const initials = userProfile?.full_name
     ? userProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
     : displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase();
 
@@ -297,8 +297,8 @@ const ProPublic = () => {
           <div className="flex items-start justify-between gap-6">
             <div className="flex items-start gap-4 flex-1">
               <div className="flex-shrink-0">
-                <img 
-                  src={userProfile.avatar_url || ''} 
+                <img
+                  src={userProfile.avatar_url || ''}
                   alt={displayName}
                   className="w-20 h-20 rounded-full object-cover bg-muted"
                   onError={(e) => {
@@ -317,17 +317,17 @@ const ProPublic = () => {
                   {kycStatus === 'approved' && (
                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 border border-emerald-200/50 dark:border-emerald-700/50 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.1)] dark:shadow-[inset_2px_2px_4px_rgba(255,255,255,0.1),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Проверен</span>
+                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Профиль</span>
                     </div>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground mb-2">Категории: {catLabels || '—'}</p>
                 <div className="flex items-center gap-2 mb-2">
-                  <StarRating 
-                    rating={rating.avg_score} 
-                    size="sm" 
-                    showValue 
-                    showCount 
+                  <StarRating
+                    rating={rating.avg_score}
+                    size="sm"
+                    showValue
+                    showCount
                     count={rating.rating_count}
                   />
                 </div>

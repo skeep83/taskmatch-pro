@@ -18,11 +18,11 @@ interface UpgradeModal {
 
 const roleConfig = {
   pro: {
-    title: "Специалист", 
+    title: "Специалист",
     description: "Предоставляйте услуги и зарабатывайте",
     icon: Briefcase,
     gradient: "from-purple-400 via-pink-500 to-indigo-600",
-    benefits: ["Получайте заказы", "Мгновенные выплаты", "Рейтинг и отзывы"]
+    benefits: ["Получайте заказы", "Приоритетная поддержка", "Рейтинг и отзывы"]
   },
   business: {
     title: "Бизнес",
@@ -50,7 +50,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
   };
 
   // Доступные апгрейды (исключаем текущую роль)
-  const availableUpgrades = (['pro', 'business'] as UserRole[]).filter(role => 
+  const availableUpgrades = (['pro', 'business'] as UserRole[]).filter(role =>
     role !== currentRole
   );
 
@@ -64,20 +64,20 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
         <h3 className="text-2xl font-bold mb-2">Расширьте возможности</h3>
         <p className="text-muted-foreground">Станьте специалистом или создайте бизнес аккаунт</p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">{availableUpgrades.map((targetRole) => {
         const config = roleConfig[targetRole];
         const IconComponent = config.icon;
-        
+
         return (
           <motion.div
             key={targetRole}
             initial={{ opacity: 0, y: 20, rotateX: 20 }}
             animate={{ opacity: 1, y: 0, rotateX: 0 }}
             transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            whileHover={{ 
-              y: -8, 
-              rotateX: 5, 
+            whileHover={{
+              y: -8,
+              rotateX: 5,
               rotateY: 3,
               transition: { duration: 0.2 }
             }}
@@ -89,7 +89,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                 {/* Декоративный оверлей */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                
+
                 {/* Иконка меньшего размера */}
                 <div className="absolute left-1/2 top-10 transform -translate-x-1/2 -translate-y-1/2 z-10">
                   <motion.div
@@ -101,7 +101,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                   </motion.div>
                 </div>
               </div>
-              
+
               {/* Нижняя секция с контентом - более компактная */}
               <div className="bg-gradient-to-b from-gray-50 to-white pt-14 px-5 pb-5 flex flex-col flex-1">
                 <div className="text-center mb-4">
@@ -110,7 +110,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                     {config.description}
                   </p>
                 </div>
-                
+
                 {/* Преимущества - более компактные */}
                 <div className="space-y-1 mb-4">
                   {config.benefits.slice(0, 2).map((benefit, index) => (
@@ -120,7 +120,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Кнопка действия - меньшего размера */}
                 <Button
                   onClick={() => handleUpgradeClick(targetRole)}
@@ -130,7 +130,7 @@ export const RoleUpgrade = ({ userId, currentRole, onRoleUpgraded }: RoleUpgrade
                   Стать {config.title.toLowerCase()}ом
                 </Button>
               </div>
-              
+
               {/* Дополнительные блики для объема */}
               <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
                 <div className="absolute top-2 left-2 w-8 h-8 bg-white/30 rounded-full blur-md"></div>

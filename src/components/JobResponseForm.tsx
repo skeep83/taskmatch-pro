@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useCurrency } from '@/hooks/useCurrency';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Clock, Euro, Shield, Send } from 'lucide-react';
+import { submitJobResponse } from '@/lib/jobResponseSubmission';
 
 interface JobResponseFormProps {
   jobId: string;
@@ -17,12 +17,12 @@ interface JobResponseFormProps {
   onApplicationSubmit?: () => void;
 }
 
-export const JobResponseForm = ({ 
-  jobId, 
-  jobTitle, 
-  budgetMinCents, 
+export const JobResponseForm = ({
+  jobId,
+  jobTitle,
+  budgetMinCents,
   budgetMaxCents,
-  onApplicationSubmit 
+  onApplicationSubmit
 }: JobResponseFormProps) => {
   const [formData, setFormData] = useState({
     price: '',
@@ -37,12 +37,63 @@ export const JobResponseForm = ({
   const budgetMin = budgetMinCents ? Math.round(budgetMinCents / 100) : null;
   const budgetMax = budgetMaxCents ? Math.round(budgetMaxCents / 100) : null;
 
+  const getReadableErrorMessage = (error: unknown) => {
+    const message = error instanceof Error ? error.message.trim() : String(error ?? '').trim();
+
+    if (message.includes('Only professionals can apply to jobs')) {
+      return {
+        title: 'Необходима роль специалиста',
+        description: 'Чтобы отправлять предложения на заказы, вам нужно включить роль специалиста в профиле.'
+      };
+    }
+
+    if (message.includes('You cannot send a proposal to your own job')) {
+      return {
+        title: 'Это ваш собственный заказ',
+        description: 'Нельзя откликаться на собственный заказ от имени специалиста.'
+      };
+    }
+
+    if (message.includes('You need to configure your services first')) {
+      return {
+        title: 'Сначала настройте услуги',
+        description: 'Добавьте в профиле хотя бы одну услугу, чтобы откликаться на заказы.'
+      };
+    }
+
+    if (message.includes('You do not offer services in')) {
+      return {
+        title: 'Категория не подключена',
+        description: 'У вас не подключена эта категория услуг. Добавьте её в настройках профиля.'
+      };
+    }
+
+    if (message.includes('You have already applied to this job')) {
+      return {
+        title: 'Предложение уже отправлено',
+        description: 'Вы уже отправили предложение на этот заказ.'
+      };
+    }
+
+    if (message.includes('Job not found or no longer available')) {
+      return {
+        title: 'Заказ уже недоступен',
+        description: 'Заказ был закрыт, удалён или уже недоступен для новых откликов.'
+      };
+    }
+
+    return {
+      title: 'Ошибка',
+      description: message || 'Не удалось отправить предложение'
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Enhanced validation with detailed logging
     console.log('JobResponseForm submission - formData:', formData);
-    
+
     if (!formData.price) {
       console.error('Validation failed: empty price field');
       toast({
@@ -52,14 +103,14 @@ export const JobResponseForm = ({
       });
       return;
     }
-    
+
     const priceNumber = Number(formData.price);
-    console.log('Price validation:', { 
-      original: formData.price, 
-      converted: priceNumber, 
-      valid: !isNaN(priceNumber) && priceNumber > 0 
+    console.log('Price validation:', {
+      original: formData.price,
+      converted: priceNumber,
+      valid: !isNaN(priceNumber) && priceNumber > 0
     });
-    
+
     if (isNaN(priceNumber) || priceNumber <= 0) {
       console.error('Validation failed: invalid price number', { price: formData.price, converted: priceNumber });
       toast({
@@ -81,21 +132,19 @@ export const JobResponseForm = ({
 
     setLoading(true);
     try {
-      const { error } = await supabase.functions.invoke('job-application-create', {
-        body: {
-          jobId,
-          priceCents,
-          etaSlot: formData.etaSlot || undefined,
-          note: formData.note || undefined,
-          warrantyDays: Number(formData.warrantyDays) || 0
-        }
+      const { error } = await submitJobResponse({
+        jobId,
+        priceCents,
+        etaSlot: formData.etaSlot,
+        note: formData.note,
+        warrantyDays: Number(formData.warrantyDays) || 0,
       });
 
       if (error) throw error;
 
       toast({
-        title: 'Отклик отправлен!',
-        description: 'Клиент получит уведомление о вашем предложении'
+        title: 'Предложение отправлено!',
+        description: 'Заказчик получит ваше предложение и сможет выбрать исполнителя'
       });
 
       // Reset form
@@ -110,9 +159,10 @@ export const JobResponseForm = ({
         onApplicationSubmit();
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error submitting application:', error);
-      
+      const errorInfo = error instanceof Error ? error : new Error(String(error ?? 'Unknown error'));
+
       // Enhanced error logging for better debugging
       const errorData = {
         timestamp: new Date().toISOString(),
@@ -124,49 +174,33 @@ export const JobResponseForm = ({
           warrantyDays: Number(formData.warrantyDays)
         },
         error: {
-          message: error.message,
-          name: error.name,
-          stack: error.stack
+          message: errorInfo.message,
+          name: errorInfo.name,
+          stack: errorInfo.stack
         }
       };
-      
+
       console.error('Detailed job application error:', errorData);
-      
-      // Special handling for role-related errors
-      if (error.message?.includes('Only professionals can apply to jobs')) {
-        toast({
-          title: 'Необходима роль специалиста',
-          description: 'Чтобы откликаться на заказы, вам нужно стать специалистом. Перейдите в настройки профиля.',
-          variant: 'destructive'
-        });
-      } else if (error.message?.includes('You do not offer services in this category') || error.message?.includes('You need to configure your services first')) {
-        toast({
-          title: 'Настройте услуги',
-          description: 'Добавьте категории услуг в настройках профиля, чтобы откликаться на заказы.',
-          variant: 'destructive',
-          action: (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => window.location.href = '/profile/settings'}
-            >
-              Настройки
-            </Button>
-          )
-        });
-      } else if (error.message?.includes('You have already applied to this job')) {
-        toast({
-          title: 'Уже откликнулись',
-          description: 'Вы уже подали заявку на этот заказ.',
-          variant: 'destructive'
-        });
-      } else {
-        toast({
-          title: 'Ошибка',
-          description: error.message || 'Не удалось отправить отклик',
-          variant: 'destructive'
-        });
-      }
+
+      const readableError = getReadableErrorMessage(error);
+      const shouldOfferSettings =
+        errorInfo.message.includes('You need to configure your services first') ||
+        errorInfo.message.includes('You do not offer services in');
+
+      toast({
+        title: readableError.title,
+        description: readableError.description,
+        variant: 'destructive',
+        action: shouldOfferSettings ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.location.href = '/profile/settings'}
+          >
+            Настройки
+          </Button>
+        ) : undefined
+      });
     } finally {
       setLoading(false);
     }
@@ -183,27 +217,27 @@ export const JobResponseForm = ({
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
             <Send className="w-5 h-5 text-primary" />
           </div>
-          Откликнуться на заказ
+          Отправить предложение по заказу
         </CardTitle>
         <p className="text-muted-foreground">
-          Предложите свою цену и условия для заказа "{jobTitle}"
+          Укажите цену, срок и комментарий для заказа "{jobTitle}"
         </p>
         {(budgetMin || budgetMax) && (
           <div className="flex items-center gap-2 text-sm">
             <Euro className="w-4 h-4 text-success" />
             <span className="font-medium">
-              Бюджет: {budgetMin && budgetMax 
+              Бюджет: {budgetMin && budgetMax
                 ? `${formatPrice(budgetMin * 100)} - ${formatPrice(budgetMax * 100)}`
-                : budgetMin 
+                : budgetMin
                 ? `от ${formatPrice(budgetMin * 100)}`
-                : budgetMax 
+                : budgetMax
                 ? `до ${formatPrice(budgetMax * 100)}`
                 : 'Не указан'}
             </span>
           </div>
         )}
       </CardHeader>
-      
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Price Input */}
@@ -214,7 +248,7 @@ export const JobResponseForm = ({
             </Label>
             {(budgetMin || budgetMax) && (
               <p className="text-xs text-muted-foreground">
-                Бюджет клиента: {budgetMin ? `от ${budgetMin}₽` : ''} {budgetMax ? `до ${budgetMax}₽` : ''}
+                Бюджет заказа: {budgetMin ? `от ${budgetMin}₽` : ''} {budgetMax ? `до ${budgetMax}₽` : ''}
               </p>
             )}
             <Input
@@ -268,7 +302,7 @@ export const JobResponseForm = ({
 
           {/* Note */}
           <div className="space-y-2">
-            <Label htmlFor="note">Комментарий к предложению</Label>
+            <Label htmlFor="note">Комментарий к отклику</Label>
             <Textarea
               id="note"
               placeholder="Расскажите о своем опыте, подходе к решению задачи, используемых материалах..."

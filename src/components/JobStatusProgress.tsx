@@ -24,7 +24,7 @@ const getStatusInfo = (status: string) => {
     'done': { label: 'Выполнен', variant: 'default' as const, color: 'text-green-500' },
     'cancelled': { label: 'Отменен', variant: 'destructive' as const, color: 'text-red-500' }
   };
-  
+
   return statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const, color: 'text-gray-500' };
 };
 
@@ -39,13 +39,13 @@ const getProgressValue = (status: string) => {
   }
 };
 
-export function JobStatusProgress({ 
-  status, 
-  startConfirmed = false, 
-  endConfirmed = false, 
-  className = "" 
+export function JobStatusProgress({
+  status,
+  startConfirmed = false,
+  endConfirmed = false,
+  className = ""
 }: JobStatusProgressProps) {
-  
+
   const statusInfo = getStatusInfo(status);
   const progressValue = getProgressValue(status);
   const currentStepIndex = statusSteps.findIndex(step => step.key === status);
@@ -69,14 +69,14 @@ export function JobStatusProgress({
       {/* Current Status Badge */}
       <div className="flex items-center gap-2">
         <div className={`p-2 rounded-full bg-background border ${statusInfo.color}`}>
-          {React.createElement(statusSteps[Math.max(0, currentStepIndex)]?.icon || AlertCircle, { 
-            className: "h-4 w-4" 
+          {React.createElement(statusSteps[Math.max(0, currentStepIndex)]?.icon || AlertCircle, {
+            className: "h-4 w-4"
           })}
         </div>
         <Badge variant={statusInfo.variant} className="flex items-center gap-1">
           <span>{statusInfo.label}</span>
-          {React.createElement(statusSteps[Math.max(0, currentStepIndex)]?.icon || AlertCircle, { 
-            className: "h-3 w-3 flex-shrink-0" 
+          {React.createElement(statusSteps[Math.max(0, currentStepIndex)]?.icon || AlertCircle, {
+            className: "h-3 w-3 flex-shrink-0"
           })}
         </Badge>
       </div>
@@ -88,17 +88,17 @@ export function JobStatusProgress({
           <span className="animate-fade-in">{progressValue}%</span>
         </div>
         <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-          <div 
+          <div
             className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-1000 ease-out animate-progress-fill"
-            style={{ 
+            style={{
               width: `${progressValue}%`,
               '--progress-width': `${progressValue}%`
             } as React.CSSProperties}
           />
           {progressValue > 0 && (
-            <div 
+            <div
               className="absolute top-0 h-full w-4 bg-white/30 rounded-full animate-pulse"
-              style={{ 
+              style={{
                 left: `${Math.max(0, progressValue - 15)}%`,
                 animationDuration: '2s'
               }}
@@ -115,32 +115,37 @@ export function JobStatusProgress({
           const StepIcon = step.icon;
 
           return (
-            <div 
-              key={step.key} 
+            <div
+              key={step.key}
               className={`flex items-center gap-3 transition-all duration-500 ${
                 isCurrent ? 'animate-fade-in' : ''
               }`}
-              style={{ 
-                animationDelay: `${index * 100}ms` 
+              style={{
+                animationDelay: `${index * 100}ms`
               }}
             >
               <div className={`p-2 rounded-full border transition-all duration-500 ${
-                isCompleted 
-                  ? 'bg-primary text-primary-foreground border-primary animate-scale-in' 
+                isCompleted
+                  ? 'bg-primary text-primary-foreground border-primary animate-scale-in'
                   : 'bg-muted text-muted-foreground border-muted'
               } ${isCurrent ? 'ring-2 ring-primary/20 animate-pulse' : ''}`}>
                 <StepIcon className="h-4 w-4" />
               </div>
               <div className="flex-1">
                 <p className={`font-medium ${
-                  isCurrent ? 'text-foreground' : 
+                  isCurrent ? 'text-foreground' :
                   isCompleted ? 'text-foreground' : 'text-muted-foreground'
                 }`}>
                   {step.label}
                 </p>
+                {step.key === 'new' && status === 'new' && (
+                  <p className="text-xs text-muted-foreground">
+                    Заказ опубликован, ожидает откликов специалистов
+                  </p>
+                )}
                 {step.key === 'accepted' && status === 'accepted' && (
                   <p className="text-xs text-muted-foreground">
-                    Специалист найден и готов приступить к работе
+                    Исполнитель выбран, ожидается начало работ
                   </p>
                 )}
                 {step.key === 'in_progress' && status === 'in_progress' && (
@@ -156,11 +161,11 @@ export function JobStatusProgress({
                 )}
                 {step.key === 'done' && status === 'done' && (
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <p>Заказ успешно выполнен</p>
+                    <p>{endConfirmed ? 'Заказ успешно выполнен' : 'Заказ выполнен, ожидает подтверждения'}</p>
                     {endConfirmed && (
                       <div className="flex items-center gap-1">
                         <CheckCircle className="h-3 w-3 text-green-500" />
-                        <span>Завершение подтверждено</span>
+                        <span>Подтверждено</span>
                       </div>
                     )}
                   </div>

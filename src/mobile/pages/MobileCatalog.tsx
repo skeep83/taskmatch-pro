@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
@@ -9,54 +9,117 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useMobile } from '../providers/MobileProvider';
 import { supabase } from '@/integrations/supabase/client';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
-const categories = [
-  { id: '1', name: 'Сантехника', icon: '🔧' },
-  { id: '2', name: 'Электрика', icon: '⚡' },
-  { id: '3', name: 'Уборка', icon: '🧹' },
-  { id: '4', name: 'Ремонт', icon: '🔨' },
-  { id: '5', name: 'Доставка', icon: '🚚' },
-  { id: '6', name: 'Красота', icon: '💄' },
-];
+type Category = {
+  id: string;
+  name: string;
+  icon: string;
+  popularity: number;
+};
+
+const ACTIVE_JOB_STATUSES = ['new'];
 
 export default function MobileCatalog() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { bottomNavHeight, safeAreaInsets } = useMobile();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category_id') || searchParams.get('category') || '');
   const [jobs, setJobs] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const [{ data: categoriesData, error: categoriesError }, { data: jobsForCounts, error: jobsError }] = await Promise.all([
+        supabase.from('categories').select('id,label_ru,key').order('label_ru'),
+        supabase.from('jobs').select('category_id,status').in('status', ACTIVE_JOB_STATUSES).limit(1000),
+      ]);
+
+      if (categoriesError) {
+        console.error('Failed to load categories:', categoriesError);
+        return;
+      }
+      if (jobsError) {
+        console.error('Failed to load category popularity:', jobsError);
+      }
+
+      const counts = new Map<string, number>();
+      (jobsForCounts || []).forEach((job: any) => {
+        if (!job.category_id) return;
+        counts.set(job.category_id, (counts.get(job.category_id) || 0) + 1);
+      });
+
+      const nextCategories = (categoriesData || []).map((category: any) => ({
+        id: category.id,
+        name: category.label_ru || category.key,
+        icon: getCategoryIcon(category.label_ru, category.key),
+        popularity: counts.get(category.id) || 0,
+      })).sort((a, b) => {
+        if (b.popularity !== a.popularity) return b.popularity - a.popularity;
+        return a.name.localeCompare(b.name, 'ru');
+      });
+
+      setCategories(nextCategories);
+    })();
+  }, []);
 
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({
-        page: '1',
-        limit: '20',
-        ...(selectedCategory && { category_id: selectedCategory }),
-        ...(searchQuery && { search: searchQuery })
-      });
 
-      const response = await fetch(`https://adstlhdgegtkvtgklkyx.supabase.co/functions/v1/jobs-catalog?${params}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkc3RsaGRnZWd0a3Z0Z2tsa3l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTMxMzMsImV4cCI6MjA3MDUyOTEzM30.SzYVLiUQPa9ZM1bVlX5UupyPte_BxELij8BpUV0xhrs',
-          'Content-Type': 'application/json'
-        }
-      });
+      const { data: session } = await supabase.auth.getSession();
+      const uid = session.session?.user?.id ?? null;
 
-      const data = await response.json();
+      let query = supabase
+        .from('jobs')
+        .select('id,public_id,title,description,created_at,location_address,urgency,status,budget_min_cents,budget_max_cents,category_id,categories(label_ru,key),client_id')
+        .eq('status', 'new')
+        .order('created_at', { ascending: false })
+        .limit(20);
 
-      if (!response.ok) {
-        console.error('Error fetching jobs:', data);
+      if (uid) {
+        query = query.neq('client_id', uid);
+      }
+
+      if (selectedCategory) {
+        query = query.eq('category_id', selectedCategory);
+      }
+
+      const { data, error } = await query;
+      if (error) {
+        console.error('Error fetching jobs:', error);
+        setJobs([]);
         return;
       }
 
-      if (data?.jobs) {
-        setJobs(data.jobs);
-      }
+      const normalizedQuery = searchQuery.trim().toLowerCase();
+      const filtered = (data || []).filter((job: any) => {
+        if (!normalizedQuery) return true;
+        const haystack = [
+          job.title || '',
+          job.description || '',
+          job.location_address || '',
+          job.categories?.label_ru || '',
+        ].join(' ').toLowerCase();
+        return haystack.includes(normalizedQuery);
+      });
+
+      setJobs(filtered.map((job: any) => ({
+        id: job.id,
+        public_id: job.public_id,
+        title: job.title,
+        description: job.description,
+        budget_min: job.budget_min_cents ? Math.round(job.budget_min_cents / 100) : undefined,
+        budget_max: job.budget_max_cents ? Math.round(job.budget_max_cents / 100) : undefined,
+        location: job.location_address,
+        created_at: job.created_at,
+        category_name: job.categories?.label_ru || job.categories?.key,
+        urgency: job.urgency === 'urgent' ? 'high' : job.urgency === 'same_day' ? 'medium' : 'low',
+        status: job.status,
+        job_photos: [],
+      })));
     } catch (error) {
       console.error('Error fetching jobs:', error);
     } finally {
@@ -65,26 +128,41 @@ export default function MobileCatalog() {
   };
 
   useEffect(() => {
+    const nextSearchQuery = searchParams.get('q') || '';
+    const nextSelectedCategory = searchParams.get('category_id') || searchParams.get('category') || '';
+    if (nextSearchQuery !== searchQuery) setSearchQuery(nextSearchQuery);
+    if (nextSelectedCategory !== selectedCategory) setSelectedCategory(nextSelectedCategory);
+  }, [searchParams]);
+
+  useEffect(() => {
     fetchJobs();
   }, [selectedCategory, searchQuery]);
 
-  useEffect(() => {
-    const delayedSearch = setTimeout(() => {
-      if (searchQuery !== searchParams.get('q')) {
-        fetchJobs();
-      }
-    }, 500);
-
-    return () => clearTimeout(delayedSearch);
-  }, [searchQuery]);
+  const topCategories = useMemo(() => categories.slice(0, 12), [categories]);
+  const activeCategory = useMemo(
+    () => categories.find((category) => category.id === selectedCategory) || null,
+    [categories, selectedCategory]
+  );
+  const trimmedSearchQuery = searchQuery.trim();
 
   const handleCategorySelect = (categoryId: string) => {
     const newCategory = categoryId === selectedCategory ? '' : categoryId;
     setSelectedCategory(newCategory);
+    setSearchQuery('');
+
+    const next = new URLSearchParams(searchParams);
+    next.delete('q');
+    if (newCategory) {
+      next.set('category_id', newCategory);
+      next.delete('category');
+    } else {
+      next.delete('category_id');
+      next.delete('category');
+    }
+    setSearchParams(next, { replace: true });
   };
 
   const handleJobPress = (jobId: string) => {
-    // Navigate to job detail
     window.location.href = `/job/${jobId}`;
   };
 
@@ -94,20 +172,19 @@ export default function MobileCatalog() {
 
   return (
     <div className="min-h-screen bg-[#E5E7EB]">
-      <MobileHeader 
-        title="Поиск услуг"
-        showBack 
+      <MobileHeader
+        title="Каталог заказов"
+        showBack
         showSearch
       />
 
-      <div 
+      <div
         className="px-4 pt-4"
-        style={{ 
+        style={{
           paddingTop: 80 + safeAreaInsets.top + 16,
-          paddingBottom: bottomNavHeight + safeAreaInsets.bottom + 16 
+          paddingBottom: bottomNavHeight + safeAreaInsets.bottom + 16
         }}
       >
-        {/* Search Bar */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -130,44 +207,71 @@ export default function MobileCatalog() {
           </Button>
         </motion.div>
 
-        {/* Location */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center text-gray-600 mb-6"
+          className="flex items-center text-gray-600 mb-3"
         >
           <MapPin size={16} className="mr-2" />
           <span>Кишинёв, Молдова</span>
         </motion.div>
 
-        {/* Categories */}
+        {(trimmedSearchQuery || activeCategory) && (
+          <motion.div
+            initial={{ y: -12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.12 }}
+            className="mb-5"
+          >
+            <MobileCard className="p-3">
+              <div className="flex flex-wrap gap-2 mb-2">
+                {trimmedSearchQuery && (
+                  <div className="rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-700 border border-gray-200">
+                    Поиск: {trimmedSearchQuery}
+                  </div>
+                )}
+                {activeCategory && (
+                  <div className="rounded-full px-3 py-1 text-xs font-medium bg-white text-gray-700 border border-gray-200">
+                    {activeCategory.icon} Категория: {activeCategory.name}
+                  </div>
+                )}
+              </div>
+              <div className="text-xs text-gray-500">
+                {activeCategory
+                  ? `Показаны заявки по категории ${activeCategory.name}${trimmedSearchQuery ? ' с учетом текстового поиска.' : '.'}`
+                  : 'Показаны заявки по всем категориям с учетом текстового поиска.'}
+              </div>
+            </MobileCard>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <h3 className="text-lg font-semibold mb-3 text-gray-800">Категории</h3>
-          <div className="grid grid-cols-2 gap-3">{/* организовал в сетку 2 колонки с равномерными отступами */}
-            {categories.map((category) => (
+          <h3 className="text-lg font-semibold mb-3 text-gray-800">Популярные категории</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {topCategories.map((category) => (
               <Button
                 key={category.id}
                 onClick={() => handleCategorySelect(category.id)}
                 className={`w-full rounded-xl text-sm px-3 py-3 h-12 flex items-center justify-start ${
-                  selectedCategory === category.id 
-                    ? 'bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800' 
+                  selectedCategory === category.id
+                    ? 'bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800'
                     : 'bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]'
                 }`}
               >
                 <span className="mr-2">{category.icon}</span>
-                {category.name}
+                <span className="truncate">{category.name}</span>
+                <span className="ml-auto text-xs opacity-70">{category.popularity}</span>
               </Button>
             ))}
           </div>
         </motion.div>
 
-        {/* Filters (if shown) */}
         {showFilters && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
@@ -176,40 +280,61 @@ export default function MobileCatalog() {
             className="mb-6"
           >
             <MobileCard className="p-4">
-              <h4 className="font-medium mb-3">Фильтры</h4>
-              {/* Add filter controls here */}
-              <div className="text-sm text-muted-foreground">
-                Фильтры в разработке...
+              <div className="flex items-center justify-between gap-3">
+                <h4 className="font-medium">Фильтры</h4>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedCategory('');
+                    setSearchQuery('');
+                    setSearchParams(new URLSearchParams(), { replace: true });
+                  }}
+                >
+                  Сбросить
+                </Button>
+              </div>
+              <div className="text-sm text-muted-foreground mt-3">
+                Категории отсортированы по реальной частоте заказов клиентов.
               </div>
             </MobileCard>
           </motion.div>
         )}
 
-        {/* Results Header */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="flex items-center justify-between mb-4"
+          className="flex items-center justify-between mb-2"
         >
           <h3 className="text-lg font-semibold text-gray-800">
             {loading ? 'Загрузка...' : `Найдено ${jobs.length} заказов`}
           </h3>
           <Button className="text-sm bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB] rounded-xl px-3 py-2">
             <Filter size={16} className="mr-2" />
-            Сортировка
+            Актуальные
           </Button>
         </motion.div>
 
-        {/* Jobs List */}
+        {activeCategory && (
+          <div className="text-sm text-gray-500 mb-4">
+            Сейчас выбрана категория: <span className="font-medium text-gray-700">{activeCategory.name}</span>
+          </div>
+        )}
+
         <div className="space-y-4">
           {loading ? (
             <div className="text-center py-8">
               <div className="text-gray-500">Загрузка заказов...</div>
             </div>
           ) : jobs.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8 space-y-2">
               <div className="text-gray-500">Заказы не найдены</div>
+              {selectedCategory && (
+                <div className="text-xs text-gray-400">
+                  Попробуйте сбросить текстовый поиск или выбрать другую категорию.
+                </div>
+              )}
             </div>
           ) : (
             jobs.map((job, index) => (
@@ -217,7 +342,7 @@ export default function MobileCatalog() {
                 key={job.id}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 + index * 0.1 }}
+                transition={{ delay: 0.4 + index * 0.05 }}
               >
                 <MobileJobCard
                   job={job}
@@ -227,23 +352,6 @@ export default function MobileCatalog() {
             ))
           )}
         </div>
-
-        {/* Load More */}
-        {!loading && jobs.length > 0 && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-8 text-center"
-          >
-            <Button 
-              onClick={fetchJobs}
-              className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]"
-            >
-              Обновить
-            </Button>
-          </motion.div>
-        )}
       </div>
     </div>
   );

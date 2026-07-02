@@ -7,12 +7,13 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  Clock, 
-  Shield, 
-  DollarSign, 
-  Calendar, 
-  MessageCircle, 
+import { buildQuickResponseNote, submitJobResponse } from '@/lib/jobResponseSubmission';
+import {
+  Clock,
+  Shield,
+  DollarSign,
+  Calendar,
+  MessageCircle,
   Send,
   Lightbulb
 } from 'lucide-react';
@@ -39,7 +40,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
   className
 }) => {
   const { toast } = useToast();
-  
+
   const [formData, setFormData] = useState({
     price: '',
     estimatedHours: '',
@@ -108,7 +109,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.price || !formData.comment) {
       toast({
         title: 'Ошибка',
@@ -121,38 +122,48 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Пользователь не авторизован');
-
       const priceInCents = Math.round(parseFloat(formData.price) * 100);
 
-      const { error } = await supabase
-        .from('job_responses')
-        .insert({
-          job_id: jobId,
-          provider_id: user.id,
-          price_cents: priceInCents,
-          estimated_hours: formData.estimatedHours ? parseInt(formData.estimatedHours) : null,
-          warranty_days: parseInt(formData.warrantyDays),
-          eta_date: formData.etaDate || null,
-          comment: formData.comment,
-          template_used: formData.templateId || null,
-          status: 'pending'
-        });
+      const estimatedHours = formData.estimatedHours ? parseInt(formData.estimatedHours, 10) : undefined;
+      const selectedEtaLabel = etaOptions.find(option => option.value === formData.etaDate)?.label;
+      const note = buildQuickResponseNote(formData.comment, {
+        etaLabel: selectedEtaLabel,
+        etaDate: formData.etaDate,
+        estimatedHours,
+      });
+
+      const { error } = await submitJobResponse({
+        jobId,
+        priceCents: priceInCents,
+        warrantyDays: parseInt(formData.warrantyDays, 10),
+        etaSlot: formData.etaDate,
+        note,
+      });
 
       if (error) throw error;
 
       toast({
-        title: 'Отклик отправлен!',
-        description: 'Ваш отклик успешно отправлен клиенту'
+        title: 'Предложение отправлено!',
+        description: 'Ваше предложение успешно отправлено клиенту'
       });
 
       onSuccess?.();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error submitting response:', error);
+      const message = error instanceof Error ? error.message : String(error ?? '');
+      const duplicateResponse =
+        (typeof error === 'object' && error !== null && 'code' in error && (error as { code?: string }).code === '23505')
+        || /duplicate key/i.test(message)
+        || /already applied/i.test(message);
+      const unauthorized = /not authorized|row-level security|violates row-level security|JWT|auth/i.test(message);
+
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось отправить отклик',
+        title: duplicateResponse ? 'Предложение уже отправлено' : 'Ошибка',
+        description: duplicateResponse
+          ? 'Вы уже отправили предложение по этому заказу.'
+          : unauthorized
+            ? 'Сначала войдите в аккаунт специалиста и повторите попытку.'
+            : (message || 'Не удалось отправить предложение'),
         variant: 'destructive'
       });
     } finally {
@@ -166,7 +177,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
         <div className="p-2 bg-primary/10 rounded-lg">
           <Send size={20} className="text-primary" />
         </div>
-        <h3 className="text-xl font-semibold">Быстрый отклик</h3>
+        <h3 className="text-xl font-semibold">Быстрое предложение</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -219,8 +230,8 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
               <Shield size={16} className="inline mr-1" />
               Гарантия
             </label>
-            <Select 
-              value={formData.warrantyDays} 
+            <Select
+              value={formData.warrantyDays}
               onValueChange={(value) => setFormData({ ...formData, warrantyDays: value })}
             >
               <SelectTrigger>
@@ -243,8 +254,8 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
             <Calendar size={16} className="inline mr-1" />
             Готов выехать
           </label>
-          <Select 
-            value={formData.etaDate} 
+          <Select
+            value={formData.etaDate}
             onValueChange={(value) => setFormData({ ...formData, etaDate: value })}
           >
             <SelectTrigger>
@@ -305,7 +316,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
             <Lightbulb size={16} />
             {showAdvanced ? 'Скрыть' : 'Дополнительно'}
           </Button>
-          
+
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span>Готов выехать завтра</span>
@@ -323,11 +334,11 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
             ) : (
               <>
                 <Send size={16} className="mr-2" />
-                Отправить отклик
+                Отправить предложение
               </>
             )}
           </Button>
-          
+
           {onCancel && (
             <Button type="button" variant="outline" onClick={onCancel}>
               Отмена
@@ -340,7 +351,7 @@ export const QuickResponseForm: React.FC<QuickResponseFormProps> = ({
           <div className="flex items-start gap-3">
             <Lightbulb size={16} className="text-blue-600 dark:text-blue-400 mt-0.5" />
             <div className="text-sm text-blue-700 dark:text-blue-300">
-              <p className="font-medium mb-1">Совет для успешного отклика:</p>
+              <p className="font-medium mb-1">Совет для успешного предложения:</p>
               <ul className="list-disc list-inside space-y-0.5 text-blue-600 dark:text-blue-400">
                 <li>Укажите реалистичную цену</li>
                 <li>Детально опишите план работ</li>
