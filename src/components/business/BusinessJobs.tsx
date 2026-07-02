@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -31,6 +32,7 @@ interface BusinessJob {
 
 export function BusinessJobs() {
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<BusinessJob[]>([]);
@@ -81,8 +83,8 @@ export function BusinessJobs() {
       setJobs(data || []);
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить заказы",
+        title: t("common.error"),
+        description: t("biz.jobs.load_error"),
         variant: "destructive"
       });
     } finally {
@@ -139,11 +141,11 @@ export function BusinessJobs() {
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
-      'new': { label: 'Новый', variant: 'default' as const },
-      'accepted': { label: 'Принят', variant: 'secondary' as const },
-      'in_progress': { label: 'В работе', variant: 'default' as const },
-      'done': { label: 'Выполнен', variant: 'default' as const },
-      'cancelled': { label: 'Отменен', variant: 'destructive' as const }
+      'new': { label: t('status.new'), variant: 'default' as const },
+      'accepted': { label: t('status.accepted'), variant: 'secondary' as const },
+      'in_progress': { label: t('status.in_progress'), variant: 'default' as const },
+      'done': { label: t('status.done'), variant: 'default' as const },
+      'canceled': { label: t('status.canceled'), variant: 'destructive' as const }
     };
 
     const getStatusIcon = (status: string) => {
@@ -175,7 +177,7 @@ export function BusinessJobs() {
       <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
-          <span className="ml-3 text-black">Загрузка заказов...</span>
+          <span className="ml-3 text-black">{t("biz.jobs.loading")}</span>
         </div>
       </div>
     );
@@ -188,14 +190,14 @@ export function BusinessJobs() {
           <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
             <Briefcase className="h-6 w-6 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold text-black">Заказы компании</h2>
+          <h2 className="text-2xl font-bold text-black">{t("biz.jobs.title")}</h2>
         </div>
         <button
           onClick={() => navigate('/job/new')}
           className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
         >
           <Plus className="h-4 w-4" />
-          Создать заказ
+          {t("biz.jobs.create")}
         </button>
       </div>
 
@@ -204,14 +206,14 @@ export function BusinessJobs() {
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-neo neo-4 flex items-center justify-center">
             <Briefcase className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-black mb-2">У вас пока нет заказов</h3>
-          <p className="text-gray-600 mb-6">Создайте первый заказ для компании</p>
+          <h3 className="text-xl font-semibold text-black mb-2">{t("biz.jobs.empty_title")}</h3>
+          <p className="text-gray-600 mb-6">{t("biz.jobs.empty_text")}</p>
           <button
             onClick={() => navigate('/job/new')}
             className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
           >
             <Plus className="h-4 w-4" />
-            Создать заказ
+            {t("biz.jobs.create")}
           </button>
         </div>
       ) : (
@@ -235,7 +237,7 @@ export function BusinessJobs() {
 
                       <div className="flex items-center gap-4">
                         <div className="bg-neo neo-4 rounded-lg px-3 py-1 text-sm text-black">
-                          {job.categories?.label_ru || "Не указано"}
+                          {job.categories?.label_ru || t("common.not_specified")}
                         </div>
                         {getStatusBadge(job.status)}
                       </div>
@@ -247,7 +249,7 @@ export function BusinessJobs() {
                         {job.budget_min_cents && job.budget_max_cents ? (
                           <span>{formatPrice(job.budget_min_cents)} - {formatPrice(job.budget_max_cents)}</span>
                         ) : (
-                          <span className="text-gray-500">По договоренности</span>
+                          <span className="text-gray-500">{t("biz.jobs.by_agreement")}</span>
                         )}
                       </div>
                       <div className="flex items-center gap-1 text-sm text-gray-500">

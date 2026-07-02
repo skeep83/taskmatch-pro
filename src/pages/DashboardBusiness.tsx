@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { RoleGuard } from "@/components/RoleGuard";
 import { Seo } from "@/components/Seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,6 +42,7 @@ export default function DashboardBusiness() {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<BasicUser | null>(null);
@@ -69,8 +71,8 @@ export default function DashboardBusiness() {
     } catch (error: unknown) {
       console.error('Auth check error:', error);
       toast({
-        title: "Ошибка",
-        description: getErrorMessage(error, "Ошибка аутентификации"),
+        title: t("common.error"),
+        description: getErrorMessage(error, t("dash.biz.auth_error")),
         variant: "destructive"
       });
       setLoading(false);
@@ -192,7 +194,7 @@ export default function DashboardBusiness() {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="card-surface p-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Загружаем бизнес-панель...</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("dash.biz.loading")}</h1>
           <div className="animate-spin">⏳</div>
         </div>
       </main>
@@ -202,23 +204,23 @@ export default function DashboardBusiness() {
   const dashboardOptions = [
     {
       value: 'client',
-      label: 'Клиент',
+      label: t('menu.role_client'),
       icon: User,
-      description: 'Личный кабинет клиента',
+      description: t('dash.biz.role_client_desc'),
       available: true,
     },
     {
       value: 'pro',
-      label: 'Специалист',
+      label: t('menu.role_pro'),
       icon: Briefcase,
-      description: 'Кабинет специалиста',
+      description: t('dash.biz.role_pro_desc'),
       available: true,
     },
     {
       value: 'business',
-      label: 'Бизнес',
+      label: t('menu.role_business'),
       icon: Building2,
-      description: 'Корпоративный аккаунт',
+      description: t('dash.biz.role_biz_desc'),
       available: true,
     },
   ];
@@ -235,11 +237,11 @@ export default function DashboardBusiness() {
 
   return (
     <RoleGuard requiredRole="business">
-      <Seo title="ServiceHub — Бизнес-панель" description="Управление корпоративным аккаунтом" canonical="/dashboard/business" />
+      <Seo title={`ServiceHub — ${t("dash.biz.title")}`} description={t("dash.biz.seo_desc")} canonical="/dashboard/business" />
 
       {isMobile && (
         <MobileHeader
-          title="Бизнес-панель"
+          title={t("dash.biz.title")}
           showNotifications={true}
           showLogout={true}
           showDashboardSelector={true}
@@ -256,10 +258,10 @@ export default function DashboardBusiness() {
         {!isMobile && (
           <div className="text-center mb-16">
             <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
-              Бизнес-панель
+              {t("dash.biz.title")}
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Управление корпоративным аккаунтом
+              {t("dash.biz.subtitle")}
             </p>
           </div>
         )}
@@ -271,12 +273,12 @@ export default function DashboardBusiness() {
               <div className="p-5 lg:p-8 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div>
-                    <h2 className="text-lg lg:text-2xl font-semibold mb-2 text-black">Что сделать сейчас</h2>
-                    <p className="text-muted-foreground text-sm lg:text-base">Сначала создайте или откройте рабочий заказ, затем переходите к тендерам, компании и финансовым разделам.</p>
+                    <h2 className="text-lg lg:text-2xl font-semibold mb-2 text-black">{t("dash.biz.what_now")}</h2>
+                    <p className="text-muted-foreground text-sm lg:text-base">{t("dash.biz.what_now_desc")}</p>
                   </div>
                   <Button onClick={() => navigate("/job/new")} className="w-full lg:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
-                    Создать заказ
+                    {t("dash.biz.create_job")}
                   </Button>
                 </div>
               </div>
@@ -289,8 +291,8 @@ export default function DashboardBusiness() {
                       <Plus className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xs lg:text-sm text-black">Создать заказ</h3>
-                      <p className="text-xs text-muted-foreground mt-1">Запустить новый рабочий сценарий</p>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">{t("dash.biz.create_job")}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{t("dash.biz.create_job_desc")}</p>
                     </div>
                   </div>
                 </motion.button>
@@ -301,8 +303,8 @@ export default function DashboardBusiness() {
                       <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xs lg:text-sm text-black">Рабочие заказы</h3>
-                      <p className="text-xs text-muted-foreground mt-1">Открыть текущие задачи компании</p>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">{t("dash.biz.work_jobs")}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{t("dash.biz.work_jobs_desc")}</p>
                     </div>
                   </div>
                 </motion.button>
@@ -313,8 +315,8 @@ export default function DashboardBusiness() {
                       <Gavel className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xs lg:text-sm text-black">Тендеры</h3>
-                      <p className="text-xs text-muted-foreground mt-1">Перейти к закупкам и конкурсным задачам</p>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">{t("biz.tenders.title")}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{t("dash.biz.tenders_desc")}</p>
                     </div>
                   </div>
                 </motion.button>
@@ -325,8 +327,8 @@ export default function DashboardBusiness() {
                       <Building2 className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xs lg:text-sm text-black">Компания</h3>
-                      <p className="text-xs text-muted-foreground mt-1">Настроить реквизиты и профиль компании</p>
+                      <h3 className="font-semibold text-xs lg:text-sm text-black">{t("dash.biz.company")}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{t("dash.biz.company_desc")}</p>
                     </div>
                   </div>
                 </motion.button>
@@ -335,8 +337,8 @@ export default function DashboardBusiness() {
               {/* Quick Stats */}
               <div>
                 <div className="mb-3 lg:mb-4">
-                  <h3 className="text-base lg:text-xl font-semibold text-black">Ключевые показатели</h3>
-                  <p className="text-sm text-muted-foreground">Короткий снимок по расходам, команде и количеству рабочих заказов.</p>
+                  <h3 className="text-base lg:text-xl font-semibold text-black">{t("dash.biz.kpi")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("dash.biz.kpi_desc")}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
                   <motion.button
@@ -348,7 +350,7 @@ export default function DashboardBusiness() {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Общие расходы</p>
+                        <p className="text-sm font-medium text-muted-foreground">{t("biz.analytics.total_spent")}</p>
                         <p className="text-xl lg:text-2xl font-bold text-black">${(overviewStats.totalExpensesCents / 100).toFixed(2)}</p>
                       </div>
                       <NeumorphicIcon icon={DollarSign} size={isMobile ? 48 : 64} variant="behance" />
@@ -363,7 +365,7 @@ export default function DashboardBusiness() {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Инвойсов</p>
+                        <p className="text-sm font-medium text-muted-foreground">{t("dash.biz.invoices_count")}</p>
                         <p className="text-xl lg:text-2xl font-bold text-black">{overviewStats.invoicesCount}</p>
                       </div>
                       <NeumorphicIcon icon={Users} size={isMobile ? 48 : 64} variant="behance" />
@@ -378,7 +380,7 @@ export default function DashboardBusiness() {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Заказов</p>
+                        <p className="text-sm font-medium text-muted-foreground">{t("dash.biz.jobs_count")}</p>
                         <p className="text-xl lg:text-2xl font-bold text-black">{overviewStats.jobsCount}</p>
                       </div>
                       <NeumorphicIcon icon={Briefcase} size={isMobile ? 48 : 64} variant="behance" />
@@ -392,10 +394,10 @@ export default function DashboardBusiness() {
             <div className={`overflow-x-auto ${isMobile ? '' : 'hidden'}`}>
               <div className="flex space-x-2 p-3 bg-neo neo-inset-8 rounded-2xl min-w-max">
                 {[
-                  { id: 'overview', label: 'Обзор', icon: BarChart3 },
-                  { id: 'jobs', label: 'Заказы', icon: Briefcase },
-                  { id: 'tenders', label: 'Тендеры', icon: Gavel },
-                  { id: 'company', label: 'Компания', icon: Building2 }
+                  { id: 'overview', label: t('dash.biz.tab_overview'), icon: BarChart3 },
+                  { id: 'jobs', label: t('dash.biz.tab_jobs'), icon: Briefcase },
+                  { id: 'tenders', label: t('biz.tenders.title'), icon: Gavel },
+                  { id: 'company', label: t('dash.biz.company'), icon: Building2 }
                 ].map((tab) => (
                   <motion.button
                     key={tab.id}
@@ -424,7 +426,7 @@ export default function DashboardBusiness() {
                     className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <BarChart3 className="h-5 w-5" />
-                    <span className="hidden sm:inline font-medium">Обзор</span>
+                    <span className="hidden sm:inline font-medium">{t("dash.biz.tab_overview")}</span>
                     {activeTab === "overview" && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -438,7 +440,7 @@ export default function DashboardBusiness() {
                     className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <Briefcase className="h-5 w-5" />
-                    <span className="hidden sm:inline font-medium">Заказы</span>
+                    <span className="hidden sm:inline font-medium">{t("dash.biz.tab_jobs")}</span>
                     {activeTab === "jobs" && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -452,7 +454,7 @@ export default function DashboardBusiness() {
                     className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <Gavel className="h-5 w-5" />
-                    <span className="hidden sm:inline font-medium">Тендеры</span>
+                    <span className="hidden sm:inline font-medium">{t("biz.tenders.title")}</span>
                     {activeTab === "tenders" && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -466,7 +468,7 @@ export default function DashboardBusiness() {
                     className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <Building2 className="h-5 w-5" />
-                    <span className="hidden sm:inline font-medium">Компания</span>
+                    <span className="hidden sm:inline font-medium">{t("dash.biz.company")}</span>
                     {activeTab === "company" && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -481,30 +483,30 @@ export default function DashboardBusiness() {
 
             <TabsContent value="overview" className="space-y-4 lg:space-y-8">
               <div className="p-4 lg:p-8 bg-neo neo-8 rounded-2xl">
-                <h2 className="text-lg lg:text-2xl font-semibold mb-3 lg:mb-4 text-black">Добро пожаловать в ServiceHub Business</h2>
+                <h2 className="text-lg lg:text-2xl font-semibold mb-3 lg:mb-4 text-black">{t("dash.biz.welcome")}</h2>
                 <p className="text-muted-foreground mb-4 lg:mb-6 text-sm lg:text-base">
-                  Управляйте заказами компании, координируйте команду и только затем переходите к финансовым и аналитическим разделам.
+                  {t("dash.biz.welcome_desc")}
                 </p>
                 <div className="space-y-2 lg:space-y-3">
-                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>1.</strong> Откройте или создайте рабочий заказ</p>
-                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>2.</strong> Перейдите к тендерам, если нужен конкурсный сценарий</p>
-                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>3.</strong> Проверьте инвойсы и аналитику как вторичный уровень контроля</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>1.</strong> {t("dash.biz.step1")}</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>2.</strong> {t("dash.biz.step2")}</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground"><strong>3.</strong> {t("dash.biz.step3")}</p>
                 </div>
               </div>
 
               <div className="p-4 lg:p-8 bg-neo neo-8 rounded-2xl">
                 <div className="mb-4 lg:mb-6">
-                  <h3 className="text-base lg:text-xl font-semibold text-black">Дополнительные разделы</h3>
-                  <p className="text-sm text-muted-foreground">Финансовые и обзорные разделы остаются доступны отсюда, без перегруза верхней навигации.</p>
+                  <h3 className="text-base lg:text-xl font-semibold text-black">{t("dash.biz.extra_sections")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("dash.biz.extra_sections_desc")}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("invoices")}>
-                    <div className="flex items-center gap-3 mb-3"><FileText className="h-5 w-5 text-primary" /><span className="font-semibold text-black">Счета</span></div>
-                    <p className="text-sm text-muted-foreground">Оплаты, документы и финансовые статусы компании.</p>
+                    <div className="flex items-center gap-3 mb-3"><FileText className="h-5 w-5 text-primary" /><span className="font-semibold text-black">{t("dash.biz.bills")}</span></div>
+                    <p className="text-sm text-muted-foreground">{t("dash.biz.bills_desc")}</p>
                   </button>
                   <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("analytics")}>
-                    <div className="flex items-center gap-3 mb-3"><BarChart3 className="h-5 w-5 text-primary" /><span className="font-semibold text-black">Аналитика</span></div>
-                    <p className="text-sm text-muted-foreground">Сводный контроль расходов и активности команды.</p>
+                    <div className="flex items-center gap-3 mb-3"><BarChart3 className="h-5 w-5 text-primary" /><span className="font-semibold text-black">{t("dash.biz.analytics")}</span></div>
+                    <p className="text-sm text-muted-foreground">{t("dash.biz.analytics_desc")}</p>
                   </button>
                 </div>
               </div>

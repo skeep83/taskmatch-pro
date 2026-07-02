@@ -362,14 +362,14 @@ export default function DashboardClient() {
       if (error) throw error;
 
       toast({
-        title: 'Профиль обновлен',
-        description: 'Изменения сохранены успешно'
+        title: t('dash.client.profile_updated'),
+        description: t('dash.client.changes_saved')
       });
     } catch (error: unknown) {
       console.error('Error saving profile:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось сохранить изменения: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t('common.error'),
+        description: t('dash.client.save_error', { error: getErrorMessage(error, t('dash.client.unknown_error')) }),
         variant: 'destructive'
       });
     } finally {
@@ -382,7 +382,7 @@ export default function DashboardClient() {
   const canCancelJob = (job: Job) => canClientCancelJob({ job, isOwner: true });
 
   const handleDeleteJob = async (jobId: string) => {
-    if (!confirm('Вы уверены, что хотите удалить этот заказ?')) {
+    if (!confirm(t('dash.client.delete_confirm'))) {
       return;
     }
 
@@ -390,8 +390,8 @@ export default function DashboardClient() {
       const result = await deleteClientJob(jobId);
 
       toast({
-        title: result === 'hard' ? 'Заказ удален' : 'Заказ скрыт из активных',
-        description: result === 'hard' ? 'Заказ был успешно удален' : 'Заказ отменён и больше не показывается в активном кабинете'
+        title: result === 'hard' ? t('dash.client.job_deleted') : t('dash.client.job_hidden'),
+        description: result === 'hard' ? t('dash.client.job_deleted_desc') : t('dash.client.job_hidden_desc')
       });
 
       // Обновляем список заказов
@@ -399,15 +399,15 @@ export default function DashboardClient() {
     } catch (error: unknown) {
       console.error('Error deleting job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось удалить заказ: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t('common.error'),
+        description: t('dash.client.delete_error', { error: getErrorMessage(error, t('dash.client.unknown_error')) }),
         variant: 'destructive'
       });
     }
   };
 
   const handleCancelJob = async (jobId: string) => {
-    if (!confirm('После выбора исполнителя заказ больше нельзя редактировать или удалять. Отменить заказ?')) {
+    if (!confirm(t('dash.client.cancel_confirm'))) {
       return;
     }
 
@@ -430,16 +430,16 @@ export default function DashboardClient() {
       });
 
       toast({
-        title: 'Заказ отменён',
-        description: 'Заказ сохранён в истории как отменённый'
+        title: t('dash.client.job_canceled'),
+        description: t('dash.client.job_canceled_desc')
       });
 
       loadUserData();
     } catch (error: unknown) {
       console.error('Error cancelling job:', error);
       toast({
-        title: 'Ошибка',
-        description: `Не удалось отменить заказ: ${getErrorMessage(error, 'неизвестная ошибка')}`,
+        title: t('common.error'),
+        description: t('dash.client.cancel_error', { error: getErrorMessage(error, t('dash.client.unknown_error')) }),
         variant: 'destructive'
       });
     }
@@ -459,11 +459,11 @@ export default function DashboardClient() {
   const getStatusBadge = (job: Job) => {
     const isDoneAwaitingConfirmation = job.status === 'done' && !job.end_confirmed;
     const statusMap = {
-      'new': { label: 'Ищем исполнителя', variant: 'secondary' as const },
-      'accepted': { label: 'Исполнитель выбран', variant: 'default' as const },
-      'in_progress': { label: 'Работа выполняется', variant: 'default' as const },
-      'done': { label: isDoneAwaitingConfirmation ? 'Ждёт вашего подтверждения' : 'Выполнен', variant: 'default' as const },
-      'canceled': { label: 'Отменён', variant: 'destructive' as const }
+      'new': { label: t('dash.client.st_new'), variant: 'secondary' as const },
+      'accepted': { label: t('dash.client.st_accepted'), variant: 'default' as const },
+      'in_progress': { label: t('dash.client.st_in_progress'), variant: 'default' as const },
+      'done': { label: isDoneAwaitingConfirmation ? t('dash.client.st_done_wait') : t('status.done'), variant: 'default' as const },
+      'canceled': { label: t('status.canceled'), variant: 'destructive' as const }
     };
 
     const statusInfo = statusMap[job.status as keyof typeof statusMap] || { label: job.status, variant: 'default' as const };
@@ -478,9 +478,9 @@ export default function DashboardClient() {
 
   const getUrgencyBadge = (urgency: string) => {
     const urgencyMap = {
-      'normal': { label: 'Обычный', variant: 'outline' as const },
-      'urgent': { label: 'Срочно', variant: 'secondary' as const },
-      'same_day': { label: 'В тот же день', variant: 'destructive' as const }
+      'normal': { label: t('dash.client.urg_normal'), variant: 'outline' as const },
+      'urgent': { label: t('dash.client.urg_urgent'), variant: 'secondary' as const },
+      'same_day': { label: t('dash.client.urg_same_day'), variant: 'destructive' as const }
     };
 
     const urgencyInfo = urgencyMap[urgency as keyof typeof urgencyMap] || { label: urgency, variant: 'outline' as const };
@@ -488,7 +488,7 @@ export default function DashboardClient() {
   };
 
   const formatPrice = (minCents?: number, maxCents?: number) => {
-    if (!minCents && !maxCents) return "Не указан";
+    if (!minCents && !maxCents) return t("dash.client.budget_na");
 
     if (minCents && maxCents) {
       return `${formatCurrency(minCents)} - ${formatCurrency(maxCents)}`;
@@ -498,21 +498,21 @@ export default function DashboardClient() {
   };
 
   const getClientNextStepText = (job: Job) => {
-    if (job.status === 'new') return 'Просмотрите отклики специалистов и выберите исполнителя для заказа';
-    if (job.status === 'accepted') return 'Свяжитесь с исполнителем и согласуйте детали перед стартом работ';
-    if (job.status === 'in_progress') return 'Отслеживайте ход работы и отвечайте на сообщения по заказу';
-    if (job.status === 'done') return 'Проверьте результат, подтвердите выполнение и оставьте отзыв';
-    if (job.status === 'canceled') return 'Заказ отменён — при необходимости создайте новый';
-    return 'Откройте детали заказа и выберите следующий шаг';
+    if (job.status === 'new') return t('dash.client.hint_new');
+    if (job.status === 'accepted') return t('dash.client.hint_accepted');
+    if (job.status === 'in_progress') return t('dash.client.hint_in_progress');
+    if (job.status === 'done') return t('dash.client.hint_done');
+    if (job.status === 'canceled') return t('dash.client.hint_canceled');
+    return t('dash.client.hint_default');
   };
 
   const getClientPrimaryActionLabel = (job: Job) => {
-    if (job.status === 'new') return 'Выбрать исполнителя';
-    if (job.status === 'accepted') return 'Связаться';
-    if (job.status === 'in_progress') return 'Отследить';
-    if (job.status === 'done') return 'Подтвердить';
-    if (job.status === 'canceled') return 'Просмотр';
-    return 'Открыть';
+    if (job.status === 'new') return t('dash.client.act_new');
+    if (job.status === 'accepted') return t('dash.client.act_accepted');
+    if (job.status === 'in_progress') return t('dash.client.act_in_progress');
+    if (job.status === 'done') return t('dash.client.act_done');
+    if (job.status === 'canceled') return t('dash.client.act_canceled');
+    return t('dash.client.act_default');
   };
 
   if (loading) {
@@ -556,7 +556,7 @@ export default function DashboardClient() {
                   className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <User className="h-5 w-5" />
-                  <span className="hidden sm:inline font-medium">Обзор</span>
+                  <span className="hidden sm:inline font-medium">{t("dash.client.tab_overview")}</span>
                   {activeTab === "overview" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -570,7 +570,7 @@ export default function DashboardClient() {
                   className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Briefcase className="h-5 w-5" />
-                  <span className="hidden sm:inline font-medium">Заказы</span>
+                  <span className="hidden sm:inline font-medium">{t("dash.client.tab_jobs")}</span>
                   {activeTab === "jobs" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -584,7 +584,7 @@ export default function DashboardClient() {
                   className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Crown className="h-5 w-5" />
-                  <span className="hidden sm:inline font-medium">Подписка</span>
+                  <span className="hidden sm:inline font-medium">{t("dash.client.tab_subscription")}</span>
                   {activeTab === "subscription" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -598,7 +598,7 @@ export default function DashboardClient() {
                   className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Settings className="h-5 w-5" />
-                  <span className="hidden sm:inline font-medium">Настройки</span>
+                  <span className="hidden sm:inline font-medium">{t("dash.client.tab_settings")}</span>
                   {activeTab === "settings" && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -615,12 +615,12 @@ export default function DashboardClient() {
               <div className="p-6 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">Что сделать сейчас</h2>
-                    <p className="text-muted-foreground">Начните с действия, которое ближе всего к текущему заказу: создать новый, открыть существующие или продолжить общение по активным заказам.</p>
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">{t("dash.client.what_now")}</h2>
+                    <p className="text-muted-foreground">{t('dash.client.what_now_desc')}</p>
                   </div>
                   <Button onClick={() => navigate("/job/new")} className="lg:w-auto w-full">
                     <Plus className="h-4 w-4 mr-2" />
-                    Создать заказ
+                    {t("dash.client.create_job")}
                   </Button>
                 </div>
               </div>
@@ -628,8 +628,8 @@ export default function DashboardClient() {
               {/* Quick Actions */}
               <div>
                 <div className="mb-4">
-                  <h2 className="text-2xl font-semibold text-gray-800">Быстрые действия</h2>
-                  <p className="text-muted-foreground">Основные действия по заказам, сообщениям и сервисам клиента.</p>
+                  <h2 className="text-2xl font-semibold text-gray-800">{t("dash.client.quick_actions")}</h2>
+                  <p className="text-muted-foreground">{t("dash.client.quick_actions_desc")}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <button
@@ -652,7 +652,7 @@ export default function DashboardClient() {
                 <div
                   aria-disabled="true"
                   className="p-6 opacity-50 cursor-not-allowed border-dashed bg-neo neo-8 rounded-2xl"
-                  title="Бизнес-тендеры доступны только для бизнес-аккаунтов"
+                  title={t("dash.client.biz_tender_only")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <div className="relative">
@@ -662,8 +662,8 @@ export default function DashboardClient() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-muted-foreground">Бизнес-тендер</h3>
-                      <p className="text-sm text-muted-foreground">Отдельный контур для компаний</p>
+                      <h3 className="font-semibold mb-1 text-muted-foreground">{t("dash.client.biz_tender")}</h3>
+                      <p className="text-sm text-muted-foreground">{t("dash.client.biz_tender_desc")}</p>
                     </div>
                   </div>
                 </div>
@@ -678,8 +678,8 @@ export default function DashboardClient() {
                       <Crown className="h-8 w-8 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-gray-800">Подписка HomeCare</h3>
-                      <p className="text-sm text-gray-600">Открыть планы подписки и сравнить тарифы</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">{t("dash.client.subscription_home")}</h3>
+                      <p className="text-sm text-gray-600">{t("dash.client.subscription_desc")}</p>
                     </div>
                   </div>
                 </button>
@@ -694,8 +694,8 @@ export default function DashboardClient() {
                       <MessageSquare className="h-8 w-8 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-gray-800">Сообщения</h3>
-                      <p className="text-sm text-gray-600">Сообщения по заказам</p>
+                      <h3 className="font-semibold mb-1 text-gray-800">{t("dash.client.messages")}</h3>
+                      <p className="text-sm text-gray-600">{t("dash.client.messages_desc")}</p>
                     </div>
                   </div>
                 </button>
@@ -705,8 +705,8 @@ export default function DashboardClient() {
               {/* Quick Stats */}
               <div>
                 <div className="mb-4">
-                  <h2 className="text-2xl font-semibold text-gray-800">Ключевые показатели</h2>
-                  <p className="text-muted-foreground">Короткий снимок по заказам, активности и расходам.</p>
+                  <h2 className="text-2xl font-semibold text-gray-800">{t("dash.client.kpi")}</h2>
+                  <p className="text-muted-foreground">{t("dash.client.kpi_desc")}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <button className="p-6 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("jobs")}>
@@ -714,7 +714,7 @@ export default function DashboardClient() {
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_jobs')}</p>
                         <p className="text-2xl font-bold">{stats.totalJobs}</p>
-                        <p className="text-xs text-muted-foreground mt-2">Открыть все заказы</p>
+                        <p className="text-xs text-muted-foreground mt-2">{t("dash.client.open_all_jobs")}</p>
                       </div>
                       <NeumorphicIcon icon={Briefcase} size={64} variant="behance" />
                     </div>
@@ -725,7 +725,7 @@ export default function DashboardClient() {
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.active_jobs')}</p>
                         <p className="text-2xl font-bold">{stats.activeJobs}</p>
-                        <p className="text-xs text-muted-foreground mt-2">Перейти к активным заказам</p>
+                        <p className="text-xs text-muted-foreground mt-2">{t("dash.client.goto_active")}</p>
                       </div>
                       <NeumorphicIcon icon={Clock} size={64} variant="behance" />
                     </div>
@@ -736,7 +736,7 @@ export default function DashboardClient() {
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.completed_jobs')}</p>
                         <p className="text-2xl font-bold">{stats.completedJobs}</p>
-                        <p className="text-xs text-muted-foreground mt-2">Посмотреть завершённые заказы</p>
+                        <p className="text-xs text-muted-foreground mt-2">{t("dash.client.view_completed")}</p>
                       </div>
                       <NeumorphicIcon icon={CheckCircle} size={64} variant="behance" />
                     </div>
@@ -747,7 +747,7 @@ export default function DashboardClient() {
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_spent')}</p>
                         <p className="text-2xl font-bold">{formatCurrency(stats.totalSpent)}</p>
-                        <p className="text-xs text-muted-foreground mt-2">Открыть историю платежей</p>
+                        <p className="text-xs text-muted-foreground mt-2">{t("dash.client.open_payments")}</p>
                       </div>
                       <NeumorphicIcon icon={DollarSign} size={64} variant="behance" />
                     </div>
@@ -758,26 +758,26 @@ export default function DashboardClient() {
               <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-800">Дополнительные разделы</h2>
-                    <p className="text-muted-foreground">Вторичные разделы убраны из верхнего ряда, но доступны отсюда, когда они действительно нужны.</p>
+                    <h2 className="text-2xl font-semibold text-gray-800">{t("dash.client.extra_sections")}</h2>
+                    <p className="text-muted-foreground">{t('dash.client.extra_sections_desc')}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("payments")}>
-                    <div className="flex items-center gap-3 mb-3"><CreditCard className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Финансы</span></div>
-                    <p className="text-sm text-muted-foreground">История оплат, статусы и финансовые операции по заказам.</p>
+                    <div className="flex items-center gap-3 mb-3"><CreditCard className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">{t("dash.client.finance")}</span></div>
+                    <p className="text-sm text-muted-foreground">{t("dash.client.payments_history_desc")}</p>
                   </button>
                   <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("referrals")}>
-                    <div className="flex items-center gap-3 mb-3"><Gift className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Реферальная программа</span></div>
-                    <p className="text-sm text-muted-foreground">Код приглашения и бонусы.</p>
+                    <div className="flex items-center gap-3 mb-3"><Gift className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">{t("dash.client.referral")}</span></div>
+                    <p className="text-sm text-muted-foreground">{t("dash.client.referral_desc")}</p>
                   </button>
                   <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("reviews")}>
-                    <div className="flex items-center gap-3 mb-3"><Star className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Исполнители</span></div>
-                    <p className="text-sm text-muted-foreground">Hall of Fame и проверка профилей.</p>
+                    <div className="flex items-center gap-3 mb-3"><Star className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">{t("dash.client.performers")}</span></div>
+                    <p className="text-sm text-muted-foreground">{t("dash.client.rating_desc")}</p>
                   </button>
                   <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("tenders")}>
-                    <div className="flex items-center gap-3 mb-3"><Gavel className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Тендеры для компаний</span></div>
-                    <p className="text-sm text-muted-foreground">Отдельный контур для тендерных и корпоративных сценариев.</p>
+                    <div className="flex items-center gap-3 mb-3"><Gavel className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">{t("dash.client.company_tenders")}</span></div>
+                    <p className="text-sm text-muted-foreground">{t("dash.client.tenders_desc")}</p>
                   </button>
                 </div>
               </div>
@@ -794,10 +794,10 @@ export default function DashboardClient() {
                         setHasPendingProRequest(true);
                       }
                       toast({
-                        title: "Заявка отправлена",
+                        title: t("dash.client.request_sent"),
                         description: newRole === 'pro'
-                          ? "Ваша заявка на статус специалиста отправлена на рассмотрение!"
-                          : "Ваша роль была успешно обновлена!"
+                          ? t("dash.client.pro_request_sent")
+                          : t("dash.client.role_updated")
                       });
                     }}
                   />
@@ -806,18 +806,18 @@ export default function DashboardClient() {
 
               {/* Recent Jobs */}
               <div className="p-8 bg-neo neo-8 rounded-2xl">
-                <h2 className="text-2xl font-semibold mb-6">Мои заказы</h2>
+                <h2 className="text-2xl font-semibold mb-6">{t("dash.client.my_jobs")}</h2>
                 {jobs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>У вас пока нет заказов</p>
-                    <p className="text-sm mb-4">Создайте первый заказ, чтобы получить отклики специалистов и выбрать исполнителя</p>
+                    <p>{t("dash.client.no_jobs")}</p>
+                    <p className="text-sm mb-4">{t("dash.client.no_jobs_desc")}</p>
                     <button
                       onClick={() => navigate("/job/new")}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
                     >
                       <Plus className="h-4 w-4" />
-                      Создать заказ
+                      {t("dash.client.create_job")}
                     </button>
                   </div>
                 ) : (
@@ -826,12 +826,12 @@ export default function DashboardClient() {
                       <div key={job.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-medium">{job.title || "Без названия"}</h4>
+                            <h4 className="font-medium">{job.title || t("dash.client.untitled")}</h4>
                             {getStatusBadge(job)}
                           </div>
-                          <div className="text-xs font-mono text-muted-foreground">№ заявки: {job.public_id}</div>
+                          <div className="text-xs font-mono text-muted-foreground">{t("dash.client.request_no")}: {job.public_id}</div>
                           <div className="text-sm text-muted-foreground">
-                            {job.categories?.label_ru || "Другое"} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                            {job.categories?.label_ru || t("dash.client.other")} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
                           </div>
                           <div className="text-xs text-muted-foreground mt-1">
                             {getClientNextStepText(job)}
@@ -894,26 +894,26 @@ export default function DashboardClient() {
             <TabsContent value="jobs">
               <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-row items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold">Мои заказы</h2>
+                  <h2 className="text-2xl font-semibold">{t("dash.client.my_jobs")}</h2>
                   <Button onClick={() => navigate("/job/new")}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Создать заказ
+                    {t("dash.client.create_job")}
                   </Button>
                 </div>
                 {jobs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>У вас пока нет заказов</p>
+                    <p>{t("dash.client.no_jobs")}</p>
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Заказ</TableHead>
-                        <TableHead>Статус</TableHead>
-                        <TableHead>Бюджет</TableHead>
-                        <TableHead>Дата</TableHead>
-                        <TableHead>Действия</TableHead>
+                        <TableHead>{t("dash.client.col_job")}</TableHead>
+                        <TableHead>{t("dash.client.col_status")}</TableHead>
+                        <TableHead>{t("dash.client.col_budget")}</TableHead>
+                        <TableHead>{t("dash.client.col_date")}</TableHead>
+                        <TableHead>{t("common.actions")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -922,9 +922,9 @@ export default function DashboardClient() {
                           <TableCell>
                             <div>
                               <div className="font-medium">{job.title}</div>
-                              <div className="text-xs font-mono text-muted-foreground">№ заявки: {job.public_id}</div>
+                              <div className="text-xs font-mono text-muted-foreground">{t("dash.client.request_no")}: {job.public_id}</div>
                               <div className="text-sm text-muted-foreground">
-                                {job.categories?.label_ru || "Другое"}
+                                {job.categories?.label_ru || t("dash.client.other")}
                               </div>
                               <div className="text-xs text-muted-foreground mt-1">
                                 {getClientNextStepText(job)}
@@ -1007,13 +1007,13 @@ export default function DashboardClient() {
                       <span className="text-sm text-white font-bold">B</span>
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Бизнес-тендеры доступны только для компаний</h3>
-                  <p className="mb-4">Для работы с тендерами используйте бизнес-аккаунт</p>
+                  <h3 className="text-xl font-semibold mb-2">{t("dash.client.biz_only_title")}</h3>
+                  <p className="mb-4">{t("dash.client.biz_only_desc")}</p>
                   <button
                     onClick={() => navigate("/dashboard/business")}
                     className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
                   >
-                    Открыть бизнес-аккаунт
+                    {t("dash.client.open_biz")}
                   </button>
                 </div>
               </div>
@@ -1024,18 +1024,18 @@ export default function DashboardClient() {
               <div className="space-y-6">
                 {/* Current Plan */}
                 <div className="p-8 bg-neo neo-8 rounded-2xl">
-                  <h2 className="text-2xl font-semibold mb-6">Подписка HomeCare</h2>
+                  <h2 className="text-2xl font-semibold mb-6">{t("dash.client.subscription_home")}</h2>
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="border rounded-lg p-6">
                       <div className="flex items-center gap-2 mb-4">
                         <Shield className="h-6 w-6 text-primary" />
                         <h3 className="text-lg font-semibold">Basic</h3>
                       </div>
-                      <div className="text-2xl font-bold mb-2">99 <span className="text-sm font-normal">/мес</span></div>
+                      <div className="text-2xl font-bold mb-2">99 <span className="text-sm font-normal">{t("dash.client.per_month")}</span></div>
                       <ul className="space-y-2 text-sm">
-                        <li>• Приоритетная поддержка</li>
-                        <li>• Скидка 5% на заказы</li>
-                        <li>• Расширенная гарантия</li>
+                        <li>• {t("dash.client.priority_support")}</li>
+                        <li>• {t("dash.client.discount5")}</li>
+                        <li>• {t("dash.client.warranty")}</li>
                       </ul>
                     </div>
 
@@ -1043,16 +1043,16 @@ export default function DashboardClient() {
                       <div className="flex items-center gap-2 mb-4">
                         <Crown className="h-6 w-6 text-primary" />
                         <h3 className="text-lg font-semibold">Plus</h3>
-                        <Badge>Популярный</Badge>
+                        <Badge>{t("dash.client.popular")}</Badge>
                       </div>
-                      <div className="text-2xl font-bold mb-2">199 <span className="text-sm font-normal">/мес</span></div>
+                      <div className="text-2xl font-bold mb-2">199 <span className="text-sm font-normal">{t("dash.client.per_month")}</span></div>
                       <ul className="space-y-2 text-sm mb-4">
-                        <li>• Все из Basic</li>
-                        <li>• Скидка 10% на заказы</li>
-                        <li>• Бесплатная диагностика</li>
-                        <li>• Приоритетная поддержка</li>
+                        <li>• {t("dash.client.all_basic")}</li>
+                        <li>• {t("dash.client.discount10")}</li>
+                        <li>• {t("dash.client.free_diag")}</li>
+                        <li>• {t("dash.client.priority_support")}</li>
                       </ul>
-                      <button onClick={() => navigate("/pricing")} className="w-full px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800">Сравнить тарифы</button>
+                      <button onClick={() => navigate("/pricing")} className="w-full px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800">{t("dash.client.compare_plans")}</button>
                     </div>
 
                     <div className="border rounded-lg p-6">
@@ -1060,12 +1060,12 @@ export default function DashboardClient() {
                         <Zap className="h-6 w-6 text-primary" />
                         <h3 className="text-lg font-semibold">Max</h3>
                       </div>
-                      <div className="text-2xl font-bold mb-2">399 <span className="text-sm font-normal">/мес</span></div>
+                      <div className="text-2xl font-bold mb-2">399 <span className="text-sm font-normal">{t("dash.client.per_month")}</span></div>
                       <ul className="space-y-2 text-sm">
-                        <li>• Все из Plus</li>
-                        <li>• Скидка 15% на заказы</li>
-                        <li>• Персональный менеджер</li>
-                        <li>• VIP поддержка 24/7</li>
+                        <li>• {t("dash.client.all_plus")}</li>
+                        <li>• {t("dash.client.discount15")}</li>
+                        <li>• {t("dash.client.personal_manager")}</li>
+                        <li>• {t("dash.client.vip_support")}</li>
                       </ul>
                     </div>
                   </div>
@@ -1076,10 +1076,10 @@ export default function DashboardClient() {
             {/* Payments Tab */}
             <TabsContent value="payments">
               <div className="p-8 bg-neo neo-8 rounded-2xl">
-                <h2 className="text-2xl font-semibold mb-6">История платежей</h2>
+                <h2 className="text-2xl font-semibold mb-6">{t("dash.client.payments_history")}</h2>
                 <div className="text-center py-8 text-muted-foreground">
                   <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>История платежей пуста</p>
+                  <p>{t("dash.client.payments_empty")}</p>
                 </div>
               </div>
             </TabsContent>
@@ -1087,27 +1087,27 @@ export default function DashboardClient() {
             {/* Referrals Tab */}
             <TabsContent value="referrals">
               <div className="p-8 bg-neo neo-8 rounded-2xl">
-                <h2 className="text-2xl font-semibold mb-6">Реферальная программа</h2>
+                <h2 className="text-2xl font-semibold mb-6">{t("dash.client.referral")}</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="font-semibold mb-4">Ваш реферальный код</h3>
+                    <h3 className="font-semibold mb-4">{t("dash.client.your_code")}</h3>
                     <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
                       <code className="font-mono text-lg">{stats.refferalCode}</code>
-                      <button className="px-4 py-2 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 text-gray-700 hover:text-gray-800 text-sm">Копировать</button>
+                      <button className="px-4 py-2 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 text-gray-700 hover:text-gray-800 text-sm">{t("dash.client.copy")}</button>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Поделитесь этим кодом с друзьями и получайте бонусы за каждого нового пользователя
+                      {t("dash.client.share_code")}
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-4">Статистика</h3>
+                    <h3 className="font-semibold mb-4">{t("dash.client.stats")}</h3>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span>Приглашено:</span>
+                        <span>{t("dash.client.invited")}:</span>
                         <span className="font-semibold">0</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Заработано:</span>
+                        <span>{t("dash.client.earned")}:</span>
                         <span className="font-semibold">0</span>
                       </div>
                     </div>
@@ -1127,7 +1127,7 @@ export default function DashboardClient() {
             <TabsContent value="settings">
               <div className="space-y-6">
                 <div className="p-8 bg-neo neo-8 rounded-2xl">
-                  <h2 className="text-2xl font-semibold mb-6">Профиль</h2>
+                  <h2 className="text-2xl font-semibold mb-6">{t("dash.client.profile")}</h2>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium mb-2">Email</label>
@@ -1139,7 +1139,7 @@ export default function DashboardClient() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Телефон</label>
+                      <label className="block text-sm font-medium mb-2">{t("dash.client.phone")}</label>
                       <input
                         type="tel"
                         value={profileData.phone}
@@ -1156,18 +1156,18 @@ export default function DashboardClient() {
                       disabled={saving}
                       className="w-full md:w-auto px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800 disabled:opacity-50"
                     >
-                      {saving ? 'Сохранение...' : 'Сохранить изменения'}
+                      {saving ? t('common.saving') : t('dash.client.save_changes')}
                     </button>
                   </div>
                 </div>
 
                 <div className="p-8 bg-neo neo-8 rounded-2xl">
-                  <h2 className="text-2xl font-semibold mb-6">Уведомления</h2>
+                  <h2 className="text-2xl font-semibold mb-6">{t("dash.client.notifications")}</h2>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-medium">Email уведомления</h4>
-                        <p className="text-sm text-muted-foreground">Получать уведомления на email</p>
+                        <h4 className="font-medium">{t("dash.client.email_notif")}</h4>
+                        <p className="text-sm text-muted-foreground">{t("dash.client.email_notif_desc")}</p>
                       </div>
                       <input
                         type="checkbox"
@@ -1178,8 +1178,8 @@ export default function DashboardClient() {
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-medium">SMS уведомления</h4>
-                        <p className="text-sm text-muted-foreground">Получать SMS о важных событиях</p>
+                        <h4 className="font-medium">{t("dash.client.sms_notif")}</h4>
+                        <p className="text-sm text-muted-foreground">{t("dash.client.sms_notif_desc")}</p>
                       </div>
                       <input
                         type="checkbox"

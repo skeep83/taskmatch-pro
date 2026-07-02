@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { UserRole } from "@/lib/userRoles";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -20,7 +21,7 @@ import { Button } from "@/components/ui/button";
 
 interface RoleItem {
   key: UserRole;
-  title: string;
+  titleKey: string;
   icon: any;
   route: string;
 }
@@ -28,19 +29,19 @@ interface RoleItem {
 const roleItems: RoleItem[] = [
   {
     key: 'client',
-    title: 'Клиент',
+    titleKey: 'menu.role_client',
     icon: User,
     route: '/dashboard/client'
   },
   {
     key: 'pro',
-    title: 'Специалист',
+    titleKey: 'menu.role_pro',
     icon: Briefcase,
     route: '/dashboard/pro'
   },
   {
     key: 'business',
-    title: 'Бизнес',
+    titleKey: 'menu.role_business',
     icon: Building2,
     route: '/dashboard/business'
   }
@@ -48,6 +49,7 @@ const roleItems: RoleItem[] = [
 
 export const UserMenu = () => {
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState<{
     first_name?: string;
@@ -94,7 +96,7 @@ export const UserMenu = () => {
     try {
       await supabase.auth.signOut();
       navigate("/");
-      toast({ title: "Вы вышли из системы" });
+      toast({ title: t("menu.signed_out") });
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -103,7 +105,7 @@ export const UserMenu = () => {
   const displayName = userProfile?.full_name || 
     (userProfile?.first_name && userProfile?.last_name 
       ? `${userProfile.first_name} ${userProfile.last_name}`.trim() 
-      : 'Пользователь');
+      : t('menu.user'));
   
   const initials = displayName
     .split(' ')
@@ -131,7 +133,7 @@ export const UserMenu = () => {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 bg-background border z-50">
-        <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('menu.my_account')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
         {/* Show all available dashboards based on role hierarchy */}
@@ -144,7 +146,7 @@ export const UserMenu = () => {
                 className="cursor-pointer"
               >
                 <item.icon className="h-4 w-4 mr-2" />
-                {item.title}
+                {t(item.titleKey)}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -153,13 +155,13 @@ export const UserMenu = () => {
         
         <DropdownMenuItem onClick={() => navigate('/profile/settings')} className="cursor-pointer">
           <Settings className="h-4 w-4 mr-2" />
-          Настройки профиля
+          {t('menu.profile_settings')}
         </DropdownMenuItem>
         
         
         <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
           <LogOut className="h-4 w-4 mr-2" />
-          Выход
+          {t('menu.sign_out')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

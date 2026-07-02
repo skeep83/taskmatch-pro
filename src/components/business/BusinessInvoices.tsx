@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -23,6 +24,7 @@ interface BusinessInvoice {
 
 export function BusinessInvoices() {
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const [loading, setLoading] = useState(true);
   const [invoices, setInvoices] = useState<BusinessInvoice[]>([]);
   const [businessId, setBusinessId] = useState<string | null>(null);
@@ -60,8 +62,8 @@ export function BusinessInvoices() {
       setInvoices(data || []);
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить инвойсы",
+        title: t("common.error"),
+        description: t("biz.invoices.load_error"),
         variant: "destructive"
       });
     } finally {
@@ -106,10 +108,10 @@ export function BusinessInvoices() {
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
-      'draft': { label: 'Черновик', variant: 'secondary' as const },
-      'sent': { label: 'Отправлен', variant: 'default' as const },
-      'paid': { label: 'Оплачен', variant: 'default' as const },
-      'overdue': { label: 'Просрочен', variant: 'destructive' as const }
+      'draft': { label: t('biz.invoices.status_draft'), variant: 'secondary' as const },
+      'sent': { label: t('biz.invoices.status_sent'), variant: 'default' as const },
+      'paid': { label: t('biz.invoices.status_paid'), variant: 'default' as const },
+      'overdue': { label: t('biz.invoices.status_overdue'), variant: 'destructive' as const }
     };
 
     const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, variant: 'default' as const };
@@ -127,8 +129,8 @@ export function BusinessInvoices() {
     const amount = Math.round(parseFloat(newAmount.replace(',', '.')) * 100);
     if (!Number.isFinite(amount) || amount <= 0) {
       toast({
-        title: "Укажите сумму",
-        description: "Сумма инвойса должна быть больше нуля",
+        title: t("biz.invoices.amount_required"),
+        description: t("biz.invoices.amount_positive"),
         variant: "destructive"
       });
       return;
@@ -152,13 +154,13 @@ export function BusinessInvoices() {
       setNewAmount("");
       loadBusinessInvoices();
       toast({
-        title: "Инвойс создан",
-        description: "Черновик инвойса создан. Срок оплаты — 30 дней."
+        title: t("biz.invoices.created"),
+        description: t("biz.invoices.created_desc")
       });
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось создать инвойс",
+        title: t("common.error"),
+        description: error.message || t("biz.invoices.create_error"),
         variant: "destructive"
       });
     } finally {
@@ -171,7 +173,7 @@ export function BusinessInvoices() {
       <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
-          <span className="ml-3 text-black">Загрузка инвойсов...</span>
+          <span className="ml-3 text-black">{t("biz.invoices.loading")}</span>
         </div>
       </div>
     );
@@ -184,14 +186,14 @@ export function BusinessInvoices() {
           <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
             <FileText className="h-6 w-6 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold text-black">Инвойсы</h2>
+          <h2 className="text-2xl font-bold text-black">{t("biz.invoices.title")}</h2>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
           className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
         >
           <Plus className="h-4 w-4" />
-          Создать инвойс
+          {t("biz.invoices.create")}
         </button>
       </div>
 
@@ -200,14 +202,14 @@ export function BusinessInvoices() {
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-neo neo-4 flex items-center justify-center">
             <FileText className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-black mb-2">У вас пока нет инвойсов</h3>
-          <p className="text-gray-600 mb-6">Создайте первый инвойс для автоматизации оплат</p>
+          <h3 className="text-xl font-semibold text-black mb-2">{t("biz.invoices.empty_title")}</h3>
+          <p className="text-gray-600 mb-6">{t("biz.invoices.empty_text")}</p>
           <button
             onClick={() => setCreateOpen(true)}
             className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
           >
             <Plus className="h-4 w-4" />
-            Создать инвойс
+            {t("biz.invoices.create")}
           </button>
         </div>
       ) : (
@@ -227,13 +229,13 @@ export function BusinessInvoices() {
                     <div className="flex items-center gap-6 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        Срок: {invoice.due_date ?
+                        {t("biz.invoices.due")}: {invoice.due_date ?
                           new Date(invoice.due_date).toLocaleDateString() :
-                          "Не указан"
+                          t("common.not_specified")
                         }
                       </div>
                       <div>
-                        Создан: {new Date(invoice.created_at).toLocaleDateString()}
+                        {t("biz.invoices.created_at")}: {new Date(invoice.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
@@ -264,23 +266,23 @@ export function BusinessInvoices() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Новый инвойс</DialogTitle>
+            <DialogTitle>{t("biz.invoices.new_title")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="invoice_amount">Сумма</Label>
+              <Label htmlFor="invoice_amount">{t("biz.invoices.amount")}</Label>
               <Input
                 id="invoice_amount"
                 type="number"
                 min="0"
                 step="0.01"
-                placeholder="Например 1500.00"
+                placeholder={t("biz.invoices.amount_placeholder")}
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="invoice_currency">Валюта</Label>
+              <Label htmlFor="invoice_currency">{t("biz.invoices.currency")}</Label>
               <select
                 id="invoice_currency"
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
@@ -294,9 +296,9 @@ export function BusinessInvoices() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>Отмена</Button>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={createInvoice} disabled={creating}>
-              {creating ? "Создание..." : "Создать"}
+              {creating ? t("biz.invoices.creating") : t("biz.invoices.create_btn")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -9,7 +9,7 @@ import {
   ShieldCheck, MessageSquare, Star, Building2, User, Briefcase,
   ClipboardList, Users, CheckCircle2, ArrowRight, type LucideIcon,
 } from "lucide-react";
-import heroDashboard from "@/assets/hero-dashboard.jpg";
+import { HeroShowcase } from "@/components/HeroShowcase";
 
 const categories: { key: string; label: string; icon: LucideIcon }[] = [
   { key: "plumbing", label: "Сантехника", icon: Wrench },
@@ -125,43 +125,9 @@ const DesktopIndex = () => {
               </div>
             </div>
 
-            {/* Hero visual */}
-            <div className="relative animate-fade-in max-w-[612px] w-full mx-auto" style={{ animationDelay: "300ms", maxHeight: "408px" }}>
-              <div className="relative hero-image-container">
-                <img
-                  src={heroDashboard}
-                  alt="Интерфейс платформы ServiceHub"
-                  className="w-full h-auto rounded-3xl neo-12 animate-float-slow"
-                  loading="eager"
-                  fetchPriority="high"
-                  width="612"
-                  height="408"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 80vw, (max-width: 1024px) 50vw, 612px"
-                  decoding="async"
-                  style={{ maxWidth: "612px", width: "100%", height: "auto", objectFit: "cover", aspectRatio: "612/408", maxHeight: "408px" }}
-                />
-
-                <div className="neo-card absolute -top-6 -left-6 p-4 w-56">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary mb-1">Каталог</div>
-                    <div className="text-sm text-muted-foreground">Специалисты по категориям</div>
-                  </div>
-                </div>
-
-                <div className="neo-card absolute -bottom-6 -right-6 p-4 w-56">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-accent mb-1">Отклики</div>
-                    <div className="text-sm text-muted-foreground">Цены и сроки от исполнителей</div>
-                  </div>
-                </div>
-
-                <div className="neo-card absolute -top-6 -right-6 p-4 w-48">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-success mb-1">Чат</div>
-                    <div className="text-sm text-muted-foreground">Всё в карточке заказа</div>
-                  </div>
-                </div>
-              </div>
+            {/* Hero visual — live product mockup */}
+            <div className="relative animate-fade-in w-full pb-10" style={{ animationDelay: "300ms" }}>
+              <HeroShowcase />
             </div>
           </div>
         </div>

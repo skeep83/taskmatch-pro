@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, TrendingUp, DollarSign, Users, Calendar, Briefcase, Clock, Target } from "lucide-react";
@@ -18,6 +19,7 @@ interface BusinessStats {
 
 export function BusinessAnalytics() {
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const [loading, setLoading] = useState(true);
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [stats, setStats] = useState<BusinessStats>({
@@ -98,7 +100,7 @@ export function BusinessAnalytics() {
 
       // Group categories by real linked jobs count only; no truthful invoice→category spend attribution exists here
       const categoryStats = jobs.reduce((acc, j) => {
-        const category = j.jobs.categories?.label_ru || 'Другое';
+        const category = j.jobs.categories?.label_ru || t('biz.analytics.other');
         if (!acc[category]) {
           acc[category] = 0;
         }
@@ -140,8 +142,8 @@ export function BusinessAnalytics() {
 
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить аналитику",
+        title: t("common.error"),
+        description: t("biz.analytics.load_error"),
         variant: "destructive"
       });
     } finally {
@@ -218,7 +220,7 @@ export function BusinessAnalytics() {
       <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
-          <span className="ml-3 text-black">Загрузка аналитики...</span>
+          <span className="ml-3 text-black">{t("biz.analytics.loading")}</span>
         </div>
       </div>
     );
@@ -230,7 +232,7 @@ export function BusinessAnalytics() {
         <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
           <BarChart3 className="h-6 w-6 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold text-black">Аналитика бизнеса</h2>
+        <h2 className="text-2xl font-bold text-black">{t("biz.analytics.title")}</h2>
       </div>
 
       {/* Key Metrics */}
@@ -238,7 +240,7 @@ export function BusinessAnalytics() {
         <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Общие расходы</p>
+              <p className="text-sm font-medium text-gray-600">{t("biz.analytics.total_spent")}</p>
               <p className="text-2xl font-bold text-black">{formatPrice(stats.totalSpent)}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
@@ -250,7 +252,7 @@ export function BusinessAnalytics() {
         <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Всего заказов</p>
+              <p className="text-sm font-medium text-gray-600">{t("biz.analytics.total_jobs")}</p>
               <p className="text-2xl font-bold text-black">{stats.totalJobs}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
@@ -262,7 +264,7 @@ export function BusinessAnalytics() {
         <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Активных</p>
+              <p className="text-sm font-medium text-gray-600">{t("biz.analytics.active")}</p>
               <p className="text-2xl font-bold text-black">{stats.activeJobs}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
@@ -274,7 +276,7 @@ export function BusinessAnalytics() {
         <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Завершено</p>
+              <p className="text-sm font-medium text-gray-600">{t("biz.analytics.completed")}</p>
               <p className="text-2xl font-bold text-black">{stats.completedJobs}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
@@ -291,11 +293,11 @@ export function BusinessAnalytics() {
             <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <BarChart3 className="h-5 w-5 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-black">Расходы по месяцам</h3>
+            <h3 className="text-lg font-semibold text-black">{t("biz.analytics.monthly")}</h3>
           </div>
 
           {stats.monthlySpending.length === 0 ? (
-            <p className="text-gray-600 text-center py-4">Нет данных</p>
+            <p className="text-gray-600 text-center py-4">{t("common.no_data")}</p>
           ) : (
             <div className="space-y-4">
               {stats.monthlySpending.map((month, index) => (
@@ -325,11 +327,11 @@ export function BusinessAnalytics() {
             <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <TrendingUp className="h-5 w-5 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-black">Топ категории по заказам</h3>
+            <h3 className="text-lg font-semibold text-black">{t("biz.analytics.top_categories")}</h3>
           </div>
 
           {stats.topCategories.length === 0 ? (
-            <p className="text-gray-600 text-center py-4">Нет данных</p>
+            <p className="text-gray-600 text-center py-4">{t("common.no_data")}</p>
           ) : (
             <div className="space-y-4">
               {stats.topCategories.map((category, index) => (
@@ -339,11 +341,11 @@ export function BusinessAnalytics() {
                       {category.category}
                     </div>
                     <span className="text-sm text-gray-600">
-                      {category.count} заказ{category.count > 1 ? 'а' : ''}
+                      {category.count} {t('biz.analytics.orders_short')}
                     </span>
                   </div>
                   <span className="text-sm font-semibold text-black">
-                    {category.count} заказ{category.count === 1 ? '' : category.count < 5 ? 'а' : 'ов'}
+                    {category.count} {t('biz.analytics.orders_short')}
                   </span>
                 </div>
               ))}
@@ -357,7 +359,7 @@ export function BusinessAnalytics() {
         <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Средний инвойс</p>
+              <p className="text-sm font-medium text-gray-600">{t("biz.analytics.avg_invoice")}</p>
               <p className="text-xl font-bold text-black">{formatPrice(stats.averageJobValue)}</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
@@ -369,9 +371,9 @@ export function BusinessAnalytics() {
         <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Команда</p>
+              <p className="text-sm font-medium text-gray-600">{t("biz.analytics.team")}</p>
               <p className="text-xl font-bold text-black">{stats.totalEmployees + 1}</p>
-              <p className="text-xs text-gray-500">включая владельца</p>
+              <p className="text-xs text-gray-500">{t("biz.analytics.incl_owner")}</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Users className="h-5 w-5 text-gray-600" />
@@ -382,11 +384,11 @@ export function BusinessAnalytics() {
         <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Доля завершённых</p>
+              <p className="text-sm font-medium text-gray-600">{t("biz.analytics.completion_rate")}</p>
               <p className="text-xl font-bold text-black">
                 {stats.totalJobs > 0 ? Math.round((stats.completedJobs / stats.totalJobs) * 100) : 0}%
               </p>
-              <p className="text-xs text-gray-500">от всех заказов</p>
+              <p className="text-xs text-gray-500">{t("biz.analytics.of_all_jobs")}</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Target className="h-5 w-5 text-gray-600" />

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ interface BusinessMember {
 
 export function BusinessMembers() {
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<BusinessMember[]>([]);
   const [businessId, setBusinessId] = useState<string | null>(null);
@@ -70,8 +72,8 @@ export function BusinessMembers() {
       setMembers(data || []);
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить список сотрудников",
+        title: t("common.error"),
+        description: t("biz.members.load_error"),
         variant: "destructive"
       });
     } finally {
@@ -96,19 +98,19 @@ export function BusinessMembers() {
         },
       });
 
-      if (error) throw new Error(error.message || 'Сервис приглашений недоступен');
+      if (error) throw new Error(error.message || t('biz.members.invite_unavailable'));
 
       setNewMemberEmail("");
       setNewMemberRole('member');
 
       toast({
-        title: "Приглашение отправлено",
-        description: `Приглашение отправлено на ${newMemberEmail}. После регистрации пользователь появится в списке сотрудников.`
+        title: t("biz.members.invite_sent"),
+        description: t("biz.members.invite_sent_desc", { email: newMemberEmail })
       });
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось отправить приглашение",
+        title: t("common.error"),
+        description: error.message || t("biz.members.invite_error"),
         variant: "destructive"
       });
     } finally {
@@ -127,13 +129,13 @@ export function BusinessMembers() {
 
       loadBusinessMembers();
       toast({
-        title: "Успешно",
-        description: "Сотрудник удален"
+        title: t("common.success"),
+        description: t("biz.members.deleted")
       });
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось удалить сотрудника",
+        title: t("common.error"),
+        description: t("biz.members.delete_error"),
         variant: "destructive"
       });
     }
@@ -149,9 +151,9 @@ export function BusinessMembers() {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'owner': return 'Владелец';
-      case 'manager': return 'Менеджер';
-      default: return 'Сотрудник';
+      case 'owner': return t('biz.members.role_owner');
+      case 'manager': return t('biz.members.role_manager');
+      default: return t('biz.members.role_member');
     }
   };
 
@@ -160,7 +162,7 @@ export function BusinessMembers() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-center py-8">
-            Загрузка сотрудников...
+            {t("biz.members.loading")}
           </div>
         </CardContent>
       </Card>
@@ -172,14 +174,14 @@ export function BusinessMembers() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <UserPlus className="h-5 w-5" />
-          Сотрудники компании
+          {t("biz.members.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Add Member Form */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
           <div>
-            <Label htmlFor="member_email">Email сотрудника</Label>
+            <Label htmlFor="member_email">{t("biz.members.email_label")}</Label>
             <Input
               id="member_email"
               type="email"
@@ -189,14 +191,14 @@ export function BusinessMembers() {
             />
           </div>
           <div>
-            <Label htmlFor="member_role">Роль</Label>
+            <Label htmlFor="member_role">{t("common.role")}</Label>
             <Select value={newMemberRole} onValueChange={(value: any) => setNewMemberRole(value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Выберите роль" />
+                <SelectValue placeholder={t("biz.members.role_placeholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="member">Сотрудник</SelectItem>
-                <SelectItem value="manager">Менеджер</SelectItem>
+                <SelectItem value="member">{t("biz.members.role_member")}</SelectItem>
+                <SelectItem value="manager">{t("biz.members.role_manager")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -207,7 +209,7 @@ export function BusinessMembers() {
               className="w-full"
             >
               <UserPlus className="h-4 w-4 mr-2" />
-              {addingMember ? "Добавление..." : "Добавить"}
+              {addingMember ? t("biz.members.adding") : t("biz.members.add")}
             </Button>
           </div>
         </div>
@@ -216,17 +218,17 @@ export function BusinessMembers() {
         {members.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <UserPlus className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>У вас пока нет сотрудников</p>
-            <p className="text-sm">Добавьте первого сотрудника выше</p>
+            <p>{t("biz.members.empty_title")}</p>
+            <p className="text-sm">{t("biz.members.empty_text")}</p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Сотрудник</TableHead>
-                <TableHead>Роль</TableHead>
-                <TableHead>Дата добавления</TableHead>
-                <TableHead>Действия</TableHead>
+                <TableHead>{t("biz.members.col_member")}</TableHead>
+                <TableHead>{t("common.role")}</TableHead>
+                <TableHead>{t("biz.members.col_added")}</TableHead>
+                <TableHead>{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -235,10 +237,10 @@ export function BusinessMembers() {
                   <TableCell>
                     <div>
                       <div className="font-medium">
-                        {member.profiles?.full_name || "Неизвестно"}
+                        {member.profiles?.full_name || t("common.unknown")}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {member.profiles?.phone || "Телефон не указан"}
+                        {member.profiles?.phone || t("biz.members.no_phone")}
                       </div>
                     </div>
                   </TableCell>
@@ -260,15 +262,15 @@ export function BusinessMembers() {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Удалить сотрудника</AlertDialogTitle>
+                          <AlertDialogTitle>{t("biz.members.delete_title")}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Вы уверены, что хотите удалить этого сотрудника из команды?
+                            {t("biz.members.delete_confirm")}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Отмена</AlertDialogCancel>
+                          <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                           <AlertDialogAction onClick={() => removeMember(member.id)}>
-                            Удалить
+                            {t("common.delete")}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

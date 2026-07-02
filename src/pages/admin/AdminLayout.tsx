@@ -177,7 +177,7 @@ export default function AdminLayout() {
         </SheetContent>
       </Sheet>
 
-      <div className="lg:ml-80 min-w-0">
+      <div className="lg:ml-72 min-w-0">
         <header className="sticky top-0 z-20 bg-neo backdrop-blur-xl shadow-[0_8px_16px_rgba(209,213,219,0.3)]">
           <div className="flex flex-wrap items-center justify-between gap-4 py-4 px-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -240,7 +240,9 @@ export default function AdminLayout() {
         </header>
 
         <main className="min-w-0 p-4 sm:p-6 min-h-[calc(100vh-80px)]">
-          <Outlet />
+          <div className="mx-auto w-full max-w-[1440px]">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ export const BusinessTenders = () => {
   const [loading, setLoading] = useState(true);
   const [businessId, setBusinessId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
 
@@ -36,7 +38,7 @@ export const BusinessTenders = () => {
       // Get current user session
       const { data: session } = await supabase.auth.getSession();
       if (!session.session?.user) {
-        toast({ title: 'Ошибка', description: 'Необходимо войти в систему' });
+        toast({ title: t('common.error'), description: t('biz.tenders.need_auth') });
         return;
       }
 
@@ -48,7 +50,7 @@ export const BusinessTenders = () => {
         .single();
 
       if (!businessAccount) {
-        toast({ title: 'Ошибка', description: 'Бизнес аккаунт не найден' });
+        toast({ title: t('common.error'), description: t('biz.tenders.no_account') });
         return;
       }
 
@@ -91,8 +93,8 @@ export const BusinessTenders = () => {
     } catch (error: any) {
       console.error('Error loading tenders:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Не удалось загрузить тендеры',
+        title: t('common.error'),
+        description: t('biz.tenders.load_error'),
         variant: 'destructive'
       });
     } finally {
@@ -107,11 +109,11 @@ export const BusinessTenders = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <Badge variant="default">Открыт</Badge>;
+        return <Badge variant="default">{t("biz.tenders.status_open")}</Badge>;
       case 'closed':
-        return <Badge variant="secondary">Закрыт</Badge>;
+        return <Badge variant="secondary">{t("biz.tenders.status_closed")}</Badge>;
       case 'completed':
-        return <Badge variant="outline">Завершен</Badge>;
+        return <Badge variant="outline">{t("biz.tenders.status_done")}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -132,7 +134,7 @@ export const BusinessTenders = () => {
       <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
-          <span className="ml-3 text-black">Загрузка тендеров...</span>
+          <span className="ml-3 text-black">{t("biz.tenders.loading")}</span>
         </div>
       </div>
     );
@@ -146,8 +148,8 @@ export const BusinessTenders = () => {
             <Calendar className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-black">Тендеры</h2>
-            <p className="text-gray-600">Управление тендерами компании</p>
+            <h2 className="text-2xl font-bold text-black">{t("biz.tenders.title")}</h2>
+            <p className="text-gray-600">{t("biz.tenders.subtitle")}</p>
           </div>
         </div>
         <button
@@ -155,7 +157,7 @@ export const BusinessTenders = () => {
           className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
         >
           <Plus className="h-4 w-4" />
-          Создать тендер
+          {t("biz.tenders.create")}
         </button>
       </div>
 
@@ -164,21 +166,21 @@ export const BusinessTenders = () => {
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-neo neo-4 flex items-center justify-center">
             <Calendar className="h-8 w-8 text-primary" />
           </div>
-          <h3 className="text-xl font-semibold text-black mb-2">Нет тендеров</h3>
+          <h3 className="text-xl font-semibold text-black mb-2">{t("biz.tenders.empty_title")}</h3>
           <p className="text-gray-600 mb-6">
-            У вас пока нет созданных тендеров. Создайте первый тендер для получения откликов исполнителей.
+            {t("biz.tenders.empty_text")}
           </p>
           <button
             onClick={() => navigate('/tenders/new')}
             className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
           >
             <Plus className="h-4 w-4" />
-            Создать первый тендер
+            {t("biz.tenders.create_first")}
           </button>
         </div>
       ) : (
         <div className="bg-neo neo-inset-4 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-black mb-6">Список тендеров</h3>
+          <h3 className="text-lg font-semibold text-black mb-6">{t("biz.tenders.list")}</h3>
           <div className="space-y-4">
             {tenders.map((tender) => (
               <div key={tender.id} className="bg-neo neo-8 rounded-xl p-6 hover:neo-4 transition-all duration-300">
@@ -191,13 +193,13 @@ export const BusinessTenders = () => {
                       {getStatusBadge(tender.status)}
                       <div className="flex items-center gap-1 text-sm text-gray-500">
                         <Users className="h-4 w-4" />
-                        {tender.bid_count} откликов
+                        {tender.bid_count} {t("biz.tenders.bids")}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>Срок подачи: {formatDate(tender.deadline)}</span>
-                      <span>Создан: {formatDate(tender.created_at)}</span>
+                      <span>{t("biz.tenders.deadline")}: {formatDate(tender.deadline)}</span>
+                      <span>{t("biz.tenders.created_at")}: {formatDate(tender.created_at)}</span>
                     </div>
                   </div>
 

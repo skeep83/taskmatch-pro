@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ interface BusinessAccount {
 
 export function BusinessAccountForm() {
   const { toast } = useToast();
+  const { t } = useEnhancedI18n();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [account, setAccount] = useState<BusinessAccount>({
@@ -56,8 +58,8 @@ export function BusinessAccountForm() {
       }
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить данные компании",
+        title: t("common.error"),
+        description: t("biz.account.load_error"),
         variant: "destructive"
       });
     } finally {
@@ -97,13 +99,13 @@ export function BusinessAccountForm() {
       }
 
       toast({
-        title: "Успешно",
-        description: "Данные компании сохранены"
+        title: t("common.success"),
+        description: t("biz.account.saved")
       });
     } catch (error: any) {
       toast({
-        title: "Ошибка",
-        description: error.message || "Не удалось сохранить данные",
+        title: t("common.error"),
+        description: error.message || t("biz.account.save_error"),
         variant: "destructive"
       });
     } finally {
@@ -127,19 +129,19 @@ export function BusinessAccountForm() {
         <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
           <Building2 className="h-6 w-6 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold text-black">Данные компании</h2>
+        <h2 className="text-2xl font-bold text-black">{t("biz.account.title")}</h2>
       </div>
       
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="company_name" className="text-black font-medium">Название компании *</Label>
+            <Label htmlFor="company_name" className="text-black font-medium">{t("biz.account.company_name")}</Label>
             <div className="relative">
               <Input
                 id="company_name"
                 value={account.company_name}
                 onChange={(e) => setAccount({ ...account, company_name: e.target.value })}
-                placeholder="ООО «Пример»"
+                placeholder={t("biz.account.company_placeholder")}
                 className="bg-neo neo-inset-4 border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:neo-inset-6"
               />
             </div>
@@ -158,7 +160,7 @@ export function BusinessAccountForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="vat_number" className="text-black font-medium">НДС номер</Label>
+            <Label htmlFor="vat_number" className="text-black font-medium">{t("biz.account.vat")}</Label>
             <Input
               id="vat_number"
               value={account.vat_number}
@@ -168,7 +170,7 @@ export function BusinessAccountForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="rate_multiplier" className="text-black font-medium">Множитель тарифа</Label>
+            <Label htmlFor="rate_multiplier" className="text-black font-medium">{t("biz.account.rate_multiplier")}</Label>
             <Input
               id="rate_multiplier"
               type="number"
@@ -183,19 +185,19 @@ export function BusinessAccountForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="legal_address" className="text-black font-medium">Юридический адрес *</Label>
+          <Label htmlFor="legal_address" className="text-black font-medium">{t("biz.account.legal_address")}</Label>
           <Textarea
             id="legal_address"
             value={account.legal_address}
             onChange={(e) => setAccount({ ...account, legal_address: e.target.value })}
-            placeholder="г. Кишинев, ул. Примера, 123"
+            placeholder={t("biz.account.address_placeholder")}
             rows={3}
             className="bg-neo neo-inset-4 border-0 rounded-xl text-black placeholder:text-gray-500 focus:neo-inset-6 resize-none"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contract_url" className="text-black font-medium">Ссылка на договор</Label>
+          <Label htmlFor="contract_url" className="text-black font-medium">{t("biz.account.contract_url")}</Label>
           <Input
             id="contract_url"
             value={account.contract_url || ""}
@@ -214,14 +216,14 @@ export function BusinessAccountForm() {
             {saving ? (
               <>
                 <div className="w-5 h-5 rounded-full bg-neo neo-2 animate-spin"></div>
-                Сохранение...
+                {t("common.saving")}
               </>
             ) : (
               <>
                 <div className="w-5 h-5 rounded-full bg-neo neo-2 flex items-center justify-center">
                   <Save className="h-3 w-3 text-primary" />
                 </div>
-                Сохранить данные
+                {t("biz.account.save")}
               </>
             )}
           </button>
