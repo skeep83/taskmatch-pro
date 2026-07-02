@@ -1,5 +1,6 @@
 import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { ResponsiveComponent } from "@/components/ResponsiveComponent";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -44,6 +45,7 @@ const DesktopIndex = () => {
   return (
     <main className="relative min-h-screen overflow-hidden">
       <SignatureGradient />
+      <AmbientBackground />
       <Seo title={t("seo.home.title")} description={t("seo.home.desc")} canonical="/" jsonLd={{
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -152,7 +154,7 @@ const DesktopIndex = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
-            <div key={step.titleKey} className="neo-card p-8 text-left">
+            <div key={step.titleKey} className="neo-card neo-aura p-8 text-left">
               <div className="flex items-center gap-4 mb-6">
                 <div className="neo-icon-well w-14 h-14">
                   <step.icon size={26} className="text-primary" />
@@ -186,7 +188,7 @@ const DesktopIndex = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
           {audiences.map((a) => (
-            <div key={a.titleKey} className="neo-card p-8 flex flex-col">
+            <div key={a.titleKey} className="neo-card neo-aura p-8 flex flex-col">
               <div className="neo-icon-well w-16 h-16 mb-6">
                 <a.icon size={28} className="text-primary" />
               </div>
@@ -203,7 +205,7 @@ const DesktopIndex = () => {
 
       {/* Final CTA */}
       <section className="container mx-auto py-24 px-6">
-        <div className="neo-card p-10 lg:p-14 text-center max-w-5xl mx-auto">
+        <div className="neo-card neo-aura p-10 lg:p-14 text-center max-w-5xl mx-auto">
           <div className="neo-chip inline-flex items-center gap-2 px-4 py-2 mb-6">
             <Sparkles size={18} className="text-primary" />
             <span className="text-sm font-medium text-primary">{t("landing.final_badge")}</span>

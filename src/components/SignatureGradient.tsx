@@ -71,7 +71,7 @@ export const SignatureGradient: React.FC = () => {
       className="absolute inset-0 -z-10"
       style={{
         background:
-          "radial-gradient(600px circle at var(--gx,50%) var(--gy,30%), hsl(var(--brand-1)/0.25), transparent 60%), radial-gradient(800px circle at 80% 20%, hsl(var(--brand-2)/0.2), transparent 60%)",
+          "radial-gradient(600px circle at var(--gx,50%) var(--gy,30%), hsl(var(--brand-1)/0.14), transparent 60%), radial-gradient(800px circle at 80% 20%, hsl(var(--brand-2)/0.10), transparent 60%)",
         filter: "blur(0px)",
       }}
     />

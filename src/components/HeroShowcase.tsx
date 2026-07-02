@@ -12,7 +12,7 @@ export const HeroShowcase = () => {
   return (
     <div className="relative w-full max-w-[560px] mx-auto select-none" aria-hidden="true">
       {/* Job card */}
-      <div className="neo-card p-6 lg:p-8 animate-float-slow">
+      <div className="neo-card neo-aura p-6 lg:p-8 animate-float-slow">
         <div className="flex items-start justify-between gap-4 mb-5">
           <div className="flex items-center gap-4">
             <div className="neo-icon-well w-14 h-14 shrink-0">
