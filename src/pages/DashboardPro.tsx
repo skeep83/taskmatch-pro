@@ -442,17 +442,14 @@ const DashboardPro = () => {
         <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Управляйте откликами, заказами и доходами" canonical="/pro/dashboard" />
 
       {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-display font-bold">
             {t("dash.pro.title")}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-1">
             {t("dash.pro.subtitle")}
           </p>
-
-          <div className="flex justify-center mt-8">
-          </div>
         </div>
 
         <div className="max-w-7xl mx-auto">

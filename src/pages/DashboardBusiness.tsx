@@ -254,13 +254,13 @@ export default function DashboardBusiness() {
       <main className="min-h-screen" style={{ paddingTop: isMobile ? 'calc(env(safe-area-inset-top) + 80px)' : '0' }}>
 
         {/* Header Section */}
-        <section className="container mx-auto py-24 px-6">
+        <section className="container mx-auto py-6 md:py-10 px-4 md:px-6">
         {!isMobile && (
-          <div className="text-center mb-16">
-            <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+          <div className="max-w-7xl mx-auto mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-display font-bold">
               {t("dash.biz.title")}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-muted-foreground mt-1">
               {t("dash.biz.subtitle")}
             </p>
           </div>

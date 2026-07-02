@@ -388,21 +388,19 @@ export default function ProfileSettings() {
   return (
     <main className="min-h-screen">
       {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <Button variant="outline" onClick={() => navigate(-1)} className="card-surface">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t("ui.nazad")}
-            </Button>
-          </div>
-
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto mb-6 md:mb-8 flex items-start gap-4">
+          <Button variant="outline" onClick={() => navigate(-1)} className="shrink-0 h-10 w-10 p-0 rounded-xl" aria-label={t("ui.nazad")}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <div className="min-w-0">
+          <h1 className="text-2xl md:text-3xl font-display font-bold">
             {t("menu.profile_settings")}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-1">
             {t("ui.upravliaite_svoimi_lichnymi_dannymi")}
           </p>
+          </div>
         </div>
 
         {/* Main Content */}

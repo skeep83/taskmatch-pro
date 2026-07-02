@@ -352,45 +352,13 @@ const JobNew = () => {
     <main className="min-h-screen bg-neo">
       <Seo title={`${t('app.name')} — ${t('job.new.title')}`} description={t("job.new.subtitle")} canonical="/job/new" />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={jobImage} alt="Job Creation" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-orange-600/80" />
-        </div>
-        <div className="relative container mx-auto px-4 py-24">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-              {t("job.new.title")}
-            </h1>
-            <p className="text-xl text-white/90 mb-8">
-              {t("job.new.subtitle")}
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
-                <div className="flex items-center gap-2 text-white">
-                  <AnimatedIcon icon={Zap} className="text-yellow-300" />
-                  <span>{t("job.new.instant_responses")}</span>
-                </div>
-              </div>
-              <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
-                <div className="flex items-center gap-2 text-white">
-                  <AnimatedIcon icon={Shield} className="text-green-300" />
-                  <span>{t("job.new.escrow_protection")}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Form Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-[#4B5563]">
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-display font-bold">
             {t("job.new.title")}
           </h2>
-          <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-1">
             {t("job.new.subtitle")}
           </p>
         </div>

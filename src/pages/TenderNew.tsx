@@ -246,34 +246,10 @@ const TenderNew = () => {
         <Seo title={`${t('app.name')} — Создать тендер`} description={t("ui.sozdaite_tender_dlia_polucheniia")} canonical="/tenders/new" />
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0">
-            <img src={tenderImage} alt="Tender Creation" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 to-orange-600/80" />
-          </div>
-          <div className="relative container mx-auto px-4 py-24">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
-                {t("biz.tenders.create")}
-              </h1>
-              <p className="text-xl text-white/90 mb-8">
-                {t("ui.poluchite_otkliki_ot_ispolnitelei")}
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center">
-                <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
-                  <div className="flex items-center gap-2 text-white">
-                    <AnimatedIcon icon={Gavel} className="text-purple-300" />
-                    <span>{t("ui.prozrachnyi_aukcion")}</span>
-                  </div>
-                </div>
-                <div className="p-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-[8px_8px_16px_rgba(0,0,0,0.1),-8px_-8px_16px_rgba(255,255,255,0.1)]">
-                  <div className="flex items-center gap-2 text-white">
-                    <AnimatedIcon icon={Shield} className="text-green-300" />
-                    <span>{t("ui.garantiia_kachestva")}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <section className="container mx-auto pt-6 md:pt-10 px-4 md:px-6">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-2xl md:text-3xl font-display font-bold">{t("biz.tenders.create")}</h1>
+            <p className="text-muted-foreground mt-1">{t("ui.poluchite_otkliki_ot_ispolnitelei")}</p>
           </div>
         </section>
 
@@ -306,7 +282,7 @@ const TenderNew = () => {
         {/* Form Section */}
         <section className="container mx-auto py-16 px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-[#4B5563]">
+            <h2 className="text-2xl md:text-3xl font-display font-bold mb-4 text-[#4B5563]">
               {t("ui.detali_tendera")}
             </h2>
             <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">

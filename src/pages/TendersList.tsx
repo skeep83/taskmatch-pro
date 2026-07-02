@@ -78,16 +78,16 @@ const TendersList = () => {
       <Seo title={`${t('app.name')} — Бизнес-заказы`} description={t("ui.korporativnye_zakazy_i_zakupki")} canonical="/tenders" />
 
       {/* Header Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-display font-bold">
             {t("ui.biznes_zakazy")}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-1">
             {t("ui.otdelnyi_kontur_dlia_korporativnyh")}
           </p>
 
-          <div className="flex flex-wrap gap-6 justify-center mt-8">
+          <div className="flex flex-wrap gap-3 mt-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

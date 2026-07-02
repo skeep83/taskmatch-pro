@@ -273,23 +273,17 @@ const Catalog = () => {
       <SignatureGradient />
       <Seo title={t("ui.servicehub_katalog_zakazov_i")} description={t("ui.otkrytye_zakazy_i_specialisty")} canonical="/catalog" jsonLd={{"@context":"https://schema.org","@type":"CollectionPage","name":"ServiceHub catalog"}} />
 
-      <section className="relative container mx-auto pt-20 pb-16 px-6">
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="flex justify-center mb-6">
-            <AnimatedIcon icon={Search} size={48} className="text-primary" />
-          </div>
-          <h1 className="text-5xl font-display font-bold text-gradient mb-6">
+      <section className="relative container mx-auto py-6 md:py-10 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-display font-bold">
             {t("ui.katalog_zakazov_i_specialistov")}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground mt-1 max-w-3xl">
             {t("ui.snachala_smotrite_zhivye_zakazy")}
           </p>
         </div>
 
-        <div className="relative max-w-4xl mx-auto mb-10 animate-scale-in">
-          <img src={servicesHero} alt="ServiceHub services" className="w-full h-auto rounded-3xl shadow-2xl hover-scale" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-3xl" />
-        </div>
+
 
         {rotatingPopularCategories.length > 0 && (
           <div className="max-w-6xl mx-auto mb-8">
