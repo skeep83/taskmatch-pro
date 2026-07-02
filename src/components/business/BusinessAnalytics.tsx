@@ -215,9 +215,9 @@ export function BusinessAnalytics() {
 
   if (loading) {
     return (
-      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
           <span className="ml-3 text-black">Загрузка аналитики...</span>
         </div>
       </div>
@@ -227,7 +227,7 @@ export function BusinessAnalytics() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
           <BarChart3 className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-2xl font-bold text-black">Аналитика бизнеса</h2>
@@ -235,49 +235,49 @@ export function BusinessAnalytics() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-6">
+        <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Общие расходы</p>
               <p className="text-2xl font-bold text-black">{formatPrice(stats.totalSpent)}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
               <DollarSign className="h-6 w-6 text-primary" />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-6">
+        <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Всего заказов</p>
               <p className="text-2xl font-bold text-black">{stats.totalJobs}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Briefcase className="h-6 w-6 text-primary" />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-6">
+        <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Активных</p>
               <p className="text-2xl font-bold text-black">{stats.activeJobs}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Clock className="h-6 w-6 text-accent" />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-6">
+        <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Завершено</p>
               <p className="text-2xl font-bold text-black">{stats.completedJobs}</p>
             </div>
-            <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Target className="h-6 w-6 text-success" />
             </div>
           </div>
@@ -286,9 +286,9 @@ export function BusinessAnalytics() {
 
       {/* Additional Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+        <div className="bg-neo neo-8 rounded-2xl p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <BarChart3 className="h-5 w-5 text-primary" />
             </div>
             <h3 className="text-lg font-semibold text-black">Расходы по месяцам</h3>
@@ -302,7 +302,7 @@ export function BusinessAnalytics() {
                 <div key={index} className="flex items-center justify-between">
                   <span className="text-sm text-black font-medium">{month.month}</span>
                   <div className="flex items-center gap-3">
-                    <div className="w-32 h-3 bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] rounded-full overflow-hidden">
+                    <div className="w-32 h-3 bg-neo neo-inset-2 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-primary to-primary-glow rounded-full transition-all duration-500"
                         style={{
@@ -320,9 +320,9 @@ export function BusinessAnalytics() {
           )}
         </div>
 
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+        <div className="bg-neo neo-8 rounded-2xl p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <TrendingUp className="h-5 w-5 text-primary" />
             </div>
             <h3 className="text-lg font-semibold text-black">Топ категории по заказам</h3>
@@ -335,7 +335,7 @@ export function BusinessAnalytics() {
               {stats.topCategories.map((category, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-lg px-3 py-1 text-sm text-black font-medium">
+                    <div className="bg-neo neo-4 rounded-lg px-3 py-1 text-sm text-black font-medium">
                       {category.category}
                     </div>
                     <span className="text-sm text-gray-600">
@@ -354,32 +354,32 @@ export function BusinessAnalytics() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-6">
+        <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Средний инвойс</p>
               <p className="text-xl font-bold text-black">{formatPrice(stats.averageJobValue)}</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Calendar className="h-5 w-5 text-gray-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-6">
+        <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Команда</p>
               <p className="text-xl font-bold text-black">{stats.totalEmployees + 1}</p>
               <p className="text-xs text-gray-500">включая владельца</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Users className="h-5 w-5 text-gray-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-6">
+        <div className="bg-neo neo-8 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Доля завершённых</p>
@@ -388,7 +388,7 @@ export function BusinessAnalytics() {
               </p>
               <p className="text-xs text-gray-500">от всех заказов</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center">
               <Target className="h-5 w-5 text-gray-600" />
             </div>
           </div>

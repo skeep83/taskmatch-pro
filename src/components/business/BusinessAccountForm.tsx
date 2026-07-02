@@ -113,18 +113,18 @@ export function BusinessAccountForm() {
 
   if (loading) {
     return (
-      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+    <div className="bg-neo neo-8 rounded-2xl p-8">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
           <Building2 className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-2xl font-bold text-black">Данные компании</h2>
@@ -140,7 +140,7 @@ export function BusinessAccountForm() {
                 value={account.company_name}
                 onChange={(e) => setAccount({ ...account, company_name: e.target.value })}
                 placeholder="ООО «Пример»"
-                className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+                className="bg-neo neo-inset-4 border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:neo-inset-6"
               />
             </div>
           </div>
@@ -151,7 +151,7 @@ export function BusinessAccountForm() {
               value={account.idno}
               onChange={(e) => setAccount({ ...account, idno: e.target.value })}
               placeholder="1234567890123"
-              className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+              className="bg-neo neo-inset-4 border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:neo-inset-6"
             />
           </div>
         </div>
@@ -164,7 +164,7 @@ export function BusinessAccountForm() {
               value={account.vat_number}
               onChange={(e) => setAccount({ ...account, vat_number: e.target.value })}
               placeholder="MD123456789"
-              className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+              className="bg-neo neo-inset-4 border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:neo-inset-6"
             />
           </div>
           <div className="space-y-2">
@@ -177,7 +177,7 @@ export function BusinessAccountForm() {
               max="10"
               value={account.rate_multiplier}
               onChange={(e) => setAccount({ ...account, rate_multiplier: parseFloat(e.target.value) || 1.0 })}
-              className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+              className="bg-neo neo-inset-4 border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:neo-inset-6"
             />
           </div>
         </div>
@@ -190,7 +190,7 @@ export function BusinessAccountForm() {
             onChange={(e) => setAccount({ ...account, legal_address: e.target.value })}
             placeholder="г. Кишинев, ул. Примера, 123"
             rows={3}
-            className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB] resize-none"
+            className="bg-neo neo-inset-4 border-0 rounded-xl text-black placeholder:text-gray-500 focus:neo-inset-6 resize-none"
           />
         </div>
 
@@ -201,7 +201,7 @@ export function BusinessAccountForm() {
             value={account.contract_url || ""}
             onChange={(e) => setAccount({ ...account, contract_url: e.target.value })}
             placeholder="https://example.com/contract.pdf"
-            className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:shadow-[inset_6px_6px_12px_#D1D5DB,inset_-6px_-6px_12px_#F9FAFB]"
+            className="bg-neo neo-inset-4 border-0 rounded-xl h-12 text-black placeholder:text-gray-500 focus:neo-inset-6"
           />
         </div>
 
@@ -209,16 +209,16 @@ export function BusinessAccountForm() {
           <button
             onClick={saveBusinessAccount}
             disabled={saving || !account.company_name || !account.idno || !account.legal_address}
-            className="w-full h-14 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] disabled:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] disabled:text-gray-400 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 text-black font-semibold text-lg"
+            className="w-full h-14 bg-neo neo-8 hover:neo-4 active:neo-inset-4 disabled:neo-inset-2 disabled:text-gray-400 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 text-black font-semibold text-lg"
           >
             {saving ? (
               <>
-                <div className="w-5 h-5 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] animate-spin"></div>
+                <div className="w-5 h-5 rounded-full bg-neo neo-2 animate-spin"></div>
                 Сохранение...
               </>
             ) : (
               <>
-                <div className="w-5 h-5 rounded-full bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                <div className="w-5 h-5 rounded-full bg-neo neo-2 flex items-center justify-center">
                   <Save className="h-3 w-3 text-primary" />
                 </div>
                 Сохранить данные

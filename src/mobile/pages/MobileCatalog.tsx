@@ -13,6 +13,7 @@ import { getCategoryIcon } from '@/utils/categoryIcons';
 
 type Category = {
   id: string;
+  key: string;
   name: string;
   icon: string;
   popularity: number;
@@ -53,6 +54,7 @@ export default function MobileCatalog() {
 
       const nextCategories = (categoriesData || []).map((category: any) => ({
         id: category.id,
+        key: category.key,
         name: category.label_ru || category.key,
         icon: getCategoryIcon(category.label_ru, category.key),
         popularity: counts.get(category.id) || 0,
@@ -129,10 +131,13 @@ export default function MobileCatalog() {
 
   useEffect(() => {
     const nextSearchQuery = searchParams.get('q') || '';
-    const nextSelectedCategory = searchParams.get('category_id') || searchParams.get('category') || '';
+    const rawCategory = searchParams.get('category_id') || searchParams.get('category') || '';
+    // Accept both category id (uuid) and category key (e.g. "plumbing")
+    const byKey = categories.find((c) => c.key === rawCategory);
+    const nextSelectedCategory = byKey ? byKey.id : rawCategory;
     if (nextSearchQuery !== searchQuery) setSearchQuery(nextSearchQuery);
     if (nextSelectedCategory !== selectedCategory) setSelectedCategory(nextSelectedCategory);
-  }, [searchParams]);
+  }, [searchParams, categories]);
 
   useEffect(() => {
     fetchJobs();
@@ -171,7 +176,7 @@ export default function MobileCatalog() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       <MobileHeader
         title="Каталог заказов"
         showBack
@@ -195,13 +200,13 @@ export default function MobileCatalog() {
               placeholder="Что вам нужно?"
               value={searchQuery}
               onChange={handleSearchChange}
-              className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
+              className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 neo-inset-4"
             />
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
           </div>
           <Button
             onClick={() => setShowFilters(!showFilters)}
-            className="h-12 px-4 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]"
+            className="h-12 px-4 rounded-xl bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo"
           >
             <SlidersHorizontal size={18} />
           </Button>
@@ -260,8 +265,8 @@ export default function MobileCatalog() {
                 onClick={() => handleCategorySelect(category.id)}
                 className={`w-full rounded-xl text-sm px-3 py-3 h-12 flex items-center justify-start ${
                   selectedCategory === category.id
-                    ? 'bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800'
-                    : 'bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]'
+                    ? 'bg-neo neo-inset-3 text-gray-800'
+                    : 'bg-neo neo-6 text-gray-700 hover:bg-neo'
                 }`}
               >
                 <span className="mr-2">{category.icon}</span>
@@ -310,7 +315,7 @@ export default function MobileCatalog() {
           <h3 className="text-lg font-semibold text-gray-800">
             {loading ? 'Загрузка...' : `Найдено ${jobs.length} заказов`}
           </h3>
-          <Button className="text-sm bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB] rounded-xl px-3 py-2">
+          <Button className="text-sm bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo rounded-xl px-3 py-2">
             <Filter size={16} className="mr-2" />
             Актуальные
           </Button>

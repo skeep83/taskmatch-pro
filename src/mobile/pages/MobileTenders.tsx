@@ -75,7 +75,7 @@ const MobileTenders = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       <Seo title={`${t('app.name')} — Бизнес-тендеры`} description="Тендеры для компаний и крупных закупок" canonical="/tenders" />
 
       <MobileHeader
@@ -90,7 +90,7 @@ const MobileTenders = () => {
       >
         {/* Hero Section */}
         <MobileCard className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-neo neo-8 flex items-center justify-center">
             <Gavel className="h-8 w-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold mb-2">
@@ -109,7 +109,7 @@ const MobileTenders = () => {
                 <div className="text-2xl font-bold text-primary">{items.length}</div>
                 <div className="text-xs text-muted-foreground">Открытых</div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-neo neo-4 flex items-center justify-center">
                 <Gavel className="w-5 h-5 text-primary" />
               </div>
             </div>
@@ -123,7 +123,7 @@ const MobileTenders = () => {
                 </div>
                 <div className="text-xs text-muted-foreground">Откликов</div>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-neo neo-4 flex items-center justify-center">
                 <Users className="w-5 h-5 text-primary" />
               </div>
             </div>
@@ -139,8 +139,8 @@ const MobileTenders = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex items-center justify-center p-4 rounded-xl transition-all duration-300 w-full aspect-square ${
                   activeTab === tab.id
-                    ? "bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary"
-                    : "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-muted-foreground hover:text-primary hover:shadow-[1px_1px_2px_#D1D5DB,-1px_-1px_2px_#F9FAFB]"
+                    ? "bg-neo neo-inset-4 text-primary"
+                    : "bg-neo neo-2 text-muted-foreground hover:text-primary hover:neo-1"
                 }`}
               >
                 <tab.icon className="h-8 w-8" />
@@ -148,7 +148,7 @@ const MobileTenders = () => {
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary shadow-[1px_1px_2px_#D1D5DB]"
+                    className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary neo-1"
                   />
                 )}
               </button>
@@ -162,12 +162,12 @@ const MobileTenders = () => {
             {/* View Toggle */}
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-bold">Активные бизнес-тендеры</h2>
-              <div className="flex gap-1 p-1 rounded-lg bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
+              <div className="flex gap-1 p-1 rounded-lg bg-neo neo-inset-2">
                 <button
                   onClick={() => setViewMode("list")}
                   className={`p-2 rounded-md transition-all duration-300 ${
                     viewMode === "list"
-                      ? "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-primary"
+                      ? "bg-neo neo-2 text-primary"
                       : "text-muted-foreground"
                   }`}
                 >
@@ -177,7 +177,7 @@ const MobileTenders = () => {
                   onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-md transition-all duration-300 ${
                     viewMode === "grid"
-                      ? "bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] text-primary"
+                      ? "bg-neo neo-2 text-primary"
                       : "text-muted-foreground"
                   }`}
                 >
@@ -189,7 +189,7 @@ const MobileTenders = () => {
             {/* Tenders List */}
             {loading ? (
               <MobileCard className="text-center py-8">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-neo neo-4 flex items-center justify-center">
                   <RefreshCw className="h-6 w-6 animate-spin text-primary" />
                 </div>
                 <p className="text-muted-foreground">Загружаем бизнес-заказы...</p>
@@ -198,7 +198,7 @@ const MobileTenders = () => {
               <div className={viewMode === "grid" ? "grid grid-cols-1 gap-4" : "space-y-4"}>
                 {items.length === 0 ? (
                   <MobileCard className="text-center py-8">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-neo neo-4 flex items-center justify-center">
                       <Trophy className="h-8 w-8 text-muted-foreground" />
                     </div>
                     <h3 className="font-semibold mb-2">Нет открытых бизнес-тендеров</h3>
@@ -219,7 +219,7 @@ const MobileTenders = () => {
                             <div className="flex-1">
                               <Badge
                                 variant="outline"
-                                className="mb-2 bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] border-0 text-primary text-xs"
+                                className="mb-2 bg-neo neo-2 border-0 text-primary text-xs"
                               >
                                 {tender.categories?.label_ru || "Тендер"}
                               </Badge>
@@ -244,7 +244,7 @@ const MobileTenders = () => {
                           <div className="grid grid-cols-3 gap-3 text-xs">
                             {tender.budget_max_cents && (
                               <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                                <div className="w-6 h-6 rounded-lg bg-neo neo-2 flex items-center justify-center">
                                   <Euro className="w-3 h-3 text-green-500" />
                                 </div>
                                 <span className="font-medium">
@@ -254,7 +254,7 @@ const MobileTenders = () => {
                             )}
 
                             <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                              <div className="w-6 h-6 rounded-lg bg-neo neo-2 flex items-center justify-center">
                                 <Users className="w-3 h-3 text-blue-500" />
                               </div>
                               <span className="font-medium">
@@ -264,7 +264,7 @@ const MobileTenders = () => {
 
                             {tender.deadline && (
                               <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                                <div className="w-6 h-6 rounded-lg bg-neo neo-2 flex items-center justify-center">
                                   <Timer className="w-3 h-3 text-orange-500" />
                                 </div>
                                 <span className="font-medium">
@@ -282,13 +282,13 @@ const MobileTenders = () => {
                             <div className="flex gap-2">
                               <Link
                                 to={`/tenders/${tender.id}`}
-                                className="w-8 h-8 rounded-lg bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] hover:shadow-[1px_1px_2px_#D1D5DB,-1px_-1px_2px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
+                                className="w-8 h-8 rounded-lg bg-neo neo-2 hover:neo-1 transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
                               >
                                 <Eye className="w-3 h-3" />
                               </Link>
                               <Link
                                 to={`/tenders/${tender.id}`}
-                                className="px-3 py-1.5 rounded-lg bg-primary shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] hover:shadow-[1px_1px_2px_#D1D5DB,-1px_-1px_2px_#F9FAFB] transition-all duration-300 text-white text-xs font-medium"
+                                className="px-3 py-1.5 rounded-lg bg-primary neo-2 hover:neo-1 transition-all duration-300 text-white text-xs font-medium"
                               >
                                 Откликнуться
                               </Link>
@@ -307,7 +307,7 @@ const MobileTenders = () => {
         {/* Other Tabs Placeholder */}
         {activeTab !== "active" && (
           <MobileCard className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-neo neo-4 flex items-center justify-center">
               {activeTab === "completed" && <Trophy className="h-8 w-8 text-muted-foreground" />}
               {activeTab === "my-bids" && <Users className="h-8 w-8 text-muted-foreground" />}
               {activeTab === "stats" && <Euro className="h-8 w-8 text-muted-foreground" />}
@@ -328,7 +328,7 @@ const MobileTenders = () => {
         {/* Floating Action Button */}
         <Link
           to="/tenders/new"
-          className="fixed bottom-20 right-4 w-14 h-14 rounded-2xl bg-primary shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-white z-10"
+          className="fixed bottom-20 right-4 w-14 h-14 rounded-2xl bg-primary neo-8 hover:neo-4 transition-all duration-300 flex items-center justify-center text-white z-10"
           style={{ bottom: `${80 + safeAreaInsets.bottom}px` }}
         >
           <Plus className="h-6 w-6" />

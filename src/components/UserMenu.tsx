@@ -119,7 +119,7 @@ export const UserMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 h-10 px-4 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+        <button className="flex items-center gap-2 h-10 px-4 rounded-2xl bg-neo neo-8 hover:neo-4 transition-all duration-300">
           <Avatar className="w-6 h-6">
             <AvatarImage src={userProfile?.avatar_url || ''} alt={displayName} />
             <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">

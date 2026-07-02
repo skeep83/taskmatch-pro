@@ -86,10 +86,13 @@ const Catalog = () => {
 
   useEffect(() => {
     const categoryFromParams = searchParams.get("category_id") || searchParams.get("category") || "";
-    if (categoryFromParams !== selectedCat) {
-      setSelectedCat(categoryFromParams);
+    // Accept both category id (uuid) and category key (e.g. "plumbing")
+    const byKey = categories.find((c) => c.key === categoryFromParams);
+    const resolved = byKey ? byKey.id : categoryFromParams;
+    if (resolved !== selectedCat) {
+      setSelectedCat(resolved);
     }
-  }, [searchParams, selectedCat]);
+  }, [searchParams, selectedCat, categories]);
 
   useEffect(() => {
     (async () => {

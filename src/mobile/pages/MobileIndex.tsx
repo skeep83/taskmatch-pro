@@ -85,7 +85,7 @@ function MobileIndex() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       <MobileHeader
         showNotifications
         showSearch
@@ -133,13 +133,13 @@ function MobileIndex() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
+                className="pl-12 h-12 text-base rounded-xl bg-white border-gray-200 neo-inset-4"
               />
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
             </div>
             <Button
               onClick={handleSearch}
-              className="h-12 px-6 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]"
+              className="h-12 px-6 rounded-xl bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo"
             >
               <Search size={18} />
             </Button>
@@ -179,7 +179,7 @@ function MobileIndex() {
             >
               <MobileCard className="p-4">
                 <div className="flex items-start space-x-3">
-                  <div className="p-2 bg-[#E5E7EB] shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl">
+                  <div className="p-2 bg-neo neo-inset-3 rounded-xl">
                     <feature.icon className="text-primary" size={18} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -238,12 +238,12 @@ function MobileIndex() {
               Выберите свою роль и начните зарабатывать или находить исполнителей
             </p>
             <div className="space-y-3">
-              <Button asChild className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
+              <Button asChild className="w-full h-12 rounded-xl bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo">
                 <Link to="/auth?type=register&role=pro">
                   Стать исполнителем
                 </Link>
               </Button>
-              <Button asChild className="w-full h-12 rounded-xl bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700 hover:bg-[#E5E7EB]">
+              <Button asChild className="w-full h-12 rounded-xl bg-neo neo-6 active:neo-inset-3 text-gray-700 hover:bg-neo">
                 <Link to="/tenders">
                   Для бизнеса
                 </Link>

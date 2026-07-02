@@ -518,7 +518,7 @@ export default function DashboardClient() {
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <div className="p-8 text-center bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+        <div className="p-8 text-center bg-neo neo-8 rounded-2xl">
           <h1 className="text-2xl font-bold mb-4">{t('client.dashboard.loading')}</h1>
           <div className="animate-spin">⏳</div>
         </div>
@@ -549,11 +549,11 @@ export default function DashboardClient() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+            <div className="p-2 rounded-2xl bg-neo neo-inset-8">
               <TabsList className="grid w-full grid-cols-4 bg-transparent gap-1">
                 <TabsTrigger
                   value="overview"
-                  className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <User className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">Обзор</span>
@@ -567,7 +567,7 @@ export default function DashboardClient() {
                 </TabsTrigger>
                 <TabsTrigger
                   value="jobs"
-                  className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Briefcase className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">Заказы</span>
@@ -581,7 +581,7 @@ export default function DashboardClient() {
                 </TabsTrigger>
                 <TabsTrigger
                   value="subscription"
-                  className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Crown className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">Подписка</span>
@@ -595,7 +595,7 @@ export default function DashboardClient() {
                 </TabsTrigger>
                 <TabsTrigger
                   value="settings"
-                  className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Settings className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">Настройки</span>
@@ -612,7 +612,7 @@ export default function DashboardClient() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-8">
-              <div className="p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-6 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div>
                     <h2 className="text-2xl font-semibold text-gray-800 mb-2">Что сделать сейчас</h2>
@@ -634,11 +634,11 @@ export default function DashboardClient() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <button
                   type="button"
-                  className="p-6 transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
+                  className="p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl"
                   onClick={() => navigate("/job/new")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-neo neo-4 flex items-center justify-center">
                       <Plus className="h-8 w-8 text-primary" />
                     </div>
                     <div>
@@ -651,7 +651,7 @@ export default function DashboardClient() {
                 {/* Бизнес-тендеры доступны только для бизнес-аккаунтов */}
                 <div
                   aria-disabled="true"
-                  className="p-6 opacity-50 cursor-not-allowed border-dashed bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl"
+                  className="p-6 opacity-50 cursor-not-allowed border-dashed bg-neo neo-8 rounded-2xl"
                   title="Бизнес-тендеры доступны только для бизнес-аккаунтов"
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
@@ -670,11 +670,11 @@ export default function DashboardClient() {
 
                 <button
                   type="button"
-                  className="p-6 transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
+                  className="p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl"
                   onClick={() => setActiveTab("subscription")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-neo neo-4 flex items-center justify-center">
                       <Crown className="h-8 w-8 text-primary" />
                     </div>
                     <div>
@@ -686,11 +686,11 @@ export default function DashboardClient() {
 
                 <button
                   type="button"
-                  className="p-6 transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl"
+                  className="p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl"
                   onClick={() => navigate("/messages")}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
-                    <div className="w-16 h-16 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-neo neo-4 flex items-center justify-center">
                       <MessageSquare className="h-8 w-8 text-primary" />
                     </div>
                     <div>
@@ -709,7 +709,7 @@ export default function DashboardClient() {
                   <p className="text-muted-foreground">Короткий снимок по заказам, активности и расходам.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  <button className="p-6 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("jobs")}>
+                  <button className="p-6 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("jobs")}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_jobs')}</p>
@@ -720,7 +720,7 @@ export default function DashboardClient() {
                     </div>
                   </button>
 
-                  <button className="p-6 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("jobs")}>
+                  <button className="p-6 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("jobs")}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.active_jobs')}</p>
@@ -731,7 +731,7 @@ export default function DashboardClient() {
                     </div>
                   </button>
 
-                  <button className="p-6 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("jobs")}>
+                  <button className="p-6 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("jobs")}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.completed_jobs')}</p>
@@ -742,7 +742,7 @@ export default function DashboardClient() {
                     </div>
                   </button>
 
-                  <button className="p-6 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("payments")}>
+                  <button className="p-6 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("payments")}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('client.dashboard.stats.total_spent')}</p>
@@ -755,7 +755,7 @@ export default function DashboardClient() {
                 </div>
               </div>
 
-              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                   <div>
                     <h2 className="text-2xl font-semibold text-gray-800">Дополнительные разделы</h2>
@@ -763,19 +763,19 @@ export default function DashboardClient() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <button className="p-5 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("payments")}>
+                  <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("payments")}>
                     <div className="flex items-center gap-3 mb-3"><CreditCard className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Финансы</span></div>
                     <p className="text-sm text-muted-foreground">История оплат, статусы и финансовые операции по заказам.</p>
                   </button>
-                  <button className="p-5 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("referrals")}>
+                  <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("referrals")}>
                     <div className="flex items-center gap-3 mb-3"><Gift className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Реферальная программа</span></div>
                     <p className="text-sm text-muted-foreground">Код приглашения и бонусы.</p>
                   </button>
-                  <button className="p-5 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("reviews")}>
+                  <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("reviews")}>
                     <div className="flex items-center gap-3 mb-3"><Star className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Исполнители</span></div>
                     <p className="text-sm text-muted-foreground">Hall of Fame и проверка профилей.</p>
                   </button>
-                  <button className="p-5 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("tenders")}>
+                  <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("tenders")}>
                     <div className="flex items-center gap-3 mb-3"><Gavel className="h-5 w-5 text-primary" /><span className="font-semibold text-gray-800">Тендеры для компаний</span></div>
                     <p className="text-sm text-muted-foreground">Отдельный контур для тендерных и корпоративных сценариев.</p>
                   </button>
@@ -784,7 +784,7 @@ export default function DashboardClient() {
 
               {/* Role Upgrade Section */}
               {!hasPendingProRequest && !(userRoles.includes('pro') && userRoles.includes('business')) && (
-                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+                <div className="p-8 bg-neo neo-8 rounded-2xl">
                   <RoleUpgrade
                     userId={user?.id || ''}
                     currentRole={currentRole}
@@ -805,7 +805,7 @@ export default function DashboardClient() {
               )}
 
               {/* Recent Jobs */}
-              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <h2 className="text-2xl font-semibold mb-6">Мои заказы</h2>
                 {jobs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
@@ -814,7 +814,7 @@ export default function DashboardClient() {
                     <p className="text-sm mb-4">Создайте первый заказ, чтобы получить отклики специалистов и выбрать исполнителя</p>
                     <button
                       onClick={() => navigate("/job/new")}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
                     >
                       <Plus className="h-4 w-4" />
                       Создать заказ
@@ -892,7 +892,7 @@ export default function DashboardClient() {
 
             {/* Jobs Tab */}
             <TabsContent value="jobs">
-              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-row items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold">Мои заказы</h2>
                   <Button onClick={() => navigate("/job/new")}>
@@ -999,7 +999,7 @@ export default function DashboardClient() {
 
             {/* Tenders Tab */}
             <TabsContent value="tenders">
-              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <div className="text-center py-12 text-muted-foreground">
                   <div className="relative inline-block mb-6">
                     <Gavel className="h-16 w-16 mx-auto opacity-30" />
@@ -1011,7 +1011,7 @@ export default function DashboardClient() {
                   <p className="mb-4">Для работы с тендерами используйте бизнес-аккаунт</p>
                   <button
                     onClick={() => navigate("/dashboard/business")}
-                    className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
+                    className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800"
                   >
                     Открыть бизнес-аккаунт
                   </button>
@@ -1023,7 +1023,7 @@ export default function DashboardClient() {
             <TabsContent value="subscription">
               <div className="space-y-6">
                 {/* Current Plan */}
-                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+                <div className="p-8 bg-neo neo-8 rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">Подписка HomeCare</h2>
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="border rounded-lg p-6">
@@ -1052,7 +1052,7 @@ export default function DashboardClient() {
                         <li>• Бесплатная диагностика</li>
                         <li>• Приоритетная поддержка</li>
                       </ul>
-                      <button onClick={() => navigate("/pricing")} className="w-full px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800">Сравнить тарифы</button>
+                      <button onClick={() => navigate("/pricing")} className="w-full px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800">Сравнить тарифы</button>
                     </div>
 
                     <div className="border rounded-lg p-6">
@@ -1075,7 +1075,7 @@ export default function DashboardClient() {
 
             {/* Payments Tab */}
             <TabsContent value="payments">
-              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <h2 className="text-2xl font-semibold mb-6">История платежей</h2>
                 <div className="text-center py-8 text-muted-foreground">
                   <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -1086,14 +1086,14 @@ export default function DashboardClient() {
 
             {/* Referrals Tab */}
             <TabsContent value="referrals">
-              <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <h2 className="text-2xl font-semibold mb-6">Реферальная программа</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
                     <h3 className="font-semibold mb-4">Ваш реферальный код</h3>
                     <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
                       <code className="font-mono text-lg">{stats.refferalCode}</code>
-                      <button className="px-4 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-gray-700 hover:text-gray-800 text-sm">Копировать</button>
+                      <button className="px-4 py-2 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 text-gray-700 hover:text-gray-800 text-sm">Копировать</button>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2">
                       Поделитесь этим кодом с друзьями и получайте бонусы за каждого нового пользователя
@@ -1126,7 +1126,7 @@ export default function DashboardClient() {
             {/* Settings Tab */}
             <TabsContent value="settings">
               <div className="space-y-6">
-                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+                <div className="p-8 bg-neo neo-8 rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">Профиль</h2>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
@@ -1154,14 +1154,14 @@ export default function DashboardClient() {
                     <button
                       onClick={saveProfile}
                       disabled={saving}
-                      className="w-full md:w-auto px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800 disabled:opacity-50"
+                      className="w-full md:w-auto px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800 disabled:opacity-50"
                     >
                       {saving ? 'Сохранение...' : 'Сохранить изменения'}
                     </button>
                   </div>
                 </div>
 
-                <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+                <div className="p-8 bg-neo neo-8 rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">Уведомления</h2>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">

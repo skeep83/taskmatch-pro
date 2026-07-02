@@ -345,7 +345,7 @@ function MobileMessages() {
   if (!id) {
     // Chat list view
     return (
-      <div className="min-h-screen bg-[#E5E7EB]">
+      <div className="min-h-screen bg-neo">
         <MobileHeader
           title="Сообщения"
           showBack={false}
@@ -429,7 +429,7 @@ function MobileMessages() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-8 w-8 rounded-lg bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-700"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-8 w-8 rounded-lg bg-neo neo-6 active:neo-inset-3 text-gray-700"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <MoreVertical className="w-4 h-4" />
@@ -469,18 +469,18 @@ function MobileMessages() {
                         'Пользователь');
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB] flex flex-col">
+    <div className="min-h-screen bg-neo flex flex-col">
       {/* Custom header for chat */}
       <div
-        className="fixed top-0 left-0 right-0 z-50 bg-[#E5E7EB]"
+        className="fixed top-0 left-0 right-0 z-50 bg-neo"
         style={{ paddingTop: `env(safe-area-inset-top)` }}
       >
-        <div className="px-4 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+        <div className="px-4 py-2 bg-neo neo-inset-8">
           <div className="flex items-center justify-between h-12">
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => navigate('/messages')}
-                className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl text-gray-700 hover:bg-[#E5E7EB]"
+                className="w-10 h-10 flex items-center justify-center bg-neo neo-6 active:neo-inset-3 rounded-xl text-gray-700 hover:bg-neo"
               >
                 <ArrowLeft size={16} />
               </Button>

@@ -109,7 +109,7 @@ export function MobileCategorySelector({
               >
                 <Badge
                   variant="secondary"
-                  className="bg-[#E5E7EB] text-gray-800 border-0 shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] transition-all duration-200 pr-1"
+                  className="bg-neo text-gray-800 border-0 neo-inset-2 hover:neo-inset-4 transition-all duration-200 pr-1"
                 >
                   <Tag className="h-3 w-3 mr-1" />
                   {getCategoryLabel(category)}
@@ -132,16 +132,16 @@ export function MobileCategorySelector({
       <motion.button
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className={`w-full p-4 rounded-2xl bg-[#E5E7EB] transition-all duration-300 border-0 ${
+        className={`w-full p-4 rounded-2xl bg-neo transition-all duration-300 border-0 ${
           isOpen
-            ? 'shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]'
-            : 'shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]'
+            ? 'neo-inset-4'
+            : 'neo-8 hover:neo-4'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         whileTap={!disabled ? { scale: 0.98 } : {}}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
+            <div className="p-2 rounded-xl bg-neo neo-inset-2">
               <Tag className="h-5 w-5 text-gray-600" />
             </div>
             <span className="text-left text-gray-700 font-medium">
@@ -168,7 +168,7 @@ export function MobileCategorySelector({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-2 z-50 bg-[#E5E7EB] rounded-2xl shadow-[8px_8px_24px_#D1D5DB,-8px_-8px_24px_#F9FAFB] border-0 overflow-hidden max-h-80"
+            className="absolute top-full left-0 right-0 mt-2 z-50 bg-neo rounded-2xl neo-8 border-0 overflow-hidden max-h-80"
           >
             {/* Search header */}
             <div className="p-4 border-b border-gray-300/50">
@@ -178,7 +178,7 @@ export function MobileCategorySelector({
                   placeholder="Поиск категорий..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-[#E5E7EB] border-0 shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] focus:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl"
+                  className="pl-10 bg-neo border-0 neo-inset-2 focus:neo-inset-4 rounded-xl"
                 />
               </div>
               
@@ -216,10 +216,10 @@ export function MobileCategorySelector({
                         disabled={!isSelected && !canSelect}
                         className={`w-full p-3 rounded-xl mb-2 transition-all duration-200 text-left ${
                           isSelected
-                            ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-gray-900'
+                            ? 'bg-neo neo-inset-4 text-gray-900'
                             : canSelect
-                            ? 'bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] text-gray-700'
-                            : 'bg-[#E5E7EB] text-gray-400 opacity-50 cursor-not-allowed'
+                            ? 'bg-neo neo-2 hover:neo-4 text-gray-700'
+                            : 'bg-neo text-gray-400 opacity-50 cursor-not-allowed'
                         }`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -231,7 +231,7 @@ export function MobileCategorySelector({
                             <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${
                               isSelected
                                 ? 'bg-primary border-primary shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]'
-                                : 'border-gray-400 bg-[#E5E7EB] shadow-[inset_1px_1px_2px_#D1D5DB,inset_-1px_-1px_2px_#F9FAFB]'
+                                : 'border-gray-400 bg-neo neo-inset-1'
                             }`}>
                               {isSelected && (
                                 <motion.div
@@ -249,7 +249,7 @@ export function MobileCategorySelector({
                           </div>
                           
                           {!canSelect && !isSelected && (
-                            <Badge variant="outline" className="text-xs bg-[#E5E7EB] border-gray-400">
+                            <Badge variant="outline" className="text-xs bg-neo border-gray-400">
                               Лимит
                             </Badge>
                           )}
@@ -262,7 +262,7 @@ export function MobileCategorySelector({
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t border-gray-300/50 bg-[#E5E7EB]">
+            <div className="p-3 border-t border-gray-300/50 bg-neo">
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>Выберите категории (без ограничений)</span>
                 <Button

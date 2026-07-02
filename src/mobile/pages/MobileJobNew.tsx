@@ -307,15 +307,15 @@ const MobileJobNew = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB] pb-safe">
+    <div className="min-h-screen bg-neo pb-safe">
       <Seo title={`${t('app.name')} — Создать заказ`} description="Создать заказ" canonical="/job/new" />
 
       {/* Mobile Header */}
-      <div className="sticky top-0 z-50 bg-[#E5E7EB] px-4 py-3 border-b border-[#D1D5DB]">
+      <div className="sticky top-0 z-50 bg-neo px-4 py-3 border-b border-[#D1D5DB]">
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]"
+            className="p-2 rounded-xl bg-neo neo-4 active:neo-inset-2"
           >
             <ArrowLeft className="w-5 h-5 text-[#374151]" />
           </button>
@@ -338,7 +338,7 @@ const MobileJobNew = () => {
               <select
                 name="category_id"
                 defaultValue={presetCategory}
-                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                 required
               >
                 <option value="" disabled>{t("job.new.select_category")}</option>
@@ -348,7 +348,7 @@ const MobileJobNew = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2 text-[#374151]">Приоритет</label>
-              <select name="urgency" className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50">
+              <select name="urgency" className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50">
                 <option value="normal">Обычный</option>
                 <option value="urgent">Срочно (+30%)</option>
                 <option value="same_day">В тот же день (+50%)</option>
@@ -359,7 +359,7 @@ const MobileJobNew = () => {
               <label className="block text-sm font-medium mb-2 text-[#374151]">{t("job.new.description")}</label>
               <textarea
                 name="description"
-                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50 resize-none"
+                className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50 resize-none"
                 rows={4}
                 placeholder={t("job.new.description_placeholder")}
                 required
@@ -388,7 +388,7 @@ const MobileJobNew = () => {
                 <input
                   name="budget_min"
                   type="number"
-                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                  className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                   placeholder="1000"
                 />
               </div>
@@ -397,7 +397,7 @@ const MobileJobNew = () => {
                 <input
                   name="budget_max"
                   type="number"
-                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                  className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                   placeholder="5000"
                 />
               </div>
@@ -412,7 +412,7 @@ const MobileJobNew = () => {
                 <input
                   name="date"
                   type="date"
-                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                  className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                 />
               </div>
               <div>
@@ -420,7 +420,7 @@ const MobileJobNew = () => {
                 <input
                   name="time"
                   type="time"
-                  className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                  className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
@@ -445,7 +445,7 @@ const MobileJobNew = () => {
                     setLocationError(null);
                   }}
                   placeholder="Кишинёв, район, улица..."
-                  className="flex-1 bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                  className="flex-1 bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                 />
                 <button
                   type="button"
@@ -461,7 +461,7 @@ const MobileJobNew = () => {
                 type="button"
                 onClick={handleUseCurrentLocation}
                 disabled={locationLoading}
-                className="w-full px-4 py-3 bg-[#E5E7EB] text-[#374151] rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full px-4 py-3 bg-neo text-[#374151] rounded-xl font-semibold neo-8 active:neo-inset-4 inline-flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4 text-primary" />}
                 Использовать моё местоположение
@@ -504,7 +504,7 @@ const MobileJobNew = () => {
                 type="button"
                 onClick={() => openMediaPicker('image/*', 'environment')}
                 disabled={mediaLimitReached}
-                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all disabled:opacity-50"
+                className="flex flex-col items-center justify-center p-2 bg-neo rounded-lg neo-4 active:neo-inset-2 transition-all disabled:opacity-50"
               >
                 <Camera className="w-4 h-4 text-primary mb-1" />
                 <span className="text-xs text-[#374151] font-medium">Камера</span>
@@ -514,7 +514,7 @@ const MobileJobNew = () => {
                 type="button"
                 onClick={() => openMediaPicker('video/*', 'environment')}
                 disabled={mediaLimitReached}
-                className="flex flex-col items-center justify-center p-2 bg-[#E5E7EB] rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] transition-all disabled:opacity-50"
+                className="flex flex-col items-center justify-center p-2 bg-neo rounded-lg neo-4 active:neo-inset-2 transition-all disabled:opacity-50"
               >
                 <div className="w-4 h-4 text-primary mb-1 flex items-center justify-center">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
@@ -524,7 +524,7 @@ const MobileJobNew = () => {
                 <span className="text-xs text-[#374151] font-medium">Видео</span>
               </button>
 
-              <label htmlFor="mobile-photo-upload" className={`flex flex-col items-center justify-center p-2 bg-primary text-white rounded-lg shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all ${mediaLimitReached ? 'opacity-50 pointer-events-none' : 'cursor-pointer active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.12)]'}`}>
+              <label htmlFor="mobile-photo-upload" className={`flex flex-col items-center justify-center p-2 bg-primary text-white rounded-lg neo-4 transition-all ${mediaLimitReached ? 'opacity-50 pointer-events-none' : 'cursor-pointer active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.12)]'}`}>
                 <Upload className="w-4 h-4 mb-1" />
                 <span className="text-xs font-medium">Файлы</span>
               </label>
@@ -553,7 +553,7 @@ const MobileJobNew = () => {
                 id="mobile-photo-upload"
                 name="photos"
               />
-              <label htmlFor="mobile-photo-upload" className={`bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] inline-flex items-center gap-1 ${mediaLimitReached ? 'opacity-50 pointer-events-none' : 'cursor-pointer active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]'}`}>
+              <label htmlFor="mobile-photo-upload" className={`bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold neo-2 inline-flex items-center gap-1 ${mediaLimitReached ? 'opacity-50 pointer-events-none' : 'cursor-pointer active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]'}`}>
                 <Upload className="w-3 h-3" />
                 Выбрать
               </label>
@@ -568,7 +568,7 @@ const MobileJobNew = () => {
                 <p className="text-xs text-[#6B7280]">Загружено: {uploadedFiles.length}/{MAX_MEDIA_FILES}</p>
                 <div className="grid grid-cols-4 gap-2">
                   {uploadedFiles.map((file, index) => (
-                    <div key={index} className="relative group bg-[#E5E7EB] rounded-lg p-1 shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB]">
+                    <div key={index} className="relative group bg-neo rounded-lg p-1 neo-2">
                       {file.type.startsWith('video/') ? (
                         <div className="w-full h-12 bg-[#D1D5DB] rounded flex items-center justify-center relative">
                           <svg className="w-4 h-4 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
@@ -605,7 +605,7 @@ const MobileJobNew = () => {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-3 bg-[#E5E7EB] text-[#374151] rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
+            className="px-6 py-3 bg-neo text-[#374151] rounded-xl font-semibold neo-8 active:neo-inset-4"
           >
             Отмена
           </button>
@@ -613,7 +613,7 @@ const MobileJobNew = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-3 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] disabled:opacity-50"
+            className="px-6 py-3 bg-primary text-white rounded-xl font-semibold neo-8 disabled:opacity-50"
           >
             {loading ? t("job.new.creating") : t("job.new.create")}
           </button>

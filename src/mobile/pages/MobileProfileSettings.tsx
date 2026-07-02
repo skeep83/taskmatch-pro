@@ -480,7 +480,7 @@ export default function MobileProfileSettings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#E5E7EB] flex items-center justify-center">
+      <div className="min-h-screen bg-neo flex items-center justify-center">
         <MobileCard className="text-center p-8">
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
           <p>Загружаем профиль...</p>
@@ -490,7 +490,7 @@ export default function MobileProfileSettings() {
   }
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       <MobileHeader
         title="Настройки профиля"
         showBack={true}
@@ -509,8 +509,8 @@ export default function MobileProfileSettings() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-300 ${
                   activeTab === tab.id
-                    ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black'
-                    : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600'
+                    ? 'bg-neo neo-inset-4 text-black'
+                    : 'bg-neo neo-8 text-gray-600'
                 }`}
                 whileTap={{ scale: 0.98 }}
               >
@@ -813,7 +813,7 @@ export default function MobileProfileSettings() {
                 />
 
                 {categories.length === 0 && (
-                  <div className="p-6 text-center text-gray-500 bg-[#E5E7EB] rounded-2xl shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]">
+                  <div className="p-6 text-center text-gray-500 bg-neo rounded-2xl neo-inset-2">
                     <Wrench className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет доступных категорий</p>
                     <p className="text-xs mt-1">Попробуйте обновить страницу</p>
@@ -850,10 +850,10 @@ export default function MobileProfileSettings() {
                   const isActive = !!schedule;
 
                   return (
-                    <div key={day.id} className="p-4 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
+                    <div key={day.id} className="p-4 rounded-xl bg-neo neo-inset-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-neo neo-4 flex items-center justify-center">
                             <span className="text-xs font-medium">{day.short}</span>
                           </div>
                           <span className="font-medium">{day.name}</span>
@@ -1006,7 +1006,7 @@ export default function MobileProfileSettings() {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] text-gray-700"
+            className="w-full bg-neo neo-8 hover:neo-4 text-gray-700"
           >
             {saving ? (
               <div className="flex items-center gap-2">

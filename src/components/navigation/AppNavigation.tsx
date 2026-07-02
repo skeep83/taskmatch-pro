@@ -190,7 +190,7 @@ export const AppNavigation = () => {
   return (
     <>
       {/* Desktop Navigation */}
-      <header className="w-full sticky top-0 z-[100] border-0 bg-white/80 backdrop-blur-md shadow-sm">
+      <header className="w-full sticky top-0 z-[100] border-0 bg-neo/80 backdrop-blur-md neo-2">
         <nav className="container mx-auto flex items-center justify-between py-3 px-6">
           {/* Logo */}
           <Link
@@ -199,7 +199,7 @@ export const AppNavigation = () => {
             aria-label={t("app.name")}
           >
             {platformLogo ? (
-              <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] flex items-center justify-center transition-all duration-300 group-hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
+              <div className="w-12 h-12 rounded-2xl bg-neo neo-8 flex items-center justify-center transition-all duration-300 group-hover:neo-4">
                 <img
                   src={platformLogo}
                   alt="ServiceHub Logo"
@@ -210,7 +210,7 @@ export const AppNavigation = () => {
                 />
               </div>
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] flex items-center justify-center transition-all duration-300 group-hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] relative">
+              <div className="w-12 h-12 rounded-2xl bg-neo neo-8 flex items-center justify-center transition-all duration-300 group-hover:neo-4 relative">
                 <div className="relative">
                   <Settings className="h-6 w-6 text-primary animate-spin-slow" />
                   <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>

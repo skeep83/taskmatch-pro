@@ -154,8 +154,8 @@ export function NeumorphicSidebar({ mobile = false, onNavigate }: NeumorphicSide
     <aside
       className={
         mobile
-          ? "w-full h-full bg-[#E5E7EB] p-4 sm:p-6 overflow-y-auto"
-          : "hidden lg:block fixed left-0 top-0 h-screen w-80 bg-[#E5E7EB] p-6 overflow-y-auto z-30 border-r border-white/20"
+          ? "w-full h-full bg-neo p-4 sm:p-6 overflow-y-auto"
+          : "hidden lg:block fixed left-0 top-0 h-screen w-80 bg-neo p-6 overflow-y-auto z-30 border-r border-white/20"
       }
     >
       <div className="mb-8">
@@ -164,7 +164,7 @@ export function NeumorphicSidebar({ mobile = false, onNavigate }: NeumorphicSide
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="inline-flex items-center gap-3 p-4 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] mb-3">
+          <div className="inline-flex items-center gap-3 p-4 rounded-2xl bg-neo neo-inset-8 mb-3">
             <Home className="w-8 h-8 text-primary" />
             <div className="text-left">
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -216,8 +216,8 @@ export function NeumorphicSidebar({ mobile = false, onNavigate }: NeumorphicSide
                         group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300
                         ${
                           isActive
-                            ? "bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]"
-                            : "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                            ? "bg-neo neo-inset-8"
+                            : "bg-neo neo-8 hover:neo-4"
                         }
                       `}
                     >
@@ -228,8 +228,8 @@ export function NeumorphicSidebar({ mobile = false, onNavigate }: NeumorphicSide
                               relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shrink-0
                               ${
                                 isActive
-                                  ? "bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]"
-                                  : "bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                                  ? "bg-neo neo-inset-4"
+                                  : "bg-neo neo-4"
                               }
                             `}
                           >
@@ -286,10 +286,10 @@ export function NeumorphicSidebar({ mobile = false, onNavigate }: NeumorphicSide
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="mt-8 p-4 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]"
+        className="mt-8 p-4 rounded-2xl bg-neo neo-inset-8"
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-neo neo-4 flex items-center justify-center">
             <FolderCog className="w-4 h-4 text-slate-500" />
           </div>
           <div>

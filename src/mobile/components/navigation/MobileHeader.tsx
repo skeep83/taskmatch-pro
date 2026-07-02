@@ -197,12 +197,12 @@ export function MobileHeader({
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={cn(
         "fixed top-0 left-0 right-0 z-40",
-        "bg-[#E5E7EB]"
+        "bg-neo"
       )}
       style={{ paddingTop: `env(safe-area-inset-top)` }}
     >
       {/* Компактный neumorphic контейнер */}
-      <div className="px-4 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+      <div className="px-4 py-2 bg-neo neo-inset-8">
         <header className={cn(
           "flex items-center justify-between h-12",
           className
@@ -212,7 +212,7 @@ export function MobileHeader({
             {showBack && (
               <motion.button
                 onClick={handleBack}
-                className="mr-2 w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
+                className="mr-2 w-10 h-10 flex items-center justify-center bg-neo neo-6 active:neo-inset-3 rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 <ArrowLeft size={16} />
@@ -239,7 +239,7 @@ export function MobileHeader({
               <div className="relative">
                 <motion.button
                   onClick={() => setSelectorOpen(!selectorOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-neo neo-6 active:neo-inset-3 rounded-xl transition-all duration-300"
                   whileTap={{ scale: 0.95 }}
                 >
                   {getCurrentDashboardOption()?.icon &&
@@ -254,7 +254,7 @@ export function MobileHeader({
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full right-0 mt-2 w-64 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl z-50 overflow-hidden"
+                    className="absolute top-full right-0 mt-2 w-64 bg-neo neo-8 rounded-2xl z-50 overflow-hidden"
                   >
                     {dashboardOptions.map((option) => (
                       <motion.button
@@ -284,7 +284,7 @@ export function MobileHeader({
             {showSearch && (
               <motion.button
                 onClick={() => navigate('/catalog')}
-                className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
+                className="w-10 h-10 flex items-center justify-center bg-neo neo-6 active:neo-inset-3 rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 <Search size={16} />
@@ -295,7 +295,7 @@ export function MobileHeader({
               <div className="relative">
                 <motion.button
                   onClick={() => setNotificationOpen(!notificationOpen)}
-                  className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300 relative"
+                  className="w-10 h-10 flex items-center justify-center bg-neo neo-6 active:neo-inset-3 rounded-xl transition-all duration-300 relative"
                   whileTap={{ scale: 0.95 }}
                 >
                   <Bell size={16} className={unreadCount > 0 ? "text-red-500" : ""} />
@@ -343,7 +343,7 @@ export function MobileHeader({
                   // Можно добавить меню или навигацию
                   console.log('Menu clicked');
                 }}
-                className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
+                className="w-10 h-10 flex items-center justify-center bg-neo neo-6 active:neo-inset-3 rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 <MoreHorizontal size={16} />
@@ -353,7 +353,7 @@ export function MobileHeader({
             {showLogout && (
               <motion.button
                 onClick={handleLogout}
-                className="w-10 h-10 flex items-center justify-center bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] active:shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] rounded-xl transition-all duration-300"
+                className="w-10 h-10 flex items-center justify-center bg-neo neo-6 active:neo-inset-3 rounded-xl transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 <LogOut size={16} />

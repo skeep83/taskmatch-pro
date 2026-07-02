@@ -910,7 +910,7 @@ const JobDetail = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#E5E7EB]">
+    <main className="min-h-screen bg-neo">
       <Seo
         title={`Заказ: ${job.title}`}
         description={job.description}
@@ -947,7 +947,7 @@ const JobDetail = () => {
                   navigate('/feed');
                 }
               }}
-              className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none"
+              className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Назад
@@ -959,7 +959,7 @@ const JobDetail = () => {
                 <Button
                   variant="ghost"
                   onClick={handleEditJob}
-                  className="px-4 py-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none text-sm"
+                  className="px-4 py-2 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none text-sm"
                 >
                   <Edit className="w-3 h-3 mr-1" />
                   Редактировать
@@ -968,7 +968,7 @@ const JobDetail = () => {
                   <Button
                     variant="destructive"
                     onClick={handleDeleteJob}
-                    className="px-4 py-2 bg-red-500 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:bg-red-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-white border-none text-sm"
+                    className="px-4 py-2 bg-red-500 neo-8 hover:bg-red-600 hover:neo-4 rounded-xl transition-all duration-300 text-white border-none text-sm"
                   >
                     <Trash2 className="w-3 h-3 mr-1" />
                     Удалить
@@ -981,7 +981,7 @@ const JobDetail = () => {
                 <Button
                   variant="destructive"
                   onClick={handleCancelJob}
-                  className="px-4 py-2 bg-red-500 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:bg-red-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-white border-none text-sm"
+                  className="px-4 py-2 bg-red-500 neo-8 hover:bg-red-600 hover:neo-4 rounded-xl transition-all duration-300 text-white border-none text-sm"
                 >
                   <XCircle className="w-3 h-3 mr-1" />
                   Отменить заказ
@@ -1002,7 +1002,7 @@ const JobDetail = () => {
 
           {/* Client Info Card */}
           {clientProfile && (
-            <div className="p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md bg-[#E5E7EB] rounded-2xl shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+            <div className="p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md bg-neo rounded-2xl neo-8">
               <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3 text-[#374151]">
                 <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                 Информация о заказчике
@@ -1055,7 +1055,7 @@ const JobDetail = () => {
             {/* Job Details */}
             <div className="lg:col-span-2 space-y-6 md:space-y-8">
               {/* Description Card */}
-              <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+              <div className="bg-neo rounded-2xl p-6 neo-8">
                 <h2 className="text-2xl font-semibold mb-4 text-[#374151]">
                   Описание заказа
                 </h2>
@@ -1065,7 +1065,7 @@ const JobDetail = () => {
               {/* Details Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {(job.budget_min_cents || job.budget_max_cents) && (
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div className="flex items-center gap-3 mb-2">
                       <Euro className="w-5 h-5 text-green-500" />
                       <span className="font-semibold text-lg text-[#374151]">Бюджет</span>
@@ -1083,7 +1083,7 @@ const JobDetail = () => {
                 )}
 
                 {job.location_address && (
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div className="flex items-center gap-3 mb-2">
                       <MapPin className="w-5 h-5 text-blue-500" />
                       <span className="font-semibold text-lg text-[#374151]">Адрес</span>
@@ -1093,7 +1093,7 @@ const JobDetail = () => {
                 )}
 
                 {job.scheduled_at && (
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 md:col-span-2 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 md:col-span-2 neo-8">
                     <div className="flex items-center gap-3 mb-2">
                       <Calendar className="w-5 h-5 text-orange-500" />
                       <span className="font-semibold text-lg text-[#374151]">Запланировано</span>
@@ -1105,7 +1105,7 @@ const JobDetail = () => {
 
               {/* Assigned Professional Section */}
               {job.pro_id && assignedPro && (
-                <div className="p-4 md:p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="p-4 md:p-6 rounded-2xl bg-neo neo-8">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
                       <User className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
@@ -1206,22 +1206,22 @@ const JobDetail = () => {
                         )}
 
                         <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                          <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                          <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => navigate(`/pro/${job.pro_id}`)}
-                              className="w-full sm:w-auto bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                              className="w-full sm:w-auto bg-neo neo-8 hover:neo-inset-4 rounded-xl transition-all duration-300 text-black hover:text-black"
                             >
                               Профиль
                             </Button>
                           </div>
-                          <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                          <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => navigate(`/messages?user=${job.pro_id}&job=${job.id}`)}
-                              className="w-full sm:w-auto bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                              className="w-full sm:w-auto bg-neo neo-8 hover:neo-inset-4 rounded-xl transition-all duration-300 text-black hover:text-black"
                             >
                               <MessageSquare className="w-4 h-4 mr-1" />
                               Написать
@@ -1236,7 +1236,7 @@ const JobDetail = () => {
 
               {/* Job Photos */}
               {jobPhotos.length > 0 && (
-                <div className="pt-6 md:pt-8 px-4 md:px-8 pb-0 overflow-hidden rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="pt-6 md:pt-8 px-4 md:px-8 pb-0 overflow-hidden rounded-2xl bg-neo neo-8">
                   <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Фото и видео заказа
@@ -1311,7 +1311,7 @@ const JobDetail = () => {
             <div className="lg:col-span-1 space-y-6 md:space-y-8">
               {/* Job Status and Statistics Combined - Only show when professional is assigned */}
               {job.pro_id && (
-                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-neo neo-8">
                   <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Статус и статистика заказа
@@ -1392,11 +1392,11 @@ const JobDetail = () => {
                         />
                       </div>
 
-                      <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                      <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                         <Button
                           onClick={handleSubmitRating}
                           disabled={rating === 0}
-                          className="w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] disabled:shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black disabled:opacity-50 font-semibold py-2 md:py-3 transform hover:scale-105 disabled:hover:scale-100 relative overflow-hidden group"
+                          className="w-full bg-neo neo-8 hover:neo-inset-4 disabled:neo-8 rounded-xl transition-all duration-300 text-black hover:text-black disabled:opacity-50 font-semibold py-2 md:py-3 transform hover:scale-105 disabled:hover:scale-100 relative overflow-hidden group"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
                           <Send className="w-4 h-4 md:w-5 md:h-5 mr-2 relative z-10" />
@@ -1456,7 +1456,7 @@ const JobDetail = () => {
 
               {/* Applications List for Job Owner - Show applications and job progress */}
               {isJobOwner && (
-                <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-neo neo-8">
                   <JobApplicationsList
                     jobId={job.id}
                     jobStatus={job.status}
@@ -1468,19 +1468,19 @@ const JobDetail = () => {
 
               {/* Professional Action Buttons */}
               {canApply && (
-                <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="p-4 md:p-6 lg:p-8 relative z-20 rounded-2xl bg-neo neo-8">
                   <div className="space-y-4">
                     <h3 className="text-lg md:text-xl font-semibold mb-4">
                       Заинтересованы в заказе?
                     </h3>
 
                     {!showPriceProposal ? (
-                      <Card className="transition-all rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
+                      <Card className="transition-all rounded-2xl bg-neo neo-8 border-none">
                         <CardHeader className="pb-3">
                           <div className="flex justify-center">
-                            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                            <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                               <Button
-                                className="flex-1 max-w-xs w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                                className="flex-1 max-w-xs w-full bg-neo neo-8 hover:neo-inset-4 rounded-xl transition-all duration-300 text-black hover:text-black"
                                 onClick={() => setShowPriceProposal(true)}
                               >
                                 <User className="w-4 h-4 mr-2" />
@@ -1546,7 +1546,7 @@ const JobDetail = () => {
                         </CardContent>
                       </Card>
                     ) : (
-                      <Card className="transition-all rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
+                      <Card className="transition-all rounded-2xl bg-neo neo-8 border-none">
                         <CardContent className="p-4 md:p-6">
                           <PriceProposalForm
                             jobId={job.id}
@@ -1559,10 +1559,10 @@ const JobDetail = () => {
                               loadJobData();
                             }}
                           />
-                          <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] mt-4">
+                          <div className="p-2 rounded-2xl bg-neo neo-inset-8 mt-4">
                             <Button
                               variant="ghost"
-                              className="w-full bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black hover:text-black"
+                              className="w-full bg-neo neo-8 hover:neo-inset-4 rounded-xl transition-all duration-300 text-black hover:text-black"
                               onClick={() => setShowPriceProposal(false)}
                             >
                               Отмена
@@ -1577,7 +1577,7 @@ const JobDetail = () => {
 
               {/* Professional Work Management */}
               {isAssignedPro && (
-                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-neo neo-8">
                   <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
                     <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
                     Управление работой
@@ -1591,7 +1591,7 @@ const JobDetail = () => {
                           Нажмите кнопку, когда приступите к выполнению заказа.
                           Статус заказа изменится на "В работе".
                         </p>
-                        <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                        <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                           <Button
                             onClick={handleStartWork}
                             className="w-full bg-blue-600 hover:bg-blue-700 text-sm md:text-base rounded-xl"
@@ -1610,7 +1610,7 @@ const JobDetail = () => {
                           Нажмите кнопку, когда закончите выполнение заказа.
                           Статус заказа изменится на "Выполнен".
                         </p>
-                        <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+                        <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                           <Button
                             onClick={handleCompleteWork}
                             className="w-full bg-green-600 hover:bg-green-700 text-sm md:text-base rounded-xl"
@@ -1651,7 +1651,7 @@ const JobDetail = () => {
 
               {/* Professional Status Card */}
               {isProfessional && !canApply && job.status === 'new' && (
-                <div className="p-4 md:p-6 text-center relative z-10 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="p-4 md:p-6 text-center relative z-10 rounded-2xl bg-neo neo-8">
                   <MessageSquare className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mx-auto mb-3 md:mb-4 opacity-50" />
                   <p className="text-muted-foreground text-sm md:text-base">
                     {professionalStatusMessage}

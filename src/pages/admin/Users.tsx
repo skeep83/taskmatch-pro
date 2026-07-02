@@ -612,7 +612,7 @@ export default function AdminUsers() {
     <section className="space-y-6">
       <Seo title="ServiceHub — Пользователи" description="Управление пользователями и мастерами" canonical="/admin/users" />
 
-      <div className="rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border border-white/40">
+      <div className="rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 neo-8 border border-white/40">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-primary shadow-sm">
@@ -643,7 +643,7 @@ export default function AdminUsers() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
-        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+        <Card className="rounded-2xl border-0 bg-neo neo-8">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -656,7 +656,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+        <Card className="rounded-2xl border-0 bg-neo neo-8">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Activity className="w-4 h-4" />
@@ -669,7 +669,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+        <Card className="rounded-2xl border-0 bg-neo neo-8">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
@@ -682,7 +682,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+        <Card className="rounded-2xl border-0 bg-neo neo-8">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <UserCheck className="w-4 h-4" />
@@ -695,7 +695,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+        <Card className="rounded-2xl border-0 bg-neo neo-8">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Ban className="w-4 h-4" />
@@ -708,7 +708,7 @@ export default function AdminUsers() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+        <Card className="rounded-2xl border-0 bg-neo neo-8">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -723,7 +723,7 @@ export default function AdminUsers() {
       </div>
 
       {/* Filters */}
-      <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+      <Card className="rounded-2xl border-0 bg-neo neo-8">
         <CardHeader>
           <CardTitle>Фильтры и поиск</CardTitle>
           <CardDescription>Быстрый срез по ролям, KYC и статусу доступа.</CardDescription>
@@ -779,7 +779,7 @@ export default function AdminUsers() {
       </Card>
 
       {/* Users Table */}
-      <Card className="rounded-2xl border-0 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+      <Card className="rounded-2xl border-0 bg-neo neo-8">
         <CardHeader>
           <CardTitle>Список пользователей</CardTitle>
           <CardDescription>

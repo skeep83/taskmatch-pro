@@ -280,7 +280,7 @@ export default function MobileDashboardPro() {
     <RoleGuard requiredRole="pro">
       <Seo title={`${t('app.name')} — Кабинет специалиста`} description="Управляйте откликами, заказами и доходами" canonical="/dashboard/pro" />
 
-      <div className="min-h-screen bg-[#E5E7EB]">
+      <div className="min-h-screen bg-neo">
         <MobileHeader
           title="Кабинет специалиста"
           showBack={false}
@@ -359,15 +359,15 @@ export default function MobileDashboardPro() {
 
           {/* Horizontal Tab Navigation */}
           <div className="overflow-x-auto mb-6">
-            <div className="flex space-x-2 p-3 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] rounded-2xl min-w-max">
+            <div className="flex space-x-2 p-3 bg-neo neo-inset-8 rounded-2xl min-w-max">
               {tabItems.map((tab) => (
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl whitespace-nowrap transition-all duration-300 font-medium ${
                     activeTab === tab.id
-                      ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary'
-                      : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]'
+                      ? 'bg-neo neo-inset-4 text-primary'
+                      : 'bg-neo neo-8 text-gray-600 hover:neo-4'
                   }`}
                   whileTap={{ scale: 0.98 }}
                   whileHover={{ scale: 1.02 }}
@@ -389,7 +389,7 @@ export default function MobileDashboardPro() {
                   onPress={() => navigate("/pro/schedule")}
                   className="flex flex-col items-center justify-center text-center h-24"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Calendar className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm">График</h3>
@@ -400,7 +400,7 @@ export default function MobileDashboardPro() {
                   onPress={() => navigate("/portfolio")}
                   className="flex flex-col items-center justify-center text-center h-24"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Star className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm">Портфолио</h3>
@@ -411,7 +411,7 @@ export default function MobileDashboardPro() {
                   onPress={() => navigate("/messages")}
                   className="flex flex-col items-center justify-center text-center h-24"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <MessageCircle className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm">Сообщения</h3>
@@ -422,7 +422,7 @@ export default function MobileDashboardPro() {
                   onPress={() => navigate("/mobile/profile-settings")}
                   className="flex flex-col items-center justify-center text-center h-24"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-full bg-neo neo-4 flex items-center justify-center mb-2">
                     <Settings className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm">Настройки</h3>
@@ -464,7 +464,7 @@ export default function MobileDashboardPro() {
                     </p>
                     <Button
                       onClick={() => navigate("/mobile/profile-settings")}
-                      className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] text-gray-700"
+                      className="bg-neo neo-8 hover:neo-4 text-gray-700"
                     >
                       <MapPin className="h-4 w-4 mr-2" />
                       Настроить точку

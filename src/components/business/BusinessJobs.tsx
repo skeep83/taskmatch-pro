@@ -172,9 +172,9 @@ export function BusinessJobs() {
 
   if (loading) {
     return (
-      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
           <span className="ml-3 text-black">Загрузка заказов...</span>
         </div>
       </div>
@@ -182,17 +182,17 @@ export function BusinessJobs() {
   }
 
   return (
-    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+    <div className="bg-neo neo-8 rounded-2xl p-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
             <Briefcase className="h-6 w-6 text-primary" />
           </div>
           <h2 className="text-2xl font-bold text-black">Заказы компании</h2>
         </div>
         <button
           onClick={() => navigate('/job/new')}
-          className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+          className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
         >
           <Plus className="h-4 w-4" />
           Создать заказ
@@ -201,26 +201,26 @@ export function BusinessJobs() {
 
       {jobs.length === 0 ? (
         <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-neo neo-4 flex items-center justify-center">
             <Briefcase className="h-8 w-8 text-gray-400" />
           </div>
           <h3 className="text-xl font-semibold text-black mb-2">У вас пока нет заказов</h3>
           <p className="text-gray-600 mb-6">Создайте первый заказ для компании</p>
           <button
             onClick={() => navigate('/job/new')}
-            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+            className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
           >
             <Plus className="h-4 w-4" />
             Создать заказ
           </button>
         </div>
       ) : (
-        <div className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl p-6">
+        <div className="bg-neo neo-inset-4 rounded-xl p-6">
           <div className="space-y-4">
             {jobs.map((businessJob) => {
               const job = businessJob.jobs;
               return (
-                <div key={businessJob.id} className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl p-6 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300 cursor-pointer">
+                <div key={businessJob.id} className="bg-neo neo-8 rounded-xl p-6 hover:neo-4 transition-all duration-300 cursor-pointer">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <h3 className="font-semibold text-black text-lg mb-2">{job.title}</h3>
@@ -234,7 +234,7 @@ export function BusinessJobs() {
                       )}
 
                       <div className="flex items-center gap-4">
-                        <div className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-lg px-3 py-1 text-sm text-black">
+                        <div className="bg-neo neo-4 rounded-lg px-3 py-1 text-sm text-black">
                           {job.categories?.label_ru || "Не указано"}
                         </div>
                         {getStatusBadge(job.status)}

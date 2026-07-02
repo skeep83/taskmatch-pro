@@ -277,7 +277,7 @@ export default function MobileFeed() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#E5E7EB]">
+      <div className="min-h-screen flex items-center justify-center bg-neo">
         <MobileCard className="p-8 text-center">
           <div className="animate-spin mb-4">
             <RefreshCw className="h-8 w-8 mx-auto" />
@@ -296,7 +296,7 @@ export default function MobileFeed() {
         canonical="/feed"
       />
 
-      <div className="min-h-screen bg-[#E5E7EB]">
+      <div className="min-h-screen bg-neo">
         <MobileHeader
           title="Лента заказов"
           showBack={true}

@@ -20,10 +20,10 @@ export function MobileCard({
   const cardContent = (
     <div className={cn(
       "rounded-2xl p-4 transition-all duration-300",
-      "bg-[#E5E7EB]",
+      "bg-neo",
       gradient && "bg-gradient-to-br from-[#E5E7EB]/90 to-[#E5E7EB]/60 backdrop-blur-sm",
-      "shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]",
-      pressable && "active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]",
+      "neo-8",
+      pressable && "active:neo-inset-4",
       className
     )}>
       <div className="space-y-3">

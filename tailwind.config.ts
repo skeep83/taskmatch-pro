@@ -24,6 +24,7 @@ export default {
 					display: ['Playfair Display', 'SF Pro Display','-apple-system','BlinkMacSystemFont','SF Pro Text','system-ui','Helvetica Neue','Arial','sans-serif']
 				},
 				colors: {
+				neo: 'hsl(var(--neo-bg))',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

@@ -232,9 +232,9 @@ export default function Feed() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+            <div className="p-2 rounded-2xl bg-neo neo-inset-8">
               <TabsList className="grid w-full grid-cols-4 bg-transparent">
-                <TabsTrigger value="all" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                <TabsTrigger value="all" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Briefcase className="h-5 w-5 text-black" />
                   <span className="hidden sm:inline">Все заказы</span>
                   {activeTab === "all" && (
@@ -246,7 +246,7 @@ export default function Feed() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="new" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                <TabsTrigger value="new" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <AlertCircle className="h-5 w-5 text-black" />
                   <span className="hidden sm:inline">Новые</span>
                   {activeTab === "new" && (
@@ -258,7 +258,7 @@ export default function Feed() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="urgent" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                <TabsTrigger value="urgent" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Clock className="h-5 w-5 text-black" />
                   <span className="hidden sm:inline">Срочные</span>
                   {activeTab === "urgent" && (
@@ -270,7 +270,7 @@ export default function Feed() {
                     />
                   )}
                 </TabsTrigger>
-                <TabsTrigger value="filters" className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
+                <TabsTrigger value="filters" className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-black">
                   <Filter className="h-5 w-5 text-black" />
                   <span className="hidden sm:inline">Фильтры</span>
                   {activeTab === "filters" && (
@@ -287,7 +287,7 @@ export default function Feed() {
 
             <TabsContent value="all" className="space-y-6">
               {/* Search and Filters */}
-              <Card className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
+              <Card className="bg-neo neo-8 border-none">
                 <CardContent className="p-6">
                   <div className="flex flex-wrap gap-4 items-center">
                     <div className="flex-1 min-w-[300px] relative">
@@ -320,7 +320,7 @@ export default function Feed() {
               {/* Jobs Grid */}
               <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredJobs.map((job) => (
-                  <Card key={job.id} className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none group hover:shadow-[12px_12px_24px_#D1D5DB,-12px_-12px_24px_#F9FAFB] transition-all duration-300">
+                  <Card key={job.id} className="bg-neo neo-8 border-none group hover:neo-12 transition-all duration-300">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between mb-2">
                         <Badge variant="secondary" className="mb-2">
@@ -366,14 +366,14 @@ export default function Feed() {
                         <div className="flex gap-2 pt-4 border-t">
                           <Button
                             onClick={() => navigate(`/job/${job.id}/respond`)}
-                            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black border-none flex-1"
+                            className="bg-neo neo-8 hover:neo-inset-4 text-black border-none flex-1"
                           >
                             Отправить предложение
                           </Button>
                           <Button
                             variant="outline"
                             size="icon"
-                            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black border-none"
+                            className="bg-neo neo-8 hover:neo-inset-4 text-black border-none"
                           >
                             <Video className="w-4 h-4" />
                           </Button>
@@ -389,7 +389,7 @@ export default function Feed() {
               </div>
 
               {filteredJobs.length === 0 && (
-                <Card className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
+                <Card className="bg-neo neo-8 border-none">
                   <CardContent className="text-center py-12">
                     <div className="text-6xl mb-4">🔍</div>
                     <h2 className="text-xl font-semibold mb-2">Заказы не найдены</h2>
@@ -400,7 +400,7 @@ export default function Feed() {
             </TabsContent>
 
             <TabsContent value="new" className="space-y-6">
-              <Card className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
+              <Card className="bg-neo neo-8 border-none">
                 <CardContent className="text-center py-12">
                   <AlertCircle className="w-16 h-16 mx-auto mb-4 text-primary" />
                   <h2 className="text-xl font-semibold mb-2">Новые заказы</h2>
@@ -410,7 +410,7 @@ export default function Feed() {
             </TabsContent>
 
             <TabsContent value="urgent" className="space-y-6">
-              <Card className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
+              <Card className="bg-neo neo-8 border-none">
                 <CardContent className="text-center py-12">
                   <Clock className="w-16 h-16 mx-auto mb-4 text-orange-500" />
                   <h2 className="text-xl font-semibold mb-2">Срочные заказы</h2>
@@ -420,7 +420,7 @@ export default function Feed() {
             </TabsContent>
 
             <TabsContent value="filters" className="space-y-6">
-              <Card className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] border-none">
+              <Card className="bg-neo neo-8 border-none">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Filter className="w-5 h-5" />
@@ -456,7 +456,7 @@ export default function Feed() {
                       </select>
                     </div>
                   </div>
-                  <Button className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-black border-none">
+                  <Button className="bg-neo neo-8 hover:neo-inset-4 text-black border-none">
                     Применить фильтры
                   </Button>
                 </CardContent>

@@ -25,15 +25,15 @@ export function DashboardTabs({
   if (variant === 'mobile') {
     return (
       <div className={cn("overflow-x-auto mb-6", className)}>
-        <div className="flex space-x-2 p-3 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] rounded-2xl min-w-max">
+        <div className="flex space-x-2 p-3 bg-neo neo-inset-8 rounded-2xl min-w-max">
           {tabs.map((tab) => (
             <motion.button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 rounded-xl whitespace-nowrap transition-all duration-300 font-medium ${
                 activeTab === tab.id
-                  ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary'
-                  : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]'
+                  ? 'bg-neo neo-inset-4 text-primary'
+                  : 'bg-neo neo-8 text-gray-600 hover:neo-4'
               }`}
               whileTap={{ scale: 0.98 }}
               whileHover={{ scale: 1.02 }}
@@ -48,13 +48,13 @@ export function DashboardTabs({
   }
 
   return (
-    <div className={cn("p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]", className)}>
+    <div className={cn("p-2 rounded-2xl bg-neo neo-inset-8", className)}>
       <div className={`grid w-full grid-cols-${tabs.length} bg-transparent gap-1`}>
         {tabs.map((tab) => (
           <motion.button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[active=true]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[active=true]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] justify-center px-3`}
+            className={`relative flex items-center gap-2 bg-neo neo-8 data-[active=true]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[active=true]:text-primary h-12 hover:neo-4 justify-center px-3`}
             data-active={activeTab === tab.id}
             whileTap={{ scale: 0.98 }}
           >

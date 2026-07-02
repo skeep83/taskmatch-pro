@@ -648,7 +648,7 @@ export default function MobileJobDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#E5E7EB] flex items-center justify-center">
+      <div className="min-h-screen bg-neo flex items-center justify-center">
         <div className="text-[#374151]">Загрузка...</div>
       </div>
     );
@@ -656,7 +656,7 @@ export default function MobileJobDetail() {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-[#E5E7EB] flex items-center justify-center">
+      <div className="min-h-screen bg-neo flex items-center justify-center">
         <div className="text-[#374151]">Заказ не найден</div>
       </div>
     );
@@ -805,13 +805,13 @@ export default function MobileJobDetail() {
       )}
 
       {/* Main Content */}
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-[#E5E7EB] px-4 py-3 border-b border-[#D1D5DB]">
+      <div className="sticky top-0 z-50 bg-neo px-4 py-3 border-b border-[#D1D5DB]">
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]"
+            className="p-2 rounded-xl bg-neo neo-4 active:neo-inset-2"
           >
             <ArrowLeft className="w-5 h-5 text-[#374151]" />
           </button>
@@ -1001,7 +1001,7 @@ export default function MobileJobDetail() {
                 <div className="flex space-x-2 shrink-0">
                   <button
                     onClick={() => navigate(`/messages?user=${job.pro_id || ''}&job=${job.id}`)}
-                    className="p-2 rounded-lg bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] hover:shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] transition-all duration-200"
+                    className="p-2 rounded-lg bg-neo neo-4 active:neo-inset-2 hover:neo-6 transition-all duration-200"
                     title="Написать специалисту"
                   >
                     <MessageCircle size={18} className="text-[#374151]" />
@@ -1074,7 +1074,7 @@ export default function MobileJobDetail() {
                   {!isOwnJob && (
                     <button
                       onClick={() => navigate(`/messages?user=${job.client_id || ''}&job=${job.id}`)}
-                      className="p-2 rounded-lg bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] hover:shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] transition-all duration-200"
+                      className="p-2 rounded-lg bg-neo neo-4 active:neo-inset-2 hover:neo-6 transition-all duration-200"
                       title="Написать сообщение"
                     >
                       <MessageCircle size={18} className="text-[#374151]" />
@@ -1083,7 +1083,7 @@ export default function MobileJobDetail() {
                   {job.profiles?.phone && (
                     <button
                       onClick={() => window.open(`tel:${job.profiles.phone}`, '_self')}
-                      className="p-2 rounded-lg bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] hover:shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB] transition-all duration-200"
+                      className="p-2 rounded-lg bg-neo neo-4 active:neo-inset-2 hover:neo-6 transition-all duration-200"
                       title="Позвонить"
                     >
                       <Phone size={18} className="text-[#374151]" />
@@ -1185,7 +1185,7 @@ export default function MobileJobDetail() {
             <Button
               onClick={handleResponse}
               disabled={responding}
-              className="w-full h-12 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] disabled:opacity-50"
+              className="w-full h-12 bg-primary text-white rounded-xl font-semibold neo-8 disabled:opacity-50"
             >
               {responding ? 'Отправка...' : 'Отправить предложение'}
             </Button>

@@ -370,7 +370,7 @@ export function JobApplicationsList({
                   : 'Специалист');
 
               return (
-                <div className="card-3d group relative w-full bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
+                <div className="card-3d group relative w-full bg-neo rounded-3xl neo-12 overflow-hidden transform-gpu">
                   {/* Top gradient section */}
                   <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600">
                     {/* Decorative gradient overlay */}
@@ -407,7 +407,7 @@ export function JobApplicationsList({
                   </div>
 
                   {/* Bottom white section */}
-                  <div className="relative bg-white px-6 pt-20 pb-8">
+                  <div className="relative bg-neo px-6 pt-20 pb-8">
                     {/* Name and title */}
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>
@@ -552,7 +552,7 @@ export function JobApplicationsList({
                 className="absolute inset-0 perspective-1000"
               >
                 {/* 3D Card with gradient background like reference */}
-                <div className="card-3d group relative w-full h-full bg-white rounded-3xl shadow-2xl overflow-hidden transform-gpu">
+                <div className="card-3d group relative w-full h-full bg-neo rounded-3xl neo-12 overflow-hidden transform-gpu">
                   {/* Top gradient section */}
                   <div className="relative h-32 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600">
                     {/* Decorative gradient overlay */}
@@ -591,7 +591,7 @@ export function JobApplicationsList({
                   </div>
 
                    {/* Bottom white section */}
-                   <div className="relative bg-white px-6 pt-20 pb-8">
+                   <div className="relative bg-neo px-6 pt-20 pb-8">
                     {/* Name and title */}
                     <div className="text-center mb-6">
                       <h4 className="font-bold text-xl text-gray-900 mb-1">{profileName}</h4>

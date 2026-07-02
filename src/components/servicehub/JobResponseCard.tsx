@@ -86,7 +86,7 @@ export const JobResponseCard: React.FC<JobResponseCardProps> = ({
 
   return (
     <div className={cn(
-      "bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-6 transition-all duration-200",
+      "bg-neo neo-8 rounded-xl border-0 p-6 transition-all duration-200",
       response.status === 'selected' && "ring-2 ring-green-500/20 border-green-200 dark:border-green-800",
       response.status === 'declined' && "opacity-60",
       className

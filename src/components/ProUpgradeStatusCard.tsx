@@ -179,7 +179,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
 
   if (loading) {
     return (
-      <div className="p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+      <div className="p-8 bg-neo neo-8 rounded-2xl">
         <div className="flex items-center gap-2">
           <RefreshCw className="w-4 h-4 animate-spin" />
           <span>Проверяем статус заявки...</span>
@@ -203,32 +203,32 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
           icon: Clock,
           title: "Заявка рассматривается",
           description: "Ваша заявка на статус специалиста находится на рассмотрении у администрации",
-          badge: <Badge variant="outline" className="text-yellow-600 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] border-yellow-300"><Clock className="w-3 h-3 mr-1" />Ожидает</Badge>,
-          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
+          badge: <Badge variant="outline" className="text-yellow-600 bg-neo neo-4 border-yellow-300"><Clock className="w-3 h-3 mr-1" />Ожидает</Badge>,
+          color: "bg-neo neo-8"
         };
       case 'approved':
         return {
           icon: CheckCircle,
           title: "Заявка одобрена!",
           description: "Поздравляем! Ваша заявка одобрена, и вы получили статус специалиста",
-          badge: <Badge variant="default" className="text-green-600 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] border-green-300"><CheckCircle className="w-3 h-3 mr-1" />Одобрено</Badge>,
-          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
+          badge: <Badge variant="default" className="text-green-600 bg-neo neo-4 border-green-300"><CheckCircle className="w-3 h-3 mr-1" />Одобрено</Badge>,
+          color: "bg-neo neo-8"
         };
       case 'rejected':
         return {
           icon: XCircle,
           title: "Заявка отклонена",
           description: "К сожалению, ваша заявка была отклонена. Ознакомьтесь с причиной отклонения ниже и подайте новую заявку с исправлениями.",
-          badge: <Badge variant="destructive" className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"><XCircle className="w-3 h-3 mr-1" />Отклонено</Badge>,
-          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
+          badge: <Badge variant="destructive" className="bg-neo neo-4"><XCircle className="w-3 h-3 mr-1" />Отклонено</Badge>,
+          color: "bg-neo neo-8"
         };
       default:
         return {
           icon: AlertCircle,
           title: "Статус неизвестен",
           description: "Не удалось определить статус заявки",
-          badge: <Badge variant="outline" className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">Неизвестно</Badge>,
-          color: "bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]"
+          badge: <Badge variant="outline" className="bg-neo neo-4">Неизвестно</Badge>,
+          color: "bg-neo neo-8"
         };
     }
   };
@@ -240,7 +240,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
     <div className={`${config.color} rounded-2xl p-8`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
             <IconComponent className="w-6 h-6 text-primary" />
           </div>
           <h3 className="text-xl font-display font-bold">{config.title}</h3>
@@ -254,13 +254,13 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
         </p>
 
         <div className="space-y-3 text-sm">
-          <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl">
+          <div className="p-4 bg-neo neo-inset-4 rounded-xl">
             <span className="text-muted-foreground">Подана: </span>
             <span className="font-medium">{formatDistanceToNow(new Date(request.submitted_at), { addSuffix: true, locale: ru })}</span>
           </div>
           
           {request.reviewed_at && (
-            <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl">
+            <div className="p-4 bg-neo neo-inset-4 rounded-xl">
               <span className="text-muted-foreground">Рассмотрена: </span>
               <span className="font-medium">{formatDistanceToNow(new Date(request.reviewed_at), { addSuffix: true, locale: ru })}</span>
             </div>
@@ -268,14 +268,14 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
         </div>
 
         {request.status === 'rejected' && request.rejection_reason && (
-          <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl border-l-4 border-red-400">
+          <div className="p-4 bg-neo neo-inset-4 rounded-xl border-l-4 border-red-400">
             <p className="text-sm font-medium text-red-800 mb-2">Причина отклонения:</p>
             <p className="text-sm text-red-700">{request.rejection_reason}</p>
           </div>
         )}
 
         {request.status === 'pending' && (
-          <div className="p-4 bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl border-l-4 border-blue-400">
+          <div className="p-4 bg-neo neo-inset-4 rounded-xl border-l-4 border-blue-400">
             <p className="text-sm text-blue-800 flex items-center gap-2">
               📋 Среднее время рассмотрения: 24 часа
             </p>
@@ -288,7 +288,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
               <button 
                 onClick={submitNewRequest}
                 disabled={resubmitting}
-                className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed mr-3"
+                className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed mr-3"
               >
                 <Send className="w-4 h-4" />
                 {resubmitting ? 'Подача заявки...' : 'Подать новую заявку'}
@@ -298,7 +298,7 @@ export const ProUpgradeStatusCard = ({ userId }: ProUpgradeStatusProps) => {
           
           <button 
             onClick={loadUpgradeStatus}
-            className="px-6 py-3 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium"
+            className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 flex items-center gap-2 text-sm font-medium"
           >
             <RefreshCw className="w-4 h-4" />
             Обновить статус

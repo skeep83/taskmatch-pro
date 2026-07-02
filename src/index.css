@@ -22,13 +22,13 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 220 13% 91%;      /* unified neumorphic gray */
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
+    --card: 220 13% 91%;
     --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 0 0% 100%;
+    --popover: 220 13% 91%;
     --popover-foreground: 222.2 84% 4.9%;
 
     --primary: 258 80% 50%; /* Brand primary (indigo-violet) */
@@ -65,28 +65,34 @@ All colors MUST be HSL.
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* ServiceHub - Pure Neumorphism like in images */
+    --primary-variant: 280 72% 60%;
     --brand-1: 258 80% 50%;
     --brand-2: 199 89% 48%;
     --brand-3: 280 72% 60%;
     --brand-glow: 258 80% 65%;
 
-    /* Pure neumorphism shadows - darker for better contrast */
+    /* Neumorphic tokens — single source of truth (neutral light gray) */
+    --neo-bg: 220 13% 91%;            /* #E5E7EB */
+    --neo-dark: #d1d5db;              /* shadow, gray-300 */
+    --neo-light: #f9fafb;             /* highlight, gray-50 */
+
+    /* Pure neumorphism shadows */
     --shadow-raised:
-      9px 9px 18px rgba(174, 187, 204, 0.5),
-      -9px -9px 18px rgba(255, 255, 255, 0.5);
+      8px 8px 16px var(--neo-dark),
+      -8px -8px 16px var(--neo-light);
 
     --shadow-raised-hover:
-      14px 14px 28px rgba(174, 187, 204, 0.6),
-      -14px -14px 28px rgba(255, 255, 255, 0.6);
+      12px 12px 24px var(--neo-dark),
+      -12px -12px 24px var(--neo-light);
 
     --shadow-raised-strong:
-      18px 18px 36px rgba(174, 187, 204, 0.7),
-      -18px -18px 36px rgba(255, 255, 255, 0.7);
+      16px 16px 32px var(--neo-dark),
+      -16px -16px 32px var(--neo-light);
 
-    /* Neumorphic backgrounds - grayish-blue like reference */
-    --surface-raised: linear-gradient(145deg, hsl(220, 16%, 95%), hsl(220, 16%, 92%));
-    --surface-elevated: linear-gradient(145deg, hsl(220, 16%, 94%), hsl(220, 16%, 91%));
-    --background-neomorphic: hsl(220, 16%, 93%);
+    /* Neumorphic backgrounds — neutral light gray */
+    --surface-raised: linear-gradient(145deg, hsl(220, 14%, 93%), hsl(220, 13%, 90%));
+    --surface-elevated: linear-gradient(145deg, hsl(220, 14%, 92%), hsl(220, 13%, 89%));
+    --background-neomorphic: hsl(220, 13% ,91%);
 
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -160,7 +166,7 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply text-foreground antialiased font-sans text-[22px] leading-relaxed;
+    @apply text-foreground antialiased font-sans text-base leading-relaxed;
     background: hsl(var(--background));
   }
 
@@ -169,7 +175,50 @@ All colors MUST be HSL.
   }
 }
 
+@layer utilities {
+  .bg-neo { background-color: hsl(var(--neo-bg)); }
+
+  .neo-1 { box-shadow: 1px 1px 2px var(--neo-dark), -1px -1px 2px var(--neo-light); }
+  .neo-2 { box-shadow: 2px 2px 4px var(--neo-dark), -2px -2px 4px var(--neo-light); }
+  .neo-4 { box-shadow: 4px 4px 8px var(--neo-dark), -4px -4px 8px var(--neo-light); }
+  .neo-6 { box-shadow: 6px 6px 12px var(--neo-dark), -6px -6px 12px var(--neo-light); }
+  .neo-8 { box-shadow: 8px 8px 16px var(--neo-dark), -8px -8px 16px var(--neo-light); }
+  .neo-12 { box-shadow: 12px 12px 24px var(--neo-dark), -12px -12px 24px var(--neo-light); }
+
+  .neo-inset-1 { box-shadow: inset 1px 1px 2px var(--neo-dark), inset -1px -1px 2px var(--neo-light); }
+  .neo-inset-2 { box-shadow: inset 2px 2px 4px var(--neo-dark), inset -2px -2px 4px var(--neo-light); }
+  .neo-inset-3 { box-shadow: inset 3px 3px 6px var(--neo-dark), inset -3px -3px 6px var(--neo-light); }
+  .neo-inset-4 { box-shadow: inset 4px 4px 8px var(--neo-dark), inset -4px -4px 8px var(--neo-light); }
+  .neo-inset-6 { box-shadow: inset 6px 6px 12px var(--neo-dark), inset -6px -6px 12px var(--neo-light); }
+  .neo-inset-8 { box-shadow: inset 8px 8px 16px var(--neo-dark), inset -8px -8px 16px var(--neo-light); }
+  .neo-inset-12 { box-shadow: inset 12px 12px 24px var(--neo-dark), inset -12px -12px 24px var(--neo-light); }
+}
+
 @layer components {
+  /* Semantic building blocks for consistent surfaces */
+  .neo-card {
+    @apply bg-neo neo-8 rounded-2xl border-0 transition-shadow duration-300;
+  }
+  .neo-card-interactive {
+    @apply neo-card hover:neo-4 active:neo-inset-4 cursor-pointer;
+  }
+  .neo-chip {
+    @apply bg-neo neo-2 rounded-full border-0;
+  }
+  .neo-icon-well {
+    @apply bg-neo neo-4 rounded-full flex items-center justify-center;
+  }
+  .neo-btn {
+    @apply inline-flex items-center justify-center gap-2 bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl border-0 font-semibold text-foreground transition-all duration-300;
+  }
+  .neo-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border-0 font-semibold text-white transition-all duration-300;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--brand-3)));
+    box-shadow: 6px 6px 12px var(--neo-dark), -6px -6px 12px var(--neo-light);
+  }
+  .neo-btn-primary:hover { box-shadow: 3px 3px 6px var(--neo-dark), -3px -3px 6px var(--neo-light); transform: translateY(-1px); }
+  .neo-btn-primary:active { transform: translateY(1px); }
+
   .btn-hero {
     @apply inline-flex items-center justify-center rounded-2xl px-8 py-4 font-semibold transition-all duration-300 ease-out border-0 text-white;
     background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));

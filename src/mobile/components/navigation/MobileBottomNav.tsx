@@ -170,7 +170,7 @@ export function MobileBottomNav() {
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={cn(
         "fixed bottom-0 left-0 right-0 z-50",
-        "bg-[#E5E7EB]"
+        "bg-neo"
       )}
       style={{
         paddingBottom: `env(safe-area-inset-bottom)`,
@@ -179,7 +179,7 @@ export function MobileBottomNav() {
         willChange: 'transform'
       }}
     >
-      <div className="px-2 py-2 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+      <div className="px-2 py-2 bg-neo neo-inset-8">
         <nav className="flex items-center justify-around h-14">
           {navItems.map((item, index) => {
             // Определяем активность: для точных совпадений или по префиксу
@@ -207,8 +207,8 @@ export function MobileBottomNav() {
                   "relative flex flex-col items-center justify-center gap-1",
                   "min-w-[60px] h-14 rounded-xl transition-all duration-300",
                   "touch-manipulation select-none text-gray-700",
-                  "bg-[#E5E7EB] shadow-[6px_6px_12px_#D1D5DB,-6px_-6px_12px_#F9FAFB]",
-                  isActive && "shadow-[inset_3px_3px_6px_#D1D5DB,inset_-3px_-3px_6px_#F9FAFB] text-gray-800"
+                  "bg-neo neo-6",
+                  isActive && "neo-inset-3 text-gray-800"
                 )}
               >
                 {isActive && (

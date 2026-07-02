@@ -336,7 +336,7 @@ export default function AdminDashboard() {
                   <button
                     key={item.label}
                     onClick={item.onClick}
-                    className="w-full rounded-2xl bg-[#E5E7EB] px-4 py-4 text-left shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300"
+                    className="w-full rounded-2xl bg-neo px-4 py-4 text-left neo-4 hover:neo-2 transition-all duration-300"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl bg-white/50 flex items-center justify-center shrink-0">

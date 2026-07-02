@@ -204,13 +204,13 @@ export default function MobileJobRespond() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-[#E5E7EB] px-4 py-3 border-b border-[#D1D5DB]">
+      <div className="sticky top-0 z-50 bg-neo px-4 py-3 border-b border-[#D1D5DB]">
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]"
+            className="p-2 rounded-xl bg-neo neo-4 active:neo-inset-2"
           >
             <ArrowLeft className="w-5 h-5 text-[#374151]" />
           </button>
@@ -243,7 +243,7 @@ export default function MobileJobRespond() {
                 value={formData.price}
                 onChange={(e) => handleInputChange('price', e.target.value)}
                 placeholder="Введите цену в MDL"
-                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
                 required
               />
               <p className="text-xs text-[#6B7280] mt-2">
@@ -261,7 +261,7 @@ export default function MobileJobRespond() {
               Время выполнения
             </h3>
             <Select value={formData.eta} onValueChange={(value) => handleInputChange('eta', value)}>
-              <SelectTrigger className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
+              <SelectTrigger className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4">
                 <SelectValue placeholder="Выберите время выполнения" />
               </SelectTrigger>
               <SelectContent>
@@ -293,7 +293,7 @@ export default function MobileJobRespond() {
                 value={formData.warranty}
                 onChange={(e) => handleInputChange('warranty', e.target.value)}
                 placeholder="Количество дней"
-                className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50"
+                className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50"
               />
               <p className="text-xs text-[#6B7280] mt-2">
                 Количество дней гарантии на выполненную работу
@@ -314,7 +314,7 @@ export default function MobileJobRespond() {
               onChange={(e) => handleInputChange('notes', e.target.value)}
               placeholder="Опишите, как вы будете выполнять работу, какие материалы понадобятся..."
               rows={4}
-              className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 text-[#374151] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] focus:ring-2 focus:ring-primary/50 resize-none"
+              className="w-full bg-neo border-none rounded-xl px-4 py-3 text-[#374151] neo-inset-4 focus:ring-2 focus:ring-primary/50 resize-none"
             />
           </div>
         </MobileCard>
@@ -324,7 +324,7 @@ export default function MobileJobRespond() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-primary text-white rounded-xl font-semibold shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] disabled:opacity-50"
+            className="w-full h-12 bg-primary text-white rounded-xl font-semibold neo-8 disabled:opacity-50"
           >
             {loading ? 'Отправка...' : 'Отправить предложение'}
           </Button>

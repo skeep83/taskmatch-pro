@@ -50,7 +50,7 @@ export default function MobileDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       <MobileHeader 
         title="Дашборд"
         showNotifications

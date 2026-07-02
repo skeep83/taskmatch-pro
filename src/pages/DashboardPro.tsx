@@ -515,37 +515,37 @@ const DashboardPro = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-12">
-            <Link to="/profile/settings" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Link to="/profile/settings" className="p-4 text-center transition-all bg-neo neo-8 hover:neo-4 rounded-2xl flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                   <UserCog className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Профиль</span>
             </Link>
 
-            <Link to="/pro/schedule" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Link to="/pro/schedule" className="p-4 text-center transition-all bg-neo neo-8 hover:neo-4 rounded-2xl flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                   <Calendar className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Расписание</span>
             </Link>
 
-            <Link to="/portfolio" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Link to="/portfolio" className="p-4 text-center transition-all bg-neo neo-8 hover:neo-4 rounded-2xl flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                   <ImageIcon className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Портфолио</span>
             </Link>
 
-            <Link to="/tenders" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Link to="/tenders" className="p-4 text-center transition-all bg-neo neo-8 hover:neo-4 rounded-2xl flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                   <Briefcase className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Заказы с дедлайном</span>
             </Link>
 
-            <button type="button" disabled aria-disabled="true" title="Выплата будет доступна после подключения payout flow" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl opacity-60 cursor-not-allowed">
+            <button type="button" disabled aria-disabled="true" title="Выплата будет доступна после подключения payout flow" className="p-4 text-center transition-all bg-neo neo-8 rounded-2xl opacity-60 cursor-not-allowed">
               <div className="flex flex-col items-center gap-2 w-full">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                   <CreditCard className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">Выплата</span>
@@ -554,8 +554,8 @@ const DashboardPro = () => {
             </button>
 
 
-            <Link to="/kyc" className="p-4 text-center transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+            <Link to="/kyc" className="p-4 text-center transition-all bg-neo neo-8 hover:neo-4 rounded-2xl flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                   <ShieldCheck className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-gray-700">KYC</span>
@@ -707,8 +707,8 @@ const DashboardPro = () => {
             <div className="space-y-8">
               {/* KYC Status Section */}
               <div className="flex items-center gap-4 justify-center">
-                <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] transition-all duration-300">
-                  <div className="w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-neo neo-8 transition-all duration-300">
+                  <div className="w-8 h-8 rounded-full bg-neo neo-4 flex items-center justify-center">
                     {kycStatus === 'approved' ? (
                       <CheckCircle className="h-5 w-5 text-green-500" />
                     ) : kycStatus === 'rejected' ? (
@@ -726,7 +726,7 @@ const DashboardPro = () => {
 
                 <button
                   onClick={() => userId && loadKycStatus(userId)}
-                  className="w-10 h-10 rounded-xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
+                  className="w-10 h-10 rounded-xl bg-neo neo-4 hover:neo-2 transition-all duration-300 flex items-center justify-center text-muted-foreground hover:text-primary"
                   title="Обновить статус KYC"
                 >
                   <TrendingUp className="h-4 w-4" />

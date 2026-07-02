@@ -160,7 +160,7 @@ const HowItWorks = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <div className="flex justify-center mb-8">
-              <div className="w-32 h-32 rounded-3xl bg-[#E5E7EB] shadow-[inset_12px_12px_24px_#D1D5DB,inset_-12px_-12px_24px_#F9FAFB] flex items-center justify-center relative">
+              <div className="w-32 h-32 rounded-3xl bg-neo neo-inset-12 flex items-center justify-center relative">
                 <div className="relative">
                   <Settings className="h-16 w-16 text-primary animate-spin-slow" />
                   <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-cyan-400 animate-pulse"></div>

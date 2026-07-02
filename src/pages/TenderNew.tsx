@@ -231,7 +231,7 @@ const TenderNew = () => {
 
   if (businessAccountLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#E5E7EB]">
+      <main className="min-h-screen flex items-center justify-center bg-neo">
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Загрузка...</h2>
           <p className="text-muted-foreground">Проверяем ваш бизнес-аккаунт</p>
@@ -242,7 +242,7 @@ const TenderNew = () => {
 
   return (
     <RoleGuard requiredRole="business">
-      <main className="min-h-screen bg-[#E5E7EB]">
+      <main className="min-h-screen bg-neo">
         <Seo title={`${t('app.name')} — Создать тендер`} description="Создайте тендер для получения откликов от исполнителей" canonical="/tenders/new" />
 
         {/* Hero Section */}
@@ -280,9 +280,9 @@ const TenderNew = () => {
         {!businessAccount && (
           <section className="container mx-auto px-6 pt-8">
             <div className="max-w-4xl mx-auto">
-              <div className="mb-8 p-6 rounded-2xl bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+              <div className="mb-8 p-6 rounded-2xl bg-neo neo-8">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-neo neo-4 flex items-center justify-center">
                     <AlertTriangle className="h-6 w-6 text-orange-500" />
                   </div>
                   <div className="flex-1">
@@ -292,7 +292,7 @@ const TenderNew = () => {
                     </p>
                     <button
                       onClick={() => navigate('/dashboard/business')}
-                      className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0 px-6 py-3 rounded-xl font-semibold transition-all"
+                      className="bg-neo neo-4 hover:neo-inset-2 border-0 px-6 py-3 rounded-xl font-semibold transition-all"
                     >
                       Создать бизнес-аккаунт
                     </button>
@@ -319,18 +319,18 @@ const TenderNew = () => {
             <div className="flex items-center gap-4 mb-8">
               <button
                 onClick={() => navigate('/dashboard/business?tab=tenders')}
-                className="gap-2 bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] border-0 px-6 py-3 rounded-xl font-semibold transition-all flex items-center"
+                className="gap-2 bg-neo neo-4 hover:neo-inset-2 border-0 px-6 py-3 rounded-xl font-semibold transition-all flex items-center"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Назад к тендерам
               </button>
             </div>
 
-            <div className="bg-[#E5E7EB] rounded-3xl p-8 shadow-[12px_12px_24px_#D1D5DB,-12px_-12px_24px_#F9FAFB]">
+            <div className="bg-neo rounded-3xl p-8 neo-12">
               <form className="space-y-8" onSubmit={onSubmit}>
 
                 {businessAccount && (
-                  <div className="p-4 rounded-xl bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]">
+                  <div className="p-4 rounded-xl bg-neo neo-inset-4">
                     <p className="text-sm text-muted-foreground">
                       <strong>Бизнес-аккаунт:</strong> {businessAccount.company_name}
                     </p>
@@ -340,23 +340,23 @@ const TenderNew = () => {
                 {/* Tender Details */}
                 <div className="space-y-6">
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
-                    <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">1</span>
+                    <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">1</span>
                     Информация о тендере
                   </h2>
 
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                    <div className="bg-neo rounded-2xl p-6 neo-8">
                       <label className="block text-sm font-medium mb-3 text-[#374151]">Категория услуги</label>
                       <select
                         name="category_id"
-                        className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                        className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                       >
                         <option value="">Выберите категорию</option>
                         {categoryOptions}
                       </select>
                     </div>
 
-                    <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                    <div className="bg-neo rounded-2xl p-6 neo-8">
                       <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
                         <Euro className="w-4 h-4 text-green-500" />
                         Максимальный бюджет *
@@ -365,29 +365,29 @@ const TenderNew = () => {
                         name="budget_max"
                         type="number"
                         min="1"
-                        className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                        className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                         placeholder="5000"
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <label className="block text-sm font-medium mb-3 text-[#374151]">Название тендера *</label>
                     <input
                       name="title"
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                      className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                       placeholder="Например: Ремонт офисного помещения"
                       maxLength={200}
                       required
                     />
                   </div>
 
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <label className="block text-sm font-medium mb-3 text-[#374151]">Описание проекта *</label>
                     <textarea
                       name="description"
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                      className="w-full bg-neo border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                       rows={4}
                       placeholder="Подробно опишите проект, требования к материалам, сроки выполнения, критерии оценки..."
                       maxLength={1000}
@@ -402,11 +402,11 @@ const TenderNew = () => {
                 {/* Deadline */}
                 <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
-                    <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">2</span>
+                    <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">2</span>
                     Срок подачи заявок
                   </h2>
 
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
@@ -416,7 +416,7 @@ const TenderNew = () => {
                         <input
                           name="date"
                           type="date"
-                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                          className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                           min={new Date().toISOString().split('T')[0]}
                           required
                         />
@@ -426,7 +426,7 @@ const TenderNew = () => {
                         <input
                           name="time"
                           type="time"
-                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                          className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                           required
                         />
                       </div>
@@ -440,11 +440,11 @@ const TenderNew = () => {
                 {/* Photos */}
                 <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                   <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
-                    <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">3</span>
+                    <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">3</span>
                     Дополнительные материалы
                   </h2>
 
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div
                       className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
                         dragActive ? 'border-primary bg-primary/5' : 'border-[#D1D5DB]'
@@ -468,7 +468,7 @@ const TenderNew = () => {
                         id="file-upload"
                         name="files"
                       />
-                      <label htmlFor="file-upload" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] inline-flex items-center gap-2 cursor-pointer">
+                      <label htmlFor="file-upload" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 inline-flex items-center gap-2 cursor-pointer">
                         <Upload className="w-4 h-4" />
                         Выбрать файлы
                       </label>
@@ -477,7 +477,7 @@ const TenderNew = () => {
                     {uploadedFiles.length > 0 && (
                       <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                         {uploadedFiles.map((file, index) => (
-                          <div key={index} className="relative group bg-[#E5E7EB] rounded-xl p-2 shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
+                          <div key={index} className="relative group bg-neo rounded-xl p-2 neo-4">
                             {file.type.startsWith('image/') ? (
                               <img
                                 src={URL.createObjectURL(file)}
@@ -492,7 +492,7 @@ const TenderNew = () => {
                             <button
                               type="button"
                               onClick={() => removeFile(index)}
-                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-[2px_2px_4px_#D1D5DB]"
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity neo-2"
                             >
                               ×
                             </button>
@@ -505,10 +505,10 @@ const TenderNew = () => {
 
                 {/* Submit */}
                 <div className="flex justify-between items-center pt-8 border-t border-[#D1D5DB]">
-                  <button type="button" className="bg-[#E5E7EB] text-[#374151] hover:bg-[#D1D5DB] px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]" onClick={() => navigate('/dashboard/business?tab=tenders')}>
+                  <button type="button" className="bg-neo text-[#374151] hover:bg-[#D1D5DB] px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 hover:neo-inset-4" onClick={() => navigate('/dashboard/business?tab=tenders')}>
                     Отмена
                   </button>
-                  <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]" disabled={loading || !businessAccount}>
+                  <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8" disabled={loading || !businessAccount}>
                     {loading ? 'Создаем тендер...' : 'Создать тендер'}
                   </button>
                 </div>

@@ -169,7 +169,7 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
             className="relative cursor-pointer"
             onClick={handleCameraClick}
           >
-            <Avatar className="w-32 h-32 border-4 border-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+            <Avatar className="w-32 h-32 border-4 border-[#E5E7EB] neo-8">
               <AvatarImage src={currentAvatarUrl || ''} alt="Avatar" />
               <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-primary/10 to-accent/10">
                 {getInitials(userName)}
@@ -184,7 +184,7 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
 
           {/* Camera Button */}
           <motion.button
-            className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center transition-all hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB]"
+            className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center transition-all hover:neo-2"
             onClick={handleCameraClick}
             disabled={uploading}
             whileTap={{ scale: 0.9 }}
@@ -206,7 +206,7 @@ export function MobileAvatarUpload({ userId, currentAvatarUrl, userName, onAvata
               exit={{ opacity: 0, y: 10, scale: 0.9 }}
               className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 z-10"
             >
-              <div className="bg-[#E5E7EB] rounded-2xl shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] p-4 space-y-3 min-w-[200px]">
+              <div className="bg-neo rounded-2xl neo-8 p-4 space-y-3 min-w-[200px]">
                 <Button
                   variant="ghost"
                   size="sm"

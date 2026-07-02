@@ -268,7 +268,7 @@ export default function DashboardBusiness() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 lg:space-y-8">
             {/* Overview Section */}
             <div className="space-y-4 lg:space-y-6">
-              <div className="p-5 lg:p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-5 lg:p-8 bg-neo neo-8 rounded-2xl">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div>
                     <h2 className="text-lg lg:text-2xl font-semibold mb-2 text-black">Что сделать сейчас</h2>
@@ -283,9 +283,9 @@ export default function DashboardBusiness() {
 
               {/* Quick Actions - Business Style */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl" onClick={() => navigate("/job/new")}>
+                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl" onClick={() => navigate("/job/new")}>
                   <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
-                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                       <Plus className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
@@ -295,9 +295,9 @@ export default function DashboardBusiness() {
                   </div>
                 </motion.button>
 
-                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl" onClick={() => setActiveTab("jobs")}>
+                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl" onClick={() => setActiveTab("jobs")}>
                   <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
-                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                       <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
@@ -307,9 +307,9 @@ export default function DashboardBusiness() {
                   </div>
                 </motion.button>
 
-                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl" onClick={() => setActiveTab("tenders")}>
+                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl" onClick={() => setActiveTab("tenders")}>
                   <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
-                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                       <Gavel className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
@@ -319,9 +319,9 @@ export default function DashboardBusiness() {
                   </div>
                 </motion.button>
 
-                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl" onClick={() => setActiveTab("company")}>
+                <motion.button type="button" whileHover={{ scale: 1.05 }} className="p-4 lg:p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl" onClick={() => setActiveTab("company")}>
                   <div className="flex flex-col items-center gap-2 lg:gap-3 text-center">
-                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
                       <Building2 className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
                     </div>
                     <div>
@@ -343,7 +343,7 @@ export default function DashboardBusiness() {
                     type="button"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="p-4 lg:p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all"
+                    className="p-4 lg:p-6 bg-neo neo-8 rounded-2xl hover:neo-4 transition-all"
                     onClick={() => setActiveTab("invoices")}
                   >
                     <div className="flex items-center justify-between">
@@ -358,7 +358,7 @@ export default function DashboardBusiness() {
                     type="button"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="p-4 lg:p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all"
+                    className="p-4 lg:p-6 bg-neo neo-8 rounded-2xl hover:neo-4 transition-all"
                     onClick={() => setActiveTab("company")}
                   >
                     <div className="flex items-center justify-between">
@@ -373,7 +373,7 @@ export default function DashboardBusiness() {
                     type="button"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="p-4 lg:p-6 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all"
+                    className="p-4 lg:p-6 bg-neo neo-8 rounded-2xl hover:neo-4 transition-all"
                     onClick={() => setActiveTab("jobs")}
                   >
                     <div className="flex items-center justify-between">
@@ -390,7 +390,7 @@ export default function DashboardBusiness() {
 
             {/* Horizontal Tab Navigation */}
             <div className={`overflow-x-auto ${isMobile ? '' : 'hidden'}`}>
-              <div className="flex space-x-2 p-3 bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB] rounded-2xl min-w-max">
+              <div className="flex space-x-2 p-3 bg-neo neo-inset-8 rounded-2xl min-w-max">
                 {[
                   { id: 'overview', label: 'Обзор', icon: BarChart3 },
                   { id: 'jobs', label: 'Заказы', icon: Briefcase },
@@ -402,8 +402,8 @@ export default function DashboardBusiness() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-2 px-4 py-3 rounded-xl whitespace-nowrap transition-all duration-300 font-medium ${
                       activeTab === tab.id
-                        ? 'bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-primary'
-                        : 'bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] text-gray-600 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]'
+                        ? 'bg-neo neo-inset-4 text-primary'
+                        : 'bg-neo neo-8 text-gray-600 hover:neo-4'
                     }`}
                     whileTap={{ scale: 0.98 }}
                     whileHover={{ scale: 1.02 }}
@@ -417,11 +417,11 @@ export default function DashboardBusiness() {
 
             {/* Desktop Tab Navigation */}
             {!isMobile && (
-              <div className="p-2 rounded-2xl bg-[#E5E7EB] shadow-[inset_8px_8px_16px_#D1D5DB,inset_-8px_-8px_16px_#F9FAFB]">
+              <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                 <TabsList className="grid w-full grid-cols-4 bg-transparent gap-1">
                   <TabsTrigger
                     value="overview"
-                    className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                    className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <BarChart3 className="h-5 w-5" />
                     <span className="hidden sm:inline font-medium">Обзор</span>
@@ -435,7 +435,7 @@ export default function DashboardBusiness() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="jobs"
-                    className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                    className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <Briefcase className="h-5 w-5" />
                     <span className="hidden sm:inline font-medium">Заказы</span>
@@ -449,7 +449,7 @@ export default function DashboardBusiness() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="tenders"
-                    className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                    className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <Gavel className="h-5 w-5" />
                     <span className="hidden sm:inline font-medium">Тендеры</span>
@@ -463,7 +463,7 @@ export default function DashboardBusiness() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="company"
-                    className="relative flex items-center gap-2 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] data-[state=active]:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"
+                    className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                   >
                     <Building2 className="h-5 w-5" />
                     <span className="hidden sm:inline font-medium">Компания</span>
@@ -480,7 +480,7 @@ export default function DashboardBusiness() {
             )}
 
             <TabsContent value="overview" className="space-y-4 lg:space-y-8">
-              <div className="p-4 lg:p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-4 lg:p-8 bg-neo neo-8 rounded-2xl">
                 <h2 className="text-lg lg:text-2xl font-semibold mb-3 lg:mb-4 text-black">Добро пожаловать в ServiceHub Business</h2>
                 <p className="text-muted-foreground mb-4 lg:mb-6 text-sm lg:text-base">
                   Управляйте заказами компании, координируйте команду и только затем переходите к финансовым и аналитическим разделам.
@@ -492,17 +492,17 @@ export default function DashboardBusiness() {
                 </div>
               </div>
 
-              <div className="p-4 lg:p-8 bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl">
+              <div className="p-4 lg:p-8 bg-neo neo-8 rounded-2xl">
                 <div className="mb-4 lg:mb-6">
                   <h3 className="text-base lg:text-xl font-semibold text-black">Дополнительные разделы</h3>
                   <p className="text-sm text-muted-foreground">Финансовые и обзорные разделы остаются доступны отсюда, без перегруза верхней навигации.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button className="p-5 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("invoices")}>
+                  <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("invoices")}>
                     <div className="flex items-center gap-3 mb-3"><FileText className="h-5 w-5 text-primary" /><span className="font-semibold text-black">Счета</span></div>
                     <p className="text-sm text-muted-foreground">Оплаты, документы и финансовые статусы компании.</p>
                   </button>
-                  <button className="p-5 text-left bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] rounded-2xl transition-all" onClick={() => setActiveTab("analytics")}>
+                  <button className="p-5 text-left bg-neo neo-8 hover:neo-4 rounded-2xl transition-all" onClick={() => setActiveTab("analytics")}>
                     <div className="flex items-center gap-3 mb-3"><BarChart3 className="h-5 w-5 text-primary" /><span className="font-semibold text-black">Аналитика</span></div>
                     <p className="text-sm text-muted-foreground">Сводный контроль расходов и активности команды.</p>
                   </button>

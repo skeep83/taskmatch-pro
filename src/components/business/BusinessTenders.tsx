@@ -129,9 +129,9 @@ export const BusinessTenders = () => {
 
   if (loading) {
     return (
-      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
           <span className="ml-3 text-black">Загрузка тендеров...</span>
         </div>
       </div>
@@ -139,10 +139,10 @@ export const BusinessTenders = () => {
   }
 
   return (
-    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+    <div className="bg-neo neo-8 rounded-2xl p-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
             <Calendar className="h-6 w-6 text-primary" />
           </div>
           <div>
@@ -152,7 +152,7 @@ export const BusinessTenders = () => {
         </div>
         <button
           onClick={() => navigate('/tenders/new')}
-          className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+          className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
         >
           <Plus className="h-4 w-4" />
           Создать тендер
@@ -161,7 +161,7 @@ export const BusinessTenders = () => {
 
       {tenders.length === 0 ? (
         <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-neo neo-4 flex items-center justify-center">
             <Calendar className="h-8 w-8 text-primary" />
           </div>
           <h3 className="text-xl font-semibold text-black mb-2">Нет тендеров</h3>
@@ -170,18 +170,18 @@ export const BusinessTenders = () => {
           </p>
           <button
             onClick={() => navigate('/tenders/new')}
-            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+            className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
           >
             <Plus className="h-4 w-4" />
             Создать первый тендер
           </button>
         </div>
       ) : (
-        <div className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl p-6">
+        <div className="bg-neo neo-inset-4 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-black mb-6">Список тендеров</h3>
           <div className="space-y-4">
             {tenders.map((tender) => (
-              <div key={tender.id} className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl p-6 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+              <div key={tender.id} className="bg-neo neo-8 rounded-xl p-6 hover:neo-4 transition-all duration-300">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <h4 className="font-semibold text-black text-lg mb-2">{tender.title}</h4>
@@ -208,7 +208,7 @@ export const BusinessTenders = () => {
                     </div>
                     <button
                       onClick={() => navigate(`/tenders/${tender.id}`)}
-                      className="bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] rounded-lg p-2 transition-all duration-300"
+                      className="bg-neo neo-4 hover:neo-2 active:neo-inset-2 rounded-lg p-2 transition-all duration-300"
                     >
                       <Eye className="h-4 w-4 text-primary" />
                     </button>

@@ -190,7 +190,7 @@ const MobileTenderDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5E7EB]">
+    <div className="min-h-screen bg-neo">
       <Seo title={`${t('app.name')} — Тендер`} description="Детали тендера" canonical={`/tenders/${id}`} />
       <MobileHeader title="Тендер" showBack={true} showNotifications={true} />
 
@@ -220,7 +220,7 @@ const MobileTenderDetail = () => {
               <div className="grid gap-3 text-sm">
                 {typeof tender.budget_max_cents === 'number' && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-neo neo-2 flex items-center justify-center">
                       <Euro className="w-4 h-4 text-green-600" />
                     </div>
                     <div>
@@ -231,7 +231,7 @@ const MobileTenderDetail = () => {
                 )}
                 {tender.deadline && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#E5E7EB] shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-neo neo-2 flex items-center justify-center">
                       <Clock3 className="w-4 h-4 text-orange-500" />
                     </div>
                     <div>

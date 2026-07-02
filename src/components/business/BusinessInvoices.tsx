@@ -168,9 +168,9 @@ export function BusinessInvoices() {
 
   if (loading) {
     return (
-      <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+      <div className="bg-neo neo-8 rounded-2xl p-8">
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-8 h-8 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]"></div>
+          <div className="animate-spin w-8 h-8 rounded-full bg-neo neo-4"></div>
           <span className="ml-3 text-black">Загрузка инвойсов...</span>
         </div>
       </div>
@@ -178,17 +178,17 @@ export function BusinessInvoices() {
   }
 
   return (
-    <div className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-2xl p-8">
+    <div className="bg-neo neo-8 rounded-2xl p-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-neo neo-4 flex items-center justify-center">
             <FileText className="h-6 w-6 text-primary" />
           </div>
           <h2 className="text-2xl font-bold text-black">Инвойсы</h2>
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+          className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-6 py-3 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
         >
           <Plus className="h-4 w-4" />
           Создать инвойс
@@ -197,24 +197,24 @@ export function BusinessInvoices() {
 
       {invoices.length === 0 ? (
         <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-neo neo-4 flex items-center justify-center">
             <FileText className="h-8 w-8 text-gray-400" />
           </div>
           <h3 className="text-xl font-semibold text-black mb-2">У вас пока нет инвойсов</h3>
           <p className="text-gray-600 mb-6">Создайте первый инвойс для автоматизации оплат</p>
           <button
             onClick={() => setCreateOpen(true)}
-            className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] active:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
+            className="bg-neo neo-8 hover:neo-4 active:neo-inset-4 rounded-xl px-8 py-4 transition-all duration-300 flex items-center gap-2 text-black font-semibold"
           >
             <Plus className="h-4 w-4" />
             Создать инвойс
           </button>
         </div>
       ) : (
-        <div className="bg-[#E5E7EB] shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] rounded-xl p-6">
+        <div className="bg-neo neo-inset-4 rounded-xl p-6">
           <div className="space-y-4">
             {invoices.map((invoice) => (
-              <div key={invoice.id} className="bg-[#E5E7EB] shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] rounded-xl p-6 hover:shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] transition-all duration-300">
+              <div key={invoice.id} className="bg-neo neo-8 rounded-xl p-6 hover:neo-4 transition-all duration-300">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-3">
@@ -246,8 +246,8 @@ export function BusinessInvoices() {
                     <button
                       className={`p-2 rounded-lg transition-all duration-300 ${
                         invoice.pdf_url
-                          ? 'bg-[#E5E7EB] shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB] hover:shadow-[2px_2px_4px_#D1D5DB,-2px_-2px_4px_#F9FAFB] active:shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB]'
-                          : 'bg-[#E5E7EB] shadow-[inset_2px_2px_4px_#D1D5DB,inset_-2px_-2px_4px_#F9FAFB] opacity-50'
+                          ? 'bg-neo neo-4 hover:neo-2 active:neo-inset-2'
+                          : 'bg-neo neo-inset-2 opacity-50'
                       }`}
                       disabled={!invoice.pdf_url}
                     >

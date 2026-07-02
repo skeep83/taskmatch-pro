@@ -65,7 +65,7 @@ export const JobProgressTracker: React.FC<JobProgressTrackerProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-100 dark:border-gray-800">
+    <div className="bg-neo neo-8 rounded-xl p-6 border-0">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-semibold text-lg">Прогресс заказа</h3>
         {showAcceptanceDeadline && acceptanceDeadline && currentStatus === 'Submitted' && (

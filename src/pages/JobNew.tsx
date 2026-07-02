@@ -349,7 +349,7 @@ const JobNew = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#E5E7EB]">
+    <main className="min-h-screen bg-neo">
       <Seo title={`${t('app.name')} — ${t('job.new.title')}`} description={t("job.new.subtitle")} canonical="/job/new" />
 
       {/* Hero Section */}
@@ -396,23 +396,23 @@ const JobNew = () => {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="bg-[#E5E7EB] rounded-3xl p-8 shadow-[12px_12px_24px_#D1D5DB,-12px_-12px_24px_#F9FAFB]">
+          <div className="bg-neo rounded-3xl p-8 neo-12">
             <form className="space-y-8" onSubmit={onSubmit}>
 
               {/* Service Details */}
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
-                  <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">1</span>
+                  <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">1</span>
                   {t("job.new.service_details")}
                 </h2>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <label className="block text-sm font-medium mb-3 text-[#374151]">{t("job.new.category")}</label>
                     <select
                       name="category_id"
                       defaultValue={presetCategory}
-                      className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                      className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                       required
                     >
                       <option value="" disabled>{t("job.new.select_category")}</option>
@@ -420,9 +420,9 @@ const JobNew = () => {
                     </select>
                   </div>
 
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <label className="block text-sm font-medium mb-3 text-[#374151]">Приоритет</label>
-                    <select name="urgency" className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]">
+                    <select name="urgency" className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]">
                       <option value="normal">Обычный</option>
                       <option value="urgent">Срочно (+30%)</option>
                       <option value="same_day">В тот же день (+50%)</option>
@@ -430,11 +430,11 @@ const JobNew = () => {
                   </div>
                 </div>
 
-                <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="bg-neo rounded-2xl p-6 neo-8">
                   <label className="block text-sm font-medium mb-3 text-[#374151]">{t("job.new.description")}</label>
                   <textarea
                     name="description"
-                    className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                    className="w-full bg-neo border-none rounded-xl px-4 py-4 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                     rows={4}
                     placeholder="Детально опишите задачу, чтобы специалисты могли дать точную оценку..."
                     required
@@ -448,12 +448,12 @@ const JobNew = () => {
               {/* Budget & Schedule */}
               <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
-                  <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">2</span>
+                  <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">2</span>
                   {t("job.new.budget_schedule")}
                 </h2>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
@@ -463,7 +463,7 @@ const JobNew = () => {
                         <input
                           name="budget_min"
                           type="number"
-                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                          className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                           placeholder="1000"
                         />
                       </div>
@@ -472,14 +472,14 @@ const JobNew = () => {
                         <input
                           name="budget_max"
                           type="number"
-                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                          className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                           placeholder="5000"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                  <div className="bg-neo rounded-2xl p-6 neo-8">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-3 flex items-center gap-2 text-[#374151]">
@@ -489,7 +489,7 @@ const JobNew = () => {
                         <input
                           name="date"
                           type="date"
-                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                          className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                         />
                       </div>
                       <div>
@@ -497,7 +497,7 @@ const JobNew = () => {
                         <input
                           name="time"
                           type="time"
-                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                          className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                         />
                       </div>
                     </div>
@@ -508,12 +508,12 @@ const JobNew = () => {
               {/* Location */}
               <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
-                  <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">3</span>
+                  <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">3</span>
                   Геолокация заказа
                 </h2>
 
                 <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-6">
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] space-y-4">
+                  <div className="bg-neo rounded-2xl p-6 neo-8 space-y-4">
                     <div>
                       <label className="block text-sm font-medium mb-3 text-[#374151]">Адрес или район</label>
                       <div className="flex gap-3">
@@ -524,7 +524,7 @@ const JobNew = () => {
                             setLocationError(null);
                           }}
                           placeholder="Например: Кишинёв, Буюканы, ул. ..."
-                          className="w-full bg-[#E5E7EB] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB] text-[#374151]"
+                          className="w-full bg-neo border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 transition-all neo-inset-4 text-[#374151]"
                         />
                         <button
                           type="button"
@@ -542,7 +542,7 @@ const JobNew = () => {
                       type="button"
                       onClick={handleUseCurrentLocation}
                       disabled={locationLoading}
-                      className="w-full bg-[#E5E7EB] text-[#374151] hover:bg-[#DDE1E7] px-5 py-4 rounded-xl font-semibold transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                      className="w-full bg-neo text-[#374151] hover:bg-[#DDE1E7] px-5 py-4 rounded-xl font-semibold transition-colors neo-8 inline-flex items-center justify-center gap-2 disabled:opacity-60"
                     >
                       {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4 text-primary" />}
                       Использовать моё местоположение
@@ -553,7 +553,7 @@ const JobNew = () => {
                     </p>
                   </div>
 
-                  <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] space-y-3">
+                  <div className="bg-neo rounded-2xl p-6 neo-8 space-y-3">
                     <div className="flex items-center gap-2 text-[#374151] font-semibold">
                       <MapPin className="w-5 h-5 text-primary" />
                       Статус геолокации
@@ -593,11 +593,11 @@ const JobNew = () => {
               {/* Photos */}
               <div className="space-y-6 pt-8 border-t border-[#D1D5DB]">
                 <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2 text-[#374151]">
-                  <span className="w-8 h-8 bg-[#E5E7EB] rounded-full flex items-center justify-center text-primary font-bold shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">4</span>
+                  <span className="w-8 h-8 bg-neo rounded-full flex items-center justify-center text-primary font-bold neo-4">4</span>
                   {t("job.new.photos")}
                 </h2>
 
-                <div className="bg-[#E5E7EB] rounded-2xl p-6 shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]">
+                <div className="bg-neo rounded-2xl p-6 neo-8">
                   <div
                     className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
                       dragActive ? 'border-primary bg-primary/5' : 'border-[#D1D5DB]'
@@ -626,7 +626,7 @@ const JobNew = () => {
                         type="button"
                         onClick={() => openMediaPicker('image/*')}
                         disabled={mediaLimitReached}
-                        className="bg-[#E5E7EB] text-[#374151] hover:bg-[#DDE1E7] px-5 py-3 rounded-xl font-semibold transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-neo text-[#374151] hover:bg-[#DDE1E7] px-5 py-3 rounded-xl font-semibold transition-colors neo-8 inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Camera className="w-4 h-4 text-primary" />
                         Фото
@@ -635,12 +635,12 @@ const JobNew = () => {
                         type="button"
                         onClick={() => openMediaPicker('video/*')}
                         disabled={mediaLimitReached}
-                        className="bg-[#E5E7EB] text-[#374151] hover:bg-[#DDE1E7] px-5 py-3 rounded-xl font-semibold transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-neo text-[#374151] hover:bg-[#DDE1E7] px-5 py-3 rounded-xl font-semibold transition-colors neo-8 inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Upload className="w-4 h-4 text-primary" />
                         Видео
                       </button>
-                      <label htmlFor="media-upload" className={`bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] inline-flex items-center gap-2 ${mediaLimitReached ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}>
+                      <label htmlFor="media-upload" className={`bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 inline-flex items-center gap-2 ${mediaLimitReached ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}>
                         <Upload className="w-4 h-4" />
                         Выбрать любые файлы
                       </label>
@@ -655,7 +655,7 @@ const JobNew = () => {
                       <p className="text-sm text-[#6B7280]">Загружено: {uploadedFiles.length}/{MAX_MEDIA_FILES}</p>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map((file, index) => (
-                        <div key={index} className="relative group bg-[#E5E7EB] rounded-xl p-2 shadow-[4px_4px_8px_#D1D5DB,-4px_-4px_8px_#F9FAFB]">
+                        <div key={index} className="relative group bg-neo rounded-xl p-2 neo-4">
                           {file.type.startsWith('video/') ? (
                             <div className="w-full h-20 bg-[#D1D5DB] rounded-lg flex items-center justify-center relative">
                               <svg className="w-8 h-8 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
@@ -675,7 +675,7 @@ const JobNew = () => {
                           <button
                             type="button"
                             onClick={() => removeFile(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-[2px_2px_4px_#D1D5DB]"
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity neo-2"
                           >
                             ×
                           </button>
@@ -689,10 +689,10 @@ const JobNew = () => {
 
               {/* Submit */}
               <div className="flex justify-between items-center pt-8 border-t border-[#D1D5DB]">
-                <button type="button" className="bg-[#E5E7EB] text-[#374151] hover:bg-[#D1D5DB] px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB] hover:shadow-[inset_4px_4px_8px_#D1D5DB,inset_-4px_-4px_8px_#F9FAFB]" onClick={() => navigate(-1)}>
+                <button type="button" className="bg-neo text-[#374151] hover:bg-[#D1D5DB] px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8 hover:neo-inset-4" onClick={() => navigate(-1)}>
                   Отмена
                 </button>
-                <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-[8px_8px_16px_#D1D5DB,-8px_-8px_16px_#F9FAFB]" disabled={loading}>
+                <button type="submit" className="bg-primary text-white hover:bg-primary/90 px-8 py-4 rounded-xl font-semibold text-lg transition-colors neo-8" disabled={loading}>
                   {loading ? 'Создаем заказ...' : 'Создать заказ'}
                 </button>
               </div>
