@@ -10,7 +10,6 @@ import { PriceProposalForm } from '@/components/PriceProposalForm';
 import { JobStatusProgress } from '@/components/JobStatusProgress';
 import { OptimizedImage } from '@/components/media/OptimizedImage';
 import interestedInJobImage from '@/assets/interested-in-job.png';
-import jobsImage from '@/assets/services-hero.jpg';
 import { AnimatedIcon } from '@/components/ui/animated-icon';
 import { canClientCancelJob, canClientDeleteJob, canClientEditJob, inferMediaKind } from '@/utils/jobLifecycle';
 import { deleteClientJob, getErrorMessage } from '@/utils/deleteClientJob';
@@ -918,25 +917,10 @@ const JobDetail = () => {
         canonical={`/job/${job.id}`}
       />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={jobsImage} alt="Jobs" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-orange-600/80" />
-        </div>
-      </section>
-
       {/* Main Content Section */}
-      <section className="container mx-auto py-24 px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-[#4B5563]">
-            {t("job.new.service_details")}
-          </h2>
-          <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
-            {t("ui.podrobnaia_informaciia_o_zakaze")}
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-6 mt-8">
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-6">
+        <div className="neo-card p-4 md:p-6 mb-6 md:mb-8 max-w-7xl mx-auto">
+          <div className="flex flex-wrap items-center gap-3 md:gap-4">
             <Button
               variant="ghost"
               onClick={() => {
@@ -948,106 +932,60 @@ const JobDetail = () => {
                   navigate('/feed');
                 }
               }}
-              className="px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none"
+              className="h-10 w-10 p-0 bg-neo neo-4 hover:neo-2 rounded-xl transition-all duration-300 text-foreground border-none shrink-0"
+              aria-label={t("ui.nazad")}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t("ui.nazad")}
+              <ArrowLeft className="w-4 h-4" />
             </Button>
 
-            {/* Edit and Delete buttons for job owner */}
-            {canEdit && (
-              <div className="flex items-center gap-2 justify-end ml-auto">
-                <Button
-                  variant="ghost"
-                  onClick={handleEditJob}
-                  className="px-4 py-2 bg-neo neo-8 hover:neo-4 rounded-xl transition-all duration-300 text-[#374151] hover:text-[#374151] border-none text-sm"
-                >
-                  <Edit className="w-3 h-3 mr-1" />
-                  {t("ui.redaktirovat")}
-                </Button>
-                {canDelete && (
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg md:text-2xl font-bold truncate">{job.title}</h1>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-sm text-muted-foreground mt-1">
+                <span className="font-mono">{t("dash.client.request_no")}: {job.public_id}</span>
+                <span className="hidden sm:inline">•</span>
+                <span>{job.categories.label_ru}</span>
+                <span className="hidden sm:inline">•</span>
+                <span>{formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ru })}</span>
+              </div>
+            </div>
+
+            <div className="shrink-0">{getStatusBadge(job.status)}</div>
+
+            {(canEdit || canCancel) && (
+              <div className="flex items-center gap-2 shrink-0">
+                {canEdit && (
+                  <Button
+                    variant="ghost"
+                    onClick={handleEditJob}
+                    className="px-4 py-2 bg-neo neo-4 hover:neo-2 rounded-xl transition-all duration-300 text-foreground border-none text-sm"
+                  >
+                    <Edit className="w-3 h-3 mr-1" />
+                    {t("ui.redaktirovat")}
+                  </Button>
+                )}
+                {canEdit && canDelete && (
                   <Button
                     variant="destructive"
                     onClick={handleDeleteJob}
-                    className="px-4 py-2 bg-red-500 neo-8 hover:bg-red-600 hover:neo-4 rounded-xl transition-all duration-300 text-white border-none text-sm"
+                    className="px-4 py-2 rounded-xl text-sm"
                   >
                     <Trash2 className="w-3 h-3 mr-1" />
                     {t("common.delete")}
                   </Button>
                 )}
-              </div>
-            )}
-            {canCancel && (
-              <div className="flex items-center gap-2 justify-end ml-auto">
-                <Button
-                  variant="destructive"
-                  onClick={handleCancelJob}
-                  className="px-4 py-2 bg-red-500 neo-8 hover:bg-red-600 hover:neo-4 rounded-xl transition-all duration-300 text-white border-none text-sm"
-                >
-                  <XCircle className="w-3 h-3 mr-1" />
-                  {t("ui.otmenit_zakaz")}
-                </Button>
+                {canCancel && (
+                  <Button
+                    variant="destructive"
+                    onClick={handleCancelJob}
+                    className="px-4 py-2 rounded-xl text-sm"
+                  >
+                    <XCircle className="w-3 h-3 mr-1" />
+                    {t("ui.otmenit_zakaz")}
+                  </Button>
+                )}
               </div>
             )}
           </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm md:text-base lg:text-lg text-[#6B7280] mb-6">
-            <span className="font-mono text-xs md:text-sm">№ заявки: {job.public_id}</span>
-            <span className="hidden sm:inline">•</span>
-            <span>{job.categories.label_ru}</span>
-            <span className="hidden sm:inline">•</span>
-            <span>{formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ru })}</span>
-            <span className="hidden sm:inline">•</span>
-            {getStatusBadge(job.status)}
-          </div>
-
-          {/* Client Info Card */}
-          {clientProfile && (
-            <div className="p-4 md:p-6 mb-6 md:mb-8 mx-auto max-w-md bg-neo rounded-2xl neo-8">
-              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3 text-[#374151]">
-                <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                {t("ui.informaciia_o_zakazchike")}
-              </h3>
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10 md:w-12 md:h-12">
-                  <AvatarImage
-                    src={clientProfile.avatar_url || ''}
-                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || t("menu.role_client")}
-                  />
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {clientProfile.full_name
-                      ? clientProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
-                      : (clientProfile.first_name && clientProfile.last_name
-                        ? `${clientProfile.first_name[0]}${clientProfile.last_name[0]}`.toUpperCase()
-                        : 'К')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                    <h4 className="font-semibold text-sm md:text-base truncate text-[#374151]">
-                      {clientProfile.full_name ||
-                       (clientProfile.first_name && clientProfile.last_name
-                         ? `${clientProfile.first_name} ${clientProfile.last_name}`
-                         : t("menu.role_client"))}
-                    </h4>
-                    <Badge variant="secondary" className="text-xs w-fit">{t("menu.role_client")}</Badge>
-                  </div>
-                  <div>
-                    {clientRating && clientRating.count > 0 ? (
-                      <StarRating
-                        rating={clientRating.average}
-                        size="sm"
-                        showValue={false}
-                        readonly
-                      />
-                    ) : (
-                      <p className="text-xs text-[#6B7280]">{t("ui.novyi_klient")}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Main Content */}
@@ -1310,6 +1248,126 @@ const JobDetail = () => {
 
             {/* Sidebar */}
             <div className="lg:col-span-1 space-y-6 md:space-y-8">
+              {/* Professional Work Management */}
+              {isAssignedPro && (
+                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-neo neo-8">
+                  <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
+                    <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                    {t("ui.upravlenie_rabotoi")}
+                  </h3>
+
+                  <div className="space-y-4">
+                    {canStartWork && (
+                      <div className="p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 className="font-medium text-blue-900 mb-2 text-sm md:text-base">{t("ui.gotovy_nachat_rabotu")}</h4>
+                        <p className="text-xs md:text-sm text-blue-700 mb-3 md:mb-4">
+                          {t("ui.nazhmite_knopku_kogda_pristupite")} {t("job.detail.status_will_change_progress")}
+                        </p>
+                        <div className="p-2 rounded-2xl bg-neo neo-inset-8">
+                          <Button
+                            onClick={handleStartWork}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-sm md:text-base rounded-xl"
+                          >
+                            <Clock className="w-4 h-4 mr-2" />
+                            {t("ui.nachat_vypolnenie_raboty")}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {canCompleteWork && (
+                      <div className="p-3 md:p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h4 className="font-medium text-green-900 mb-2 text-sm md:text-base">{t("ui.rabota_vypolnena")}</h4>
+                        <p className="text-xs md:text-sm text-green-700 mb-3 md:mb-4">
+                          {t("ui.nazhmite_knopku_kogda_zakonchite")} {t("job.detail.status_will_change_done")}
+                        </p>
+                        <div className="p-2 rounded-2xl bg-neo neo-inset-8">
+                          <Button
+                            onClick={handleCompleteWork}
+                            className="w-full bg-green-600 hover:bg-green-700 text-sm md:text-base rounded-xl"
+                          >
+                            <Star className="w-4 h-4 mr-2" />
+                            {t("ui.zavershit_rabotu")}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {job.status === 'done' && (
+                      <div className={`p-3 md:p-4 rounded-lg text-center ${isDoneConfirmed ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
+                        <Star className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mx-auto mb-2" />
+                        <h4 className={`font-medium mb-1 text-sm md:text-base ${isDoneConfirmed ? 'text-emerald-900' : 'text-amber-900'}`}>{isDoneConfirmed ? t("ui.zakaz_zavershen") : t("ui.rabota_zavershena")}</h4>
+                        <p className={`text-xs md:text-sm ${isDoneConfirmed ? 'text-emerald-700' : 'text-amber-700'}`}>
+                          {isDoneConfirmed
+                            ? hasClientRatedAssignedPro
+                              ? t("ui.zakazchik_uzhe_ostavil_otzyv")
+                              : t("ui.zakaz_podtverzhden_kak_tolko")
+                            : t("ui.zakaz_ozhidaet_podtverzhdeniia_ot")}
+                        </p>
+                      </div>
+                    )}
+
+                    {isCancelled && (
+                      <div className="p-3 md:p-4 rounded-lg text-center bg-red-50 border border-red-200">
+                        <XCircle className="w-6 h-6 md:w-8 md:h-8 text-red-600 mx-auto mb-2" />
+                        <h4 className="font-medium mb-1 text-sm md:text-base text-red-900">{t("ui.rabota_po_zakazu_ostanovlena")}</h4>
+                        <p className="text-xs md:text-sm text-red-700">
+                          {t("ui.zakaz_otmenen_prodolzhat_vypolnenie")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Client Info Card */}
+          {clientProfile && (
+            <div className="p-4 md:p-6 bg-neo rounded-2xl neo-8">
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 flex items-center gap-3 text-[#374151]">
+                <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                {t("ui.informaciia_o_zakazchike")}
+              </h3>
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10 md:w-12 md:h-12">
+                  <AvatarImage
+                    src={clientProfile.avatar_url || ''}
+                    alt={clientProfile.full_name || `${clientProfile.first_name} ${clientProfile.last_name}` || t("menu.role_client")}
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {clientProfile.full_name
+                      ? clientProfile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
+                      : (clientProfile.first_name && clientProfile.last_name
+                        ? `${clientProfile.first_name[0]}${clientProfile.last_name[0]}`.toUpperCase()
+                        : 'К')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                    <h4 className="font-semibold text-sm md:text-base truncate text-[#374151]">
+                      {clientProfile.full_name ||
+                       (clientProfile.first_name && clientProfile.last_name
+                         ? `${clientProfile.first_name} ${clientProfile.last_name}`
+                         : t("menu.role_client"))}
+                    </h4>
+                    <Badge variant="secondary" className="text-xs w-fit">{t("menu.role_client")}</Badge>
+                  </div>
+                  <div>
+                    {clientRating && clientRating.count > 0 ? (
+                      <StarRating
+                        rating={clientRating.average}
+                        size="sm"
+                        showValue={false}
+                        readonly
+                      />
+                    ) : (
+                      <p className="text-xs text-[#6B7280]">{t("ui.novyi_klient")}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
               {/* Job Status and Statistics Combined - Only show when professional is assigned */}
               {job.pro_id && (
                 <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-neo neo-8">
@@ -1571,80 +1629,6 @@ const JobDetail = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Professional Work Management */}
-              {isAssignedPro && (
-                <div className="p-4 md:p-6 relative z-10 rounded-2xl bg-neo neo-8">
-                  <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center gap-3">
-                    <div className="w-1 h-4 md:h-6 bg-gradient-to-b from-primary to-accent rounded-full"></div>
-                    {t("ui.upravlenie_rabotoi")}
-                  </h3>
-
-                  <div className="space-y-4">
-                    {canStartWork && (
-                      <div className="p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <h4 className="font-medium text-blue-900 mb-2 text-sm md:text-base">{t("ui.gotovy_nachat_rabotu")}</h4>
-                        <p className="text-xs md:text-sm text-blue-700 mb-3 md:mb-4">
-                          {t("ui.nazhmite_knopku_kogda_pristupite")}
-                          Статус заказа изменится на t("status.in_progress").
-                        </p>
-                        <div className="p-2 rounded-2xl bg-neo neo-inset-8">
-                          <Button
-                            onClick={handleStartWork}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-sm md:text-base rounded-xl"
-                          >
-                            <Clock className="w-4 h-4 mr-2" />
-                            {t("ui.nachat_vypolnenie_raboty")}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {canCompleteWork && (
-                      <div className="p-3 md:p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <h4 className="font-medium text-green-900 mb-2 text-sm md:text-base">{t("ui.rabota_vypolnena")}</h4>
-                        <p className="text-xs md:text-sm text-green-700 mb-3 md:mb-4">
-                          {t("ui.nazhmite_knopku_kogda_zakonchite")}
-                          Статус заказа изменится на t("status.done").
-                        </p>
-                        <div className="p-2 rounded-2xl bg-neo neo-inset-8">
-                          <Button
-                            onClick={handleCompleteWork}
-                            className="w-full bg-green-600 hover:bg-green-700 text-sm md:text-base rounded-xl"
-                          >
-                            <Star className="w-4 h-4 mr-2" />
-                            {t("ui.zavershit_rabotu")}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {job.status === 'done' && (
-                      <div className={`p-3 md:p-4 rounded-lg text-center ${isDoneConfirmed ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
-                        <Star className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mx-auto mb-2" />
-                        <h4 className={`font-medium mb-1 text-sm md:text-base ${isDoneConfirmed ? 'text-emerald-900' : 'text-amber-900'}`}>{isDoneConfirmed ? t("ui.zakaz_zavershen") : t("ui.rabota_zavershena")}</h4>
-                        <p className={`text-xs md:text-sm ${isDoneConfirmed ? 'text-emerald-700' : 'text-amber-700'}`}>
-                          {isDoneConfirmed
-                            ? hasClientRatedAssignedPro
-                              ? t("ui.zakazchik_uzhe_ostavil_otzyv")
-                              : t("ui.zakaz_podtverzhden_kak_tolko")
-                            : t("ui.zakaz_ozhidaet_podtverzhdeniia_ot")}
-                        </p>
-                      </div>
-                    )}
-
-                    {isCancelled && (
-                      <div className="p-3 md:p-4 rounded-lg text-center bg-red-50 border border-red-200">
-                        <XCircle className="w-6 h-6 md:w-8 md:h-8 text-red-600 mx-auto mb-2" />
-                        <h4 className="font-medium mb-1 text-sm md:text-base text-red-900">{t("ui.rabota_po_zakazu_ostanovlena")}</h4>
-                        <p className="text-xs md:text-sm text-red-700">
-                          {t("ui.zakaz_otmenen_prodolzhat_vypolnenie")}
-                        </p>
-                      </div>
                     )}
                   </div>
                 </div>

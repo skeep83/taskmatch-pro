@@ -1722,5 +1722,7 @@
   "ui.otkryt_polnye_nastroiki_profilia": "Deschide setările complete ale profilului",
   "ui.bez_geolokacii_platforma_ne": "Fără geolocație, platforma nu va putea arăta prioritar comanda specialiștilor din apropiere.",
   "ui.otdelnyi_kontur_dlia_korporativnyh": "Un circuit separat pentru comenzi corporative și achiziții mari",
-  "ui.biznes_zakazy": "Comenzi business"
+  "ui.biznes_zakazy": "Comenzi business",
+  "job.detail.status_will_change_progress": "Statusul comenzii se va schimba în „În lucru”.",
+  "job.detail.status_will_change_done": "Statusul comenzii se va schimba în „Finalizat”."
 }

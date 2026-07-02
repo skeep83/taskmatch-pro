@@ -1722,5 +1722,7 @@
   "ui.otkryt_polnye_nastroiki_profilia": "Открыть полные настройки профиля",
   "ui.bez_geolokacii_platforma_ne": "Без геолокации платформа не сможет приоритетно показать заказ специалистам рядом.",
   "ui.otdelnyi_kontur_dlia_korporativnyh": "Отдельный контур для корпоративных заказов и крупных закупок",
-  "ui.biznes_zakazy": "Бизнес-заказы"
+  "ui.biznes_zakazy": "Бизнес-заказы",
+  "job.detail.status_will_change_progress": "Статус заказа изменится на «В работе».",
+  "job.detail.status_will_change_done": "Статус заказа изменится на «Выполнен»."
 }
