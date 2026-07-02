@@ -50,6 +50,11 @@ const Messages = () => {
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const roomRef = useRef<any>(null);
   const typingTimerRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages.length, otherTyping]);
 
   const selectedChatId = id;
 
@@ -365,106 +370,139 @@ const Messages = () => {
     setChatToDelete(null);
   };
 
+  // Load messages + realtime subscription (proper cleanup, unique channel per chat)
   useEffect(() => {
-    (async () => {
-      if (!id) { setMessages([]); return; }
+    if (!id) { setMessages([]); return; }
+
+    let cancelled = false;
+
+    const load = async () => {
       const { data } = await (supabase as any)
         .from("chat_messages")
         .select("id, sender_id, content, file_url, created_at, is_read")
         .eq("chat_id", id)
         .order("created_at", { ascending: true })
         .limit(500);
+      if (cancelled) return;
       setMessages(data || []);
 
-      // Load profiles for message senders
+      // Mark incoming messages as read (receipt for the other side)
+      if (userId) {
+        void (supabase as any)
+          .from("chat_messages")
+          .update({ is_read: true })
+          .eq("chat_id", id)
+          .neq("sender_id", userId)
+          .eq("is_read", false);
+        void markChatNotificationsAsRead(id);
+      }
+
       const senderIds = new Set((data || []).map((msg: any) => msg.sender_id));
       if (senderIds.size > 0) {
         const { data: messageProfiles } = await (supabase as any)
           .from("profiles")
           .select("id, full_name, first_name, last_name, avatar_url")
           .in("id", Array.from(senderIds));
-
-        if (messageProfiles) {
+        if (!cancelled && messageProfiles) {
           setProfiles(prev => {
             const updated = { ...prev };
-            messageProfiles.forEach((profile: any) => {
-              updated[profile.id] = profile;
-            });
+            messageProfiles.forEach((profile: any) => { updated[profile.id] = profile; });
             return updated;
           });
         }
       }
+    };
 
-      // Realtime subscription with notification handling
-      const channel = (supabase as any).channel('schema-db-changes')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${id}` }, async (payload: any) => {
-          const newMessage = payload.new;
-          setMessages((prev) => prev.some((message) => message.id === newMessage.id) ? prev : [...prev, newMessage]);
+    void load();
 
-          // Load sender profile if not already loaded
-          if (!profiles[newMessage.sender_id]) {
-            const { data: senderProfile } = await (supabase as any)
-              .from("profiles")
-              .select("id, full_name, first_name, last_name, avatar_url")
-              .eq("id", newMessage.sender_id)
-              .single();
+    const channel = (supabase as any).channel(`chat-messages:${id}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${id}` }, async (payload: any) => {
+        const newMessage = payload.new;
+        setMessages((prev) => prev.some((message) => message.id === newMessage.id) ? prev : [...prev, newMessage]);
 
-            if (senderProfile) {
-              setProfiles(prev => ({ ...prev, [senderProfile.id]: senderProfile }));
-            }
+        if (!profiles[newMessage.sender_id]) {
+          const { data: senderProfile } = await (supabase as any)
+            .from("profiles")
+            .select("id, full_name, first_name, last_name, avatar_url")
+            .eq("id", newMessage.sender_id)
+            .single();
+          if (senderProfile) {
+            setProfiles(prev => ({ ...prev, [senderProfile.id]: senderProfile }));
           }
+        }
 
-          // Play sound and show notification if message is from another user
-          if (newMessage.sender_id !== userId && settings.enabled && settings.messageSound) {
-            try {
-              await notificationSounds.playNotification('message');
-            } catch (error) {
-              ;
-            }
+        if (newMessage.sender_id !== userId) {
+          if (settings.enabled && settings.messageSound) {
+            try { await notificationSounds.playNotification('message'); } catch { /* noop */ }
           }
-
-          // Mark chat notifications as read when user is viewing the chat
+          // Viewing the chat => immediately mark as read
           if (document.visibilityState === 'visible') {
-            await markChatNotificationsAsRead(id);
+            void (supabase as any)
+              .from("chat_messages")
+              .update({ is_read: true })
+              .eq("id", newMessage.id);
+            void markChatNotificationsAsRead(id);
           }
-        })
-        .subscribe();
+        }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chat_messages', filter: `chat_id=eq.${id}` }, (payload: any) => {
+        const updated = payload.new;
+        setMessages((prev) => prev.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)));
+      })
+      .subscribe();
 
-      return () => { (supabase as any).removeChannel(channel); };
-    })();
-  }, [id]);
+    return () => {
+      cancelled = true;
+      (supabase as any).removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, userId]);
 
-  // Presence: track participants in this chat
+  // Presence: online/typing of the other participant (proper cleanup)
   useEffect(() => {
-    (async () => {
-      if (!id || !userId) return;
-      const room = (supabase as any).channel(`presence:chat:${id}`, { config: { presence: { key: userId } } });
-      roomRef.current = room;
+    if (!id || !userId) return;
 
-      const updateState = () => {
-        const state = room.presenceState() as Record<string, any[]>;
-        setPresence(state);
-        const chat = chats.find((c) => String(c.id) === String(id));
-        const otherId = chat ? (chat.client_id === userId ? chat.professional_id : chat.client_id) : null;
-        const flat = Object.values(state).flat() as any[];
-        setOtherOnline(Boolean(flat.find((p: any) => p.user_id === otherId)));
-        const otherPresence = flat.find((p: any) => p.user_id === otherId);
-        setOtherTyping(Boolean(otherPresence?.typing));
-      };
+    const room = (supabase as any).channel(`presence:chat:${id}`, { config: { presence: { key: userId } } });
+    roomRef.current = room;
 
-      room
-        .on('presence', { event: 'sync' }, updateState)
-        .on('presence', { event: 'join' }, updateState)
-        .on('presence', { event: 'leave' }, updateState)
-        .subscribe(async (status: string) => {
-          if (status === 'SUBSCRIBED') {
-            await room.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString(), typing: false });
-          }
-        });
+    const updateState = () => {
+      const state = room.presenceState() as Record<string, any[]>;
+      setPresence(state);
+      const chat = chats.find((c) => String(c.id) === String(id));
+      const otherId = chat ? (chat.client_id === userId ? chat.professional_id : chat.client_id) : null;
+      const flat = Object.values(state).flat() as any[];
+      setOtherOnline(Boolean(flat.find((p: any) => p.user_id === otherId)));
+      const otherPresence = flat.find((p: any) => p.user_id === otherId);
+      setOtherTyping(Boolean(otherPresence?.typing));
+    };
 
-      return () => { (supabase as any).removeChannel(room); roomRef.current = null; };
-    })();
+    room
+      .on('presence', { event: 'sync' }, updateState)
+      .on('presence', { event: 'join' }, updateState)
+      .on('presence', { event: 'leave' }, updateState)
+      .subscribe(async (status: string) => {
+        if (status === 'SUBSCRIBED') {
+          await room.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString(), typing: false });
+        }
+      });
+
+    return () => {
+      (supabase as any).removeChannel(room);
+      roomRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userId, chats]);
+
+  // Broadcast typing state (throttled, auto-reset after 2s idle)
+  const broadcastTyping = () => {
+    const room = roomRef.current;
+    if (!room || !userId || !id) return;
+    void room.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString(), typing: true });
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+    typingTimerRef.current = setTimeout(() => {
+      void room.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString(), typing: false });
+    }, 2000);
+  };
 
   const send = async () => {
     if (!text.trim() || !userId || !id) return;
@@ -494,7 +532,12 @@ const Messages = () => {
 
       if (error) throw error;
 
-      ;
+      // Optimistic append (realtime will dedupe by id)
+      if (newMessage) {
+        setMessages((prev) => prev.some((m) => m.id === newMessage.id) ? prev : [...prev, newMessage]);
+      }
+      if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+      void roomRef.current?.track({ user_id: userId, chat_id: id, online_at: new Date().toISOString(), typing: false });
 
       // Update chat timestamp
       await (supabase as any).from('chats').update({ last_message_at: new Date().toISOString() }).eq('id', id);
@@ -746,7 +789,7 @@ const Messages = () => {
                               })}
                             </span>
                             {isOwn && (
-                              <CheckCircle2 className="h-3 w-3 ml-1" />
+                              <CheckCircle2 className={cn("h-3 w-3 ml-1", message.is_read ? "opacity-100" : "opacity-40")} />
                             )}
                           </div>
                         </div>
@@ -763,6 +806,17 @@ const Messages = () => {
                     );
                   })
                 )}
+                {otherTyping && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground pl-9">
+                    <span className="inline-flex gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "300ms" }} />
+                    </span>
+                    {t("ui.pechataet")}
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Message Input - ВСЕГДА ПОКАЗЫВАЕМ */}
@@ -772,7 +826,7 @@ const Messages = () => {
                     <input
                       type="text"
                       value={text}
-                      onChange={(e) => setText(e.target.value)}
+                      onChange={(e) => { setText(e.target.value); broadcastTyping(); }}
                       placeholder={t("ui.vvedite_soobschenie")}
                       className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background min-h-[44px]"
                       disabled={false}

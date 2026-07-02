@@ -196,16 +196,15 @@ export const useNotifications = () => {
           (payload) => {
             console.log('Notification updated:', payload);
             const updatedNotification = payload.new as Notification;
-            setNotifications(prev =>
-              prev.map(n =>
+            setNotifications(prev => {
+              const next = prev.map(n =>
                 n.id === updatedNotification.id ? updatedNotification : n
-              )
-            );
-            
-            // Update unread count if notification was read
-            if (updatedNotification.is_read) {
-              setUnreadCount(prev => Math.max(0, prev - 1));
-            }
+              );
+              // Recompute instead of decrementing: avoids drift when
+              // markAsRead already updated the count optimistically
+              setUnreadCount(next.filter(n => !n.is_read).length);
+              return next;
+            });
           }
         )
         .subscribe();

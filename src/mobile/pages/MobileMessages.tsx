@@ -80,20 +80,28 @@ function MobileMessages() {
     loadChats();
   }, []);
 
+  const messagesChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
   useEffect(() => {
     if (id) {
       loadMessages();
       setupPresence();
     }
     return () => {
+      if (messagesChannelRef.current) {
+        supabase.removeChannel(messagesChannelRef.current);
+        messagesChannelRef.current = null;
+      }
       if (roomRef.current) {
-        roomRef.current.unsubscribe();
+        supabase.removeChannel(roomRef.current);
+        roomRef.current = null;
       }
       // Очищаем typing timeout при размонтировании
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userId]);
 
   const loadChats = async () => {
@@ -165,8 +173,11 @@ function MobileMessages() {
         }
       }
 
-      // Setup realtime subscription
-      const channel = supabase.channel('schema-db-changes')
+      // Setup realtime subscription (unique per chat, cleaned up in useEffect)
+      if (messagesChannelRef.current) {
+        supabase.removeChannel(messagesChannelRef.current);
+      }
+      const channel = supabase.channel(`chat-messages:${id}`)
         .on('postgres_changes', {
           event: 'INSERT',
           schema: 'public',
@@ -187,7 +198,7 @@ function MobileMessages() {
         })
         .subscribe();
 
-      return () => supabase.removeChannel(channel);
+      messagesChannelRef.current = channel;
     } catch (error) {
       ;
     }
