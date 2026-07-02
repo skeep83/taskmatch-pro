@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, Copy, Check, ShieldCheck, Smartphone } from "lucide-react";
+import { CreditCard, Copy, Check, ShieldCheck, Smartphone, FlaskConical, ExternalLink, CheckCircle2, XCircle } from "lucide-react";
 
 type Settings = {
   payment_provider: string;
@@ -60,6 +60,41 @@ export default function AdminPayments() {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string; url?: string } | null>(null);
+
+  const runTestPayment = async () => {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: {
+          amount_cents: 1000,
+          currency: settings.payment_currency,
+          description: "ServiceHub — тестовый платёж (админ-проверка процессинга)",
+          test: true,
+        },
+      });
+      if (error) throw new Error(error.message || "Функция create-payment вернула ошибку");
+      const url = (data as { url?: string; checkout_url?: string })?.url
+        || (data as { checkout_url?: string })?.checkout_url;
+      if (url) {
+        setTestResult({ ok: true, message: "Платёжная сессия создана. Откройте страницу оплаты и используйте тестовую карту.", url });
+      } else {
+        setTestResult({ ok: true, message: `Функция ответила без ошибок: ${JSON.stringify(data).slice(0, 200)}` });
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setTestResult({
+        ok: false,
+        message: msg.includes("STRIPE_SECRET_KEY")
+          ? "Секретный ключ не задан. Выполните команду из шага 2 (используйте sk_test_... для тестового режима)."
+          : `Ошибка: ${msg}`,
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -226,6 +261,57 @@ export default function AdminPayments() {
           </li>
           <li>Включите главный тумблер «Платежи включены» и сохраните.</li>
         </ol>
+      </div>
+
+      {/* Test the processing pipeline */}
+      <div className="neo-card p-6 space-y-4">
+        <h3 className="font-semibold flex items-center gap-2"><FlaskConical className="w-4 h-4" /> Проверка процессинга (тестовый режим)</h3>
+        <p className="text-sm text-muted-foreground">
+          Использует те же функции, что и боевые платежи, но с тестовыми ключами (<code className="text-xs">pk_test_ / sk_test_</code>) деньги не списываются.
+          Установите режим «Тестовый», вставьте тестовые ключи Stripe и нажмите кнопку.
+        </p>
+
+        <div className="grid sm:grid-cols-3 gap-3 text-xs">
+          <div className="bg-neo neo-inset-2 rounded-xl p-3">
+            <div className="font-medium mb-1">Успешная оплата</div>
+            <code>4242 4242 4242 4242</code>
+          </div>
+          <div className="bg-neo neo-inset-2 rounded-xl p-3">
+            <div className="font-medium mb-1">Отклонённая карта</div>
+            <code>4000 0000 0000 0002</code>
+          </div>
+          <div className="bg-neo neo-inset-2 rounded-xl p-3">
+            <div className="font-medium mb-1">3-D Secure</div>
+            <code>4000 0027 6000 3184</code>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">Любая будущая дата, любой CVC. Google Pay / Apple Pay в тестовом режиме тоже используют тестовые карты Stripe.</p>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button onClick={runTestPayment} disabled={testing} variant="outline" className="rounded-xl">
+            <FlaskConical className="w-4 h-4 mr-2" />
+            {testing ? "Создаём тестовый платёж…" : "Создать тестовый платёж (10.00)"}
+          </Button>
+          {settings.payment_mode === "live" && (
+            <Badge variant="destructive" className="text-xs">Внимание: выбран боевой режим</Badge>
+          )}
+        </div>
+
+        {testResult && (
+          <div className={`flex items-start gap-2 p-3 rounded-xl text-sm ${testResult.ok ? "bg-neo neo-inset-2" : "bg-destructive/10"}`}>
+            {testResult.ok
+              ? <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
+              : <XCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />}
+            <div className="min-w-0">
+              <p>{testResult.message}</p>
+              {testResult.url && (
+                <a href={testResult.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary font-medium mt-1">
+                  Открыть страницу оплаты <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <Button onClick={save} disabled={saving} className="rounded-xl px-8">

@@ -550,66 +550,32 @@ export default function DashboardClient() {
         {/* Main Content with Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <div className="p-2 rounded-2xl bg-neo neo-inset-8">
-              <TabsList className="grid w-full grid-cols-4 bg-transparent gap-1">
+            <TabsList className="grid h-auto w-full grid-cols-4 gap-2">
                 <TabsTrigger
                   value="overview"
-                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <User className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">{t("dash.client.tab_overview")}</span>
-                  {activeTab === "overview" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
-                    />
-                  )}
-                </TabsTrigger>
+                                  </TabsTrigger>
                 <TabsTrigger
                   value="jobs"
-                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Briefcase className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">{t("dash.client.tab_jobs")}</span>
-                  {activeTab === "jobs" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
-                    />
-                  )}
-                </TabsTrigger>
+                                  </TabsTrigger>
                 <TabsTrigger
                   value="subscription"
-                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Crown className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">{t("dash.client.tab_subscription")}</span>
-                  {activeTab === "subscription" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
-                    />
-                  )}
-                </TabsTrigger>
+                                  </TabsTrigger>
                 <TabsTrigger
                   value="settings"
-                  className="relative flex items-center gap-2 bg-neo neo-8 data-[state=active]:neo-inset-4 rounded-xl transition-all duration-300 text-black data-[state=active]:text-primary h-12 hover:neo-4"
                 >
                   <Settings className="h-5 w-5" />
                   <span className="hidden sm:inline font-medium">{t("dash.client.tab_settings")}</span>
-                  {activeTab === "settings" && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary"
-                    />
-                  )}
-                </TabsTrigger>
-              </TabsList>
-            </div>
+                                  </TabsTrigger>
+            </TabsList>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-8">

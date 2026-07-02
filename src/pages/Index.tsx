@@ -1,7 +1,6 @@
 import { Seo } from "@/components/Seo";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { AmbientBackground } from "@/components/AmbientBackground";
-import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { ResponsiveComponent } from "@/components/ResponsiveComponent";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Link } from "react-router-dom";
@@ -117,27 +116,20 @@ const DesktopIndex = () => {
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 items-stretch">
           {categories.map((c, index) => (
-            <Reveal key={c.key} delay={index * 70}>
-            <Link
-              to={`/catalog?category=${c.key}`}
-              className="neo-card neo-card-interactive p-6 text-center group"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="mb-4">
-                <NeumorphicIcon
-                  icon={c.icon}
-                  size={96}
-                  variant="square"
-                  className="group-hover:scale-105 transition-transform mx-auto"
-                  delayMs={index * 100}
-                />
-              </div>
-              <div className="font-semibold group-hover:text-primary transition-colors">
-                {t(c.labelKey)}
-              </div>
-            </Link>
+            <Reveal key={c.key} delay={index * 70} className="h-full">
+              <Link
+                to={`/catalog?category=${c.key}`}
+                className="neo-card neo-card-interactive group flex h-full min-h-[168px] flex-col items-center justify-center gap-4 p-5 text-center"
+              >
+                <div className="neo-icon-well w-16 h-16 md:w-20 md:h-20 shrink-0 transition-transform duration-300 group-hover:scale-105">
+                  <c.icon className="w-7 h-7 md:w-9 md:h-9 text-primary" />
+                </div>
+                <div className="font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                  {t(c.labelKey)}
+                </div>
+              </Link>
             </Reveal>
           ))}
         </div>
@@ -156,7 +148,7 @@ const DesktopIndex = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
-            <Reveal key={step.titleKey} delay={index * 120}>
+            <Reveal key={step.titleKey} delay={index * 120} className="h-full">
             <div className="neo-card neo-aura p-8 text-left h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="neo-icon-well w-14 h-14">

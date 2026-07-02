@@ -1,128 +1,79 @@
 import { Eye, User, Briefcase, Building, UserX } from 'lucide-react';
 import { useLiveVisitors } from '@/hooks/useLiveVisitors';
-import { CentralStatsCircle } from './CentralStatsCircle';
-import { UserTypeCard } from './UserTypeCard';
-import type { UserTypeInfo } from '@/types/liveVisitors';
 
+/**
+ * Live visitors block: total counter + breakdown by user type.
+ * Clean responsive grid (no absolutely-positioned decorations that
+ * drift with the layout), colors defined explicitly.
+ */
 export const LiveVisitorsContainer = () => {
   const { userStats } = useLiveVisitors();
 
-  const userTypeInfo: UserTypeInfo[] = [
-    {
-      type: 'client',
-      count: userStats.client,
-      label: 'Клиенты',
-      icon: User,
-      color: 'from-blue-500 to-blue-600',
-    },
-    {
-      type: 'pro',
-      count: userStats.pro,
-      label: 'Специалисты',
-      icon: Briefcase,
-      color: 'from-green-500 to-green-600',
-    },
-    {
-      type: 'business',
-      count: userStats.business,
-      label: 'Бизнес',
-      icon: Building,
-      color: 'from-purple-500 to-purple-600',
-    },
-    {
-      type: 'unregistered',
-      count: userStats.unregistered,
-      label: 'Не зарегистрированы',
-      icon: UserX,
-      color: 'from-orange-500 to-orange-600',
-    }
+  const total =
+    (userStats.client || 0) +
+    (userStats.pro || 0) +
+    (userStats.business || 0) +
+    (userStats.unregistered || 0);
+
+  const types = [
+    { key: 'client', count: userStats.client || 0, label: 'Клиенты', icon: User, color: '#3B82F6' },
+    { key: 'pro', count: userStats.pro || 0, label: 'Специалисты', icon: Briefcase, color: '#10B981' },
+    { key: 'business', count: userStats.business || 0, label: 'Бизнес', icon: Building, color: '#8B5CF6' },
+    { key: 'unregistered', count: userStats.unregistered || 0, label: 'Гости', icon: UserX, color: '#F59E0B' },
   ];
 
   return (
-    <div className="card-surface p-6 overflow-hidden">
+    <div className="neo-card p-6 h-full">
+      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-cyan-500/10 rounded-lg">
-          <Eye className="h-5 w-5 text-cyan-600" />
+        <div className="neo-icon-well w-10 h-10">
+          <Eye className="h-5 w-5 text-primary" />
         </div>
-        <div>
-          <h3 className="font-semibold">Live Посетители</h3>
-          <p className="text-sm text-muted-foreground">
-            Активные пользователи по типам
-          </p>
+        <div className="min-w-0">
+          <h3 className="font-semibold">Live посетители</h3>
+          <p className="text-sm text-muted-foreground truncate">Активные пользователи по типам</p>
         </div>
+        <span className="ml-auto flex items-center gap-2 neo-chip px-3 py-1.5 text-xs font-medium shrink-0">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+          </span>
+          online
+        </span>
       </div>
 
-      <div className="relative flex flex-col items-center gap-6 xl:flex-row xl:items-center xl:justify-between xl:gap-8">
-        {/* Анимированные линии соединения */}
-        <svg
-          className="absolute inset-0 hidden h-full w-full pointer-events-none xl:block"
-          style={{ zIndex: 3 }}
-        >
-          <defs>
-            <linearGradient id="lineGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-            </linearGradient>
-            <linearGradient id="lineGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
+      {/* Total */}
+      <div className="bg-neo neo-inset-2 rounded-2xl p-5 text-center mb-4">
+        <div className="text-4xl font-bold text-foreground tabular-nums">{total}</div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground mt-1">всего на платформе</div>
+      </div>
 
-          {userTypeInfo.map((_, index) => {
-            const startX = 170; // Позиция центрального шара
-            const startY = 210; // Центр по вертикали
-            const endX = 360; // Начало карточек (еще больше увеличено)
-            const endY = 80 + (index * 85); // Позиция каждой карточки
-
-            return (
-              <g key={index}>
-                {/* Основная линия */}
-                <path
-                  d={`M ${startX} ${startY} Q ${startX + 40} ${startY} ${endX} ${endY}`}
-                  stroke="url(#lineGradient1)"
-                  strokeWidth="2"
-                  fill="none"
-                  className="animate-fade-in"
-                  style={{
-                    animationDelay: `${index * 0.2}s`,
-                    strokeDasharray: '5,5',
-                    animation: `fadeInLine 1s ease-out ${index * 0.2}s forwards, dashFlow 3s linear infinite`
-                  }}
+      {/* Breakdown */}
+      <div className="grid grid-cols-2 gap-3">
+        {types.map((tItem) => {
+          const Icon = tItem.icon;
+          const share = total > 0 ? Math.round((tItem.count / total) * 100) : 0;
+          return (
+            <div key={tItem.key} className="bg-neo neo-2 rounded-xl p-3.5 min-w-0">
+              <div className="flex items-center gap-2.5 mb-2">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: `${tItem.color}1a` }}
+                >
+                  <Icon className="h-4 w-4" style={{ color: tItem.color }} />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground truncate">{tItem.label}</span>
+                <span className="ml-auto text-lg font-bold tabular-nums">{tItem.count}</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-neo neo-inset-1 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${share}%`, backgroundColor: tItem.color }}
                 />
-
-                {/* Светящаяся точка на конце */}
-                <circle
-                  cx={endX}
-                  cy={endY}
-                  r="3"
-                  fill="hsl(var(--primary))"
-                  className="animate-pulse"
-                  style={{
-                    animationDelay: `${index * 0.2 + 0.5}s`,
-                    filter: 'drop-shadow(0 0 6px hsl(var(--primary)))'
-                  }}
-                />
-              </g>
-            );
-          })}
-        </svg>
-
-        {/* Большой шар слева */}
-        <div className="flex-shrink-0 relative" style={{ zIndex: 2 }}>
-          <CentralStatsCircle userStats={userStats} />
-        </div>
-
-        {/* Категории справа в стиле навигации */}
-        <div className="relative w-full max-w-full space-y-3 xl:max-w-[320px]" style={{ zIndex: 2 }}>
-          {userTypeInfo.map((userType, index) => (
-            <UserTypeCard
-              key={userType.type}
-              userType={userType}
-              index={index}
-            />
-          ))}
-        </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
