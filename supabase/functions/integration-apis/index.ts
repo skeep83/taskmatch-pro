@@ -221,6 +221,8 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error(`Unsupported provider: ${provider}`);
     }
 
+    const responseData = await result.json();
+
     // Log integration usage
     const { error: logError } = await supabaseClient
       .from('integration_logs')
@@ -228,7 +230,7 @@ const handler = async (req: Request): Promise<Response> => {
         provider,
         action,
         request_data: data,
-        response_data: await result.json(),
+        response_data: responseData,
         status: result.ok ? 'success' : 'error',
         created_at: new Date().toISOString()
       });
@@ -239,7 +241,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({
       success: result.ok,
-      data: await result.json(),
+      data: responseData,
       provider,
       action
     }), {

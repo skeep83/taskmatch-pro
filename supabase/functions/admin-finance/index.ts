@@ -94,6 +94,25 @@ serve(async (req) => {
   }
 });
 
+async function adjustWalletBalance(supabase: any, proId: string, deltaCents: number) {
+  // supabase-js has no .raw(); read-modify-write instead
+  const { data: wallet, error: readError } = await supabase
+    .from('wallets')
+    .select('id, balance_cents')
+    .eq('pro_id', proId)
+    .maybeSingle();
+  if (readError || !wallet) return readError || new Error('Wallet not found');
+
+  const { error: writeError } = await supabase
+    .from('wallets')
+    .update({
+      balance_cents: (wallet.balance_cents || 0) + deltaCents,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', wallet.id);
+  return writeError;
+}
+
 async function handleGetFinance(supabase: any, url: URL) {
   const action = url.searchParams.get('action') || 'wallets';
   const page = parseInt(url.searchParams.get('page') || '1');
@@ -238,14 +257,8 @@ async function handleFinanceAction(supabase: any, data: any, req: Request) {
         });
       }
 
-      // Update pro wallet
-      const { error: walletError } = await supabase
-        .from('wallets')
-        .update({ 
-          balance_cents: supabase.raw(`balance_cents + ${escrow.amount_cents}`),
-          updated_at: new Date().toISOString()
-        })
-        .eq('pro_id', escrow.pro_id);
+      const walletError = await adjustWalletBalance(supabase, escrow.pro_id, escrow.amount_cents);
+      if (walletError) console.error('Wallet update failed after escrow release:', walletError);
 
       await supabase.rpc('log_admin_action', {
         p_action: 'ADMIN_ESCROW_RELEASE',
@@ -335,14 +348,9 @@ async function handleFinanceAction(supabase: any, data: any, req: Request) {
         })
         .eq('id', payoutId);
 
-      // Deduct from wallet
       if (!approveError) {
-        await supabase
-          .from('wallets')
-          .update({ 
-            balance_cents: supabase.raw(`balance_cents - ${payout.amount_cents}`)
-          })
-          .eq('pro_id', payout.pro_id);
+        const walletError = await adjustWalletBalance(supabase, payout.pro_id, -payout.amount_cents);
+        if (walletError) console.error('Wallet deduction failed after payout approval:', walletError);
       }
 
       await supabase.rpc('log_admin_action', {

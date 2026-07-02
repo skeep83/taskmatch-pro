@@ -270,7 +270,7 @@ async function handleJobAction(supabase: any, data: any, adminId: string, req: R
       const { error: jobError } = await supabase
         .from('jobs')
         .update({ 
-          status: 'cancelled',
+          status: 'canceled',
           updated_at: new Date().toISOString()
         })
         .eq('id', jobId);
