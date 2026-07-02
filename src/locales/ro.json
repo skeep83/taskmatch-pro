@@ -1732,5 +1732,21 @@
   "rate.client_thanks": "Ați evaluat deja acest client pentru această comandă. Mulțumim!",
   "rate.reviews_title": "Recenzii",
   "rate.no_reviews": "Nu există recenzii încă",
-  "rate.new_client_review": "O recenzie nouă despre dvs."
+  "rate.new_client_review": "O recenzie nouă despre dvs.",
+  "pay.methods_title": "Metode de plată",
+  "pay.methods_hint": "Datele cardurilor sunt păstrate la furnizorul de plăți. Noi vedem doar tipul cardului și ultimele 4 cifre.",
+  "pay.add_card": "Adaugă card",
+  "pay.manage_cards": "Gestionează cardurile",
+  "pay.no_methods": "Nu aveți metode de plată salvate",
+  "pay.not_configured": "Furnizorul de plăți nu este conectat încă. Plata cu cardul, Apple Pay și Google Pay vor apărea aici după lansare.",
+  "pay.default": "Principal",
+  "pay.make_default": "Setează ca principal",
+  "pay.delete_method": "Șterge",
+  "pay.method_deleted": "Metoda de plată a fost ștearsă",
+  "pay.expires": "până la",
+  "pay.portal_error": "Nu s-a putut deschide portalul de gestionare a cardurilor",
+  "rate.reply_label": "Răspuns",
+  "rate.reply_placeholder": "Răspunsul dvs. public la recenzie...",
+  "rate.reply_send": "Răspunde",
+  "rate.reply_sent": "Răspunsul a fost publicat"
 }

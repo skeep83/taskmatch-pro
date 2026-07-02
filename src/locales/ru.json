@@ -1732,5 +1732,21 @@
   "rate.client_thanks": "Вы уже оценили этого заказчика по данному заказу. Спасибо!",
   "rate.reviews_title": "Отзывы",
   "rate.no_reviews": "Отзывов пока нет",
-  "rate.new_client_review": "Новый отзыв о вас"
+  "rate.new_client_review": "Новый отзыв о вас",
+  "pay.methods_title": "Способы оплаты",
+  "pay.methods_hint": "Данные карт хранятся у платёжного провайдера. Мы видим только тип карты и последние 4 цифры.",
+  "pay.add_card": "Добавить карту",
+  "pay.manage_cards": "Управлять картами",
+  "pay.no_methods": "У вас пока нет сохранённых способов оплаты",
+  "pay.not_configured": "Платёжный провайдер ещё не подключён. Оплата картой, Apple Pay и Google Pay появятся здесь после запуска.",
+  "pay.default": "Основная",
+  "pay.make_default": "Сделать основной",
+  "pay.delete_method": "Удалить",
+  "pay.method_deleted": "Способ оплаты удалён",
+  "pay.expires": "до",
+  "pay.portal_error": "Не удалось открыть портал управления картами",
+  "rate.reply_label": "Ответ",
+  "rate.reply_placeholder": "Ваш публичный ответ на отзыв...",
+  "rate.reply_send": "Ответить",
+  "rate.reply_sent": "Ответ опубликован"
 }

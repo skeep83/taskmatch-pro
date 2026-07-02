@@ -66,6 +66,7 @@ const AdminJobs = lazy(() => import("./pages/admin/Jobs"));
 const AdminTenders = lazy(() => import("./pages/admin/Tenders"));
 const AdminDisputes = lazy(() => import("./pages/admin/Disputes"));
 const AdminFinance = lazy(() => import("./pages/admin/Finance"));
+const AdminPayments = lazy(() => import("./pages/admin/Payments"));
 const AdminRisk = lazy(() => import("./pages/admin/Risk"));
 const AdminContent = lazy(() => import("./pages/admin/Content"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
@@ -161,6 +162,7 @@ const AppContent = () => {
               <Route path="pro-requests" element={<ProUpgradeRequests />} />
               <Route path="kyc" element={<AdminKycVerification />} />
               <Route path="finance" element={<AdminFinance />} />
+              <Route path="payments" element={<AdminPayments />} />
               <Route path="risk" element={<AdminRisk />} />
               <Route path="content" element={<AdminContent />} />
               <Route path="currencies" element={<AdminCurrencies />} />

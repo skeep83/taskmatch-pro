@@ -1577,6 +1577,53 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_methods: {
+        Row: {
+          brand: string | null
+          created_at: string
+          exp_month: number | null
+          exp_year: number | null
+          id: string
+          is_default: boolean
+          last4: string | null
+          provider: string
+          provider_method_id: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          created_at?: string
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean
+          last4?: string | null
+          provider?: string
+          provider_method_id: string
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          created_at?: string
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean
+          last4?: string | null
+          provider?: string
+          provider_method_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_settings: {
         Row: {
           category: string
@@ -2142,6 +2189,8 @@ export type Database = {
           from_user_id: string
           id: string
           job_id: string
+          reply: string | null
+          reply_at: string | null
           score: number
           to_user_id: string
           updated_at: string | null
@@ -2152,6 +2201,8 @@ export type Database = {
           from_user_id: string
           id?: string
           job_id: string
+          reply?: string | null
+          reply_at?: string | null
           score: number
           to_user_id: string
           updated_at?: string | null
@@ -2162,6 +2213,8 @@ export type Database = {
           from_user_id?: string
           id?: string
           job_id?: string
+          reply?: string | null
+          reply_at?: string | null
           score?: number
           to_user_id?: string
           updated_at?: string | null
@@ -2709,6 +2762,7 @@ export type Database = {
       clear_all_error_logs: { Args: never; Returns: Json }
       clear_expired_otp: { Args: never; Returns: undefined }
       delete_client_job: { Args: { _job_id: string }; Returns: undefined }
+      reply_to_rating: { Args: { _rating_id: string; _reply: string }; Returns: undefined }
       find_nearby_jobs_for_pro: {
         Args: {
           _pro_id: string

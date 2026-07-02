@@ -11,6 +11,7 @@ import { RoleUpgrade } from "@/components/RoleUpgrade";
 import { HallOfFame } from "@/pages/HallOfFame";
 import { canClientCancelJob, canClientDeleteJob, canClientEditJob } from "@/utils/jobLifecycle";
 import { deleteClientJob } from "@/utils/deleteClientJob";
+import { PaymentMethodsCard } from "@/components/PaymentMethodsCard";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -1075,12 +1076,15 @@ export default function DashboardClient() {
 
             {/* Payments Tab */}
             <TabsContent value="payments">
+              <div className="space-y-6">
+              {user?.id && <PaymentMethodsCard userId={user.id} />}
               <div className="p-8 bg-neo neo-8 rounded-2xl">
                 <h2 className="text-2xl font-semibold mb-6">{t("dash.client.payments_history")}</h2>
                 <div className="text-center py-8 text-muted-foreground">
                   <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>{t("dash.client.payments_empty")}</p>
                 </div>
+              </div>
               </div>
             </TabsContent>
 

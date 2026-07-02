@@ -4,11 +4,15 @@ import { useEnhancedI18n } from "@/i18n/enhanced";
 import { StarRating } from "@/components/ui/star-rating";
 import { formatDistanceToNow } from "date-fns";
 import { ru as ruLocale } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 interface ReviewRow {
   id: string;
   score: number;
   comment: string | null;
+  reply: string | null;
   created_at: string;
   from_user_id: string;
   raterName?: string;
@@ -21,9 +25,28 @@ interface ReviewRow {
  */
 export const UserReviews = ({ userId, limit = 6 }: { userId: string; limit?: number }) => {
   const { t } = useEnhancedI18n();
+  const { toast } = useToast();
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [stats, setStats] = useState<{ avg: number; count: number } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    void supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id ?? null));
+  }, []);
+
+  const submitReply = async (ratingId: string) => {
+    const reply = (replyDrafts[ratingId] || "").trim();
+    if (!reply) return;
+    const { error } = await supabase.rpc("reply_to_rating", { _rating_id: ratingId, _reply: reply });
+    if (error) {
+      toast({ title: t("notifications.error"), description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: t("rate.reply_sent") });
+    setReviews((prev) => prev.map((r) => (r.id === ratingId ? { ...r, reply } : r)));
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -32,7 +55,7 @@ export const UserReviews = ({ userId, limit = 6 }: { userId: string; limit?: num
         const [{ data: rows }, { data: stat }] = await Promise.all([
           supabase
             .from("ratings")
-            .select("id, score, comment, created_at, from_user_id")
+            .select("id, score, comment, reply, created_at, from_user_id")
             .eq("to_user_id", userId)
             .order("created_at", { ascending: false })
             .limit(limit),
@@ -96,6 +119,26 @@ export const UserReviews = ({ userId, limit = 6 }: { userId: string; limit?: num
               </div>
               {r.comment && (
                 <p className="text-sm text-foreground/80 leading-relaxed mb-2">{r.comment}</p>
+              )}
+              {r.reply && (
+                <div className="bg-neo neo-inset-2 rounded-lg p-2.5 mb-2">
+                  <div className="text-xs font-medium text-primary mb-0.5">{t("rate.reply_label")}</div>
+                  <p className="text-sm text-foreground/80 leading-relaxed">{r.reply}</p>
+                </div>
+              )}
+              {!r.reply && currentUserId === userId && (
+                <div className="mb-2">
+                  <Textarea
+                    rows={2}
+                    className="text-sm mb-2"
+                    placeholder={t("rate.reply_placeholder")}
+                    value={replyDrafts[r.id] || ""}
+                    onChange={(e) => setReplyDrafts((d) => ({ ...d, [r.id]: e.target.value }))}
+                  />
+                  <Button size="sm" variant="outline" className="rounded-lg" onClick={() => submitReply(r.id)} disabled={!(replyDrafts[r.id] || "").trim()}>
+                    {t("rate.reply_send")}
+                  </Button>
+                </div>
               )}
               <p className="text-xs text-muted-foreground">
                 {formatDistanceToNow(new Date(r.created_at), { addSuffix: true, locale: ruLocale })}
