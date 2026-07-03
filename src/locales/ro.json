@@ -1753,5 +1753,8 @@
   "settings.hub_desc": "Nume, contacte, adresă, serviciile specialistului și metodele de plată — totul într-un singur loc.",
   "settings.open_full": "Deschide setările profilului",
   "reviews.about_me": "Recenzii despre mine",
-  "reviews.about_me_desc": "Evaluări publice de la participanții platformei. Un rating înalt vă ajută să primiți mai multe comenzi."
+  "reviews.about_me_desc": "Evaluări publice de la participanții platformei. Un rating înalt vă ajută să primiți mai multe comenzi.",
+  "portfolio.subtitle": "Arătați cele mai bune lucrări și atrageți mai mulți clienți",
+  "portfolio.add_new": "Adaugă o lucrare nouă",
+  "kyc.title": "Verificarea identității"
 }

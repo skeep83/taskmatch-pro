@@ -2,6 +2,7 @@ import { default as React, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -144,7 +145,7 @@ export default function MobileDashboardClient() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { formatPrice: formatCurrency } = useCurrency();
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { safeAreaInsets } = useMobile();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<BasicUser | null>(null);
@@ -824,7 +825,7 @@ export default function MobileDashboardClient() {
                         </div>
                         <div className="mb-2 text-[11px] font-mono text-muted-foreground">№ заявки: {job.public_id}</div>
                         <div className="text-xs text-muted-foreground mb-2">
-                          {job.categories?.label_ru || t("dash.client.other")} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                          {categoryLabel(job.categories, language) || t("dash.client.other")} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
                         </div>
                         <div className="text-xs text-muted-foreground mb-3">
                           {getClientNextStepText(job)}
@@ -929,7 +930,7 @@ export default function MobileDashboardClient() {
                         <div className="text-[11px] font-mono text-muted-foreground">№ заявки: {job.public_id}</div>
 
                         <div className="text-sm text-muted-foreground">
-                          {job.categories?.label_ru || t("dash.client.other")}
+                          {categoryLabel(job.categories, language) || t("dash.client.other")}
                         </div>
 
                         <div className="text-sm">

@@ -11,6 +11,7 @@ import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import {
   MapPin,
   Clock,
@@ -54,7 +55,7 @@ interface Job {
 }
 
 export default function Feed() {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
 
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
@@ -83,7 +84,7 @@ export default function Feed() {
 
       let query = supabase
         .from("jobs")
-        .select("*")
+        .select("*, profiles!jobs_client_id_fkey(full_name, first_name, last_name, avatar_url)")
         .eq("status", "new")
         .order("created_at", { ascending: false })
         .limit(20);
@@ -202,7 +203,7 @@ export default function Feed() {
   const filteredJobs = jobs.filter(job =>
     searchQuery === "" ||
     job.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    job.category?.label_ru?.toLowerCase().includes(searchQuery.toLowerCase())
+    categoryLabel(job.category, language)?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -310,7 +311,7 @@ export default function Feed() {
                       >
                         <option value="">{t("feed.category.all")}</option>
                         {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>{cat.label_ru || cat.key}</option>
+                          <option key={cat.id} value={cat.id}>{categoryLabel(cat, language) || cat.key}</option>
                         ))}
                       </select>
                     </div>
@@ -325,7 +326,7 @@ export default function Feed() {
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between mb-2">
                         <Badge variant="secondary" className="mb-2">
-                          {job.category?.label_ru || t("ui.usluga")}
+                          {categoryLabel(job.category, language) || t("ui.usluga")}
                         </Badge>
                         {job.scheduled_at && (
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -335,6 +336,21 @@ export default function Feed() {
                         )}
                       </div>
                       <CardTitle className="text-lg line-clamp-2">{job.description}</CardTitle>
+                      {(() => {
+                        const p = (job as { profiles?: { full_name?: string | null; first_name?: string | null; last_name?: string | null; avatar_url?: string | null } }).profiles;
+                        const clientName = p?.full_name || [p?.first_name, p?.last_name].filter(Boolean).join(" ") || t("menu.role_client");
+                        const initials = clientName.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "К";
+                        return (
+                          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                            <div className="neo-icon-well w-7 h-7 text-[10px] font-bold text-primary shrink-0 overflow-hidden">
+                              {p?.avatar_url
+                                ? <img src={p.avatar_url} alt={clientName} className="w-full h-full object-cover rounded-full" />
+                                : initials}
+                            </div>
+                            <span className="truncate">{clientName}</span>
+                          </div>
+                        );
+                      })()}
                     </CardHeader>
 
                     <CardContent className="space-y-4">

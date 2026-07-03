@@ -10,10 +10,11 @@ import { useCurrency } from "@/hooks/useCurrency";
 import { RoleGuard } from "@/components/RoleGuard";
 import tenderImage from "@/assets/tenders-auction.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
 
 const TenderNew = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
@@ -35,7 +36,7 @@ const TenderNew = () => {
         if (error) throw error;
         const mappedData = data?.map(cat => ({
           id: cat.id,
-          name: cat.label_ru || cat.key,
+          name: categoryLabel(cat, language) || cat.key,
           name_ro: cat.label_ro
         })) || [];
         setCategories(dedupeCategoriesByDisplayName(mappedData));

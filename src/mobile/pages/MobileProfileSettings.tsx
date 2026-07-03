@@ -18,6 +18,8 @@ import { MobileCategorySelector } from '../components/ui/MobileCategorySelector'
 import { useMobile } from '../providers/MobileProvider';
 import { useEnhancedI18n } from '@/i18n/enhanced';
 import { supabase } from '@/integrations/supabase/client';
+import { PaymentMethodsCard } from '@/components/PaymentMethodsCard';
+import { UserReviews } from '@/components/UserReviews';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
 import { AvatarUpload } from '@/components/AvatarUpload';
@@ -999,6 +1001,16 @@ export default function MobileProfileSettings() {
               </div>
             </MobileCard>
           </div>
+        )}
+
+        {/* Payment methods (parity with desktop) */}
+        {user?.id && <PaymentMethodsCard userId={user.id} />}
+
+        {/* Reviews about me */}
+        {user?.id && (
+          <MobileCard>
+            <UserReviews userId={user.id} limit={4} />
+          </MobileCard>
         )}
 
         {/* Save Button */}

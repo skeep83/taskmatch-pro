@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, Loader2, Navigation, Search } from "lucide-react";
 import jobImage from "@/assets/services-hero.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { geocodeAddress, getCurrentResolvedLocation, type ResolvedLocation } from "@/lib/geolocation";
 import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
 
@@ -17,7 +18,7 @@ const MAX_MEDIA_FILES = 8;
 const LAST_CREATED_JOB_STORAGE_KEY = "taskmatch:lastCreatedJob";
 
 const JobNew = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -41,7 +42,7 @@ const JobNew = () => {
         if (error) throw error;
         const mappedData = data?.map(cat => ({
           id: cat.id,
-          name: cat.label_ru || cat.key,
+          name: categoryLabel(cat, language) || cat.key,
           name_ro: cat.label_ro
         })) || [];
         setCategories(dedupeCategoriesByDisplayName(mappedData));

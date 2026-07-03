@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -76,7 +77,7 @@ export default function MobileFeed() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { safeAreaInsets } = useMobile();
 
   const [loading, setLoading] = useState(true);
@@ -142,7 +143,7 @@ export default function MobileFeed() {
       }
 
       const { data: response, error } = await supabase.functions.invoke('jobs-catalog', {
-        body: { params: Object.fromEntries(params) }
+        body: { params: { ...Object.fromEntries(params), lang: language } }
       });
 
       if (error) throw error;
@@ -254,7 +255,7 @@ export default function MobileFeed() {
   const filteredJobs = jobs.filter(job => {
     if (searchQuery && job.description) {
       return job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-             job.categories?.label_ru?.toLowerCase().includes(searchQuery.toLowerCase());
+             categoryLabel(job.categories, language)?.toLowerCase().includes(searchQuery.toLowerCase());
     }
     return true;
   });
@@ -355,7 +356,7 @@ export default function MobileFeed() {
                   <option value="">{t("feed.category.all")}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.label_ru || cat.key}
+                      {categoryLabel(cat, language) || cat.key}
                     </option>
                   ))}
                 </select>
@@ -411,7 +412,7 @@ export default function MobileFeed() {
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <Badge variant="secondary" className="text-xs">
-                        {job.categories?.label_ru || t("ui.usluga")}
+                        {categoryLabel(job.categories, language) || t("ui.usluga")}
                       </Badge>
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3 text-muted-foreground" />

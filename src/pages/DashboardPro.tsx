@@ -5,6 +5,7 @@ import { FloatingCard } from "@/components/ui/floating-card";
 import { NeumorphicIcon } from "@/components/ui/neumorphic-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import i18n from "@/i18n/config";
+import { UserReviews } from "@/components/UserReviews";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useNavigate, Link } from "react-router-dom";
@@ -789,6 +790,13 @@ const DashboardPro = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Reviews about me */}
+              {userId && (
+                <div className="card-surface p-6">
+                  <UserReviews userId={userId} limit={4} />
+                </div>
+              )}
 
               {/* Quick Tips */}
               <div className="card-surface p-6">

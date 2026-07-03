@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useToast } from "@/hooks/use-toast";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,7 @@ interface BusinessJob {
 
 export function BusinessJobs() {
   const { toast } = useToast();
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<BusinessJob[]>([]);
@@ -237,7 +238,7 @@ export function BusinessJobs() {
 
                       <div className="flex items-center gap-4">
                         <div className="bg-neo neo-4 rounded-lg px-3 py-1 text-sm text-black">
-                          {job.categories?.label_ru || t("common.not_specified")}
+                          {categoryLabel(job.categories, language) || t("common.not_specified")}
                         </div>
                         {getStatusBadge(job.status)}
                       </div>

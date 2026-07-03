@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Seo } from '@/components/Seo';
 import { useEnhancedI18n } from '@/i18n/enhanced';
@@ -118,7 +119,7 @@ interface AssignedProData {
 }
 
 const JobDetail = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { id: jobId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -993,7 +994,7 @@ const JobDetail = () => {
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-sm text-muted-foreground mt-1">
                 <span className="font-mono">{t("dash.client.request_no")}: {job.public_id}</span>
                 <span className="hidden sm:inline">•</span>
-                <span>{job.categories.label_ru}</span>
+                <span>{categoryLabel(job.categories, language)}</span>
                 <span className="hidden sm:inline">•</span>
                 <span>{formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: ru })}</span>
               </div>
@@ -1581,7 +1582,7 @@ const JobDetail = () => {
 
                     <div className="flex items-center justify-between py-2 md:py-3">
                       <span className="text-muted-foreground text-sm md:text-base">{t("ui.kategoriia")}</span>
-                      <span className="font-medium text-sm md:text-base">{job.categories.label_ru}</span>
+                      <span className="font-medium text-sm md:text-base">{categoryLabel(job.categories, language)}</span>
                     </div>
 
                     {isCancelled && (

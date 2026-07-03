@@ -56,7 +56,7 @@ const Kyc = () => {
       />
       
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Верификация личности</h1>
+        <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">{t("kyc.title")}</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Пройдите простую процедуру верификации, чтобы получить статус специалиста 
           и начать принимать заказы на платформе

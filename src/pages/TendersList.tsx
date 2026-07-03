@@ -13,9 +13,10 @@ import { Clock, Euro, Users, Eye, Gavel, Trophy, Timer, RefreshCw, Filter, Grid,
 import tendersImage from "@/assets/tenders-auction.jpg";
 import MobileTenders from "@/mobile/pages/MobileTenders";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 
 const TendersList = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { toast } = useToast();
   const { isMobile } = useDeviceDetection();
   const [items, setItems] = useState<any[]>([]);
@@ -33,7 +34,7 @@ const TendersList = () => {
           .select(`
             id, title, description, status, created_at, deadline:window_to, budget_max_cents:budget_hint_cents,
             bids(id, price_cents, created_at),
-            categories(label_ru, key)
+            categories(label_ru, label_ro, key)
           `)
           .eq('status','open')
           .order('created_at', { ascending: false })
@@ -300,7 +301,7 @@ const TendersList = () => {
                               variant="outline"
                               className="mb-3 bg-neo neo-4 border-0 text-primary"
                             >
-                              {tender.categories?.label_ru || t("dash.pro.tender_fallback")}
+                              {categoryLabel(tender.categories, language) || t("dash.pro.tender_fallback")}
                             </Badge>
                             <h3 className="font-display font-bold text-xl mb-2">
                               {tender.title || `Тендер #${String(tender.id).slice(0, 8)}`}

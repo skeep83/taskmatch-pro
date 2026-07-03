@@ -12,9 +12,10 @@ import { MobileHeader } from "@/mobile/components/navigation/MobileHeader";
 import { Button } from "@/components/ui/button";
 import { Clock, Euro, Users, Eye, Gavel, Trophy, Timer, RefreshCw, Grid, List, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 
 const MobileTenders = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { toast } = useToast();
   const { safeAreaInsets } = useMobile();
   const [items, setItems] = useState<any[]>([]);
@@ -32,7 +33,7 @@ const MobileTenders = () => {
           .select(`
             id, title, description, status, created_at, deadline, budget_max_cents,
             bids(id, price_cents, created_at),
-            categories(label_ru, key)
+            categories(label_ru, label_ro, key)
           `)
           .eq('status','open')
           .order('created_at', { ascending: false })
@@ -221,7 +222,7 @@ const MobileTenders = () => {
                                 variant="outline"
                                 className="mb-2 bg-neo neo-2 border-0 text-primary text-xs"
                               >
-                                {tender.categories?.label_ru || t("dash.pro.tender_fallback")}
+                                {categoryLabel(tender.categories, language) || t("dash.pro.tender_fallback")}
                               </Badge>
                               <h3 className="font-bold text-base leading-tight">
                                 {tender.title || `Тендер #${String(tender.id).slice(0, 8)}`}

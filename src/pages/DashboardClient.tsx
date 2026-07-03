@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -137,7 +138,7 @@ export default function DashboardClient() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { formatPrice: formatCurrency } = useCurrency();
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<BasicUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -800,7 +801,7 @@ export default function DashboardClient() {
                           </div>
                           <div className="text-xs font-mono text-muted-foreground">{t("dash.client.request_no")}: {job.public_id}</div>
                           <div className="text-sm text-muted-foreground">
-                            {job.categories?.label_ru || t("dash.client.other")} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
+                            {categoryLabel(job.categories, language) || t("dash.client.other")} • {formatPrice(job.budget_min_cents, job.budget_max_cents)}
                           </div>
                           <div className="text-xs text-muted-foreground mt-1">
                             {getClientNextStepText(job)}
@@ -893,7 +894,7 @@ export default function DashboardClient() {
                               <div className="font-medium">{job.title}</div>
                               <div className="text-xs font-mono text-muted-foreground">{t("dash.client.request_no")}: {job.public_id}</div>
                               <div className="text-sm text-muted-foreground">
-                                {job.categories?.label_ru || t("dash.client.other")}
+                                {categoryLabel(job.categories, language) || t("dash.client.other")}
                               </div>
                               <div className="text-xs text-muted-foreground mt-1">
                                 {getClientNextStepText(job)}

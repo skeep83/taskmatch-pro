@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useToast } from "@/hooks/use-toast";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,7 @@ interface BusinessStats {
 
 export function BusinessAnalytics() {
   const { toast } = useToast();
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const [loading, setLoading] = useState(true);
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [stats, setStats] = useState<BusinessStats>({
@@ -100,7 +101,7 @@ export function BusinessAnalytics() {
 
       // Group categories by real linked jobs count only; no truthful invoice→category spend attribution exists here
       const categoryStats = jobs.reduce((acc, j) => {
-        const category = j.jobs.categories?.label_ru || t('biz.analytics.other');
+        const category = categoryLabel(j.jobs.categories, language) || t('biz.analytics.other');
         if (!acc[category]) {
           acc[category] = 0;
         }

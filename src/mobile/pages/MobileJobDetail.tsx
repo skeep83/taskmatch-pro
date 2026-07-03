@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useEnhancedI18n } from '@/i18n/enhanced';
 import { MediaViewer, VideoThumbnail } from '@/components/media';
 import { canClientCancelJob, canClientDeleteJob, canClientEditJob, inferMediaKind } from '@/utils/jobLifecycle';
@@ -56,7 +57,7 @@ export default function MobileJobDetail() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
 
   const [job, setJob] = useState<JobDetail | null>(null);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
@@ -831,7 +832,7 @@ export default function MobileJobDetail() {
               </div>
               {job.categories && (
                 <Badge variant="secondary" className="ml-2 shrink-0">
-                  {job.categories.label_ru}
+                  {categoryLabel(job.categories, language)}
                 </Badge>
               )}
             </div>

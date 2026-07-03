@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { categoryLabel } from '@/lib/categoryLabel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -40,7 +41,7 @@ interface JobPhoto {
 }
 
 const JobEdit = () => {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const { id: jobId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -447,7 +448,7 @@ const JobEdit = () => {
                     <option value="">{t("job.new.select_category")}</option>
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
-                        {category.label_ru}
+                        {categoryLabel(category, language)}
                       </option>
                     ))}
                   </select>

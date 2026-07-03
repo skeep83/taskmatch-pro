@@ -106,7 +106,7 @@ export default function MobileCatalog() {
           job.title || '',
           job.description || '',
           job.location_address || '',
-          job.categories?.label_ru || '',
+          categoryLabel(job.categories, language) || '',
         ].join(' ').toLowerCase();
         return haystack.includes(normalizedQuery);
       });

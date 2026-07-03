@@ -369,19 +369,10 @@ export default function ProPortfolio() {
       <div className="container mx-auto py-4 lg:py-8 px-4 bg-background-neomorphic">
         <div className="bg-card/80 backdrop-blur-sm rounded-3xl p-6 lg:p-8 shadow-neomorphic border border-border/50">
         {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl mb-6 lg:mb-12 bg-gradient-to-br from-primary/10 via-background to-primary/5">
-          <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
-          <div className="relative p-6 lg:p-12">
-            <div className="max-w-2xl">
-              <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-3 lg:mb-4">
-                Портфолио
-              </h1>
-              <p className="text-base lg:text-lg text-muted-foreground mb-4 lg:mb-6">
-                Покажите свои лучшие работы и привлеките больше клиентов
-              </p>
-            </div>
-          </div>
-        </section>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-display font-bold">{t("dash.pro.portfolio")}</h1>
+          <p className="text-muted-foreground mt-1">{t("portfolio.subtitle")}</p>
+        </div>
 
         {/* Add New Item Section */}
         <motion.section 
@@ -394,7 +385,7 @@ export default function ProPortfolio() {
             <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b p-4 lg:p-6">
               <CardTitle className="flex items-center gap-2 text-lg lg:text-xl">
                 <Plus className="h-5 w-5" />
-                Добавить новую работу
+                {t("portfolio.add_new")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 lg:p-6">

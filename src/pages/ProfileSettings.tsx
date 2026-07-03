@@ -4,6 +4,7 @@ import { PaymentMethodsCard } from "@/components/PaymentMethodsCard";
 import { UserReviews } from "@/components/UserReviews";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryLabel } from '@/lib/categoryLabel';
 import { useToast } from "@/hooks/use-toast";
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,7 +48,7 @@ interface ProProfile {
 }
 
 export default function ProfileSettings() {
-  const { t } = useEnhancedI18n();
+  const { t, language } = useEnhancedI18n();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -190,7 +191,7 @@ export default function ProfileSettings() {
       const transformedData = (data || []).map(cat => ({
         id: cat.id,
         key: cat.key,
-        name: cat.label_ru,
+        name: categoryLabel(cat, language),
         name_ro: cat.label_ro
       }));
 

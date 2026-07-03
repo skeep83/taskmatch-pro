@@ -18,6 +18,7 @@ serve(async (req: Request) => {
     let city = url.searchParams.get('city');
     let category_id = url.searchParams.get('category_id');
     let search = url.searchParams.get('search');
+    let lang = url.searchParams.get('lang') || 'ru';
 
     // Also accept POST body { params: {...} } (client wrapper sends POST)
     if (req.method === 'POST') {
@@ -28,6 +29,7 @@ serve(async (req: Request) => {
       if (p.city) city = String(p.city);
       if (p.category_id) category_id = String(p.category_id);
       if (p.search) search = String(p.search);
+      if (p.lang) lang = String(p.lang);
     }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -148,7 +150,7 @@ serve(async (req: Request) => {
         budget_max: job.budget_max_cents ? Math.round(job.budget_max_cents / 100) : null,
         location: job.location_address || '',
         created_at: job.created_at,
-        category_name: category?.label_ru || category?.label_ro || '',
+        category_name: (lang === 'ro' ? (category?.label_ro || category?.label_ru) : (category?.label_ru || category?.label_ro)) || '',
         client_name: profile?.full_name || 
                     (profile?.first_name && profile?.last_name 
                       ? `${profile.first_name} ${profile.last_name.charAt(0)}.`
