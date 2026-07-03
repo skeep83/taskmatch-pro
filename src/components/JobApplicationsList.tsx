@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase, SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from '@/integrations/supabase/client';
 import { useCurrency } from '@/hooks/useCurrency';
+import { openChatWidget, isDesktopViewport } from '@/lib/chatWidget';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -271,7 +272,11 @@ export function JobApplicationsList({
       });
 
       if (data?.chatId) {
-        navigate(`/messages/${data.chatId}`);
+        if (isDesktopViewport()) {
+          openChatWidget(String(data.chatId));
+        } else {
+          navigate(`/messages/${data.chatId}`);
+        }
         return;
       }
       navigate(`/messages?user=${application.pro_id}&job=${jobId}`);

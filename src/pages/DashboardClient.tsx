@@ -13,6 +13,7 @@ import { canClientCancelJob, canClientDeleteJob, canClientEditJob } from "@/util
 import { deleteClientJob } from "@/utils/deleteClientJob";
 import { PaymentMethodsCard } from "@/components/PaymentMethodsCard";
 import { UserReviews } from "@/components/UserReviews";
+import { openChatWidget, isDesktopViewport } from "@/lib/chatWidget";
 
 import { getUserRole, UserRole } from "@/lib/userRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -655,7 +656,7 @@ export default function DashboardClient() {
                 <button
                   type="button"
                   className="p-6 transition-all bg-neo neo-8 hover:neo-4 rounded-2xl"
-                  onClick={() => navigate("/messages")}
+                  onClick={() => (isDesktopViewport() ? openChatWidget() : navigate("/messages"))}
                 >
                   <div className="flex flex-col items-center gap-4 text-center">
                     <div className="w-16 h-16 rounded-full bg-neo neo-4 flex items-center justify-center">
@@ -845,7 +846,7 @@ export default function DashboardClient() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => navigate("/messages")}
+                              onClick={() => (isDesktopViewport() ? openChatWidget() : navigate("/messages"))}
                             >
                               <MessageSquare className="h-4 w-4" />
                             </Button>
@@ -950,7 +951,7 @@ export default function DashboardClient() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => navigate("/messages")}
+                                  onClick={() => (isDesktopViewport() ? openChatWidget() : navigate("/messages"))}
                                 >
                                   <MessageSquare className="h-4 w-4" />
                                 </Button>

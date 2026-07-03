@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircle, X, ArrowLeft, Send, Maximize2 } from "lucide-react";
+import { OPEN_CHAT_EVENT } from "@/lib/chatWidget";
 
 interface ChatRow {
   id: string;
@@ -98,6 +99,25 @@ export const ChatWidget = () => {
   }, [userId]);
 
   useEffect(() => { void loadChats(); }, [loadChats]);
+
+  // External entry points (nav "Messages", job detail, FAB) open the widget
+  useEffect(() => {
+    const handler = async (e: Event) => {
+      setOpen(true);
+      const chatId = (e as CustomEvent<{ chatId?: string }>).detail?.chatId;
+      if (chatId) {
+        const { data } = await supabase
+          .from("chats")
+          .select("id, client_id, professional_id, last_message_at")
+          .eq("id", chatId)
+          .maybeSingle();
+        if (data) void openChat(data as ChatRow);
+      }
+    };
+    window.addEventListener(OPEN_CHAT_EVENT, handler);
+    return () => window.removeEventListener(OPEN_CHAT_EVENT, handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   // realtime: refresh badge / active conversation on any new message
   useEffect(() => {

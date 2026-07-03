@@ -32,6 +32,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
+import { openChatWidget, isDesktopViewport } from "@/lib/chatWidget";
 import serviceHubLogo from "@/assets/servicehub-logo-new.png";
 
 type UserRole = 'client' | 'pro' | 'business';
@@ -295,7 +296,16 @@ export const AppNavigation = () => {
                       action.priority && "bg-primary text-white hover:bg-primary/90 shadow-lg animate-pulse-glow"
                     )}
                   >
-                    <Link to={action.href} className="flex items-center gap-2">
+                    <Link
+                      to={action.href}
+                      onClick={(e) => {
+                        if (action.href === "/messages" && isDesktopViewport()) {
+                          e.preventDefault();
+                          openChatWidget();
+                        }
+                      }}
+                      className="flex items-center gap-2"
+                    >
                       <action.icon className="h-4 w-4" />
                       <span className="hidden lg:inline">{action.title}</span>
                       {action.badge && (
