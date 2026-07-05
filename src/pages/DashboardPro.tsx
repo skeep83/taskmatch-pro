@@ -464,7 +464,7 @@ const DashboardPro = () => {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
             <div className="card-surface p-6">
-              <Link to="/wallet" className="flex items-center justify-between p-2 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/profile/settings" className="flex items-center justify-between p-2 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">{t("dash.pro.balance")}</p>
                   <p className="text-2xl font-bold">{formatPrice(walletBalance)}</p>
@@ -474,7 +474,7 @@ const DashboardPro = () => {
             </div>
 
             <div className="card-surface p-6">
-              <Link to="/profile" className="flex items-center justify-between p-2 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
+              <Link to="/profile/settings" className="flex items-center justify-between p-2 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">{t("dash.pro.rating")}</p>
                   <div className="flex items-center gap-2">

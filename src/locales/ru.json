@@ -1756,5 +1756,10 @@
   "reviews.about_me_desc": "Публичные оценки от участников платформы. Высокий рейтинг помогает получать больше заказов.",
   "portfolio.subtitle": "Покажите свои лучшие работы и привлеките больше клиентов",
   "portfolio.add_new": "Добавить новую работу",
-  "kyc.title": "Верификация личности"
+  "kyc.title": "Верификация личности",
+  "messages.delete_chat": "Удалить чат",
+  "messages.no_chats": "У вас пока нет чатов",
+  "messages.no_messages": "Нет сообщений",
+  "messages.search_placeholder": "Поиск чатов...",
+  "messages.select_chat_description": "Выберите беседу из списка для начала общения"
 }

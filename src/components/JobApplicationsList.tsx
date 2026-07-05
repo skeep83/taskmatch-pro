@@ -131,7 +131,6 @@ const invokeEdgeFunction = async <T,>(name: string, payload: Record<string, unkn
   };
 
   const fallbackUrls = [
-    `${window.location.origin}/marketplace-api/functions/${name}`,
     `${SUPABASE_URL}/functions/v1/${name}`,
   ];
 

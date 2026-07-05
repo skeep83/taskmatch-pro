@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
 
 class AdminAPI {
   private requestCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
@@ -10,7 +10,7 @@ class AdminAPI {
     const explicitMethod = String(options.method || '').toUpperCase();
     const hasBody = options.body !== undefined && options.body !== null;
     const method = explicitMethod || (hasBody ? 'POST' : 'GET');
-    let url = `${window.location.origin}/marketplace-api/functions/${functionName}`;
+    let url = `${SUPABASE_URL}/functions/v1/${functionName}`;
 
     if (method === 'GET' && hasBody && typeof options.body === 'object') {
       const params = new URLSearchParams();
@@ -342,7 +342,7 @@ class AdminAPI {
     });
 
     const session = await supabase.auth.getSession();
-    const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-logs?${query.toString()}`, {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-logs?${query.toString()}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.data.session?.access_token}`,
@@ -367,7 +367,7 @@ class AdminAPI {
     });
 
     const session = await supabase.auth.getSession();
-    const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-logs?${query.toString()}`, {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-logs?${query.toString()}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.data.session?.access_token}`,
@@ -406,7 +406,7 @@ class AdminAPI {
     });
 
     const session = await supabase.auth.getSession();
-    const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-logs?${query.toString()}`, {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-logs?${query.toString()}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.data.session?.access_token}`,

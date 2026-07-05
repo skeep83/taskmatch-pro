@@ -26,7 +26,7 @@ import {
   MessageSquare
 } from "lucide-react";
 import { DocumentViewer } from "./DocumentViewer";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
@@ -111,7 +111,7 @@ export const AdminKycVerification = () => {
       setLoading(true);
 
       const session = await supabase.auth.getSession();
-      const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-kyc-submissions`, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-kyc-submissions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.data.session?.access_token}`,
@@ -145,7 +145,7 @@ export const AdminKycVerification = () => {
       setProcessing(true);
 
       const session = await supabase.auth.getSession();
-      const response = await fetch(`${window.location.origin}/marketplace-api/functions/admin-kyc`, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-kyc`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.data.session?.access_token}`,

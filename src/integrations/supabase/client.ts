@@ -16,66 +16,8 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-const FUNCTION_BASE = `${window.location.origin}/marketplace-api/functions`;
-const originalInvoke = supabase.functions.invoke.bind(supabase.functions);
-
-(supabase.functions as any).invoke = async (functionName: string, options: any = {}) => {
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_PUBLISHABLE_KEY,
-      ...(options.headers || {}),
-    };
-
-    if (session?.access_token) {
-      headers['Authorization'] = `Bearer ${session.access_token}`;
-    }
-
-    const explicitMethod = String(options.method || '').toUpperCase();
-    const hasBody = options.body !== undefined && options.body !== null;
-    const method = explicitMethod || (hasBody ? 'POST' : 'GET');
-    let url = `${FUNCTION_BASE}/${functionName}`;
-
-    if (method === 'GET' && hasBody && typeof options.body === 'object') {
-      const params = new URLSearchParams();
-      for (const [key, value] of Object.entries(options.body)) {
-        if (value === undefined || value === null) continue;
-        if (typeof value === 'object') {
-          params.set(key, JSON.stringify(value));
-        } else {
-          params.set(key, String(value));
-        }
-      }
-      const qs = params.toString();
-      if (qs) url += `?${qs}`;
-    }
-
-    const response = await fetch(url, {
-      method,
-      headers,
-      body: method === 'GET' ? undefined : JSON.stringify(options.body || {}),
-    });
-
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : null;
-
-    if (!response.ok) {
-      const message = data?.error || data?.message || `Function ${functionName} failed with ${response.status}`;
-      const shouldFallbackToDirectInvoke =
-        response.status === 404 ||
-        /unknown function/i.test(message) ||
-        /not found/i.test(message);
-
-      if (shouldFallbackToDirectInvoke) {
-        return await originalInvoke(functionName as any, options);
-      }
-
-      return { data: null, error: { message } };
-    }
-
-    return { data, error: null };
-  } catch (error) {
-    return await originalInvoke(functionName as any, options);
-  }
-};
+// NOTE: previously an invoke-wrapper routed function calls through a
+// reverse proxy at /marketplace-api that only exists on one specific
+// hosting setup; on every other deployment it silently broke functions
+// (proposals, notifications, payments). Functions are now called
+// directly at the Supabase URL — CORS is open on all edge functions.

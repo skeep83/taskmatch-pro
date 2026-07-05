@@ -1022,7 +1022,7 @@ export default function DashboardClient() {
                         <li>• {t("dash.client.free_diag")}</li>
                         <li>• {t("dash.client.priority_support")}</li>
                       </ul>
-                      <button onClick={() => navigate("/pricing")} className="w-full px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800">{t("dash.client.compare_plans")}</button>
+                      <button onClick={() => navigate("/how-it-works")} className="w-full px-6 py-3 bg-neo neo-8 hover:neo-4 rounded-2xl transition-all duration-300 text-gray-700 hover:text-gray-800">{t("dash.client.compare_plans")}</button>
                     </div>
 
                     <div className="border rounded-lg p-6">

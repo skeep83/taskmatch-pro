@@ -1756,5 +1756,10 @@
   "reviews.about_me_desc": "Evaluări publice de la participanții platformei. Un rating înalt vă ajută să primiți mai multe comenzi.",
   "portfolio.subtitle": "Arătați cele mai bune lucrări și atrageți mai mulți clienți",
   "portfolio.add_new": "Adaugă o lucrare nouă",
-  "kyc.title": "Verificarea identității"
+  "kyc.title": "Verificarea identității",
+  "messages.delete_chat": "Șterge chatul",
+  "messages.no_chats": "Nu aveți conversații încă",
+  "messages.no_messages": "Nu există mesaje",
+  "messages.search_placeholder": "Căutare conversații...",
+  "messages.select_chat_description": "Alegeți o conversație din listă pentru a începe"
 }
