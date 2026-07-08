@@ -231,7 +231,7 @@ export const ChatWidget = () => {
 
       {/* Panel */}
       {open && (
-        <div className="hidden md:flex fx-appear fixed bottom-24 right-6 z-[120] w-[380px] h-[560px] max-h-[calc(100vh-8rem)] neo-card neo-aura flex-col overflow-hidden">
+        <div className="hidden md:flex fx-appear fixed bottom-24 right-6 z-[120] w-[380px] h-[560px] max-h-[calc(100vh-8rem)] neo-card flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-2 px-4 py-3 bg-neo neo-inset-2 shrink-0">
             {activeChat ? (

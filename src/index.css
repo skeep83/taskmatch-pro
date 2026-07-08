@@ -200,8 +200,10 @@ All colors MUST be HSL.
 
   /* Subtle halo + hairline gradient edge around a block */
   .neo-aura {
-    position: relative;
     isolation: isolate;
+  }
+  :where(.neo-aura) {
+    position: relative;
   }
   .neo-aura::before {
     content: "";
