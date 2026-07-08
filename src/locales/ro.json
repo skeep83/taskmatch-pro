@@ -1786,7 +1786,13 @@
     "funded_title": "Plata a fost rezervată",
     "funded_desc": "Fondurile vor fi transferate specialistului după acceptarea lucrării.",
     "released_title": "Plata a fost transferată",
-    "released_desc": "Mulțumim! Nu uitați să lăsați o recenzie."
+    "released_desc": "Mulțumim! Nu uitați să lăsați o recenzie.",
+    "line_base": "Costul comenzii",
+    "line_fee": "Comision platformă ({{percent}}%)",
+    "line_tax": "Impozit ({{percent}}%)",
+    "line_total": "Total de plată",
+    "start_hint": "Specialistul va începe lucrul după rezervarea plății.",
+    "frozen_dispute": "Fondurile sunt înghețate: a fost deschisă o dispută."
   },
   "verified": {
     "label": "Verificat",
@@ -1854,5 +1860,36 @@
     "label": "Punct pe hartă",
     "hint": "Mutați harta pentru a indica locația dvs. — este folosită pentru selectarea comenzilor din apropiere.",
     "saved_point": "Punctul a fost ales — nu uitați să salvați profilul"
+  },
+  "nearby": {
+    "title": "Ce se întâmplă în apropierea dvs.",
+    "subtitle": "Harta live a platformei: specialiști și comenzi deschise pe o rază de 7 km — chiar acum.",
+    "cta_hint": "Apăsați butonul — vă arătăm specialiștii și comenzile din jur. Adresele exacte nu sunt dezvăluite.",
+    "cta_btn": "Arată ce e în apropiere",
+    "pros": "specialiști",
+    "jobs": "comenzi",
+    "privacy_note": "Pozițiile sunt aproximative — adresele exacte sunt ascunse.",
+    "fallback_note": "Geolocația nu este disponibilă — este afișat Chișinăul. Pozițiile sunt aproximative.",
+    "cta_order": "Publică o comandă",
+    "cta_catalog": "Catalog"
+  },
+  "dispute": {
+    "title": "Dispută",
+    "hint": "Dacă rezultatul nu vă mulțumește — deschideți o dispută. Fondurile rămân înghețate, iar departamentul de dispute va analiza dovezile ambelor părți.",
+    "open_btn": "Deschide o dispută",
+    "open_confirm": "Deschide disputa",
+    "reason_placeholder": "Descrieți ce anume nu vă mulțumește…",
+    "opened_title": "Disputa a fost deschisă",
+    "opened_desc": "Fondurile sunt înghețate. Adăugați dovezi — fotografii și descriere.",
+    "active_hint": "Adăugați dovezile mai jos. Decizia va fi luată de administrația platformei.",
+    "status_open": "Deschisă",
+    "status_resolved": "Soluționată",
+    "resolved_title": "Disputa a fost soluționată",
+    "evidence_placeholder": "Argumentele, faptele, detaliile dvs.…",
+    "evidence_send": "Trimite dovezile",
+    "evidence_added": "Dovezile au fost adăugate",
+    "you": "Dvs.",
+    "client": "Client",
+    "pro": "Specialist"
   }
 }

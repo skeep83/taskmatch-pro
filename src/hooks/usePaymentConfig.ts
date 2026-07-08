@@ -9,6 +9,8 @@ export interface PaymentConfig {
   applePayEnabled: boolean;
   googlePayEnabled: boolean;
   paymentsEnabled: boolean;
+  feePercent: number;
+  taxPercent: number;
   /** true when a publishable key is present and payments are switched on */
   isConfigured: boolean;
 }
@@ -21,6 +23,8 @@ const DEFAULTS: PaymentConfig = {
   applePayEnabled: false,
   googlePayEnabled: false,
   paymentsEnabled: false,
+  feePercent: 10,
+  taxPercent: 0,
   isConfigured: false,
 };
 
@@ -52,6 +56,8 @@ export const usePaymentConfig = () => {
           applePayEnabled: map.apple_pay_enabled === true,
           googlePayEnabled: map.google_pay_enabled === true,
           paymentsEnabled,
+          feePercent: Number(map.platform_fee_percent ?? 10) || 0,
+          taxPercent: Number(map.tax_percent ?? 0) || 0,
           isConfigured: paymentsEnabled && publishableKey.length > 0,
         });
       } finally {

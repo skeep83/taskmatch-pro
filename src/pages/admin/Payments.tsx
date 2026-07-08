@@ -13,6 +13,8 @@ type Settings = {
   payment_provider: string;
   payment_mode: string;
   payment_currency: string;
+  platform_fee_percent: number;
+  tax_percent: number;
   stripe_publishable_key: string;
   apple_pay_enabled: boolean;
   google_pay_enabled: boolean;
@@ -23,6 +25,8 @@ const DEFAULTS: Settings = {
   payment_provider: "stripe",
   payment_mode: "test",
   payment_currency: "mdl",
+  platform_fee_percent: 10,
+  tax_percent: 0,
   stripe_publishable_key: "",
   apple_pay_enabled: false,
   google_pay_enabled: false,
@@ -190,6 +194,37 @@ export default function AdminPayments() {
                 <SelectItem value="usd">USD</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="fee">Комиссия платформы, %</Label>
+            <Input
+              id="fee"
+              type="number"
+              min="0"
+              max="50"
+              step="0.5"
+              className="mt-1"
+              value={settings.platform_fee_percent}
+              onChange={(e) => setSettings((s) => ({ ...s, platform_fee_percent: Number(e.target.value) || 0 }))}
+            />
+            <p className="text-xs text-muted-foreground mt-1">Добавляется к сумме заказа при оплате в эскроу; остаётся платформе.</p>
+          </div>
+          <div>
+            <Label htmlFor="tax">Налог, %</Label>
+            <Input
+              id="tax"
+              type="number"
+              min="0"
+              max="30"
+              step="0.5"
+              className="mt-1"
+              value={settings.tax_percent}
+              onChange={(e) => setSettings((s) => ({ ...s, tax_percent: Number(e.target.value) || 0 }))}
+            />
+            <p className="text-xs text-muted-foreground mt-1">0 — если налог не взимается на уровне платформы.</p>
           </div>
         </div>
 

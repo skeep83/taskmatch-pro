@@ -60,11 +60,17 @@ serve(async (req) => {
     });
     const mode = String(map.payment_mode || "test");
     const currency = String(map.payment_currency || "mdl");
+    const feePercent = Number(map.platform_fee_percent ?? 10) || 0;
+    const taxPercent = Number(map.tax_percent ?? 0) || 0;
+    const feeCents = Math.round(amountCents * feePercent / 100);
+    const taxCents = Math.round(amountCents * taxPercent / 100);
+    const totalCents = amountCents + feeCents + taxCents;
 
     if (mode === "test") {
       const { error } = await admin.from("escrows").insert({
         job_id, client_id: job.client_id, pro_id: job.pro_id,
-        amount_cents: amountCents, currency, status: "held",
+        amount_cents: totalCents, fee_cents: feeCents, tax_cents: taxCents,
+        currency, status: "held",
       });
       if (error) return json({ error: error.message }, 500);
       await admin.from("notifications").insert({
@@ -74,7 +80,7 @@ serve(async (req) => {
         message_ro: `Clientul a rezervat plata pentru comanda „${job.title}”. Fondurile vor fi creditate după acceptarea lucrării.`,
         data: { job_id, amount_cents: amountCents },
       });
-      return json({ success: true, funded: true, test_mode: true, amount_cents: amountCents });
+      return json({ success: true, funded: true, test_mode: true, amount_cents: totalCents, base_cents: amountCents, fee_cents: feeCents, tax_cents: taxCents });
     }
 
     // Live mode: Stripe Checkout, escrow marked held by stripe-webhook
@@ -85,13 +91,14 @@ serve(async (req) => {
 
     await admin.from("escrows").insert({
       job_id, client_id: job.client_id, pro_id: job.pro_id,
-      amount_cents: amountCents, currency, status: "pending",
+      amount_cents: totalCents, fee_cents: feeCents, tax_cents: taxCents,
+      currency, status: "pending",
     });
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{
-        price_data: { currency, product_data: { name: job.title || "ServiceHub escrow" }, unit_amount: amountCents },
+        price_data: { currency, product_data: { name: job.title || "ServiceHub escrow" }, unit_amount: totalCents },
         quantity: 1,
       }],
       success_url: `${origin}/job/${job_id}?escrow=funded`,

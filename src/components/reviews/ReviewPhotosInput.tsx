@@ -12,13 +12,15 @@ interface ReviewPhotosInputProps {
   jobId: string;
   photos: string[];
   onChange: (photos: string[]) => void;
+  /** Storage bucket; defaults to review photos */
+  bucket?: string;
 }
 
 /**
  * Up to 4 photos of the completed work, attached to a review.
  * Uploads to the public `review-photos` bucket under the reviewer's folder.
  */
-export const ReviewPhotosInput = ({ userId, jobId, photos, onChange }: ReviewPhotosInputProps) => {
+export const ReviewPhotosInput = ({ userId, jobId, photos, onChange, bucket = "review-photos" }: ReviewPhotosInputProps) => {
   const { t } = useEnhancedI18n();
   const { toast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -38,7 +40,7 @@ export const ReviewPhotosInput = ({ userId, jobId, photos, onChange }: ReviewPho
       }
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const path = `${userId}/${jobId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error } = await supabase.storage.from("review-photos").upload(path, file, {
+      const { error } = await supabase.storage.from(bucket).upload(path, file, {
         cacheControl: "31536000",
         upsert: false,
       });
@@ -46,7 +48,7 @@ export const ReviewPhotosInput = ({ userId, jobId, photos, onChange }: ReviewPho
         toast({ title: t("reviews.photo_upload_error"), variant: "destructive" });
         continue;
       }
-      const { data } = supabase.storage.from("review-photos").getPublicUrl(path);
+      const { data } = supabase.storage.from(bucket).getPublicUrl(path);
       if (data?.publicUrl) uploaded.push(data.publicUrl);
     }
     if (uploaded.length) onChange([...photos, ...uploaded]);
@@ -57,10 +59,10 @@ export const ReviewPhotosInput = ({ userId, jobId, photos, onChange }: ReviewPho
   const removePhoto = (url: string) => {
     onChange(photos.filter((p) => p !== url));
     // best-effort cleanup in storage
-    const idx = url.indexOf("/review-photos/");
+    const idx = url.indexOf(`/${bucket}/`);
     if (idx !== -1) {
-      const path = decodeURIComponent(url.slice(idx + "/review-photos/".length));
-      void supabase.storage.from("review-photos").remove([path]);
+      const path = decodeURIComponent(url.slice(idx + bucket.length + 2));
+      void supabase.storage.from(bucket).remove([path]);
     }
   };
 

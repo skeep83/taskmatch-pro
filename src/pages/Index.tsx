@@ -10,6 +10,7 @@ import {
   ClipboardList, Users, CheckCircle2, ArrowRight, type LucideIcon,
 } from "lucide-react";
 import { HeroShowcase } from "@/components/HeroShowcase";
+import { NearbyLive } from "@/components/landing/NearbyLive";
 import { Reveal } from "@/components/Reveal";
 
 const categories: { key: string; labelKey: string; icon: LucideIcon }[] = [
@@ -106,6 +107,9 @@ const DesktopIndex = () => {
       </section>
 
       {/* Categories */}
+      {/* Live map around the visitor */}
+      <NearbyLive />
+
       <section className="container mx-auto py-24 px-6">
         <Reveal className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gradient">

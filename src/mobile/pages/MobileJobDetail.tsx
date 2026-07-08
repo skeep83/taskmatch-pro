@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { EscrowCard } from '@/components/escrow/EscrowCard';
+import { DisputeCard } from '@/components/disputes/DisputeCard';
 import { JobLocationMap } from '@/components/maps/JobLocationMap';
 import { ReviewPhotosInput } from '@/components/reviews/ReviewPhotosInput';
 import { StarRating } from '@/components/ui/star-rating';
@@ -1142,6 +1143,16 @@ export default function MobileJobDetail() {
             proId={job.pro_id}
             jobStatus={String(job.status)}
             amountCents={job.budget_max_cents || job.budget_min_cents || 0}
+            currentUserId={currentUserId}
+          />
+        )}
+
+        {job && currentUserId && (
+          <DisputeCard
+            jobId={job.id}
+            clientId={job.client_id}
+            proId={job.pro_id}
+            jobStatus={String(job.status)}
             currentUserId={currentUserId}
           />
         )}

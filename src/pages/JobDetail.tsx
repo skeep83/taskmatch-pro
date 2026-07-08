@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EscrowCard } from '@/components/escrow/EscrowCard';
+import { DisputeCard } from '@/components/disputes/DisputeCard';
 import { JobLocationMap } from '@/components/maps/JobLocationMap';
 import { ReviewPhotosInput } from '@/components/reviews/ReviewPhotosInput';
 import { StarRating } from '@/components/ui/star-rating';
@@ -1370,6 +1371,16 @@ const JobDetail = () => {
                           amountCents={job.budget_max_cents || job.budget_min_cents || 0}
                           currentUserId={currentUser.id}
                         />
+                        <div className="mt-4">
+                          <DisputeCard
+                            jobId={job.id}
+                            clientId={job.client_id}
+                            proId={job.pro_id}
+                            jobStatus={String(job.status)}
+                            currentUserId={currentUser.id}
+                            onChanged={() => void fetchJob()}
+                          />
+                        </div>
                       </div>
                     )}
 

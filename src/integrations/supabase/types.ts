@@ -870,6 +870,8 @@ export type Database = {
       escrows: {
         Row: {
           amount_cents: number
+          fee_cents: number
+          tax_cents: number
           client_id: string
           created_at: string
           currency: string
@@ -892,6 +894,8 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
+          fee_cents?: number
+          tax_cents?: number
           client_id?: string
           created_at?: string
           currency?: string
@@ -2804,6 +2808,9 @@ export type Database = {
     }
     Functions: {
       release_escrow: { Args: { _job_id: string }; Returns: Json }
+      open_dispute: { Args: { _job_id: string; _reason: string }; Returns: Json }
+      add_dispute_evidence: { Args: { _dispute_id: string; _text: string; _files?: Json }; Returns: Json }
+      resolve_dispute: { Args: { _dispute_id: string; _decision: string; _resolution: string; _refund_cents?: number }; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
       apply_referral_code: { Args: { _code: string }; Returns: Json }
       create_telegram_link_token: { Args: never; Returns: string }
