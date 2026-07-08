@@ -170,8 +170,8 @@ class WebCrawler {
     const matches = html.matchAll(linkRegex);
 
     for (const match of matches) {
+      const href = match[1];
       try {
-        const href = match[1];
         let fullUrl: string;
 
         if (href.startsWith('http')) {

@@ -1761,5 +1761,14 @@
   "messages.no_chats": "У вас пока нет чатов",
   "messages.no_messages": "Нет сообщений",
   "messages.search_placeholder": "Поиск чатов...",
-  "messages.select_chat_description": "Выберите беседу из списка для начала общения"
+  "messages.select_chat_description": "Выберите беседу из списка для начала общения",
+  "reviews": {
+    "photos_label": "Фото выполненной работы",
+    "photos_hint": "До 4 фото. Их увидят будущие клиенты в отзывах о специалисте.",
+    "add_photo": "Фото",
+    "remove_photo": "Удалить фото",
+    "view_photo": "Открыть фото",
+    "photo_too_large": "Файл слишком большой (макс. 8 МБ)",
+    "photo_upload_error": "Не удалось загрузить фото"
+  }
 }

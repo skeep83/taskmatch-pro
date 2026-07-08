@@ -1761,5 +1761,14 @@
   "messages.no_chats": "Nu aveți conversații încă",
   "messages.no_messages": "Nu există mesaje",
   "messages.search_placeholder": "Căutare conversații...",
-  "messages.select_chat_description": "Alegeți o conversație din listă pentru a începe"
+  "messages.select_chat_description": "Alegeți o conversație din listă pentru a începe",
+  "reviews": {
+    "photos_label": "Fotografii ale lucrării finalizate",
+    "photos_hint": "Până la 4 fotografii. Viitorii clienți le vor vedea în recenziile despre specialist.",
+    "add_photo": "Foto",
+    "remove_photo": "Șterge fotografia",
+    "view_photo": "Deschide fotografia",
+    "photo_too_large": "Fișierul este prea mare (max. 8 MB)",
+    "photo_upload_error": "Nu s-a putut încărca fotografia"
+  }
 }

@@ -2188,6 +2188,7 @@ export type Database = {
           created_at: string
           from_user_id: string
           id: string
+          photos: string[]
           job_id: string
           reply: string | null
           reply_at: string | null
@@ -2200,6 +2201,7 @@ export type Database = {
           created_at?: string
           from_user_id: string
           id?: string
+          photos?: string[]
           job_id: string
           reply?: string | null
           reply_at?: string | null
@@ -2212,6 +2214,7 @@ export type Database = {
           created_at?: string
           from_user_id?: string
           id?: string
+          photos?: string[]
           job_id?: string
           reply?: string | null
           reply_at?: string | null

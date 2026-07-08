@@ -14,6 +14,7 @@ interface ReviewRow {
   score: number;
   comment: string | null;
   reply: string | null;
+  photos: string[] | null;
   created_at: string;
   from_user_id: string;
   raterName?: string;
@@ -40,6 +41,7 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   const dateLocale = language === "ro" ? roLocale : ruLocale;
 
@@ -54,7 +56,7 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
         const [{ data: rows }, { data: stat }] = await Promise.all([
           supabase
             .from("ratings")
-            .select("id, score, comment, reply, created_at, from_user_id")
+            .select("id, score, comment, reply, photos, created_at, from_user_id")
             .eq("to_user_id", userId)
             .order("created_at", { ascending: false })
             .limit(limit),
@@ -163,6 +165,22 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
                   <p className="text-sm text-foreground/85 leading-relaxed mt-3">{r.comment}</p>
                 )}
 
+                {r.photos && r.photos.length > 0 && (
+                  <div className="flex gap-2 mt-3">
+                    {r.photos.slice(0, 4).map((url) => (
+                      <button
+                        key={url}
+                        type="button"
+                        onClick={() => setLightbox(url)}
+                        className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-neo neo-2 hover:neo-4 transition-all shrink-0"
+                        aria-label={t("reviews.view_photo")}
+                      >
+                        <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {r.reply && (
                   <div className="mt-3 pl-3 border-l-2 border-primary/40">
                     <div className="text-xs font-semibold text-primary mb-0.5">{t("rate.reply_label")}</div>
@@ -203,6 +221,21 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
               </div>
             );
           })}
+        </div>
+      )}
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[130] bg-foreground/60 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <img
+            src={lightbox}
+            alt=""
+            className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain"
+          />
         </div>
       )}
     </div>

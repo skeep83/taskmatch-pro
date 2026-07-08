@@ -72,13 +72,6 @@ serve(async (req) => {
     
     console.log(`Admin Analytics: dashboard for ${timeRange}`);
 
-    // Log admin action
-    await supabaseService.rpc('log_admin_action', {
-      p_action: 'ADMIN_ANALYTICS_VIEW',
-      p_resource_type: 'analytics',
-      p_new_values: { timeRange }
-    });
-
     const analytics = await getDashboardAnalytics(supabaseService, timeRange);
 
     return new Response(JSON.stringify(analytics), {
@@ -394,7 +387,7 @@ async function getDashboardAnalytics(supabase: any, timeRange: string) {
       });
     }
     
-    if (avgRating < 3.5) {
+    if (avgRating > 0 && avgRating < 3.5) {
       alerts.push({
         title: "Низкие рейтинги",
         message: `Средний рейтинг ${avgRating.toFixed(1)} требует внимания`,

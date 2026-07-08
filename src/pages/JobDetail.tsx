@@ -41,6 +41,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ReviewPhotosInput } from '@/components/reviews/ReviewPhotosInput';
 import { StarRating } from '@/components/ui/star-rating';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -135,6 +136,7 @@ const JobDetail = () => {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [rating, setRating] = useState(0);
   const [ratingComment, setRatingComment] = useState('');
+  const [ratingPhotos, setRatingPhotos] = useState<string[]>([]);
   const [hasSubmittedRating, setHasSubmittedRating] = useState(false);
   const [clientRatingScore, setClientRatingScore] = useState(0);
   const [clientRatingComment, setClientRatingComment] = useState('');
@@ -817,7 +819,8 @@ const JobDetail = () => {
           from_user_id: currentUser.id,
           to_user_id: job.pro_id,
           score: rating,
-          comment: ratingComment || null
+          comment: ratingComment || null,
+          photos: ratingPhotos
         });
 
       if (error) throw error;
@@ -855,6 +858,7 @@ const JobDetail = () => {
       setHasSubmittedRating(true);
       setRating(0);
       setRatingComment('');
+      setRatingPhotos([]);
 
       // Force refresh notifications for the specialist
       if (notifyResult?.notification_id) {
@@ -1542,6 +1546,15 @@ const JobDetail = () => {
                           className="min-h-[100px] md:min-h-[120px] transition-all duration-300 focus:scale-[1.02] text-sm md:text-base"
                         />
                       </div>
+
+                      {currentUser && (
+                        <ReviewPhotosInput
+                          userId={currentUser.id}
+                          jobId={job.id}
+                          photos={ratingPhotos}
+                          onChange={setRatingPhotos}
+                        />
+                      )}
 
                       <div className="p-2 rounded-2xl bg-neo neo-inset-8">
                         <Button

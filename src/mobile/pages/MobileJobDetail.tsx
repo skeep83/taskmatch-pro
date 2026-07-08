@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
+import { ReviewPhotosInput } from '@/components/reviews/ReviewPhotosInput';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,6 +72,7 @@ export default function MobileJobDetail() {
   const [assignedProProfile, setAssignedProProfile] = useState<AssignedProProfile | null>(null);
   const [rating, setRating] = useState(0);
   const [ratingComment, setRatingComment] = useState('');
+  const [ratingPhotos, setRatingPhotos] = useState<string[]>([]);
   const [hasSubmittedRating, setHasSubmittedRating] = useState(false);
   const [submittingRating, setSubmittingRating] = useState(false);
 
@@ -487,7 +489,8 @@ export default function MobileJobDetail() {
           from_user_id: currentUserId,
           to_user_id: job.pro_id,
           score: rating,
-          comment: ratingComment || null
+          comment: ratingComment || null,
+          photos: ratingPhotos
         });
 
       if (error) throw error;
@@ -1144,6 +1147,15 @@ export default function MobileJobDetail() {
                       rows={4}
                     />
                   </div>
+
+                  {currentUserId && job && (
+                    <ReviewPhotosInput
+                      userId={currentUserId}
+                      jobId={job.id}
+                      photos={ratingPhotos}
+                      onChange={setRatingPhotos}
+                    />
+                  )}
 
                   <Button className="w-full" onClick={handleSubmitRating} disabled={submittingRating || rating === 0}>
                     {submittingRating ? t("ui.otpravka") : t("ui.otpravit_ocenku")}
