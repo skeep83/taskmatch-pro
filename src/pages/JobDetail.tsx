@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EscrowCard } from '@/components/escrow/EscrowCard';
+import { JobLocationMap } from '@/components/maps/JobLocationMap';
 import { ReviewPhotosInput } from '@/components/reviews/ReviewPhotosInput';
 import { StarRating } from '@/components/ui/star-rating';
 import { formatDistanceToNow } from 'date-fns';
@@ -56,6 +57,8 @@ interface Job {
   budget_min_cents?: number;
   budget_max_cents?: number;
   location_address?: string;
+  location_lat?: number | null;
+  location_lng?: number | null;
   scheduled_at?: string;
   created_at: string;
   client_id: string;
@@ -1084,6 +1087,14 @@ const JobDetail = () => {
                       <span className="font-semibold text-lg text-[#374151]">{t("ui.adres")}</span>
                     </div>
                     <p className="text-[#6B7280]">{job.location_address}</p>
+                    {job.location_lat != null && job.location_lng != null && (
+                      <JobLocationMap
+                        latitude={Number(job.location_lat)}
+                        longitude={Number(job.location_lng)}
+                        address={job.location_address}
+                        className="mt-4"
+                      />
+                    )}
                   </div>
                 )}
 

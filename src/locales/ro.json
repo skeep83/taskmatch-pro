@@ -1843,6 +1843,11 @@
     "locate": "Determină locația mea",
     "resolving": "Determinăm adresa…",
     "move_pin": "Mutați harta pentru a indica punctul",
-    "confirm": "Alege"
+    "confirm": "Alege",
+    "distance_btn": "Distanța până la mine",
+    "distance_away": "{{distance}} de la dvs.",
+    "min": "min",
+    "straight_line": "în linie dreaptă",
+    "geo_denied": "Accesul la geolocație nu a fost acordat"
   }
 }

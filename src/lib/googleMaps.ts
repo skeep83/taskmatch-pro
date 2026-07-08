@@ -24,7 +24,7 @@ const installAuthFailureHook = () => {
 /** Reads the Google Maps browser key from platform settings (admin-configurable). */
 export const getGoogleMapsKey = (): Promise<string> => {
   if (!keyPromise) {
-    keyPromise = supabase
+    keyPromise = Promise.resolve(supabase
       .from("platform_settings")
       .select("value")
       .eq("key", "google_maps_api_key")
@@ -33,7 +33,7 @@ export const getGoogleMapsKey = (): Promise<string> => {
         let v = data?.value as unknown;
         if (typeof v === "string") { try { v = JSON.parse(v); } catch { /* raw */ } }
         return String(v || "");
-      });
+      }));
   }
   return keyPromise;
 };

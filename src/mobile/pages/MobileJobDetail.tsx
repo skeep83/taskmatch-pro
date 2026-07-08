@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { EscrowCard } from '@/components/escrow/EscrowCard';
+import { JobLocationMap } from '@/components/maps/JobLocationMap';
 import { ReviewPhotosInput } from '@/components/reviews/ReviewPhotosInput';
 import { StarRating } from '@/components/ui/star-rating';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +28,8 @@ interface JobDetail {
   budget_min_cents?: number;
   budget_max_cents?: number;
   location_address?: string;
+  location_lat?: number | null;
+  location_lng?: number | null;
   created_at: string;
   urgency: string;
   status: string;
@@ -132,6 +135,8 @@ export default function MobileJobDetail() {
           budget_min_cents,
           budget_max_cents,
           location_address,
+          location_lat,
+          location_lng,
           created_at,
           urgency,
           status,
@@ -921,6 +926,14 @@ export default function MobileJobDetail() {
                   <div className="text-sm text-[#6B7280]">{job.location_address}</div>
                 </div>
               </div>
+            )}
+
+            {job.location_lat != null && job.location_lng != null && (
+              <JobLocationMap
+                latitude={Number(job.location_lat)}
+                longitude={Number(job.location_lng)}
+                address={job.location_address}
+              />
             )}
 
             {/* Date */}
