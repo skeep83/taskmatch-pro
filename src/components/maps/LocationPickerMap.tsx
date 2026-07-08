@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { loadGoogleMaps, googleReverseGeocode, type PickedLocation } from "@/lib/googleMaps";
+import { loadGoogleMaps, googleReverseGeocode, GMAPS_AUTH_FAILURE_EVENT, type PickedLocation } from "@/lib/googleMaps";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { MapPin, LocateFixed, Loader2, Check } from "lucide-react";
 
@@ -69,7 +69,13 @@ export const LocationPickerMap = ({ initial, onSelect, className = "" }: Locatio
       setReady(true);
       resolveCenter();
     });
-    return () => { cancelled = true; window.clearTimeout(idleTimer.current); };
+    const onAuthFail = () => setReady(false); // hide the broken map, keep the text-input flow
+    window.addEventListener(GMAPS_AUTH_FAILURE_EVENT, onAuthFail);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(idleTimer.current);
+      window.removeEventListener(GMAPS_AUTH_FAILURE_EVENT, onAuthFail);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

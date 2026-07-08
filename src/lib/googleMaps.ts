@@ -9,6 +9,18 @@ declare global {
 let keyPromise: Promise<string> | null = null;
 let loadPromise: Promise<typeof google | null> | null = null;
 
+/** Google calls window.gm_authFailure on key/billing/referrer errors. */
+export const GMAPS_AUTH_FAILURE_EVENT = "gmaps-auth-failure";
+const installAuthFailureHook = () => {
+  (window as unknown as { gm_authFailure?: () => void }).gm_authFailure = () => {
+    console.error(
+      "Google Maps auth failure: the key is invalid, billing is off, or this site's URL is not in the key's allowed referrers. " +
+      "Fix it in Google Cloud Console -> Credentials -> your key -> Website restrictions."
+    );
+    window.dispatchEvent(new CustomEvent(GMAPS_AUTH_FAILURE_EVENT));
+  };
+};
+
 /** Reads the Google Maps browser key from platform settings (admin-configurable). */
 export const getGoogleMapsKey = (): Promise<string> => {
   if (!keyPromise) {
@@ -33,6 +45,7 @@ export const loadGoogleMaps = (): Promise<typeof google | null> => {
       if (window.google?.maps) return window.google;
       const key = await getGoogleMapsKey();
       if (!key) return null;
+      installAuthFailureHook();
       await new Promise<void>((resolve, reject) => {
         const s = document.createElement("script");
         s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&language=ru&region=MD&loading=async`;
