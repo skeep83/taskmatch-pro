@@ -1849,5 +1849,10 @@
     "min": "min",
     "straight_line": "în linie dreaptă",
     "geo_denied": "Accesul la geolocație nu a fost acordat"
+  },
+  "profile_map": {
+    "label": "Punct pe hartă",
+    "hint": "Mutați harta pentru a indica locația dvs. — este folosită pentru selectarea comenzilor din apropiere.",
+    "saved_point": "Punctul a fost ales — nu uitați să salvați profilul"
   }
 }

@@ -20,6 +20,7 @@ import { useEnhancedI18n } from '@/i18n/enhanced';
 import { supabase } from '@/integrations/supabase/client';
 import { PaymentMethodsCard } from '@/components/PaymentMethodsCard';
 import { TelegramLinkCard } from '@/components/TelegramLinkCard';
+import { LocationPickerMap } from '@/components/maps/LocationPickerMap';
 import { ReferralCard } from '@/components/ReferralCard';
 import { UserReviews } from '@/components/UserReviews';
 import { useToast } from '@/hooks/use-toast';
@@ -579,6 +580,22 @@ export default function MobileProfileSettings() {
                 {t("ui.bazovyi_adres_klienta")}
               </h3>
               <div className="space-y-4">
+                <LocationPickerMap
+                  initial={profile.latitude != null && profile.longitude != null
+                    ? { latitude: Number(profile.latitude), longitude: Number(profile.longitude) }
+                    : null}
+                  onSelect={(loc) => {
+                    setProfile(prev => ({
+                      ...prev,
+                      latitude: loc.latitude,
+                      longitude: loc.longitude,
+                      address_line1: loc.address,
+                      location_public_label: loc.address,
+                      location_precision: 'exact' as LocationPrecision,
+                      location_source: 'map',
+                    }));
+                  }}
+                />
                 <div className="grid grid-cols-2 gap-3">
                   <Button type="button" variant="outline" onClick={handleUseCurrentLocation}>
                     {t("ui.opredelit_geolokaciiu")}

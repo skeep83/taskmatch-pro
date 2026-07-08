@@ -136,7 +136,7 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
           <p className="text-sm text-muted-foreground">{t("rate.no_reviews")}</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="divide-y divide-foreground/[0.07]">
           {reviews.map((r) => {
             const initials = (r.raterName || "•")
               .split(" ")
@@ -145,34 +145,40 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
               .map((w) => w[0]?.toUpperCase())
               .join("") || "•";
             return (
-              <div key={r.id} className="rounded-xl bg-neo neo-inset-2 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 overflow-hidden">
+              <div key={r.id} className="py-4 first:pt-1 last:pb-1">
+                {/* header: avatar, name + stars, date */}
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 overflow-hidden">
                     {r.raterAvatar
                       ? <img src={r.raterAvatar} alt={r.raterName} className="w-full h-full object-cover" />
                       : initials}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium truncate">{r.raterName}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(r.created_at), { addSuffix: true, locale: dateLocale })}
+                    <div className="flex items-baseline justify-between gap-3 min-w-0">
+                      <span className="text-sm font-semibold truncate">{r.raterName}</span>
+                      <span className="text-[11px] text-muted-foreground whitespace-nowrap shrink-0">
+                        {formatDistanceToNow(new Date(r.created_at), { addSuffix: true, locale: dateLocale })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <StarRating rating={r.score} size="sm" readonly showValue={false} />
+                      <span className="text-xs font-medium text-muted-foreground">{r.score}.0</span>
                     </div>
                   </div>
-                  <StarRating rating={r.score} size="sm" readonly showValue={false} />
                 </div>
 
                 {r.comment && (
-                  <p className="text-sm text-foreground/85 leading-relaxed mt-3">{r.comment}</p>
+                  <p className="text-sm text-foreground/90 leading-relaxed mt-2.5 md:pl-[3.25rem]">{r.comment}</p>
                 )}
 
                 {r.photos && r.photos.length > 0 && (
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex gap-2 mt-2.5 md:pl-[3.25rem]">
                     {r.photos.slice(0, 4).map((url) => (
                       <button
                         key={url}
                         type="button"
                         onClick={() => setLightbox(url)}
-                        className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-neo neo-2 hover:neo-4 transition-all shrink-0"
+                        className="w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden neo-2 hover:neo-4 transition-all shrink-0"
                         aria-label={t("reviews.view_photo")}
                       >
                         <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -182,15 +188,15 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
                 )}
 
                 {r.reply && (
-                  <div className="mt-3 pl-3 border-l-2 border-primary/40">
-                    <div className="text-xs font-semibold text-primary mb-0.5">{t("rate.reply_label")}</div>
-                    <p className="text-sm text-foreground/75 leading-relaxed">{r.reply}</p>
+                  <div className="mt-2.5 md:ml-[3.25rem] rounded-lg bg-primary/[0.06] px-3 py-2">
+                    <div className="text-[11px] font-semibold text-primary mb-0.5">{t("rate.reply_label")}</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">{r.reply}</p>
                   </div>
                 )}
 
                 {!r.reply && currentUserId === userId && (
                   replyingTo === r.id ? (
-                    <div className="mt-3">
+                    <div className="mt-2.5 md:ml-[3.25rem]">
                       <Textarea
                         rows={2}
                         className="text-sm mb-2"
@@ -212,7 +218,7 @@ export const UserReviews = ({ userId, limit = 6, showHeader = true }: UserReview
                     <button
                       type="button"
                       onClick={() => setReplyingTo(r.id)}
-                      className="mt-2 text-xs font-medium text-primary hover:underline"
+                      className="mt-2 md:ml-[3.25rem] text-xs font-medium text-primary hover:underline"
                     >
                       {t("rate.reply_send")}
                     </button>

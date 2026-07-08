@@ -5,6 +5,7 @@ import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { Search, Filter, Star, Clock, MapPin, Zap, Briefcase, Inbox } from "lucide-react";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { StaticMapThumb } from "@/components/maps/StaticMapThumb";
 import { useVerifiedUsers } from "@/hooks/useVerifiedUsers";
 import { StarRating } from "@/components/ui/star-rating";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -161,7 +162,7 @@ const Catalog = () => {
     (async () => {
       let query = supabase
         .from("jobs")
-        .select("id,public_id,title,description,status,created_at,location_address,urgency,category_id,budget_min_cents,budget_max_cents,categories(label_ru,label_ro,key),profiles!jobs_client_id_fkey(full_name,first_name,last_name,avatar_url)")
+        .select("id,public_id,title,description,status,created_at,location_address,location_lat,location_lng,urgency,category_id,budget_min_cents,budget_max_cents,categories(label_ru,label_ro,key),profiles!jobs_client_id_fkey(full_name,first_name,last_name,avatar_url)")
         .eq("status", "new")
         .order("created_at", { ascending: false })
         .limit(30);
@@ -403,6 +404,25 @@ const Catalog = () => {
                 <p className="text-sm text-muted-foreground line-clamp-3 min-h-[3.75rem]">
                   {job.description || t("ui.opisanie_ne_ukazano")}
                 </p>
+
+                {(() => {
+                  const j = job as { location_lat?: number | null; location_lng?: number | null };
+                  return j.location_lat != null && j.location_lng != null ? (
+                    <div className="relative">
+                      <StaticMapThumb
+                        latitude={Number(j.location_lat)}
+                        longitude={Number(j.location_lng)}
+                        alt={job.location_address || ""}
+                        className="h-24 w-full"
+                      />
+                      {job.location_address && (
+                        <span className="absolute left-2 bottom-2 max-w-[85%] truncate rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-gray-800 shadow">
+                          {job.location_address}
+                        </span>
+                      )}
+                    </div>
+                  ) : null;
+                })()}
 
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <div className="neo-icon-well w-9 h-9 text-xs font-bold text-primary shrink-0 overflow-hidden">

@@ -4,6 +4,7 @@ import { PaymentMethodsCard } from "@/components/PaymentMethodsCard";
 import { TelegramLinkCard } from "@/components/TelegramLinkCard";
 import { ReferralCard } from "@/components/ReferralCard";
 import { JobAlertsCard } from "@/components/JobAlertsCard";
+import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { UserReviews } from "@/components/UserReviews";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -510,30 +511,26 @@ export default function ProfileSettings() {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="latitude">{t("ui.shirota")}</Label>
-                      <Input
-                        id="latitude"
-                        type="number"
-                        step="any"
-                        value={profile.latitude ?? ''}
-                        onChange={(e) => updateProfile('latitude', e.target.value === '' ? null : Number(e.target.value))}
-                        placeholder={t("ui.naprimer_47_0105")}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="longitude">{t("ui.dolgota")}</Label>
-                      <Input
-                        id="longitude"
-                        type="number"
-                        step="any"
-                        value={profile.longitude ?? ''}
-                        onChange={(e) => updateProfile('longitude', e.target.value === '' ? null : Number(e.target.value))}
-                        placeholder={t("ui.naprimer_28_8638")}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label>{t("profile_map.label")}</Label>
+                    <p className="text-xs text-muted-foreground">{t("profile_map.hint")}</p>
+                    <LocationPickerMap
+                      initial={profile.latitude != null && profile.longitude != null
+                        ? { latitude: Number(profile.latitude), longitude: Number(profile.longitude) }
+                        : null}
+                      onSelect={(loc) => {
+                        updateProfile('latitude', loc.latitude);
+                        updateProfile('longitude', loc.longitude);
+                        const cityGuess = loc.address.split(',').map((p) => p.trim()).find((p) => /Кишин|Chi\u0219in|Bălți|Бельцы|Тирасполь|Tiraspol|Orhei|Орхей|Cahul|Кагул/i.test(p));
+                        if (cityGuess && !profile.city) updateProfile('city', cityGuess);
+                      }}
+                    />
+                    {profile.latitude != null && profile.longitude != null && (
+                      <p className="text-xs text-success flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {t("profile_map.saved_point")}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
