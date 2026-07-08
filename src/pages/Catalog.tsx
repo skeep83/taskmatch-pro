@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { SignatureGradient } from "@/components/SignatureGradient";
-import { Search, Filter, Star, Clock, MapPin, Zap, Briefcase } from "lucide-react";
+import { Search, Filter, Star, Clock, MapPin, Zap, Briefcase, Inbox } from "lucide-react";
 import { StarRating } from "@/components/ui/star-rating";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { supabase } from "@/integrations/supabase/client";
@@ -430,7 +430,7 @@ const Catalog = () => {
           </div>
         ) : (
           <div className="text-center py-16 rounded-3xl border border-dashed border-border/60 bg-background/70 max-w-5xl mx-auto">
-            <div className="text-6xl opacity-20 mb-4">📭</div>
+            <div className="neo-icon-well w-16 h-16 mx-auto mb-4"><Inbox className="w-7 h-7 text-muted-foreground" /></div>
             <h3 className="text-2xl font-semibold mb-2">{t("ui.zakazy_ne_naideny")}</h3>
             <p className="text-muted-foreground">{t("ui.poprobuite_druguiu_kategoriiu_ili")}</p>
           </div>
@@ -485,7 +485,7 @@ const Catalog = () => {
 
         {pros.length === 0 && (
           <div className="text-center py-20 animate-fade-in">
-            <div className="text-6xl opacity-20 mb-4">🔍</div>
+            <div className="neo-icon-well w-16 h-16 mx-auto mb-4"><Search className="w-7 h-7 text-muted-foreground" /></div>
             <h3 className="text-2xl font-semibold mb-2">{t("catalog.not_found")}</h3>
             <p className="text-muted-foreground">{t("catalog.try_filters")}</p>
           </div>

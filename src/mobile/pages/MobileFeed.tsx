@@ -399,7 +399,7 @@ export default function MobileFeed() {
           <div className="space-y-4">
             {filteredJobs.length === 0 ? (
               <MobileCard className="text-center py-8">
-                <div className="text-4xl mb-4">🔍</div>
+                <div className="neo-icon-well w-14 h-14 mx-auto mb-4"><Search className="w-6 h-6 text-muted-foreground" /></div>
                 <h3 className="text-lg font-semibold mb-2">{t("ui.zakazy_ne_naideny")}</h3>
                 <p className="text-muted-foreground text-sm">
                   {t("catalog.try_filters")}

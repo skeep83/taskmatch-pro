@@ -1309,7 +1309,7 @@ const JobDetail = () => {
 
                   <div className="space-y-4">
                     {canStartWork && (
-                      <div className="p-3 md:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="p-3 md:p-4 bg-neo neo-inset-2 rounded-xl border-l-4 border-l-blue-400">
                         <h4 className="font-medium text-blue-900 mb-2 text-sm md:text-base">{t("ui.gotovy_nachat_rabotu")}</h4>
                         <p className="text-xs md:text-sm text-blue-700 mb-3 md:mb-4">
                           {t("ui.nazhmite_knopku_kogda_pristupite")} {t("job.detail.status_will_change_progress")}
@@ -1327,7 +1327,7 @@ const JobDetail = () => {
                     )}
 
                     {canCompleteWork && (
-                      <div className="p-3 md:p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="p-3 md:p-4 bg-neo neo-inset-2 rounded-xl border-l-4 border-l-green-500">
                         <h4 className="font-medium text-green-900 mb-2 text-sm md:text-base">{t("ui.rabota_vypolnena")}</h4>
                         <p className="text-xs md:text-sm text-green-700 mb-3 md:mb-4">
                           {t("ui.nazhmite_knopku_kogda_zakonchite")} {t("job.detail.status_will_change_done")}
@@ -1381,7 +1381,7 @@ const JobDetail = () => {
                     )}
 
                     {job.status === 'done' && (
-                      <div className={`p-3 md:p-4 rounded-lg text-center ${isDoneConfirmed ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
+                      <div className={`p-3 md:p-4 rounded-lg text-center bg-neo neo-inset-2 ${isDoneConfirmed ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-amber-500'}`}>
                         <Star className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mx-auto mb-2" />
                         <h4 className={`font-medium mb-1 text-sm md:text-base ${isDoneConfirmed ? 'text-emerald-900' : 'text-amber-900'}`}>{isDoneConfirmed ? t("ui.zakaz_zavershen") : t("ui.rabota_zavershena")}</h4>
                         <p className={`text-xs md:text-sm ${isDoneConfirmed ? 'text-emerald-700' : 'text-amber-700'}`}>
@@ -1395,7 +1395,7 @@ const JobDetail = () => {
                     )}
 
                     {isCancelled && (
-                      <div className="p-3 md:p-4 rounded-lg text-center bg-red-50 border border-red-200">
+                      <div className="p-3 md:p-4 rounded-xl text-center bg-neo neo-inset-2 border-l-4 border-l-red-500">
                         <XCircle className="w-6 h-6 md:w-8 md:h-8 text-red-600 mx-auto mb-2" />
                         <h4 className="font-medium mb-1 text-sm md:text-base text-red-900">{t("ui.rabota_po_zakazu_ostanovlena")}</h4>
                         <p className="text-xs md:text-sm text-red-700">
@@ -1481,7 +1481,7 @@ const JobDetail = () => {
                 {/* Rating Section - Appears first when job is done and user can rate */}
                 {canRate ? (
                   <div className="mb-6 md:mb-8">
-                    <div className="p-3 md:p-4 mb-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
+                    <div className="p-3 md:p-4 mb-4 bg-neo neo-inset-2 rounded-xl border-l-4 border-l-amber-500 text-center">
                       <h4 className="font-medium text-amber-900 mb-1 text-sm md:text-base">{t("ui.nuzhen_poslednii_shag_ot")}</h4>
                       <p className="text-xs md:text-sm text-amber-700">
                         {t("ui.podtverdite_zavershenie_i_ostavte")}

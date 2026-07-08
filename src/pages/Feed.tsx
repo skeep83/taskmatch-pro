@@ -408,7 +408,7 @@ export default function Feed() {
               {filteredJobs.length === 0 && (
                 <Card className="bg-neo neo-8 border-none">
                   <CardContent className="text-center py-12">
-                    <div className="text-6xl mb-4">🔍</div>
+                    <div className="neo-icon-well w-16 h-16 mx-auto mb-4"><Search className="w-7 h-7 text-muted-foreground" /></div>
                     <h2 className="text-xl font-semibold mb-2">{t("ui.zakazy_ne_naideny")}</h2>
                     <p className="text-muted-foreground">{t("ui.poprobuite_izmenit_filtry_ili")}</p>
                   </CardContent>

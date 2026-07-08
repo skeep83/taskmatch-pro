@@ -587,3 +587,17 @@ html { scroll-behavior: smooth; }
   .fx-appear { animation: none; opacity: 1; }
   .btn-sheen::after { animation: none; display: none; }
 }
+
+/* ---- Themed scrollbars (WebKit + Firefox) ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(220 9% 78%) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: hsl(220 9% 78%);
+  border-radius: 8px;
+  border: 2px solid hsl(var(--neo-bg));
+}
+*::-webkit-scrollbar-thumb:hover { background: hsl(220 9% 68%); }

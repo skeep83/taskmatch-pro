@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Send, ArrowLeft, Circle, MoreVertical, Trash2 } from 'lucide-react';
+import { Send, ArrowLeft, Circle, MoreVertical, Trash2, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMobile } from '../providers/MobileProvider';
 import { MobileHeader } from '../components/navigation/MobileHeader';
@@ -374,7 +374,7 @@ function MobileMessages() {
         >
           {chats.length === 0 ? (
             <MobileCard className="p-8 text-center">
-              <div className="text-4xl mb-4">💬</div>
+              <div className="neo-icon-well w-14 h-14 mx-auto mb-4"><MessageCircle className="w-6 h-6 text-muted-foreground" /></div>
               <h3 className="text-lg font-semibold mb-2 text-gray-800">{t("ui.net_soobschenii")}</h3>
               <p className="text-gray-600">{t("ui.vashi_chaty_poiaviatsia_zdes")}</p>
             </MobileCard>
