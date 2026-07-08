@@ -787,8 +787,8 @@ export default function ProfileSettings() {
                     <Star className="w-5 h-5 text-primary" />
                     {t("reviews.about_me")}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-2">{t("reviews.about_me_desc")}</p>
-                  <UserReviews userId={user.id} />
+                  <p className="text-sm text-muted-foreground mb-4">{t("reviews.about_me_desc")}</p>
+                  <UserReviews userId={user.id} showHeader={false} />
                 </div>
               )}
 

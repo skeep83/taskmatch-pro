@@ -1009,7 +1009,8 @@ export default function MobileProfileSettings() {
         {/* Reviews about me */}
         {user?.id && (
           <MobileCard>
-            <UserReviews userId={user.id} limit={4} />
+            <h3 className="font-semibold mb-3">{t("reviews.about_me")}</h3>
+            <UserReviews userId={user.id} limit={4} showHeader={false} />
           </MobileCard>
         )}
 

@@ -794,7 +794,11 @@ const DashboardPro = () => {
               {/* Reviews about me */}
               {userId && (
                 <div className="card-surface p-6">
-                  <UserReviews userId={userId} limit={4} />
+                  <div className="flex items-center gap-3 mb-4">
+                    <NeumorphicIcon icon={Star} size={48} variant="behance" />
+                    <h3 className="font-bold">{t("reviews.about_me")}</h3>
+                  </div>
+                  <UserReviews userId={userId} limit={4} showHeader={false} />
                 </div>
               )}
 

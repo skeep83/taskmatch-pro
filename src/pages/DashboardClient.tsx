@@ -1110,7 +1110,13 @@ export default function DashboardClient() {
                   </button>
                 </div>
 
-                {user?.id && <UserReviews userId={user.id} />}
+                {user?.id && (
+                  <div className="p-8 bg-neo neo-8 rounded-2xl">
+                    <h2 className="text-2xl font-semibold mb-1">{t("reviews.about_me")}</h2>
+                    <p className="text-muted-foreground mb-6">{t("reviews.about_me_desc")}</p>
+                    <UserReviews userId={user.id} showHeader={false} />
+                  </div>
+                )}
 
                 <div className="p-8 bg-neo neo-8 rounded-2xl">
                   <h2 className="text-2xl font-semibold mb-6">{t("dash.client.notifications")}</h2>
