@@ -74,6 +74,8 @@ const Catalog = () => {
   const [selectedCat, setSelectedCat] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobPhotos, setJobPhotos] = useState<Record<string, string[]>>({});
+  const [lightbox, setLightbox] = useState<string | null>(null);
   const [pros, setPros] = useState<ProProfile[]>([]);
   const verifiedSet = useVerifiedUsers(pros.map((p) => p.user_id));
   const [ratingMap, setRatingMap] = useState<Record<string, { avg_score: number; rating_count: number }>>({});
@@ -192,6 +194,23 @@ const Catalog = () => {
       });
 
       setJobs(filtered as Job[]);
+
+      // Thumbnails uploaded with the jobs
+      const ids = (filtered as Job[]).map((j) => j.id);
+      if (ids.length) {
+        const { data: photos } = await supabase
+          .from("job_photos")
+          .select("job_id, file_url")
+          .in("job_id", ids);
+        const map: Record<string, string[]> = {};
+        (photos || []).forEach((p) => {
+          if (!map[p.job_id]) map[p.job_id] = [];
+          if (map[p.job_id].length < 8) map[p.job_id].push(p.file_url);
+        });
+        setJobPhotos(map);
+      } else {
+        setJobPhotos({});
+      }
     })();
   }, [selectedCat, searchQuery]);
 
@@ -407,21 +426,54 @@ const Catalog = () => {
 
                 {(() => {
                   const j = job as { location_lat?: number | null; location_lng?: number | null };
-                  return j.location_lat != null && j.location_lng != null ? (
-                    <div className="relative">
-                      <StaticMapThumb
-                        latitude={Number(j.location_lat)}
-                        longitude={Number(j.location_lng)}
-                        alt={job.location_address || ""}
-                        className="h-24 w-full"
-                      />
-                      {job.location_address && (
-                        <span className="absolute left-2 bottom-2 max-w-[85%] truncate rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-gray-800 shadow">
-                          {job.location_address}
-                        </span>
+                  const photos = jobPhotos[job.id] || [];
+                  const hasMap = j.location_lat != null && j.location_lng != null;
+                  if (!photos.length && !hasMap) return null;
+                  const shown = photos.slice(0, hasMap ? 2 : 3);
+                  const extra = photos.length - shown.length;
+                  return (
+                    <div className="flex gap-2 h-24">
+                      {shown.map((url, i) => {
+                        const isLast = i === shown.length - 1 && extra > 0;
+                        return (
+                          <button
+                            key={url}
+                            type="button"
+                            onClick={() => setLightbox(url)}
+                            className="relative flex-1 min-w-0 rounded-xl overflow-hidden neo-2 hover:neo-4 transition-all group/photo"
+                            aria-label={job.title || ""}
+                          >
+                            <img
+                              src={url}
+                              alt=""
+                              loading="lazy"
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover/photo:scale-105"
+                            />
+                            {isLast && (
+                              <span className="absolute inset-0 bg-black/45 flex items-center justify-center text-white text-sm font-bold">
+                                +{extra}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                      {hasMap && (
+                        <div className="relative flex-1 min-w-0">
+                          <StaticMapThumb
+                            latitude={Number(j.location_lat)}
+                            longitude={Number(j.location_lng)}
+                            alt={job.location_address || ""}
+                            className="h-full w-full"
+                          />
+                          {job.location_address && (
+                            <span className="absolute left-2 bottom-2 max-w-[85%] truncate rounded-full bg-white/90 backdrop-blur px-2 py-0.5 text-[10px] font-medium text-gray-800 shadow">
+                              {job.location_address}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
-                  ) : null;
+                  );
                 })()}
 
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -517,6 +569,17 @@ const Catalog = () => {
           </div>
         )}
       </section>
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[130] bg-foreground/60 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <img src={lightbox} alt="" className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain" />
+        </div>
+      )}
     </main>
   );
 };
