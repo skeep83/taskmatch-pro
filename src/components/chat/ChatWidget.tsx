@@ -61,6 +61,16 @@ export const ChatWidget = () => {
 
   useEffect(() => {
     void supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+      if (!session?.user) {
+        setOpen(false);
+        setActiveChat(null);
+        setChats([]);
+        setUnread(0);
+      }
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const loadChats = useCallback(async () => {
@@ -100,6 +110,16 @@ export const ChatWidget = () => {
 
   useEffect(() => { void loadChats(); }, [loadChats]);
 
+  // Refresh the list whenever the panel opens; Esc closes it
+  useEffect(() => {
+    if (open) void loadChats();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    if (open) window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, loadChats]);
+
   // External entry points (nav "Messages", job detail, FAB) open the widget
   useEffect(() => {
     const handler = async (e: Event) => {
@@ -131,8 +151,13 @@ export const ChatWidget = () => {
           if (m.sender_id !== userId && open) {
             void supabase.from("chat_messages").update({ is_read: true }).eq("id", m.id);
           }
-        } else if (m.sender_id !== userId && chats.some((c) => c.id === m.chat_id)) {
-          setUnread((u) => u + 1);
+        } else if (m.sender_id !== userId) {
+          if (chats.some((c) => c.id === m.chat_id)) {
+            setUnread((u) => u + 1);
+          } else {
+            // message in a conversation we have not loaded yet
+            void loadChats();
+          }
         }
       })
       .subscribe();
@@ -198,7 +223,7 @@ export const ChatWidget = () => {
 
       {/* Panel */}
       {open && (
-        <div className="hidden lg:flex fixed bottom-24 right-6 z-[90] w-[380px] h-[560px] neo-card neo-aura flex-col overflow-hidden">
+        <div className="hidden lg:flex fx-appear fixed bottom-24 right-6 z-[90] w-[380px] h-[560px] max-h-[calc(100vh-8rem)] neo-card neo-aura flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-2 px-4 py-3 bg-neo neo-inset-2 shrink-0">
             {activeChat ? (

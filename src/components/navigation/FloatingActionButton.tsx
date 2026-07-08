@@ -97,7 +97,7 @@ export const FloatingActionButton = () => {
         y: isVisible ? 0 : 100 
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed bottom-6 right-6 z-40 md:hidden"
+      className="fixed bottom-24 right-4 z-40 md:hidden"
     >
       <div className="flex flex-col items-end gap-3">
         {/* Expanded Actions */}
