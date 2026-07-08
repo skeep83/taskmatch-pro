@@ -176,7 +176,7 @@ const AppContent = () => {
           </Routes>
         </Suspense>
       </PageTransition>
-      {!hidePublicShell && !isMobile && <ChatWidget />}
+      {!hidePublicShell && <ChatWidget />}
       {!hidePublicShell && !isMobile && <FloatingActionButton />}
       {!hidePublicShell && !isMobile && <Footer />}
       {!hidePublicShell && isMobile && <MobileBottomNav />}

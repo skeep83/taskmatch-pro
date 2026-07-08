@@ -211,7 +211,7 @@ export const ChatWidget = () => {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={t("nav.messages_tab")}
-        className="hidden lg:flex fixed bottom-6 right-6 z-[90] w-14 h-14 rounded-full bg-neo neo-8 hover:neo-4 active:neo-inset-4 items-center justify-center transition-all duration-300"
+        className="hidden md:flex fixed bottom-6 right-6 z-[90] w-14 h-14 rounded-full bg-neo neo-8 hover:neo-4 active:neo-inset-4 items-center justify-center transition-all duration-300"
       >
         {open ? <X className="w-6 h-6 text-foreground" /> : <MessageCircle className="w-6 h-6 text-primary" />}
         {!open && unread > 0 && (
@@ -223,7 +223,7 @@ export const ChatWidget = () => {
 
       {/* Panel */}
       {open && (
-        <div className="hidden lg:flex fx-appear fixed bottom-24 right-6 z-[90] w-[380px] h-[560px] max-h-[calc(100vh-8rem)] neo-card neo-aura flex-col overflow-hidden">
+        <div className="hidden md:flex fx-appear fixed bottom-24 right-6 z-[90] w-[380px] h-[560px] max-h-[calc(100vh-8rem)] neo-card neo-aura flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-2 px-4 py-3 bg-neo neo-inset-2 shrink-0">
             {activeChat ? (

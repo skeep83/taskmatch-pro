@@ -11,4 +11,4 @@ export const openChatWidget = (chatId?: string) => {
 
 /** true when the viewport uses the desktop layout (lg breakpoint) */
 export const isDesktopViewport = () =>
-  typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
+  typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
