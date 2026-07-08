@@ -12,6 +12,7 @@ import { useEnhancedI18n } from "@/i18n/enhanced";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryLabel } from '@/lib/categoryLabel';
+import { StaticMapThumb } from '@/components/maps/StaticMapThumb';
 import {
   MapPin,
   Clock,
@@ -46,6 +47,8 @@ interface Job {
   created_at: string;
   scheduled_at?: string | null;
   location_address?: string | null;
+  location_lat?: number | null;
+  location_lng?: number | null;
   urgency?: string | null;
   client_id: string;
   category_id: string;
@@ -369,10 +372,20 @@ export default function Feed() {
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-blue-500" />
-                          <span className="text-sm text-muted-foreground">{t("ui.v_radiuse_5km")}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <MapPin className="w-4 h-4 text-blue-500 shrink-0" />
+                          <span className="text-sm text-muted-foreground truncate">
+                            {job.location_address || t("ui.v_radiuse_5km")}
+                          </span>
                         </div>
+                        {job.location_lat != null && job.location_lng != null && (
+                          <StaticMapThumb
+                            latitude={Number(job.location_lat)}
+                            longitude={Number(job.location_lng)}
+                            alt={job.location_address || ""}
+                            className="h-24 w-full"
+                          />
+                        )}
                         <div className="flex items-center gap-2">
                           <Star className="w-4 h-4 text-yellow-500" />
                           <span className="text-sm text-muted-foreground">{t("ui.srochnost_obychnaia")}</span>

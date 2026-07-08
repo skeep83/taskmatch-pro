@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, SUPABASE_URL } from "@/integrations/supabase/client";
+import { StaticMapThumb } from "@/components/maps/StaticMapThumb";
 import { categoryLabel } from '@/lib/categoryLabel';
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/hooks/useCurrency";
@@ -46,6 +47,8 @@ interface Job {
   scheduled_at?: string;
   urgency: string;
   location_address?: string;
+  location_lat?: number | null;
+  location_lng?: number | null;
   client_id: string;
   category_id: string;
   categories?: {
@@ -451,6 +454,15 @@ export default function MobileFeed() {
                             {job.location_address}
                           </span>
                         </div>
+                      )}
+
+                      {job.location_lat != null && job.location_lng != null && (
+                        <StaticMapThumb
+                          latitude={Number(job.location_lat)}
+                          longitude={Number(job.location_lng)}
+                          alt={job.location_address || ""}
+                          className="h-20 w-full"
+                        />
                       )}
 
                       <div className="flex items-center gap-2">

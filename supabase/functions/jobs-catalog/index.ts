@@ -49,6 +49,8 @@ serve(async (req: Request) => {
         budget_min_cents,
         budget_max_cents,
         location_address,
+        location_lat,
+        location_lng,
         created_at,
         urgency,
         status,
@@ -149,6 +151,9 @@ serve(async (req: Request) => {
         budget_min: job.budget_min_cents ? Math.round(job.budget_min_cents / 100) : null,
         budget_max: job.budget_max_cents ? Math.round(job.budget_max_cents / 100) : null,
         location: job.location_address || '',
+        location_address: job.location_address || '',
+        location_lat: job.location_lat ?? null,
+        location_lng: job.location_lng ?? null,
         created_at: job.created_at,
         category_name: (lang === 'ro' ? (category?.label_ro || category?.label_ru) : (category?.label_ru || category?.label_ro)) || '',
         client_name: profile?.full_name || 
