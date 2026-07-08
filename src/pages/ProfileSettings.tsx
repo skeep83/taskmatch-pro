@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { PaymentMethodsCard } from "@/components/PaymentMethodsCard";
+import { TelegramLinkCard } from "@/components/TelegramLinkCard";
+import { ReferralCard } from "@/components/ReferralCard";
+import { JobAlertsCard } from "@/components/JobAlertsCard";
 import { UserReviews } from "@/components/UserReviews";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -779,6 +782,15 @@ export default function ProfileSettings() {
 
               {/* Payment methods */}
               {user?.id && <PaymentMethodsCard userId={user.id} />}
+
+              {/* Job alerts for pros */}
+              {user?.id && showProSettings && <JobAlertsCard userId={user.id} />}
+
+              {/* Telegram notifications */}
+              {user?.id && <TelegramLinkCard userId={user.id} />}
+
+              {/* Invite a friend */}
+              {user?.id && <ReferralCard userId={user.id} />}
 
               {/* Reviews about me */}
               {user?.id && (

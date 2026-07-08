@@ -1770,5 +1770,79 @@
     "view_photo": "Deschide fotografia",
     "photo_too_large": "Fișierul este prea mare (max. 8 MB)",
     "photo_upload_error": "Nu s-a putut încărca fotografia"
+  },
+  "escrow": {
+    "title": "Tranzacție sigură",
+    "explain": "Rezervați plata — fondurile vor fi păstrate pe platformă și vor fi transferate specialistului doar după ce acceptați lucrarea.",
+    "fund_btn": "Rezervă {{amount}}",
+    "waiting_client": "Se așteaptă rezervarea plății de către client.",
+    "pending": "Se așteaptă confirmarea plății…",
+    "held": "Rezervat {{amount}}",
+    "held_pro_hint": "Fondurile sunt rezervate. Vor fi creditate în contul dvs. după acceptarea lucrării de către client.",
+    "release_btn": "Acceptă lucrarea și transferă plata",
+    "release_hint": "Fondurile vor fi creditate imediat specialistului.",
+    "released": "Plătit {{amount}}",
+    "refunded": "Fondurile au fost returnate clientului.",
+    "funded_title": "Plata a fost rezervată",
+    "funded_desc": "Fondurile vor fi transferate specialistului după acceptarea lucrării.",
+    "released_title": "Plata a fost transferată",
+    "released_desc": "Mulțumim! Nu uitați să lăsați o recenzie."
+  },
+  "verified": {
+    "label": "Verificat",
+    "tooltip": "Identitatea specialistului este confirmată prin documente (KYC)"
+  },
+  "tg": {
+    "title": "Notificări în Telegram",
+    "hint": "Notificări instantanee despre comenzi noi, mesaje și plăți — direct în Telegram.",
+    "connect": "Conectează Telegram",
+    "linked": "Telegram conectat",
+    "unlink": "Deconectează",
+    "unlinked": "Telegram deconectat",
+    "opened_title": "Deschideți Telegram",
+    "opened_desc": "Apăsați «Start» în chatul cu botul — conectarea se va finaliza automat.",
+    "not_configured": "Botul Telegram nu este încă configurat de administrator."
+  },
+  "referral": {
+    "title": "Invitați un prieten",
+    "hint": "Distribuiți linkul — bonusul va fi acordat după prima comandă finalizată a invitatului.",
+    "copy": "Copiază linkul",
+    "copied": "Linkul a fost copiat",
+    "invited": "Invitați: {{count}}"
+  },
+  "alerts": {
+    "title": "Abonare la comenzi noi",
+    "hint": "Primiți o notificare imediat ce apare o comandă potrivită.",
+    "categories": "Categorii",
+    "categories_hint": "Nicio categorie selectată — notificări pentru toate categoriile.",
+    "city": "Oraș",
+    "city_placeholder": "De exemplu: Chișinău",
+    "min_budget": "Buget min. (lei)",
+    "save": "Salvează filtrele",
+    "saved": "Abonarea a fost salvată"
+  },
+  "catland": {
+    "h1": "{{category}} în Moldova — specialiști verificați",
+    "intro": "Publicați gratuit o comandă pentru {{category}}, comparați ofertele specialiștilor cu rating și recenzii cu fotografii, plătiți prin tranzacție sigură.",
+    "cta_order": "Publică o comandă",
+    "cta_catalog": "Vezi catalogul",
+    "stat_pros": "specialiști în categorie",
+    "stat_jobs": "comenzi publicate",
+    "stat_escrow_v": "Escrow",
+    "stat_escrow": "plăți sigure",
+    "top_pros": "Cei mai buni specialiști: {{category}}",
+    "how_title": "Cum funcționează",
+    "how_1": "Descrieți sarcina din domeniul „{{category}}” — este gratuit.",
+    "how_2": "Primiți oferte de la specialiști cu prețuri și termene.",
+    "how_3": "Alegeți executantul după rating și recenzii cu fotografii, rezervați plata.",
+    "how_4": "Acceptați lucrarea — plata ajunge la specialist, iar dvs. lăsați o recenzie.",
+    "not_found": "Categoria nu a fost găsită",
+    "to_catalog": "Deschide catalogul"
+  },
+  "map": {
+    "locate": "Determină locația mea",
+    "resolving": "Determinăm adresa…",
+    "move_pin": "Mutați harta pentru a indica punctul",
+    "confirm": "Alege"
   }
 }

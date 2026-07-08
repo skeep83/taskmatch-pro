@@ -4,6 +4,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { SignatureGradient } from "@/components/SignatureGradient";
 import { Search, Filter, Star, Clock, MapPin, Zap, Briefcase, Inbox } from "lucide-react";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { useVerifiedUsers } from "@/hooks/useVerifiedUsers";
 import { StarRating } from "@/components/ui/star-rating";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,6 +74,7 @@ const Catalog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [pros, setPros] = useState<ProProfile[]>([]);
+  const verifiedSet = useVerifiedUsers(pros.map((p) => p.user_id));
   const [ratingMap, setRatingMap] = useState<Record<string, { avg_score: number; rating_count: number }>>({});
   const [catById, setCatById] = useState<Record<string, Category>>({});
   const [searchParams, setSearchParams] = useSearchParams();
@@ -455,7 +458,10 @@ const Catalog = () => {
                     <img src={pro.profiles?.avatar_url || proPlaceholder} alt={displayName} className="w-full h-full object-cover" />
                   </div>
                   <div className="text-center mt-4">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{displayName}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1 flex items-center justify-center gap-1.5 flex-wrap">
+                      <span className="truncate max-w-full">{displayName}</span>
+                      {verifiedSet.has(pro.user_id) && <VerifiedBadge />}
+                    </h3>
                     <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-3">
                       {selectedCat ? categoryLabel(catById[selectedCat], language) || t("catalog.professional_bio") : t("catalog.professional_bio")}
                     </p>

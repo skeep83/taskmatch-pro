@@ -41,6 +41,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { EscrowCard } from '@/components/escrow/EscrowCard';
 import { ReviewPhotosInput } from '@/components/reviews/ReviewPhotosInput';
 import { StarRating } from '@/components/ui/star-rating';
 import { formatDistanceToNow } from 'date-fns';
@@ -1345,6 +1346,19 @@ const JobDetail = () => {
                             {t("ui.zavershit_rabotu")}
                           </Button>
                         </div>
+                      </div>
+                    )}
+
+                    {currentUser && (
+                      <div className="mb-4 md:mb-6">
+                        <EscrowCard
+                          jobId={job.id}
+                          clientId={job.client_id}
+                          proId={job.pro_id}
+                          jobStatus={String(job.status)}
+                          amountCents={job.budget_max_cents || job.budget_min_cents || 0}
+                          currentUserId={currentUser.id}
+                        />
                       </div>
                     )}
 

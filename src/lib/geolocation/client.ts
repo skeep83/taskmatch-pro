@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
 
-export type LocationSource = 'device_gps' | 'address_geocode' | 'ip_geolocate';
+export type LocationSource = 'device_gps' | 'address_geocode' | 'ip_geolocate' | 'map';
 export type LocationPrecision = 'exact' | 'street' | 'district' | 'city';
 
 export interface ResolvedLocation {

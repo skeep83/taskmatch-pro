@@ -19,6 +19,8 @@ import { useMobile } from '../providers/MobileProvider';
 import { useEnhancedI18n } from '@/i18n/enhanced';
 import { supabase } from '@/integrations/supabase/client';
 import { PaymentMethodsCard } from '@/components/PaymentMethodsCard';
+import { TelegramLinkCard } from '@/components/TelegramLinkCard';
+import { ReferralCard } from '@/components/ReferralCard';
 import { UserReviews } from '@/components/UserReviews';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -1005,6 +1007,10 @@ export default function MobileProfileSettings() {
 
         {/* Payment methods (parity with desktop) */}
         {user?.id && <PaymentMethodsCard userId={user.id} />}
+
+        {user?.id && <TelegramLinkCard userId={user.id} />}
+
+        {user?.id && <ReferralCard userId={user.id} />}
 
         {/* Reviews about me */}
         {user?.id && (

@@ -17,6 +17,7 @@ import {
   ScrollText,
   FlaskConical,
   CreditCard,
+  Plug,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -52,6 +53,7 @@ export const adminNavigationSections: AdminNavSection[] = [
       { name: "Риски", path: "/admin/risk", icon: Shield, color: "#F97316", description: "Фрод, нарушения и флаги" },
       { name: "Финансы", path: "/admin/finance", icon: DollarSign, color: "#059669", description: "Оплаты, выплаты и движение денег" },
       { name: "Процессинг", path: "/admin/payments", icon: CreditCard, color: "#0EA5E9", description: "Платёжный провайдер, Apple/Google Pay" },
+      { name: "API-сервисы", path: "/admin/integrations", icon: Plug, color: "#14B8A6", description: "Google Maps и другие внешние ключи" },
     ],
   },
   {

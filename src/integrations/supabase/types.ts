@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_alerts: {
+        Row: {
+          user_id: string
+          category_ids: string[]
+          city: string | null
+          min_budget_cents: number | null
+          enabled: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          category_ids?: string[]
+          city?: string | null
+          min_budget_cents?: number | null
+          enabled?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          category_ids?: string[]
+          city?: string | null
+          min_budget_cents?: number | null
+          enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: { user_id: string; code: string; created_at: string }
+        Insert: { user_id: string; code: string; created_at?: string }
+        Update: { user_id?: string; code?: string }
+        Relationships: []
+      }
+      user_telegram: {
+        Row: { user_id: string; chat_id: string; username: string | null; linked_at: string }
+        Insert: { user_id: string; chat_id: string; username?: string | null; linked_at?: string }
+        Update: { user_id?: string; chat_id?: string; username?: string | null; linked_at?: string }
+        Relationships: []
+      }
+
       admin_audit_log: {
         Row: {
           action: string
@@ -2746,6 +2788,11 @@ export type Database = {
       }
     }
     Views: {
+      verified_users: {
+        Row: { user_id: string }
+        Relationships: []
+      }
+
       user_rating_stats: {
         Row: {
           user_id: string
@@ -2756,6 +2803,11 @@ export type Database = {
       }
     }
     Functions: {
+      release_escrow: { Args: { _job_id: string }; Returns: Json }
+      get_or_create_referral_code: { Args: never; Returns: string }
+      apply_referral_code: { Args: { _code: string }; Returns: Json }
+      create_telegram_link_token: { Args: never; Returns: string }
+
       add_admin_role: { Args: { _user_id: string }; Returns: undefined }
       approve_pro_upgrade_request: {
         Args: { _request_id: string }

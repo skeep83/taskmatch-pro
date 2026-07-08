@@ -3,6 +3,8 @@ import { UserReviews } from "@/components/UserReviews";
 import { useEnhancedI18n } from "@/i18n/enhanced";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { useVerifiedUsers } from "@/hooks/useVerifiedUsers";
 import { StarRating } from "@/components/ui/star-rating";
 import { MediaViewer } from "@/components/media";
 import { useCurrency } from "@/hooks/useCurrency";
@@ -16,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 const ProPublic = () => {
   const { t } = useEnhancedI18n();
   const { id } = useParams<{ id: string }>();
+  const verifiedSet = useVerifiedUsers(id ? [String(id)] : []);
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
@@ -316,7 +319,10 @@ const ProPublic = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-2xl font-semibold">{displayName}</h1>
+                  <h1 className="text-2xl font-semibold flex items-center gap-2 flex-wrap">
+                    <span>{displayName}</span>
+                    {id && verifiedSet.has(String(id)) && <VerifiedBadge />}
+                  </h1>
                   {kycStatus === 'approved' && (
                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-800/30 border border-emerald-200/50 dark:border-emerald-700/50 shadow-[inset_2px_2px_4px_rgba(255,255,255,0.8),inset_-2px_-2px_4px_rgba(0,0,0,0.1)] dark:shadow-[inset_2px_2px_4px_rgba(255,255,255,0.1),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />

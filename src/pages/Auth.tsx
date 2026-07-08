@@ -2,7 +2,7 @@ import { Seo } from "@/components/Seo";
 import { GlassMorphism } from "@/components/ui/glass-morphism";
 import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { useEnhancedI18n } from "@/i18n/enhanced";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ import authBg from "@/assets/auth-bg.jpg";
 import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
+  // Capture referral code from ?ref= for post-signup attribution
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref) localStorage.setItem("sh_referral_code", ref.toUpperCase());
+  }, []);
   const { t } = useEnhancedI18n();
   const navigate = useNavigate();
   const { toast } = useToast();

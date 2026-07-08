@@ -8,6 +8,7 @@ import { Camera, Clock, Euro, MapPin, Shield, Zap, Upload, CheckCircle, ArrowLef
 import { supabase } from "@/integrations/supabase/client";
 import { categoryLabel } from '@/lib/categoryLabel';
 import { geocodeAddress, getCurrentResolvedLocation, type ResolvedLocation } from "@/lib/geolocation";
+import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
 
 const MAX_MEDIA_FILES = 8;
@@ -438,6 +439,22 @@ const MobileJobNew = () => {
 
             <div className="space-y-3">
               <label className="block text-sm font-medium text-[#374151]">{t("ui.adres_ili_raion")}</label>
+              <LocationPickerMap
+                initial={resolvedLocation ? { latitude: resolvedLocation.latitude, longitude: resolvedLocation.longitude } : null}
+                onSelect={(loc) => {
+                  setLocationQuery(loc.address);
+                  setLocationError(null);
+                  applyResolvedLocation({
+                    latitude: loc.latitude,
+                    longitude: loc.longitude,
+                    address: loc.address,
+                    publicLabel: loc.address,
+                    source: 'map',
+                    precision: 'exact',
+                  } as ResolvedLocation);
+                }}
+                className="mb-3"
+              />
               <div className="flex gap-2">
                 <input
                   value={locationQuery}

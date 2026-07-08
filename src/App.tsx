@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -19,12 +20,14 @@ import { AppNavigation } from "./components/navigation/AppNavigation";
 import { FloatingActionButton } from "./components/navigation/FloatingActionButton";
 import Footer from "./components/layout/Footer";
 import { EnhancedI18nProvider } from "./i18n/enhanced";
+import { supabase } from "@/integrations/supabase/client";
 import { DatabaseI18nProvider } from "./i18n/DatabaseI18n";
 import Diagnostics from "./components/Diagnostics";
 import { usePresenceTracking } from "./hooks/usePresenceTracking";
 
 // Lazy-loaded pages for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
+const CategoryLanding = lazy(() => import("./pages/CategoryLanding"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const MobileFeed = lazy(() => import("./mobile/pages/MobileFeed"));
 const PaymentCanceled = lazy(() => import("./pages/PaymentCanceled"));
@@ -67,6 +70,7 @@ const AdminTenders = lazy(() => import("./pages/admin/Tenders"));
 const AdminDisputes = lazy(() => import("./pages/admin/Disputes"));
 const AdminFinance = lazy(() => import("./pages/admin/Finance"));
 const AdminPayments = lazy(() => import("./pages/admin/Payments"));
+const AdminIntegrations = lazy(() => import("./pages/admin/Integrations"));
 const AdminRisk = lazy(() => import("./pages/admin/Risk"));
 const AdminContent = lazy(() => import("./pages/admin/Content"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
@@ -80,7 +84,25 @@ import PageTransition from "./components/PageTransition";
 import { GlobalHaze } from "./components/GlobalHaze";
 import { ChatWidget } from "./components/chat/ChatWidget";
 
+/** Applies a stored referral code once the user is signed in. */
+const useReferralApply = () => {
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event !== "SIGNED_IN" || !session?.user) return;
+      const code = localStorage.getItem("sh_referral_code");
+      if (!code) return;
+      window.setTimeout(() => {
+        void supabase.rpc("apply_referral_code", { _code: code }).then(() => {
+          localStorage.removeItem("sh_referral_code");
+        });
+      }, 0);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+};
+
 const AppContent = () => {
+  useReferralApply();
   const location = useLocation();
   const { isMobile } = useDeviceDetection();
   const isAuthRoute = location.pathname === "/auth";
@@ -110,6 +132,7 @@ const AppContent = () => {
           <Routes location={location}>
             <Route path="/" element={<Index />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/services/:key" element={<CategoryLanding />} />
             <Route path="/catalog" element={
               isMobile ? <MobileCatalog /> : <Catalog />
             } />
@@ -164,6 +187,7 @@ const AppContent = () => {
               <Route path="kyc" element={<AdminKycVerification />} />
               <Route path="finance" element={<AdminFinance />} />
               <Route path="payments" element={<AdminPayments />} />
+              <Route path="integrations" element={<AdminIntegrations />} />
               <Route path="risk" element={<AdminRisk />} />
               <Route path="content" element={<AdminContent />} />
               <Route path="currencies" element={<AdminCurrencies />} />

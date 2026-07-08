@@ -12,6 +12,7 @@ import jobImage from "@/assets/services-hero.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryLabel } from '@/lib/categoryLabel';
 import { geocodeAddress, getCurrentResolvedLocation, type ResolvedLocation } from "@/lib/geolocation";
+import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
 import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
 
 const MAX_MEDIA_FILES = 8;
@@ -483,6 +484,21 @@ const JobNew = () => {
 
                 <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-6">
                   <div className="bg-neo rounded-2xl p-6 neo-8 space-y-4">
+                    <LocationPickerMap
+                      initial={resolvedLocation ? { latitude: resolvedLocation.latitude, longitude: resolvedLocation.longitude } : null}
+                      onSelect={(loc) => {
+                        setLocationQuery(loc.address);
+                        setLocationError(null);
+                        applyResolvedLocation({
+                          latitude: loc.latitude,
+                          longitude: loc.longitude,
+                          address: loc.address,
+                          publicLabel: loc.address,
+                          source: 'map',
+                          precision: 'exact',
+                        } as ResolvedLocation);
+                      }}
+                    />
                     <div>
                       <label className="block text-sm font-medium mb-3 text-[#374151]">{t("ui.adres_ili_raion")}</label>
                       <div className="flex gap-3">
