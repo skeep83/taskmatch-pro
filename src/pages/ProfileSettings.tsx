@@ -762,7 +762,7 @@ export default function ProfileSettings() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between py-3 border-b border-border/50">
                     <span className="text-muted-foreground">Email:</span>
-                    <span className="font-medium text-sm">{user?.email}</span>
+                    <span className="font-medium text-sm truncate min-w-0">{user?.email}</span>
                   </div>
 
                   <div className="flex items-center justify-between py-3 border-b border-border/50">

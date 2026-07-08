@@ -239,7 +239,7 @@ export const ChatWidget = () => {
                 <button type="button" onClick={() => setActiveChat(null)} className="neo-icon-well w-8 h-8" aria-label={t("ui.nazad")}>
                   <ArrowLeft className="w-4 h-4" />
                 </button>
-                <span className="font-semibold text-sm truncate flex-1">
+                <span className="font-semibold text-sm truncate flex-1 min-w-0">
                   {nameOf(profiles[activeChat.client_id === userId ? activeChat.professional_id : activeChat.client_id], t("menu.user"))}
                 </span>
               </>

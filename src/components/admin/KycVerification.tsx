@@ -384,7 +384,7 @@ export const AdminKycVerification = () => {
                           <p className="font-medium">
                             {submission.user?.profiles?.first_name} {submission.user?.profiles?.last_name}
                           </p>
-                          <p className="text-sm text-muted-foreground">{submission.user?.email}</p>
+                          <p className="text-sm text-muted-foreground truncate">{submission.user?.email}</p>
                         </div>
                       </div>
                       {getStatusBadge(submission.status)}
@@ -434,7 +434,7 @@ export const AdminKycVerification = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground">Email:</span>
-                        <p className="font-medium">{selectedSubmission.user?.email}</p>
+                        <p className="font-medium break-all">{selectedSubmission.user?.email}</p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Телефон:</span>

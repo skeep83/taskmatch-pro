@@ -903,7 +903,7 @@ export default function AdminUsers() {
                                   <h4 className="font-medium mb-2">Основная информация</h4>
                                   <div className="space-y-2 text-sm">
                                     <div><strong>Имя:</strong> {selectedUser.first_name || "Не указано"} {selectedUser.last_name || ""}</div>
-                                    <div><strong>Email:</strong> {selectedUser.email}</div>
+                                    <div className="break-all"><strong>Email:</strong> {selectedUser.email}</div>
                                     <div><strong>Телефон:</strong> {selectedUser.phone || "Не указан"}</div>
                                     <div><strong>Город:</strong> {selectedUser.city || "Не указан"}</div>
                                     <div><strong>Регистрация:</strong> {new Date(selectedUser.created_at).toLocaleString()}</div>
