@@ -95,6 +95,7 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     // Add React debugging in development
     __DEV__: mode === 'development',
   },
