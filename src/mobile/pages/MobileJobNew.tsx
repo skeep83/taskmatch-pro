@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { categoryLabel } from '@/lib/categoryLabel';
 import { geocodeAddress, getCurrentResolvedLocation, type ResolvedLocation } from "@/lib/geolocation";
 import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
+import { useAddressAutocomplete } from "@/hooks/useAddressAutocomplete";
 import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
 
 const MAX_MEDIA_FILES = 8;
@@ -24,6 +25,7 @@ const MobileJobNew = () => {
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [locationQuery, setLocationQuery] = useState("");
+  const addressInputRef = useRef<HTMLInputElement>(null);
   const [resolvedLocation, setResolvedLocation] = useState<ResolvedLocation | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -58,6 +60,19 @@ const MobileJobNew = () => {
     setLocationQuery(location.address);
     setLocationError(null);
   };
+
+  useAddressAutocomplete(addressInputRef, (loc) => {
+    setLocationQuery(loc.address);
+    setLocationError(null);
+    applyResolvedLocation({
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      address: loc.address,
+      publicLabel: loc.address,
+      source: 'map',
+      precision: 'exact',
+    } as ResolvedLocation);
+  });
 
   const handleUseCurrentLocation = async () => {
     try {
@@ -457,6 +472,7 @@ const MobileJobNew = () => {
               />
               <div className="flex gap-2">
                 <input
+                  ref={addressInputRef}
                   value={locationQuery}
                   onChange={(e) => {
                     setLocationQuery(e.target.value);

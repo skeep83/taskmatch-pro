@@ -78,7 +78,9 @@ export default function AdminPayments() {
       if (error) throw new Error(error.message || "Функция create-payment вернула ошибку");
       const url = (data as { url?: string; checkout_url?: string })?.url
         || (data as { checkout_url?: string })?.checkout_url;
-      if (url) {
+      if ((data as { simulated?: boolean })?.simulated) {
+        setTestResult({ ok: true, message: "Тестовый режим: платёж успешно симулирован (Stripe не подключён — для реальных карт добавьте sk_test).", url });
+      } else if (url) {
         setTestResult({ ok: true, message: "Платёжная сессия создана. Откройте страницу оплаты и используйте тестовую карту.", url });
       } else {
         setTestResult({ ok: true, message: `Функция ответила без ошибок: ${JSON.stringify(data).slice(0, 200)}` });

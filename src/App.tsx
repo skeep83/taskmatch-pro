@@ -23,6 +23,7 @@ import { EnhancedI18nProvider } from "./i18n/enhanced";
 import { supabase } from "@/integrations/supabase/client";
 import { DatabaseI18nProvider } from "./i18n/DatabaseI18n";
 import Diagnostics from "./components/Diagnostics";
+import { ComingSoonGate } from "./components/ComingSoonGate";
 import { usePresenceTracking } from "./hooks/usePresenceTracking";
 
 // Lazy-loaded pages for code splitting
@@ -237,7 +238,9 @@ const App = () => {
                     <Toaster />
                     <Sonner />
                     <Diagnostics />
-                    <AppContent />
+                    <ComingSoonGate>
+                      <AppContent />
+                    </ComingSoonGate>
                   </div>
                 </TooltipProvider>
               </MobileProvider>

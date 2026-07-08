@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Map, Plug, Eye, EyeOff, CheckCircle2, Loader2, Plus, Trash2, Send, Link2Off } from "lucide-react";
+import { Map, Plug, Eye, EyeOff, CheckCircle2, Loader2, Plus, Trash2, Send, Link2Off, Lock } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface SettingRow { key: string; value: string }
 
@@ -40,10 +41,14 @@ const Integrations = () => {
   const [tgShown, setTgShown] = useState(false);
   const [tgBot, setTgBot] = useState("");
   const [tgBusy, setTgBusy] = useState(false);
+  const [gateEnabled, setGateEnabled] = useState(false);
+  const [gatePassword, setGatePassword] = useState("");
+  const [gateBusy, setGateBusy] = useState(false);
+  const [gateHasPassword, setGateHasPassword] = useState(false);
 
   useEffect(() => {
     void (async () => {
-      const [{ data }, { data: tgRow }] = await Promise.all([
+      const [{ data }, { data: tgRow }, { data: siteRows }] = await Promise.all([
         supabase
           .from("platform_settings")
           .select("key, value")
@@ -53,8 +58,16 @@ const Integrations = () => {
           .select("value")
           .eq("key", "telegram_bot_username")
           .maybeSingle(),
+        supabase
+          .from("platform_settings")
+          .select("key, value")
+          .eq("category", "site"),
       ]);
       setTgBot(parse(tgRow?.value) || "");
+      const site: Record<string, unknown> = {};
+      (siteRows || []).forEach((r) => { site[r.key] = typeof r.value === "string" ? (() => { try { return JSON.parse(r.value as string); } catch { return r.value; } })() : r.value; });
+      setGateEnabled(site.coming_soon_enabled === true);
+      setGateHasPassword(Boolean(site.site_password_hash));
       const map: Record<string, string> = {};
       const extras: SettingRow[] = [];
       (data || []).forEach((r) => {
@@ -117,6 +130,34 @@ const Integrations = () => {
       toast({ title: "Бот отключён" });
     } finally {
       setTgBusy(false);
+    }
+  };
+
+  const sha256Hex = async (text: string) => {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  };
+
+  const saveGate = async (enabled?: boolean) => {
+    setGateBusy(true);
+    try {
+      const en = enabled ?? gateEnabled;
+      await supabase.from("platform_settings").upsert(
+        { category: "site", key: "coming_soon_enabled", value: JSON.stringify(en) },
+        { onConflict: "key" },
+      );
+      if (gatePassword.trim()) {
+        const h = await sha256Hex(gatePassword.trim());
+        await supabase.from("platform_settings").upsert(
+          { category: "site", key: "site_password_hash", value: JSON.stringify(h) },
+          { onConflict: "key" },
+        );
+        setGateHasPassword(true);
+        setGatePassword("");
+      }
+      toast({ title: en ? "Сайт закрыт заглушкой" : "Сайт открыт для всех", description: en ? "Посетители видят Coming Soon, вход по паролю." : undefined });
+    } finally {
+      setGateBusy(false);
     }
   };
 
@@ -193,6 +234,43 @@ const Integrations = () => {
           </section>
         );
       })}
+
+      <section className="neo-card p-6">
+        <div className="flex items-start gap-3">
+          <div className="neo-icon-well w-10 h-10 shrink-0">
+            <Lock className="w-5 h-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold">Доступ к сайту (Coming Soon)</h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Когда включено, посетители видят страницу «Скоро запуск», а тестировщики входят по паролю.
+                  Разблокировка запоминается в браузере тестировщика.
+                </p>
+              </div>
+              <Switch
+                checked={gateEnabled}
+                onCheckedChange={(v) => { setGateEnabled(v); void saveGate(v); }}
+                aria-label="Coming Soon"
+              />
+            </div>
+            <div className="flex gap-2 mt-3">
+              <Input
+                type="text"
+                value={gatePassword}
+                placeholder={gateHasPassword ? "Новый пароль (текущий сохранён)" : "Пароль для тестировщиков"}
+                onChange={(e) => setGatePassword(e.target.value)}
+                className="flex-1 font-mono text-sm"
+              />
+              <Button onClick={() => void saveGate()} disabled={gateBusy || !gatePassword.trim()} variant="outline" className="rounded-xl shrink-0">
+                {gateBusy && <Loader2 className="w-4 h-4 animate-spin mr-1" />}
+                Сменить пароль
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="neo-card p-6">
         <div className="flex items-start gap-3">

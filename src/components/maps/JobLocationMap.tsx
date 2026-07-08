@@ -33,6 +33,8 @@ export const JobLocationMap = ({ latitude, longitude, address, className = "" }:
   const mapRef = useRef<google.maps.Map | null>(null);
   const [ready, setReady] = useState<boolean | null>(null);
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const [driveText, setDriveText] = useState<string | null>(null);
+  const [walkText, setWalkText] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
   const [denied, setDenied] = useState(false);
 
@@ -77,8 +79,32 @@ export const JobLocationMap = ({ latitude, longitude, address, className = "" }:
     setDenied(false);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setDistanceKm(haversineKm(pos.coords.latitude, pos.coords.longitude, latitude, longitude));
+        const km = haversineKm(pos.coords.latitude, pos.coords.longitude, latitude, longitude);
+        setDistanceKm(km);
         setLocating(false);
+        // Real travel times when the Distance Matrix service is available
+        const g = window.google;
+        if (g?.maps?.DistanceMatrixService) {
+          const svc = new g.maps.DistanceMatrixService();
+          const origin = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          const dest = { lat: latitude, lng: longitude };
+          svc.getDistanceMatrix(
+            { origins: [origin], destinations: [dest], travelMode: g.maps.TravelMode.DRIVING },
+            (res, status) => {
+              const el = res?.rows?.[0]?.elements?.[0];
+              if (status === "OK" && el?.status === "OK" && el.duration) setDriveText(el.duration.text);
+            }
+          );
+          if (km <= 8) {
+            svc.getDistanceMatrix(
+              { origins: [origin], destinations: [dest], travelMode: g.maps.TravelMode.WALKING },
+              (res, status) => {
+                const el = res?.rows?.[0]?.elements?.[0];
+                if (status === "OK" && el?.status === "OK" && el.duration) setWalkText(el.duration.text);
+              }
+            );
+          }
+        }
       },
       () => { setLocating(false); setDenied(true); },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
@@ -118,19 +144,19 @@ export const JobLocationMap = ({ latitude, longitude, address, className = "" }:
               <MapPin className="w-3.5 h-3.5" />
               {t("map.distance_away", { distance: fmtKm(distanceKm) })}
             </span>
-            {walkMin != null && walkMin <= 90 && (
+            {(walkText || (walkMin != null && walkMin <= 90)) && (
               <span className="inline-flex items-center gap-1 rounded-full bg-neo neo-inset-1 px-2.5 py-1.5 text-[11px] text-muted-foreground">
                 <Footprints className="w-3 h-3" />
-                ~{walkMin} {t("map.min")}
+                {walkText || `~${walkMin} ${t("map.min")}`}
               </span>
             )}
-            {driveMin != null && (
+            {(driveText || driveMin != null) && (
               <span className="inline-flex items-center gap-1 rounded-full bg-neo neo-inset-1 px-2.5 py-1.5 text-[11px] text-muted-foreground">
                 <Car className="w-3 h-3" />
-                ~{driveMin} {t("map.min")}
+                {driveText || `~${driveMin} ${t("map.min")}`}
               </span>
             )}
-            <span className="text-[11px] text-muted-foreground">{t("map.straight_line")}</span>
+            {!driveText && <span className="text-[11px] text-muted-foreground">{t("map.straight_line")}</span>}
           </>
         )}
         {denied && <span className="text-[11px] text-muted-foreground">{t("map.geo_denied")}</span>}

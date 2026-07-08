@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Seo } from "@/components/Seo";
 import { useEnhancedI18n } from "@/i18n/enhanced";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { categoryLabel } from '@/lib/categoryLabel';
 import { geocodeAddress, getCurrentResolvedLocation, type ResolvedLocation } from "@/lib/geolocation";
 import { LocationPickerMap } from "@/components/maps/LocationPickerMap";
+import { useAddressAutocomplete } from "@/hooks/useAddressAutocomplete";
 import { dedupeCategoriesByDisplayName } from "@/utils/categoryHelpers";
 
 const MAX_MEDIA_FILES = 8;
@@ -29,6 +30,7 @@ const JobNew = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [step, setStep] = useState(1);
   const [locationQuery, setLocationQuery] = useState("");
+  const addressInputRef = useRef<HTMLInputElement>(null);
   const [resolvedLocation, setResolvedLocation] = useState<ResolvedLocation | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -63,6 +65,19 @@ const JobNew = () => {
     setLocationQuery(location.address);
     setLocationError(null);
   };
+
+  useAddressAutocomplete(addressInputRef, (loc) => {
+    setLocationQuery(loc.address);
+    setLocationError(null);
+    applyResolvedLocation({
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      address: loc.address,
+      publicLabel: loc.address,
+      source: 'map',
+      precision: 'exact',
+    } as ResolvedLocation);
+  });
 
   const handleUseCurrentLocation = async () => {
     try {
@@ -503,6 +518,7 @@ const JobNew = () => {
                       <label className="block text-sm font-medium mb-3 text-[#374151]">{t("ui.adres_ili_raion")}</label>
                       <div className="flex gap-3">
                         <input
+                          ref={addressInputRef}
                           value={locationQuery}
                           onChange={(e) => {
                             setLocationQuery(e.target.value);

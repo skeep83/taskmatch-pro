@@ -48,7 +48,7 @@ export const loadGoogleMaps = (): Promise<typeof google | null> => {
       installAuthFailureHook();
       await new Promise<void>((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&language=ru&region=MD&loading=async`;
+        s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places&language=ru&region=MD&loading=async`;
         s.async = true;
         s.onload = () => resolve();
         s.onerror = () => reject(new Error("maps load failed"));

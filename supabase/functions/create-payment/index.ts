@@ -15,14 +15,11 @@ serve(async (req) => {
     const STRIPE_SECRET = Deno.env.get("STRIPE_SECRET_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
-    if (!STRIPE_SECRET) {
-      return new Response(JSON.stringify({ error: "Missing STRIPE_SECRET_KEY" }), { status: 500, headers: { ...corsHeaders, "content-type": "application/json" } });
-    }
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
       return new Response(JSON.stringify({ error: "Missing Supabase env" }), { status: 500, headers: { ...corsHeaders, "content-type": "application/json" } });
     }
 
-    const stripe = new Stripe(STRIPE_SECRET, { apiVersion: "2024-06-20" as any });
+
 
     const authHeader = req.headers.get("Authorization") || "";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { global: { headers: { Authorization: authHeader } } });
@@ -38,6 +35,36 @@ serve(async (req) => {
     if (!Number.isFinite(amountCents) || amountCents <= 0) {
       return new Response(JSON.stringify({ error: "Invalid amount" }), { status: 400, headers: { ...corsHeaders, "content-type": "application/json" } });
     }
+
+    // Payment mode from platform settings (admin panel)
+    const { data: settingsRows } = await supabase
+      .from("platform_settings")
+      .select("key, value")
+      .eq("category", "payments");
+    const cfg: Record<string, unknown> = {};
+    (settingsRows || []).forEach((r: { key: string; value: unknown }) => {
+      let v = r.value;
+      if (typeof v === "string") { try { v = JSON.parse(v); } catch { /* raw */ } }
+      cfg[r.key] = v;
+    });
+    const mode = String(cfg.payment_mode || "test");
+
+    // Test mode without a Stripe key: simulate a successful checkout so the
+    // whole flow can be verified before connecting a real provider.
+    if (!STRIPE_SECRET) {
+      if (mode === "test") {
+        return new Response(JSON.stringify({
+          url: `${origin}/payment-success?simulated=1&amount=${amountCents}&currency=${currency}`,
+          simulated: true,
+          message: "Тестовый режим: платёж симулирован (Stripe-ключ не подключён).",
+        }), { headers: { ...corsHeaders, "content-type": "application/json" } });
+      }
+      return new Response(JSON.stringify({
+        error: "STRIPE_SECRET_KEY is not set. Run: supabase secrets set STRIPE_SECRET_KEY=sk_live_...",
+      }), { status: 500, headers: { ...corsHeaders, "content-type": "application/json" } });
+    }
+
+    const stripe = new Stripe(STRIPE_SECRET, { apiVersion: "2024-06-20" as any });
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
