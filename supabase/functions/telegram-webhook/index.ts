@@ -9,14 +9,20 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  */
 serve(async (req) => {
   try {
-    const token = Deno.env.get("TELEGRAM_BOT_TOKEN");
-    if (!token) return new Response("no token", { status: 200 });
-
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { persistSession: false } },
     );
+
+    let token = Deno.env.get("TELEGRAM_BOT_TOKEN") || "";
+    if (!token) {
+      const { data: row } = await admin.from("platform_settings").select("value").eq("key", "telegram_bot_token").maybeSingle();
+      let v = row?.value as unknown;
+      if (typeof v === "string") { try { v = JSON.parse(v); } catch { /* raw */ } }
+      token = String(v || "");
+    }
+    if (!token) return new Response("no token", { status: 200 });
 
     const update = await req.json().catch(() => null);
     const msg = update?.message;

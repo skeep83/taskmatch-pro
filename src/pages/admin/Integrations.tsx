@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Map, Plug, Eye, EyeOff, CheckCircle2, Loader2, Plus, Trash2 } from "lucide-react";
+import { Map, Plug, Eye, EyeOff, CheckCircle2, Loader2, Plus, Trash2, Send, Link2Off } from "lucide-react";
 
 interface SettingRow { key: string; value: string }
 
@@ -36,13 +36,25 @@ const Integrations = () => {
   const [visible, setVisible] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tgToken, setTgToken] = useState("");
+  const [tgShown, setTgShown] = useState(false);
+  const [tgBot, setTgBot] = useState("");
+  const [tgBusy, setTgBusy] = useState(false);
 
   useEffect(() => {
     void (async () => {
-      const { data } = await supabase
-        .from("platform_settings")
-        .select("key, value")
-        .eq("category", "integrations");
+      const [{ data }, { data: tgRow }] = await Promise.all([
+        supabase
+          .from("platform_settings")
+          .select("key, value")
+          .eq("category", "integrations"),
+        supabase
+          .from("platform_settings")
+          .select("value")
+          .eq("key", "telegram_bot_username")
+          .maybeSingle(),
+      ]);
+      setTgBot(parse(tgRow?.value) || "");
       const map: Record<string, string> = {};
       const extras: SettingRow[] = [];
       (data || []).forEach((r) => {
@@ -73,6 +85,39 @@ const Integrations = () => {
     await supabase.from("platform_settings").delete().eq("category", "integrations").eq("key", key);
     setCustom((prev) => prev.filter((r) => r.key !== key));
     toast({ title: "Удалено" });
+  };
+
+  const connectTelegram = async () => {
+    setTgBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("telegram-setup", { body: { token: tgToken.trim() } });
+      if (error) throw error;
+      const res = data as { success?: boolean; username?: string; error?: string };
+      if (!res?.success) throw new Error(res?.error || "setup_failed");
+      setTgBot(res.username || "");
+      setTgToken("");
+      toast({ title: "Бот подключён", description: `@${res.username} — вебхук установлен, уведомления заработали.` });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      const readable =
+        msg === "invalid_token_format" ? "Неверный формат токена. Скопируйте его целиком из @BotFather." :
+        msg === "token_rejected_by_telegram" ? "Telegram отклонил токен. Проверьте, что он скопирован без ошибок." :
+        msg;
+      toast({ title: "Ошибка подключения", description: readable, variant: "destructive" });
+    } finally {
+      setTgBusy(false);
+    }
+  };
+
+  const disconnectTelegram = async () => {
+    setTgBusy(true);
+    try {
+      await supabase.functions.invoke("telegram-setup", { body: { action: "disconnect" } });
+      setTgBot("");
+      toast({ title: "Бот отключён" });
+    } finally {
+      setTgBusy(false);
+    }
   };
 
   const addCustom = async () => {
@@ -148,6 +193,66 @@ const Integrations = () => {
           </section>
         );
       })}
+
+      <section className="neo-card p-6">
+        <div className="flex items-start gap-3">
+          <div className="neo-icon-well w-10 h-10 shrink-0">
+            <Send className="w-5 h-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-lg font-semibold">Telegram-бот</h2>
+              {tgBot && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-2.5 py-0.5 text-[11px] font-semibold">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Подключено · @{tgBot}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Уведомления пользователям в Telegram: новые заказы, сообщения, оплаты, отзывы.
+              Создайте бота у <a href="https://t.me/BotFather" target="_blank" rel="noreferrer" className="text-primary hover:underline">@BotFather</a> (команда /newbot),
+              вставьте токен — вебхук и имя бота настроятся автоматически.
+            </p>
+
+            {tgBot ? (
+              <button
+                type="button"
+                onClick={() => void disconnectTelegram()}
+                disabled={tgBusy}
+                className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+              >
+                {tgBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2Off className="w-3.5 h-3.5" />}
+                Отключить бота
+              </button>
+            ) : (
+              <div className="flex gap-2 mt-3">
+                <div className="relative flex-1 min-w-0">
+                  <Input
+                    type={tgShown ? "text" : "password"}
+                    value={tgToken}
+                    placeholder="1234567890:AAE…"
+                    onChange={(e) => setTgToken(e.target.value)}
+                    className="pr-10 font-mono text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setTgShown((v) => !v)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label={tgShown ? "Скрыть" : "Показать"}
+                  >
+                    {tgShown ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <Button onClick={() => void connectTelegram()} disabled={tgBusy || !tgToken.trim()} className="rounded-xl shrink-0">
+                  {tgBusy ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Send className="w-4 h-4 mr-1" />}
+                  Подключить
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       <section className="neo-card p-6">
         <div className="flex items-start gap-3">

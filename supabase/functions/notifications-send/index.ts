@@ -106,7 +106,13 @@ serve(async (req) => {
 
     // Telegram: deliver to every linked account (cheap, high open rate)
     try {
-      const tgToken = Deno.env.get('TELEGRAM_BOT_TOKEN');
+      let tgToken = Deno.env.get('TELEGRAM_BOT_TOKEN') || '';
+      if (!tgToken) {
+        const { data: tokRow } = await supabase.from('platform_settings').select('value').eq('key', 'telegram_bot_token').maybeSingle();
+        let v = tokRow?.value as unknown;
+        if (typeof v === 'string') { try { v = JSON.parse(v); } catch { /* raw */ } }
+        tgToken = String(v || '');
+      }
       if (tgToken) {
         const { data: tg } = await supabase
           .from('user_telegram')
